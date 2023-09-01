@@ -1,0 +1,21 @@
+// Write your overrides
+div.v-avatar {
+  img.v-img__img {
+    object-fit: cover;
+  }
+}
+
+.layout-nav-type-vertical .layout-vertical-nav .nav-group .nav-link .nav-item-icon,
+.layout-nav-type-vertical .layout-vertical-nav .nav-group .nav-group .nav-item-icon,
+.layout-nav-type-vertical .layout-vertical-nav .nav-group .nav-link .nav-item-icon {
+  font-size: 1.375rem;
+}
+
+.layout-content-width-boxed .layout-page-content {
+  max-inline-size: 1800px;
+}
+
+.layout-content-width-boxed.layout-wrapper.layout-nav-type-vertical .layout-navbar,
+.layout-content-width-boxed.layout-wrapper.layout-nav-type-vertical .layout-footer {
+  max-inline-size: 1800px;
+}
