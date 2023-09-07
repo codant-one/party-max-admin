@@ -29,6 +29,7 @@ const { width: windowWidth } = useWindowSize()
 const { isVerticalNavMini, dynamicI18nProps } = useLayouts()
 const hideTitleAndBadge = isVerticalNavMini(windowWidth)
 const isVerticalNavHovered = inject(injectionKeyIsVerticalNavHovered, ref(false))
+const autoHideMenu = isVerticalNavMini(windowWidth, isVerticalNavHovered)
 
 // })
 const isGroupActive = ref(false)
@@ -56,7 +57,10 @@ watch(() => route.path, () => {
   const isActive = isNavGroupActive(props.item.children, router)
 
   // Don't open group if vertical nav is collapsed and window size is more than overlay nav breakpoint
-  isGroupOpen.value = isActive && !isVerticalNavMini(windowWidth, isVerticalNavHovered).value
+  if(autoHideMenu.value)
+    isGroupOpen.value = false
+  else
+    isGroupOpen.value = openGroups.value.includes(props.item.title)
   isGroupActive.value = isActive
 }, { immediate: true })
 watch(isGroupOpen, val => {
@@ -64,31 +68,24 @@ watch(isGroupOpen, val => {
   // Find group index for adding/removing group from openGroups array
   const grpIndex = openGroups.value.indexOf(props.item.title)
 
-  // If group is opened => Add it to `openGroups` array
+  // // If group is opened => Add it to `openGroups` array
   if (val && grpIndex === -1) {
     openGroups.value.push(props.item.title)
-  } else if (!val && grpIndex !== -1) {
+    axios.post('menu/update',{ menus: openGroups.value.join(',') })
+    if(autoHideMenu.value){
+      isGroupOpen.value = false
+    }
+  } else if (!val && grpIndex !== -1 && !autoHideMenu.value) {
     openGroups.value.splice(grpIndex, 1)
     collapseChildren(props.item.children)
+    axios.post('menu/update',{ menus: openGroups.value.join(',') })
   }
 }, { immediate: true })
 watch(openGroups, val => {
-
-  // Prevent closing recently opened inactive group.
-  const lastOpenedGroup = val[val.length - 1]
-  if (lastOpenedGroup === props.item.title)
-    return
-  const isActive = isNavGroupActive(props.item.children, router)
-
-  // Goal of this watcher is to close inactive groups. So don't do anything for active groups.
-  if (isActive)
-    return
-
-  // We won't close group if any of child group is open in current group
-  if (isAnyChildOpen(props.item.children))
-    return
-  isGroupOpen.value = isActive
-  isGroupActive.value = isActive
+  if(autoHideMenu.value)
+    isGroupOpen.value = false
+  else
+    isGroupOpen.value = openGroups.value.includes(props.item.title)
 }, { deep: true })
 
 // ℹ️ Previously instead of below watcher we were using two individual watcher for `isVerticalNavHovered`, `isVerticalNavCollapsed` & `isLessThanOverlayNavBreakpoint`

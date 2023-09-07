@@ -12,11 +12,11 @@
         class="mx-1"
       />
       por <a
-        href="https://iznoval.com"
+        href="https://codant.one/"
         target="_blank"
         rel="noopener noreferrer"
         class="text-primary ms-1"
-      >Iznoval</a>
+      >Codant</a>
     </span>
     <!--
       👉 Footer: right content 

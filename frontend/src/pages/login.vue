@@ -148,13 +148,13 @@ const onSubmit = () => {
         </VAlert>
         <VCardText>
           <VNodeRenderer
-            :nodes="themeConfig.app.logo"
-            class="mb-6"
+            :nodes="themeConfig.app.logoSlogan"
+            class="mb-6 d-flex align-center"
             size="100"
           />
           
           <h5 class="text-h5 font-weight-semibold mb-1">
-            Bienvenido a {{ themeConfig.app.title }} Panel! 👋🏻
+            Bienvenido a tu Panel! 👋🏻
           </h5>
           <p class="mb-0">
             Inicia sesión en tu cuenta

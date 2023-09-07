@@ -7,6 +7,7 @@ import { RouteTransitions, Skins } from '@core/enums'
 import logo from '@images/logo.svg?raw'
 import logoWhite from '@images/logowhite.svg?raw'
 import logoFull from '@images/logo_full.svg?raw'
+import logoSlogan from '@images/logo_slogan.svg?raw'
 import { AppContentLayoutNav, ContentWidth, FooterType, NavbarType } from '@layouts/enums'
 
 export const { themeConfig, layoutConfig } = defineThemeConfig({
@@ -14,6 +15,7 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     title: 'PARTYMAX',
     logo: h('div', { innerHTML: logo, style: 'line-height:0; color: rgb(var(--v-global-theme-primary))' }),
     logoFull: h('div', { innerHTML: logoFull, style: 'line-height:0; color: rgb(var(--v-global-theme-primary))' }),
+    logoSlogan: h('div', { innerHTML: logoSlogan, style: 'line-height:0; color: rgb(var(--v-global-theme-primary))' }),
     logoWhite: h('div', { innerHTML: logoWhite, style: 'line-height:0; color: rgb(var(--v-global-theme-primary))' }),
     contentWidth: ContentWidth.Boxed,
     contentLayoutNav: AppContentLayoutNav.Vertical,

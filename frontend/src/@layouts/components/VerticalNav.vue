@@ -11,6 +11,8 @@ import {
   VerticalNavSectionTitle,
 } from '@layouts/components'
 import { config } from '@layouts/config'
+import { openGroups } from '@layouts/utils'
+import axios from '@axios'
 
 const props = defineProps({
   tag: {
@@ -71,6 +73,11 @@ const updateIsVerticalNavScrolled = val => isVerticalNavScrolled.value = val
 const handleNavScroll = evt => {
   isVerticalNavScrolled.value = evt.target.scrollTop > 0
 }
+
+const closeAll = () =>{
+  openGroups.value = []
+  axios.post('menu/update',{ menus: openGroups.value.join(',') })
+}
 </script>
 
 <template>
@@ -94,17 +101,24 @@ const handleNavScroll = evt => {
           to="/"
           class="app-logo d-flex align-center gap-x-3 app-title-wrapper"
         >
-          <VNodeRenderer :nodes="config.app.logoWhite" />
+        <VNodeRenderer :nodes="(hideTitleAndIcon) ? config.app.logoWhite : config.app.logoFull" />
 
           <Transition name="vertical-nav-app-title">
             <h4
               v-show="!hideTitleAndIcon"
               class="app-title font-weight-bold leading-normal"
             >
-            {{ config.app.title }}
             </h4>
           </Transition>
         </RouterLink>
+        <!-- Show toggle collapsible in >md and close button in <md -->
+        <VIcon
+          icon="tabler-arrows-minimize"
+          size="small"
+          class="me-2"
+          @click="closeAll"
+        />
+        
         <!-- 👉 Vertical nav actions -->
         <!-- Show toggle collapsible in >md and close button in <md -->
         <template v-if="!isLessThanOverlayNavBreakpoint(windowWidth)">

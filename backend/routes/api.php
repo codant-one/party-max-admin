@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     ProvinceController,
     UsersController,
     RoleController,
-    PermissionController
+    PermissionController,
+    UserMenuController
 };
 
 /*
@@ -61,6 +62,13 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Permissions
     Route::group(['prefix' => 'permissions'], function () {
         Route::get('permission/all', [PermissionController::class, 'all']);
+    });
+
+    //Menu
+    Route::group(['prefix' => 'menu'], function () {
+        Route::get('/',[UserMenuController::class, 'index']);
+        Route::post('/add',[UserMenuController::class, 'store']);
+        Route::post('/update',[UserMenuController::class, 'update']);
     });
 
 });
