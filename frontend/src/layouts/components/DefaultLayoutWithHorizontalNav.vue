@@ -20,7 +20,7 @@ const { appRouteTransition } = useThemeConfig()
     <!-- 👉 navbar -->
     <template #navbar>
       <RouterLink
-        to="/"
+        to="/info"
         class="app-logo d-flex align-center gap-x-3"
       >
         <VNodeRenderer :nodes="themeConfig.app.logo" />

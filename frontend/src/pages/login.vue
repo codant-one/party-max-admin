@@ -66,12 +66,17 @@ const login = () => {
     .then(response => {
       load.value = false
 
-      const { accessToken, user_data, userAbilities } = response.data
-      
-      localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
+      const { qr, token, accessToken, user_data, userAbilities } = response.data     
+      const two_factor = { generate_qr: (response.message === '2fa-generate') ? true : false }       
+
       ability.update(userAbilities)
+
+      localStorage.setItem('userAbilities', JSON.stringify(userAbilities))      
       localStorage.setItem('user_data', JSON.stringify(user_data))
-      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem('accessToken', accessToken)     
+      localStorage.setItem('qr', qr)
+      localStorage.setItem('token', token)
+      localStorage.setItem('two_factor', JSON.stringify(two_factor))      
       localStorage.setItem('remember_me', remember_me.value);
 
       if(remember_me.value){
@@ -83,7 +88,7 @@ const login = () => {
       }
 
       // Redirect to `to` query if exist or redirect to index route
-      router.replace(route.query.to ? String(route.query.to) : '/')
+      router.replace(route.query.to ? String(route.query.to) : (response.message === 'login_success' ? '/info': '/'))
     }).catch(err => {
 
       load.value = false
@@ -137,7 +142,7 @@ const onSubmit = () => {
     >
       <VCard
         flat
-        :max-width="500"
+        :max-width="400"
         class="mt-12 mt-sm-0 pa-4"
       >
         <VAlert
@@ -169,8 +174,9 @@ const onSubmit = () => {
               <!-- email -->
               <VCol cols="12">
                 <VTextField
+                  class="login"
                   v-model="email"
-                  label="Correo Electronico"
+                  label="Correo electrónico"
                   type="email"
                   :rules="[requiredValidator, emailValidator]"
                   :error-messages="errors.email"
@@ -181,6 +187,7 @@ const onSubmit = () => {
               <!-- password -->
               <VCol cols="12">
                 <VTextField
+                  class="login"
                   v-model="password"
                   label="Contraseña"
                   :error-messages="errors.password"
@@ -196,6 +203,13 @@ const onSubmit = () => {
                     v-model="remember_me"
                     label="Recuérdame"
                   />
+               
+                    <RouterLink
+                      class="text-primary mb-1"
+                      :to="{ name: 'forgot-password' }"
+                    >
+                    ¿Olvido su contraseña?
+                    </RouterLink>
                 </div>
 
                 <VBtn
@@ -219,7 +233,7 @@ const onSubmit = () => {
 </template>
 
 <style lang="scss">
-@use "@core/scss/template/pages/page-auth.scss";
+  @use "@core/scss/template/pages/page-auth.scss";
 </style>
 
 <route lang="yaml">

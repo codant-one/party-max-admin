@@ -14,6 +14,22 @@ class Auth {
         return axios.post('auth/logout')
     }
 
+    validate(data) {
+        return axios.post('auth/2fa/validate', data)
+    }
+
+    forgot_password(data) {
+        return axios.post('auth/forgot-password', data)
+    }
+
+    find(token) {
+        return axios.get(`auth/password/find/${token}`)
+    }
+
+    change(data) {
+        return axios.post('auth/change', data)
+    }
+
 }
 
 const auth = new Auth();

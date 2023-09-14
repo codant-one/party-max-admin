@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('avatar')->nullable();
             $table->timestamp('online')->nullable();
+            $table->longText('token_2fa')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();         
             

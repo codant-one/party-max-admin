@@ -30,6 +30,42 @@ export const useAuthStores = defineStore('auth', {
                 }).catch(error => {
                     return Promise.reject(error)
                 })
+        },
+        validate(data) {
+            
+            return Auth.validate(data)
+                .then((response) => {
+                    return Promise.resolve(response.data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                })
+        },
+        forgot_password(data) {
+            
+            return Auth.forgot_password(data)
+                .then((response) => {
+                    return Promise.resolve(response.data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                })
+        },
+        find(token) {
+            
+            return Auth.find(token)
+                .then((response) => {
+                    return Promise.resolve(response.data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                })
+        },
+        change(data) {
+            
+            return Auth.change(data)
+                .then((response) => {
+                    return Promise.resolve(response.data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                })
         }
     }
 })

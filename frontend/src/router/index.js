@@ -10,6 +10,22 @@ const router = createRouter({
     {
       path: '/',
       redirect: to => {
+        const two_factor = JSON.parse(localStorage.getItem('two_factor') || 'null')
+        
+        if(two_factor){
+          if(two_factor.generate_qr) { 
+            return { name: '2fa-generate' }
+          } else {            
+            return { name: '2fa' }
+          }          
+        }         
+        
+        return { name: 'login', query: to.query }
+      },
+    },
+    {
+      path: '/info',
+      redirect: to => {
         const userData = JSON.parse(localStorage.getItem('user_data') || 'null')
         if(userData){
           if(!userData.full_profile) {            
@@ -49,14 +65,8 @@ router.beforeEach(to => {
   
   if (canNavigate(to)) {
 
-    const userData = JSON.parse(localStorage.getItem('user_data') || '{}') 
-  
-    if(isLoggedIn && !userData.full_profile && !to.meta.parar) {
-      return { name: 'complete-profile' }
-    }
-
     if (to.meta.redirectIfLoggedIn && isLoggedIn) { 
-      return '/'
+      return '/info'
     }
       
   }

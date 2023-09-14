@@ -96,7 +96,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'invalid_credentials',
-                'errors' => 'Invalid username or password'
+                'errors' => 'Usuario o contraseña invalida'
             ], 400);
         }
 
@@ -104,8 +104,71 @@ class AuthController extends Controller
         $user->online = Carbon::now();
         $user->save();
 
-        return $this->respondWithToken($token);
+        if (env('APP_DEBUG')) {
+            return response()->json([
+                'success' => true,
+                'message' => 'login_success',
+                'data' => $this->respondWithToken($token)
+            ], 200);
+        }
 
+        if (empty($user->token_2fa)) {
+            $google2fa = app('pragmarx.google2fa');
+            $token2FA = $google2fa->generateSecretKey();
+
+            $user->token_2fa = $token2FA;
+            $user->update();
+
+            $qr = $google2fa->getQRCodeUrl(
+                config('app.name'),
+                $user->email,
+                $token2FA
+            );
+
+            $data = [
+                'qr' => $qr,
+                'token' => $token2FA
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => '2fa-generate',
+                'data' => array_merge($data, $this->respondWithToken($token))
+            ], 200);
+
+        } else {
+
+            $data = [
+                'token' => $user->token_2fa
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => '2fa',
+                'data' => array_merge($data, $this->respondWithToken($token))
+            ], 200);
+        }
+    }
+
+    public function validate_double_factor_auth(Request $request)
+    {
+        $user = auth()->user();
+        $google2fa = app('pragmarx.google2fa');
+
+        if ($google2fa->verifyKey($user->token_2fa, $request->token_2fa)) {
+            session()->put('2fa', '1');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'login_success'
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'invalid_code',
+            'errors' => 'Código de verificación incorrecto'
+        ], 400);
     }
 
     /**
@@ -236,15 +299,11 @@ class AuthController extends Controller
         $permissions = getPermissionsByRole(Auth::user());
         $userData = getUserData(Auth::user()->load(['userDetail.province.country']));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'login_success',
-            'data' => [
-                'accessToken' => $token,
-                'token_type' => 'bearer',
-                'user_data' => $userData,
-                'userAbilities' => $permissions
-            ]
-        ], 200);
+        return [
+            'accessToken' => $token,
+            'token_type' => 'bearer',
+            'user_data' => $userData,
+            'userAbilities' => $permissions
+        ];
     }
 }

@@ -98,7 +98,7 @@ const closeAll = () =>{
     <div class="nav-header">
       <slot name="nav-header">
         <RouterLink
-          to="/"
+          to="/info"
           class="app-logo d-flex align-center gap-x-3 app-title-wrapper"
         >
         <VNodeRenderer :nodes="(hideTitleAndIcon) ? config.app.logoWhite : config.app.logoFull" />

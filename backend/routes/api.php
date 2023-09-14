@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Testing\TestingController;
 
 use App\Http\Controllers\{
@@ -31,8 +32,12 @@ Route::group([
     'middleware' => 'cors'
 ], function () {
     Route::post('login', [AuthController::class , 'login'])->name('login');
+    Route::post('forgot-password', [PasswordResetController::class, 'forgot_password'])->name('forgot.password');
+    Route::get('password/find/{token}', [PasswordResetController::class, 'find'])->name("find");
+    Route::post('change', [PasswordResetController::class, 'change'])->name("change");
 
     Route::middleware('jwt')->group(function () {
+        Route::post('2fa/validate', [AuthController::class, 'validate_double_factor_auth'])->name('2fa.validate');
         Route::post('logout', [AuthController::class , 'logout'])->name('logout');
         Route::post('me', [AuthController::class , 'me'])->name('me');
     });

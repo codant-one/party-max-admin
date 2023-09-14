@@ -16,21 +16,7 @@ export default [
         to: 'dashboard-admin-roles', 
         action: 'ver' , 
         subject: 'roles', 
-      },
-      { 
-        title: 'Proveedores', 
-        icon: { icon: 'mdi-account-tie' },
-        to: 'dashboard-admin-providers', 
-        action: 'ver' , 
-        subject: 'roles', 
-      },
-      { 
-        title: 'Clientes', 
-        icon: { icon: 'mdi-account-star' },
-        to: 'dashboard-admin-clients', 
-        action: 'ver' , 
-        subject: 'roles', 
-      }     
+      }  
     ],
   }
 ]

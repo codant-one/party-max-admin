@@ -49,7 +49,7 @@ const handleKeyDown = (event, index) => {
 <template>
   <div>
     <h6 class="text-base font-weight-bold mb-3">
-      Type your 6 digit security code
+      Escriba su código de seguridad de 6 dígitos
     </h6>
     <div
       ref="refOtpComp"
@@ -57,6 +57,7 @@ const handleKeyDown = (event, index) => {
     >
       <VTextField
         v-for="i in props.totalInput"
+        class="digits"
         :key="i"
         :model-value="digits[i - 1]"
         v-bind="defaultStyle"
@@ -68,11 +69,9 @@ const handleKeyDown = (event, index) => {
 </template>
 
 <style lang="scss">
-.v-field__field {
-  input {
-    padding: 0.5rem;
+  .digits input {
+    padding: 0.6rem;
     font-size: 1.25rem;
-    text-align: center;
+    text-align: center
   }
-}
 </style>

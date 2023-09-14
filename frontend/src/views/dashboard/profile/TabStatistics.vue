@@ -1,14 +1,10 @@
 <script setup>
 
-import { useUserStatsStores } from '@/stores/useUserStats'
 import sliderBar1 from '@images/illustrations/sidebar-pic-1.png'
-
-const userStatsStores = useUserStatsStores()
 
 const userDataJ = ref('')
 const name = ref('')
-const statistics = ref()
-const  data = ref([])
+const data = ref([])
 
 watchEffect(fetchData)
 
@@ -18,24 +14,6 @@ async function fetchData() {
     
     userDataJ.value = JSON.parse(userData)
     name.value = userDataJ.value.name + " " + userDataJ.value.last_name
-
-    statistics.value = await userStatsStores.statistics()
-
-    if(statistics.value !== null) {
-        data.value = [
-            { number: statistics.value.sales, text: 'Ventas' , path: 'dashboard-collaboration-sales' },
-            { number: statistics.value.ideas, text: 'Ideas' , path: 'dashboard-collaboration-ideas' },
-            { number: statistics.value.links, text: 'Enlaces' , path: 'dashboard-collaboration-links' },
-            { number: '0', text: 'Com. Total($)', path: 'dashboard-collaboration-links' }
-        ]
-    } else {
-        data.value = [
-            { number: '0',  text: 'Ventas' },
-            { number: '0', text: 'Ideas' },
-            { number: '0', text: 'Enlaces' },
-            { number: '0', text: 'Com. Total($)' }
-        ]
-    }
 }
 
 </script>
