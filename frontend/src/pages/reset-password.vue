@@ -124,7 +124,7 @@ const onSubmit = () => {
 
       <!-- 👉 Auth Card -->
       <VCard
-        class="auth-card pa-4"
+        class="auth-card auth pa-4"
         max-width="448"
       >
         <VCardItem class="justify-center">
@@ -132,7 +132,7 @@ const onSubmit = () => {
             <div class="d-flex">
                 <VNodeRenderer
                     :nodes="themeConfig.app.logoSlogan"
-                    class="mb-6 d-flex align-center"
+                    class="mb-5 d-flex align-center"
                     size="100"
                 />
             </div>
@@ -216,16 +216,16 @@ const onSubmit = () => {
 <style lang="scss">
     @use "@core/scss/template/pages/page-auth.scss";
 
-    .v-card-item__prepend {
+    .auth .v-card-item__prepend {
         padding-inline-end: 0 !important;
     }
 
-    .v-card-item {
+    .auth .v-card-item {
         padding: 0 24px !important;
     }
 
     @media(max-width: 991px){
-        .v-card--variant-elevated {
+        .auth .v-card--variant-elevated {
             box-shadow: none !important;
         }
     }
