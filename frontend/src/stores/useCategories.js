@@ -74,6 +74,19 @@ export const useCategoriesStores = defineStore('categories', {
                 .finally(() => {
                     this.setLoading(false)
                 })  
-        }
+        },
+        fetchCategoriesOrder(params) {
+            this.setLoading(true)
+            
+            return Categories.order(params)
+                .then((response) => {
+                    this.categories = response.data.categories
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
     }
 })

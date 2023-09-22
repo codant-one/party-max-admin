@@ -17,6 +17,10 @@ class Categories {
     delete(id){
         return axios.delete(`/categories/${id}`)
     }
+
+    order(params){
+        return axios.get(`/categories/list/order`, {params})
+    }
     
 }
 

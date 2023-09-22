@@ -31,7 +31,7 @@ const refForm = ref()
 const categories = ref([])
 const id = ref(0)
 const name = ref('')
-const category_id = ref('')
+const category_id = ref()
 const description = ref('')
 const image = ref('')
 const avatar = ref('')
@@ -46,7 +46,7 @@ watchEffect(async() => {
     if (props.isDrawerOpen) {
         let data = { limit: -1 }
 
-        await categoriesStores.fetchCategories(data)
+        await categoriesStores.fetchCategoriesOrder(data)
 
         categories.value = categoriesStores.getCategories
 
@@ -218,17 +218,6 @@ const handleDrawerModelValueUpdate = val => {
                   :src="avatar"
                   aspect-ratio="4/3"
                 />
-                <VAvatar
-                    v-else
-                    size="300"
-                    color="primary"
-                    variant="tonal"
-                    rounded="0"
-                >
-                    <span class="text-3xl font-weight-semibold">
-                        {{ avatarText(name) }}
-                    </span>
-                </VAvatar>
             </v-col>
 
             <VCol cols="12">
@@ -270,7 +259,34 @@ const handleDrawerModelValueUpdate = val => {
                     :item-value="item => item.id"
                     autocomplete="off"
                     multiple
-                    :menu-props="{ maxHeight: '300px' }"/>
+                    :menu-props="{ maxHeight: '300px' }">
+                    <template v-slot:selection="{ item, index }">
+                        <v-chip v-if="index < 2">
+                            <span>{{ item.title }}</span>
+                        </v-chip>
+                        <span
+                            v-if="index === 2"
+                            class="text-grey text-caption align-self-center"
+                        >
+                            (+{{ category_id.length - 2 }} otros)
+                        </span>
+                    </template>
+                    <template v-slot:item="{ props, item }">
+                        <v-list-item
+                            v-bind="props"
+                            :title="item?.raw?.name"
+                            :style="{ 
+                                paddingLeft: `${(item?.raw?.level) * 20}px`
+                            }"
+                        >
+                            <template v-slot:prepend>
+                              <v-checkbox-btn
+                                :model-value="item?.raw?.id"
+                              ></v-checkbox-btn>
+                            </template>
+                        </v-list-item>
+                    </template>
+                </VAutocomplete>
               </VCol>
 
               <!-- 👉 description -->

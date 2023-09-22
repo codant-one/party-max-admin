@@ -13,12 +13,32 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
+    protected $categories;
+
     public function __construct()
     {
+        $this->categories = [];
+
         $this->middleware(PermissionMiddleware::class . ':ver categorías|administrador')->only(['index']);
         $this->middleware(PermissionMiddleware::class . ':crear categorías|administrador')->only(['store']);
         $this->middleware(PermissionMiddleware::class . ':editar categorías|administrador')->only(['update']);
         $this->middleware(PermissionMiddleware::class . ':eliminar categorías|administrador')->only(['delete']);
+    }
+
+    function traverseChildren($children, $level = 1)
+    {
+        $children->sortBy('id');
+        
+        foreach ($children as $child) {
+            $data = [
+                'id' => $child->id, 
+                'name' => $child->name, 
+                'level' => $level + 1
+            ];
+
+            array_push($this->categories, $data);
+            $this->traverseChildren($child->children, $level + 1);
+        }
     }
 
     /**
@@ -28,7 +48,7 @@ class CategoryController extends Controller
     {
         $limit = $request->has('limit') ? $request->limit : 10;
     
-        $query = Category::with(['category'])
+        $query = Category::with(['category.category'])
                          ->applyFilters(
                                 $request->only([
                                     'search',
@@ -45,6 +65,31 @@ class CategoryController extends Controller
             'categories' => $categories,
             'categoriesTotalCount' => $count
         ]);
+    }
+
+    public function order(Request $request): JsonResponse
+    {
+        $query = Category::with('children')
+                              ->whereNull('category_id')
+                              ->orderBy('id')
+                              ->get();
+
+        foreach ($query as $category) {
+            $data = [
+                'id' => $category->id, 
+                'name' => $category->name, 
+                'level' => 1
+            ];
+
+            array_push($this->categories, $data);
+
+            $this->traverseChildren($category->children);
+        }
+
+        return response()->json([
+            'categories' => $this->categories
+        ]);
+
     }
 
     /**

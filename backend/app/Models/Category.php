@@ -17,6 +17,22 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'category_id');
+    }
+
+    public function recursiveItems()
+    {
+        return $this->children()->with('recursiveItems');
+    }
+
+    public static function getRecursiveItems($category_id = null)
+    {
+        return self::with('recursiveItems')->where('category_id', $category_id)->get();
+    }
+
+
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('name', 'LIKE', '%' . $search . '%')

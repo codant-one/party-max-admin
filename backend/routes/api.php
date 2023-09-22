@@ -78,6 +78,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('/update',[UserMenuController::class, 'update']);
     });
 
+    //Categories
+     Route::group(['prefix' => 'categories'], function () {
+        Route::get('list/order', [CategoryController::class, 'order']);
+    });
+
 });
 
 //Public Endpoints
