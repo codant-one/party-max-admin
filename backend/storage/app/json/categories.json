@@ -2,31 +2,921 @@
     {
         "id": 1,
         "category_id": null,
-        "name": "Ropa"
+        "name": "Fiestas Infantiles"
     },
     {
         "id": 2,
-        "category_id": 1,
-        "name": "Ropa Femenina"
+        "category_id": null,
+        "name": "Fiestas Temáticas"
     },
     {
         "id": 3,
-        "category_id": 2,
-        "name": "Ropa Blanca Femenina"
+        "category_id": null,
+        "name": "Fiestas Especiales"
     },
     {
         "id": 4,
-        "category_id": 2,
-        "name": "Ropa Negra Femenina"
+        "category_id": null,
+        "name": "Globos"
     },
+
     {
         "id": 5,
-        "category_id": 1,
-        "name": "Ropa Masculina"
+        "category_id": null,
+        "name": "Decoración"
     },
+
     {
         "id": 6,
+        "category_id": null,
+        "name": "Hora Loca"
+    },
+
+    {
+        "id": 7,
+        "category_id": null,
+        "name": "Desechables"
+    },
+
+    {
+        "id": 8,
+        "category_id": null,
+        "name": "Sorpresas"
+    },
+
+    {
+        "id": 9,
+        "category_id": null,
+        "name": "Ponqués"
+    },
+
+    {
+        "id": 10,
+        "category_id": null,
+        "name": "Catrering"
+    },
+
+    {
+        "id": 11,
+        "category_id": null,
+        "name": "Servicios"
+    },
+
+    {
+        "id": 12,
+        "category_id": 1,
+        "name": "Fiestas niños"
+    },
+
+    {
+        "id": 13,
+        "category_id": 1,
+        "name": "Temática niñas"
+    },
+    
+    {
+        "id": 14,
+        "category_id": 1,
+        "name": "Temática bebes"
+    },
+
+    {
+        "id": 15,
+        "category_id": 12,
+        "name": "Temática Avengers"
+    },
+
+    {
+        "id": 16,
+        "category_id": 12,
+        "name": "Temática Mickey Mouse"
+    },
+
+    {
+        "id": 17,
+        "category_id": 12,
+        "name": "Temática Spiderman"
+    },
+
+    {
+        "id": 18,
+        "category_id": 12,
+        "name": "Temática Grand Prix"
+    },
+
+    {
+        "id": 19,
+        "category_id": 12,
+        "name": "Temática Fútbol"
+    },
+
+    {
+        "id": 20,
+        "category_id": 12,
+        "name": "Temática Cars"
+    },
+
+    {
+        "id": 21,
+        "category_id": 12,
+        "name": "Temática Comics"
+    },
+
+    {
+        "id": 22,
+        "category_id": 12,
+        "name": "Temática Video Juegos"
+    },
+
+    {
+        "id": 23,
+        "category_id": 12,
+        "name": "Temática Camuflado"
+    },
+
+    {
+        "id": 25,
+        "category_id": 12,
+        "name": "Temática de Dinosaurio"
+    },
+
+    {
+        "id": 26,
+        "category_id": 12,
+        "name": "Temática Piratas"
+    },
+
+    {
+        "id": 27,
+        "category_id": 13,
+        "name": "Temática Princesas"
+    },
+
+    {
+        "id": 28,
+        "category_id": 13,
+        "name": "Temática Frozen"
+    },
+
+    {
+        "id": 29,
+        "category_id": 13,
+        "name": "Temática Minnie Mouse"
+    },
+
+    {
+        "id": 30,
+        "category_id": 13,
+        "name": "Temática Candy Party"
+    },
+
+    {
+        "id": 31,
+        "category_id": 13,
+        "name": "Temática Sirena"
+    },
+
+    {
+        "id": 32,
+        "category_id": 13,
+        "name": "Temática Unicornio"
+    },
+    
+    {
+        "id": 33,
+        "category_id": 14,
+        "name": "Temática Granja"
+    },
+
+    {
+        "id": 34,
+        "category_id": 14,
+        "name": "Temática Selva"
+    },
+
+    {
+        "id": 35,
+        "category_id": 14,
+        "name": "Temática Circo"
+    },
+
+    {
+        "id": 36,
+        "category_id": 14,
+        "name": "Temática Espacial"
+    },
+
+    {
+        "id": 37,
+        "category_id": 2,
+        "name": "Temática Cumpleaños"
+    },
+
+    {
+        "id": 38,
+        "category_id": 2,
+        "name": "Temática Mexicana"
+    },
+
+    {
+        "id": 39,
+        "category_id": 2,
+        "name": "Temática Vallenata"
+    },
+
+    {
+        "id": 40,
+        "category_id": 2,
+        "name": "Temática Pastel"
+    },
+
+    {
+        "id": 41,
+        "category_id": 2,
+        "name": "Temática Neon"
+    },
+
+    {
+        "id": 42,
+        "category_id": 2,
+        "name": "Temática Picnic"
+    },
+
+    {
+        "id": 43,
+        "category_id": 2,
+        "name": "Temática Rallas"
+    },
+
+    {
+        "id": 44,
+        "category_id": 2,
+        "name": "Temática Confetti"
+    },
+
+    {
+        "id": 45,
+        "category_id": 2,
+        "name": "Temática Metalizada"
+    },
+
+    {
+        "id": 46,
+        "category_id": 2,
+        "name": "Temática Hawaiana"
+    },
+
+    {
+        "id": 47,
+        "category_id": 2,
+        "name": "Temática Polka"
+    },
+
+    {
+        "id": 48,
+        "category_id": 2,
+        "name": "Temática de Flores y Hojas"
+    },
+
+    {
+        "id": 49,
+        "category_id": 3,
+        "name": "Baby Shower Niña"
+    },
+
+    {
+        "id": 50,
+        "category_id": 3,
+        "name": "Baby Shower Niño"
+    },
+
+    {
+        "id": 51,
+        "category_id": 3,
+        "name": "Baby Shower Niño y Niña"
+    },
+
+    {
+        "id": 52,
+        "category_id": 3,
+        "name": "Bautizo Niña"
+    },
+
+    {
+        "id": 53,
+        "category_id": 3,
+        "name": "Bautizo Niño"
+    },
+
+    {
+        "id": 54,
+        "category_id": 3,
+        "name": "Primera comunión niña"
+    },
+
+    {
+        "id": 55,
+        "category_id": 3,
+        "name": "Primera comunión niño"
+    },
+
+    {
+        "id": 56,
+        "category_id": 3,
+        "name": "Graduación"
+    },
+
+    {
+        "id": 57,
+        "category_id": 3,
+        "name": "Despedida de soltera"
+    },
+
+    {
+        "id": 58,
+        "category_id": 3,
+        "name": "Aniversario"
+    },
+
+    {
+        "id": 59,
+        "category_id": 3,
+        "name": "Amor y Amistad"
+    },
+
+    {
+        "id": 60,
+        "category_id": 3,
+        "name": "Dia de la Madre y del Padre"
+    },
+
+    {
+        "id": 61,
+        "category_id": 4,
+        "name": "Globos latex"
+    },
+
+    {
+        "id": 62,
+        "category_id": 4,
+        "name": "Globos Metalizados"
+    },
+
+    {
+        "id": 63,
+        "category_id": 4,
+        "name": "Globos Burbuja"
+    },
+
+    {
+        "id": 64,
+        "category_id": 4,
+        "name": "Bouquet de Globos"
+    },
+
+    {
+        "id": 65,
+        "category_id": 4,
+        "name": "Accesorios para Globos"
+    },
+
+    {
+        "id": 66,
+        "category_id": 61,
+        "name": "Globos Latex Unicolor"
+    },
+
+    {
+        "id": 67,
+        "category_id": 61,
+        "name": "Globos Latex Impresos"
+    },
+
+    {
+        "id": 68,
+        "category_id": 61,
+        "name": "Globos Latex Infiniti"
+    },
+
+    {
+        "id": 69,
+        "category_id": 61,
+        "name": "Globos Latex Amor y Amistad"
+    },
+
+    {
+        "id": 70,
+        "category_id": 62,
+        "name": "Globos Metalizados Números"
+    },
+
+    {
+        "id": 71,
+        "category_id": 62,
+        "name": "Globos Metalizados Letras"
+    },
+
+    {
+        "id": 72,
+        "category_id": 62,
+        "name": "Globos Metalizados Letreros"
+    },
+
+    {
+        "id": 73,
+        "category_id": 62,
+        "name": "Globos Metalizados Cumpleaños"
+    },
+
+    {
+        "id": 74,
+        "category_id": 62,
+        "name": "Globos Metalizados Temáticas Niños"
+    },
+
+    {
+        "id": 75,
+        "category_id": 62,
+        "name": "Globos Metalizados Temáticas Adultos"
+    },
+
+    {
+        "id": 76,
+        "category_id": 62,
+        "name": "Globos Metalizados Fechas Especiales"
+    },
+
+    {
+        "id": 77,
+        "category_id": 62,
+        "name": "Globos Metalizados Amor y Amistad"
+    },
+
+    {
+        "id": 78,
+        "category_id": 62,
+        "name": "Globos Metalizados Baby Shower"
+    },
+
+    {
+        "id": 79,
+        "category_id": 62,
+        "name": "Globos Metalizados Aniversario"
+    },
+
+    {
+        "id": 80,
+        "category_id": 62,
+        "name": "Globos Metalizados Grado"
+    },
+
+    {
+        "id": 81,
+        "category_id": 62,
+        "name": "Globos Metalizados Dia del Padre-Madre"
+    },
+
+    {
+        "id": 82,
+        "category_id": 64,
+        "name": "Bouquet de Cumpleaños"
+    },
+
+    {
+        "id": 83,
+        "category_id": 64,
+        "name": "Bouquet Toda Ocasión"
+    },
+
+    {
+        "id": 84,
+        "category_id": 64,
+        "name": "Bouquet Fiestas Temáticas"
+    },
+
+    {
+        "id": 85,
+        "category_id": 64,
+        "name": "Bouquet Baby Shower"
+    },
+
+    {
+        "id": 86,
+        "category_id": 64,
+        "name": "Bouquet Amor y Amistad"
+    },
+
+    {
+        "id": 87,
+        "category_id": 64,
+        "name": "Bouquet Grado"
+    },
+
+    {
+        "id": 88,
+        "category_id": 65,
+        "name": "Stickers Para Globos"
+    },
+
+    {
+        "id": 89,
+        "category_id": 65,
+        "name": "Bases y Soportes Para Globos"
+    },
+
+    {
+        "id": 90,
         "category_id": 5,
-        "name": "Ropa Negra Masculina"
+        "name": "Confetti de Mesa"
+    },
+
+    {
+        "id": 91,
+        "category_id": 5,
+        "name": "Lanza Confetti"
+    },
+
+    {
+        "id": 92,
+        "category_id": 5,
+        "name": "Globos Chinos"
+    },
+
+    {
+        "id": 93,
+        "category_id": 5,
+        "name": "Pompones"
+    },
+
+    {
+        "id": 94,
+        "category_id": 5,
+        "name": "Banderines"
+    },
+
+    {
+        "id": 95,
+        "category_id": 5,
+        "name": "Guirnaldas"
+    },
+
+    {
+        "id": 96,
+        "category_id": 5,
+        "name": "Abanicos"
+    },
+
+    {
+        "id": 97,
+        "category_id": 5,
+        "name": "Cortinas Metalizadas"
+    },
+
+    {
+        "id": 98,
+        "category_id": 5,
+        "name": "Velas"
+    },
+
+    {
+        "id": 99,
+        "category_id": 5,
+        "name": "Bolas Decorativas"
+    },
+
+    {
+        "id": 100,
+        "category_id": 5,
+        "name": "Serpentinas"
+    },
+
+    {
+        "id": 101,
+        "category_id": 5,
+        "name": "Articulos Iluminados"
+    },
+
+    {
+        "id": 102,
+        "category_id": 5,
+        "name": "Centro y Accesorios de Mesa"
+    },
+
+    {
+        "id": 103,
+        "category_id": 5,
+        "name": "Accesorios Decorativos Variados"
+    },
+
+    {
+        "id": 104,
+        "category_id": 6,
+        "name": "Pitos y Cornetas"
+    },
+
+    {
+        "id": 105,
+        "category_id": 6,
+        "name": "Gafas y Antifaces"
+    },
+
+    {
+        "id": 106,
+        "category_id": 6,
+        "name": "Sombreros"
+    },
+
+    {
+        "id": 107,
+        "category_id": 6,
+        "name": "Corbatas y Corbatines"
+    },
+
+    {
+        "id": 108,
+        "category_id": 6,
+        "name": "Diademas y Tocados"
+    },
+
+    {
+        "id": 109,
+        "category_id": 6,
+        "name": "Collares"
+    },
+
+    {
+        "id": 110,
+        "category_id": 6,
+        "name": "Inflables"
+    },
+
+    {
+        "id": 111,
+        "category_id": 6,
+        "name": "Articulos Neon"
+    },
+
+    {
+        "id": 112,
+        "category_id": 7,
+        "name": "Vasos"
+    },
+
+    {
+        "id": 113,
+        "category_id": 7,
+        "name": "Copas"
+    },
+
+    {
+        "id": 114,
+        "category_id": 7,
+        "name": "Platos"
+    },
+
+    {
+        "id": 115,
+        "category_id": 7,
+        "name": "Cubiertos"
+    },
+
+    {
+        "id": 116,
+        "category_id": 7,
+        "name": "Pitillos"
+    },
+
+    {
+        "id": 117,
+        "category_id": 7,
+        "name": "Bandejas"
+    },
+
+    {
+        "id": 118,
+        "category_id": 7,
+        "name": "Manteles"
+    },
+
+    {
+        "id": 119,
+        "category_id": 7,
+        "name": "Servilletas"
+    },
+
+    {
+        "id": 120,
+        "category_id": 7,
+        "name": "Accesorios Desechables Para Mesa"
+    },
+
+    {
+        "id": 121,
+        "category_id": 112,
+        "name": "Vasos Plásticos"
+    },
+
+    {
+        "id": 122,
+        "category_id": 112,
+        "name": "Vasos Cartón"
+    },
+
+    {
+        "id": 124,
+        "category_id": 113,
+        "name": "Copas Plásticas"
+    },
+
+    {
+        "id": 125,
+        "category_id": 114,
+        "name": "Platos Plásticos"
+    },
+
+    {
+        "id": 126,
+        "category_id": 114,
+        "name": "Platos Cartón"
+    },
+
+    {
+        "id": 127,
+        "category_id": 8,
+        "name": "Relleno de Sorpresas"
+    },
+
+    {
+        "id": 128,
+        "category_id": 8,
+        "name": "Caja de Sorpresas"
+    },
+
+    {
+        "id": 129,
+        "category_id": 8,
+        "name": "Sorpresa Niñas"
+    },
+
+    {
+        "id": 130,
+        "category_id": 8,
+        "name": "Sorpresa Niños"
+    },
+
+    {
+        "id": 131,
+        "category_id": 8,
+        "name": "Sorpresa Niñas y Niños"
+    },
+
+    {
+        "id": 132,
+        "category_id": 8,
+        "name": "Sorpresa Bebes"
+    },
+
+    {
+        "id": 133,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Belleza"
+    },
+
+    {
+        "id": 134,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Utilitarios"
+    },
+
+    {
+        "id": 135,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Juegos de Rol"
+    },
+
+    {
+        "id": 136,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Juegos Divertido"
+    },
+
+    {
+        "id": 137,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Juegos Muñecas"
+    },
+
+    {
+        "id": 138,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Muñecas"
+    },
+
+    {
+        "id": 139,
+        "category_id": 129,
+        "name": "Sorpresa Niñas Escolar"
+    },
+
+    {
+        "id": 140,
+        "category_id": 130,
+        "name": "Sorpresa Niño Juegos Didácticos"
+    },
+
+    {
+        "id": 141,
+        "category_id": 130,
+        "name": "Sorpresa Niño Escolar"
+    },
+
+    {
+        "id": 142,
+        "category_id": 130,
+        "name": "Sorpresa Niño Carros"
+    },
+
+    {
+        "id": 143,
+        "category_id": 130,
+        "name": "Sorpresa Niño Superheroes y Robots"
+    },
+
+    {
+        "id": 144,
+        "category_id": 130,
+        "name": "Sorpresa Niño Diversión"
+    },
+
+    {
+        "id": 145,
+        "category_id": 131,
+        "name": "Sorpresa Niña y Niño Didáctico"
+    },
+
+    {
+        "id": 146,
+        "category_id": 131,
+        "name": "Sorpresa Niña y Niño Deporte"
+    },
+
+    {
+        "id": 147,
+        "category_id": 131,
+        "name": "Sorpresa Niña y Niño Diversión"
+    },
+
+    {
+        "id": 148,
+        "category_id": 11,
+        "name": "Decoración"
+    },
+
+    {
+        "id": 149,
+        "category_id": 11,
+        "name": "Piñatas"
+    },
+
+    {
+        "id": 150,
+        "category_id": 11,
+        "name": "Animación"
+    },
+
+    {
+        "id": 151,
+        "category_id": 11,
+        "name": "Inflamables"
+    },
+
+    {
+        "id": 152,
+        "category_id": 11,
+        "name": "Música"
+    },
+
+    {
+        "id": 153,
+        "category_id": 11,
+        "name": "Moviliario"
+    },
+
+    {
+        "id": 154,
+        "category_id": 11,
+        "name": "Fotografía"
+    },
+
+    {
+        "id": 155,
+        "category_id": 11,
+        "name": "Productos Personalizados"
+    },
+
+    {
+        "id": 156,
+        "category_id": 11,
+        "name": "Eventos Empresariales"
     }
   ]
