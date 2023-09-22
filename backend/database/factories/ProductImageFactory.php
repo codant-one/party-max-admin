@@ -24,8 +24,8 @@ class ProductImageFactory extends Factory
     public function definition()
     {
         return [
-            'color_id' => rand(1,10),
-            'image' => 'products/gallery/'.$this->faker->file(public_path('images/products/gallery'), storage_path('app/public/products/gallery'), false),
+            'color_id' => rand(1, 10),
+            'image' => 'products/gallery/' . $this->faker->file(public_path('images/products/gallery'), storage_path('app/public/products/gallery'), false),
         ];
         
     }

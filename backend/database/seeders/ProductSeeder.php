@@ -30,18 +30,14 @@ class ProductSeeder extends Seeder
             mkdir(storage_path('app/public/products/main'), 0755,true);
         } //create a folder
 
-        // Crea 10 productos utilizando el factory
         Product::factory(10)->create();
 
         $products = Product::all();
         
-        foreach ($products as $product) 
-        {
-
+        foreach ($products as $product) {
             ProductCategory::factory(['product_id' => $product->id])->create();
             ProductDetail::factory(['product_id' => $product->id])->create();
             ProductImage::factory(['product_id' => $product->id])->create();
-            
         }
 
         Permission::create(['name' => 'ver productos']);

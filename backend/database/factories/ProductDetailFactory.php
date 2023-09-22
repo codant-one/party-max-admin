@@ -24,9 +24,9 @@ class ProductDetailFactory extends Factory
     public function definition()
     {
         return [
-            'width' => rand(1,20),
-            'height'=> rand(1,20),
-            'deep' => rand(1,20),
+            'width' => rand(1, 20),
+            'height'=> rand(1, 20),
+            'deep' => rand(1, 20),
             'created_at' => now(),
             'updated_at' => now() 
         ];
