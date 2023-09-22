@@ -43,5 +43,10 @@ class ProductSeeder extends Seeder
             ProductImage::factory(['product_id' => $product->id])->create();
             
         }
+
+        Permission::create(['name' => 'ver productos']);
+        Permission::create(['name' => 'crear productos']);
+        Permission::create(['name' => 'editar productos']);
+        Permission::create(['name' => 'eliminar productos']);
     }
 }
