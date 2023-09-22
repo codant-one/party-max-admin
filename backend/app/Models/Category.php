@@ -37,7 +37,8 @@ class Category extends Model
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('name', 'LIKE', '%' . $search . '%')
-             ->orWhere('description', 'LIKE', '%' . $search . '%');
+             ->orWhere('description', 'LIKE', '%' . $search . '%')
+             ->orWhere('slug', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
