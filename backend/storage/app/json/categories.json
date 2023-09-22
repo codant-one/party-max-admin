@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "category_id": null,
+        "name": "Ropa"
+    },
+    {
+        "id": 2,
+        "category_id": 1,
+        "name": "Ropa Femenina"
+    },
+    {
+        "id": 3,
+        "category_id": 2,
+        "name": "Ropa Blanca Femenina"
+    },
+    {
+        "id": 4,
+        "category_id": 2,
+        "name": "Ropa Negra Femenina"
+    },
+    {
+        "id": 5,
+        "category_id": 1,
+        "name": "Ropa Masculina"
+    },
+    {
+        "id": 6,
+        "category_id": 5,
+        "name": "Ropa Negra Masculina"
+    }
+  ]
