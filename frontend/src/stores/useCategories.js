@@ -37,7 +37,7 @@ export const useCategoriesStores = defineStore('categories', {
 
             return Categories.create(data)
                 .then((response) => {
-                    this.categories.push(response.data.data.category)
+                    this.categories.push(response.data.category)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -46,13 +46,13 @@ export const useCategoriesStores = defineStore('categories', {
                 })
             
         },
-        updateCategory(data, id) {
+        updateCategory(data) {
             this.setLoading(true)
             
-            return Categories.update(data, id)
+            return Categories.update(data)
                 .then((response) => {
-                    let pos = this.categories.findIndex((item) => item.id === response.data.data.category.id)
-                    this.categories[pos] = response.data.data.category
+                    let pos = this.categories.findIndex((item) => item.id === response.data.category.id)
+                    this.categories[pos] = response.data.category
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))

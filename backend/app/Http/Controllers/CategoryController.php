@@ -99,6 +99,17 @@ class CategoryController extends Controller
     {
         $category = Category::createCategory($request);
 
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $path = 'categories/';
+
+            $file_data = uploadFile($image, $path);
+
+            $category->image = $file_data['filePath'];
+            $category->update();
+        } 
+
         return response()->json([
             'category' => Category::find($category->id),
             'success' => true
@@ -110,7 +121,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::with(['instructions'])->find($id);
+        $category = Category::find($id);
 
         if (!$category)
             return response()->json([
@@ -130,6 +141,17 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, Category $category): JsonResponse
     {
         $category = $category->updateCategory($request, $category);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $path = 'categories/';
+
+            $file_data = uploadFile($image, $path, $category->image);
+
+            $category->image = $file_data['filePath'];
+            $category->save();
+        }
 
         return response()->json([
             'category' => Category::find($category->id),

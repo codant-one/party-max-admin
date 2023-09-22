@@ -81,6 +81,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Categories
      Route::group(['prefix' => 'categories'], function () {
         Route::get('list/order', [CategoryController::class, 'order']);
+        Route::post('delete', [CategoryController::class, 'delete']);
     });
 
 });

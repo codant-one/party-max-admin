@@ -4,7 +4,6 @@ import { useCategoriesStores } from '@/stores/useCategories'
 import { themeConfig } from '@themeConfig'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { requiredValidator } from '@validators'
-import { avatarText } from '@/@core/utils/formatters'
 
 const props = defineProps({
   isDrawerOpen: {
@@ -55,7 +54,8 @@ watchEffect(async() => {
             id.value = props.category.id
             name.value = props.category.name
             description.value = props.category.description
-            avatar.value = props.category.image === null ? null : themeConfig.configuraciones.urlStorage + props.category.image
+            category_id.value = props.category.category_id
+            avatar.value = props.category.image === null ? '' : themeConfig.settings.urlStorage + props.category.image
         }
     }
 })
@@ -84,8 +84,8 @@ const onSubmit = () => {
       formData.append('image', image.value ?? null)
       formData.append('name', name.value)
       formData.append('description', description.value)
-      formData.append('category', category.value)
-
+      formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
+      formData.append('category_id', category_id.value)
 
       emit('categoryData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
@@ -172,12 +172,17 @@ const blobToBase64 = blob => {
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
 }
+
+const closeDropdown = () => { 
+  document.getElementById("selectCategory").blur()
+}
+
 </script>
 
 <template>
   <VNavigationDrawer
     temporary
-    :width="400"
+    :width="550"
     location="end"
     class="scrollable-content"
     :model-value="props.isDrawerOpen"
@@ -212,11 +217,12 @@ const handleDrawerModelValueUpdate = val => {
         <VCardText>
           <v-row>
             <v-col cols="12" class="d-flex justify-center align-center">
-              
                 <VImg
-                  v-if="avatar !== null"
-                  :src="avatar"
-                  aspect-ratio="4/3"
+                    v-if="avatar !== null"
+                    :src="avatar"
+                    :height="200"
+                    aspect-ratio="16/9"
+                    class="border-img"
                 />
             </v-col>
 
@@ -251,14 +257,13 @@ const handleDrawerModelValueUpdate = val => {
 
               <VCol cols="12">
                 <VAutocomplete
-                    id="selectFilterUsers"
+                    id="selectCategory"
                     v-model="category_id"
                     label="Categorías:"
                     :items="categories"
                     :item-title="item => item.name"
                     :item-value="item => item.id"
                     autocomplete="off"
-                    multiple
                     :menu-props="{ maxHeight: '300px' }">
                     <template v-slot:selection="{ item, index }">
                         <v-chip v-if="index < 2">
@@ -279,11 +284,25 @@ const handleDrawerModelValueUpdate = val => {
                                 paddingLeft: `${(item?.raw?.level) * 20}px`
                             }"
                         >
-                            <template v-slot:prepend>
-                              <v-checkbox-btn
-                                :model-value="item?.raw?.id"
-                              ></v-checkbox-btn>
+                            <template v-slot:prepend="{ isActive }">
+                                <v-list-item-action start>
+                                    <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                </v-list-item-action>
                             </template>
+                        </v-list-item>
+                    </template>
+                    <template v-slot:append-item>
+                        <v-divider class="mt-2"></v-divider>
+                        <v-list-item title="Cerrar Opciones" class="text-right">
+                        <template v-slot:append>
+                            <VBtn
+                            size="small"
+                            variant="plain"
+                            icon="tabler-x"
+                            color="black"
+                            :ripple="false"
+                            @click="closeDropdown"/>
+                        </template>
                         </v-list-item>
                     </template>
                 </VAutocomplete>
@@ -293,7 +312,6 @@ const handleDrawerModelValueUpdate = val => {
               <VCol cols="12">
                 <VTextarea
                   v-model="description"
-                  :rules="[requiredValidator]"
                   rows="4"
                   label="Descripción"
                 />
@@ -323,3 +341,14 @@ const handleDrawerModelValueUpdate = val => {
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+
+<style scoped>
+    .border-img {
+        border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
+        border-radius: 6px;
+    }
+
+    .border-img .v-img__img--contain {
+        padding: 10px;
+    }
+</style>

@@ -1,8 +1,9 @@
 <script setup>
 
 import { useCategoriesStores } from '@/stores/useCategories'
-import AddNewCategoryDrawer from './AddNewCategoryDrawer.vue' 
 import { ref } from "vue"
+import { themeConfig } from '@themeConfig'
+import AddNewCategoryDrawer from './AddNewCategoryDrawer.vue' 
 
 const categoriesStores = useCategoriesStores()
 
@@ -63,6 +64,11 @@ async function fetchData() {
   isRequestOngoing.value = false
 }
 
+const editCategory = categoryData => {
+    isAddNewCategoryDrawerVisible.value = true
+    selectedCategory.value = { ...categoryData }
+}
+
 
 const showDeleteDialog = categoryData => {
   isConfirmDeleteDialogVisible.value = true
@@ -103,6 +109,71 @@ const submitForm = async (category, method) => {
   }
 
   submitCreate(category.data)
+}
+
+
+const submitCreate = categoryData => {
+
+    categoriesStores.addCategory(categoryData)
+        .then((res) => {
+            if (res.data.success) {
+                advisor.value = {
+                    type: 'success',
+                    message: 'Categoría creada con éxito',
+                    show: true
+                }
+                fetchData()
+            }
+            isRequestOngoing.value = false
+        })
+        .catch((err) => {
+            advisor.value = {
+                type: 'error',
+                message: err.message,
+                show: true
+            }
+            isRequestOngoing.value = false
+        })
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
+}
+
+const submitUpdate = categoryData => {
+
+    categoriesStores.updateCategory(categoryData)
+        .then((res) => {
+            if (res.data.success) {
+                    advisor.value = {
+                    type: 'success',
+                    message: 'Categoría actualizada con éxito',
+                    show: true
+                }
+                fetchData()
+            }
+            isRequestOngoing.value = false
+        })
+        .catch((err) => {
+            advisor.value = {
+                type: 'error',
+                message: err.message,
+                show: true
+            }
+            isRequestOngoing.value = false
+        })
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
 }
 
 </script>
@@ -156,7 +227,7 @@ const submitForm = async (category, method) => {
 
             <div class="d-flex align-center flex-wrap gap-4">
               <!-- 👉 Search  -->
-              <div style="width: 10rem;">
+              <div class="search">
                 <v-text-field
                   v-model="searchQuery"
                   placeholder="Buscar"
@@ -184,6 +255,7 @@ const submitForm = async (category, method) => {
                 <th scope="col"> DESCRIPCIÓN </th>
                 <th scope="col"> SUBCATEGORÍA </th>
                 <th scope="col"> SLUG </th>
+                <th scope="col"> IMAGEN </th>
                 <th scope="col" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
@@ -201,6 +273,14 @@ const submitForm = async (category, method) => {
                 <td> {{ category.description }} </td>
                 <td> {{ category.category?.name }} </td>
                 <td> {{ category.slug }} </td>
+                <td>
+                    <VImg
+                        v-if="category.image !== null"
+                        :src="themeConfig.settings.urlStorage + category.image"
+                        :height="50"
+                        aspect-ratio="1/1"
+                    />
+                </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">      
                   <VBtn
@@ -208,7 +288,8 @@ const submitForm = async (category, method) => {
                     icon
                     size="x-small"
                     color="default"
-                    variant="text">
+                    variant="text"
+                    @click="editCategory(category)">
                               
                     <VIcon
                         size="22"
@@ -297,6 +378,17 @@ const submitForm = async (category, method) => {
   </section>
 </template>
 
+<style scope>
+    .search {
+        width: 100%;
+    }
+
+    @media(min-width: 991px){
+        .search {
+            width: 30rem;
+        }
+    }
+</style>
 <route lang="yaml">
   meta:
     action: ver
