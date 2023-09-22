@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     UsersController,
     RoleController,
     PermissionController,
-    UserMenuController
+    UserMenuController,
+    CategoryController
 };
 
 /*
@@ -50,6 +51,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('users', UsersController::class);
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('permissions', PermissionController::class);
+    Route::apiResource('categories', CategoryController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {

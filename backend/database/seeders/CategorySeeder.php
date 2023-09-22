@@ -6,6 +6,7 @@ use Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
+use Spatie\Permission\Models\Permission;
 
 use App\Models\Category;
 
@@ -61,6 +62,11 @@ class CategorySeeder extends Seeder
                 'slug' => $grandfather . $father . Str::slug($category['name'])
             ]);
         }
+
+        Permission::create(['name' => 'ver categorías']);
+        Permission::create(['name' => 'crear categorías']);
+        Permission::create(['name' => 'editar categorías']);
+        Permission::create(['name' => 'eliminar categorías']);
     }
     
 }
