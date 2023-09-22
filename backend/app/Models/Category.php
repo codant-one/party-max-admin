@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,27 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'category_id');
+    }
+
+    public function recursiveItems()
+    {
+        return $this->children()->with('recursiveItems');
+    }
+
+    public static function getRecursiveItems($category_id = null)
+    {
+        return self::with('recursiveItems')->where('category_id', $category_id)->get();
+    }
+
+
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('name', 'LIKE', '%' . $search . '%')
-             ->orWhere('description', 'LIKE', '%' . $search . '%');
+             ->orWhere('description', 'LIKE', '%' . $search . '%')
+             ->orWhere('slug', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
@@ -47,5 +65,86 @@ class Category extends Model
         }
 
         return $query->paginate($limit);
+    }
+
+    public static function getSlug($request) {
+
+        $categories = self::get()->toArray();
+
+        $grandfather = '';
+        $father = '';
+
+        if($request->is_category) {
+            $result = [];
+            $category_id = intval($request->category_id);
+            
+            $result = array_filter($categories, function ($element) use ($category_id) {
+                return $element['id'] === $category_id;
+            });
+
+            $result = array_values($result)[0];
+
+            if(!is_null($result['category_id'])) {
+                $result2 = [];
+                $category_id = $result['category_id'];
+                $result2 = array_filter($categories, function ($element) use ($category_id) {
+                    return $element['id'] === $category_id;
+                });
+
+                // Convertir el resultado nuevamente en un array indexado
+                $result2 = array_values($result2)[0];
+
+                $grandfather = Str::slug($result2['name']) . '/';
+                $father = Str::slug($result['name']) . '/';
+            } else {
+                $father = Str::slug($result['name']) . '/';
+            }
+        }
+
+        return $grandfather . $father . Str::slug($request->name);
+    }
+    
+    /**** Public methods ****/
+    public static function createCategory($request) {
+        
+        $slug = self::getSlug($request);
+
+        $category = self::create([
+            'category_id' => ($request->is_category) ? $request->category_id : null,
+            'name' => $request->name,
+            'description' => $request->description === 'null' ? null : $request->description,
+            'slug' => $slug
+        ]);
+
+        return $category;
+    }
+
+    public static function updateCategory($request, $category) {
+        $slug = self::getSlug($request);
+
+        $category->update([
+            'category_id' => ($request->is_category) ? $request->category_id : null,
+            'name' => $request->name,
+            'description' => $request->description === 'null' ? null : $request->description,
+            'slug' => $slug
+        ]);
+
+        return $category;
+    }
+
+    public static function deleteCategories($ids) {
+        foreach ($ids as $id) {
+            $category = self::with(['children.children'])->find($id);
+            $category->delete();
+
+            if(count($category->children) > 0) {
+                deleteFile($category->children[0]->image);
+                if(count($category->children[0]->children) > 0)
+                    deleteFile($category->children[0]->children[0]->image);
+            }
+
+            if($category->image)
+                deleteFile($category->image);
+        }
     }
 }

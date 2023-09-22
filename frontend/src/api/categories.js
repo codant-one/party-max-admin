@@ -10,12 +10,16 @@ class Categories {
         return axios.post('/categories', data)
     }
 
-    update(data, id) {
-        return axios.put(`/categories/${id}`, data)
+    update(data) {
+        return axios.post(`/categories/${data.id}`, data.data)
     }
 
     delete(id){
-        return axios.delete(`/categories/${id}`)
+        return axios.post(`/categories/delete`, id)
+    }
+
+    order(params){
+        return axios.get(`/categories/list/order`, {params})
     }
     
 }

@@ -27,7 +27,6 @@ class CategorySeeder extends Seeder
             $father = '';
 
             if(!is_null($category['category_id'])) {
-                // Filtrar el array por 'name'
                 $result = [];
                 $category_id = $category['category_id'];
                 
@@ -35,7 +34,6 @@ class CategorySeeder extends Seeder
                     return $element['id'] === $category_id;
                 });
 
-                // Convertir el resultado nuevamente en un array indexado
                 $result = array_values($result)[0];
 
                 if(!is_null($result['category_id'])) {
@@ -45,7 +43,6 @@ class CategorySeeder extends Seeder
                         return $element['id'] === $category_id;
                     });
     
-                    // Convertir el resultado nuevamente en un array indexado
                     $result2 = array_values($result2)[0];
 
                     $grandfather = Str::slug($result2['name']) . '/';
