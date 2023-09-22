@@ -68,20 +68,6 @@ const closeTreeDialog  = function(){
                                 <strong>Eliminar Roles</strong>&emsp;/&emsp;<code>Permite la eliminacion de roles</code>
                             </li>
                         </ul>
-                        <li class="n2">
-                            <strong>Ver Afiliados</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de afiliados</code>
-                        </li>
-                        <li class="n2">
-                            <strong>Ver Capturador</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de capturador de enlaces</code>
-                        </li>
-                        <li class="n2">
-                            <strong>Ver Mis Enlaces</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de mis enlaces</code>
-                        </li>
-                        <ul class="tab">
-                            <li class="n3">
-                                <strong>Crear Enlace</strong>&emsp;/&emsp;<code>Permite la creacion de enlaces dentro del capturador</code>
-                            </li>
-                        </ul>
                     </ul>
                 </ol>
             </VCardText>

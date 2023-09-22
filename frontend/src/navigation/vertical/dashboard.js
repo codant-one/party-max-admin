@@ -5,7 +5,7 @@ export default [
         icon: { icon: 'tabler-home-hand' },
         to: 'dashboard-panel', 
         action: 'ver' , 
-        subject: 'roles'
+        subject: 'dashboard'
     }
 ]
   

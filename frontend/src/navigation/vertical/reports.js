@@ -8,21 +8,21 @@ export default [
           icon: { icon: 'mdi-poll' },
           to: 'dashboard-reports-report-1', 
           action: 'ver', 
-          subject: 'usuarios', 
+          subject: 'x', 
         },
         { 
           title: 'Reporte 2', 
           icon: { icon: 'mdi-poll' },
           to: 'dashboard-reports-report-2', 
           action: 'ver' , 
-          subject: 'roles', 
+          subject: 'x', 
         },
         { 
             title: 'Reporte 3', 
             icon: { icon: 'mdi-poll' },
             to: 'dashboard-reports-report-3', 
             action: 'ver' , 
-            subject: 'roles', 
+            subject: 'x', 
           }
       ],
     }

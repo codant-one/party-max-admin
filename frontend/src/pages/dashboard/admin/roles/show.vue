@@ -200,45 +200,6 @@ const closeRoleDetailDialog = function(){
                                 :readonly="readonly"
                             />
                         </div>
-                        <VLabel style="font-weight: bold;">
-                            Afiliados
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver afiliados"
-                                value="ver afiliados"
-                                :readonly="readonly"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
-                            Capturador
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver capturador-enlaces"
-                                value="ver capturador-enlaces"
-                                :readonly="readonly"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
-                            Mis Enlaces
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver mis-enlaces"
-                                value="ver mis-enlaces"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="crear mis-enlaces"
-                                value="crear mis-enlaces"
-                                :readonly="readonly"
-                            />
-                        </div>
                     </div>
                 </VCardText>
                 

@@ -8,14 +8,14 @@ export default [
           icon: { icon: 'tabler-category' },
           to: 'dashboard-products-categories', 
           action: 'ver', 
-          subject: 'usuarios', 
+          subject: 'x', 
         },
         { 
           title: 'Productos', 
           icon: { icon: 'tabler-confetti' },
           to: 'dashboard-products-products', 
           action: 'ver' , 
-          subject: 'roles', 
+          subject: 'x', 
         }
       ],
     }

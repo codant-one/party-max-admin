@@ -8,14 +8,14 @@ export default [
           icon: { icon: 'mdi-account-credit-card' },
           to: 'dashboard-payments-providers', 
           action: 'ver', 
-          subject: 'usuarios', 
+          subject: 'x', 
         },
         { 
           title: 'Mi Cuenta', 
           icon: { icon: 'mdi-credit-card-settings-outline' },
           to: 'dashboard-payments-my-account', 
           action: 'ver' , 
-          subject: 'roles', 
+          subject: 'x', 
         }
       ],
     }
