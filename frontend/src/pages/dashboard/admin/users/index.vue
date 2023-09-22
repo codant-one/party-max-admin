@@ -220,8 +220,7 @@ const showAlert = function(alert) {
 
       <div class="d-flex align-center flex-wrap gap-4">
         <!-- 👉 Select status -->
-        <div
-          class="invoice-list-filter"
+        <div class="invoice-list-filter"
           style="width: 20rem;"
         >
           <VSelect
@@ -235,7 +234,7 @@ const showAlert = function(alert) {
         </div>
         
         <!-- 👉 Search  -->
-        <div class="rol-list-filter">
+        <div class="search">
           <VTextField
             v-model="searchQuery"
             placeholder="Buscar usuario"
@@ -499,19 +498,29 @@ const showAlert = function(alert) {
 </template>
 
 <style lang="scss">
-#rol-list {
-  .rol-list-actions {
-    inline-size: 8rem;
+  #rol-list {
+    .rol-list-actions {
+      inline-size: 8rem;
+    }
+
+    .rol-list-filter {
+      inline-size: 12rem;
+    }
   }
 
-  .rol-list-filter {
-    inline-size: 12rem;
+  .v-dialog {
+    z-index: 1999 !important;
   }
-}
 
-.v-dialog {
-  z-index: 1999 !important;
-}
+  .search {
+    width: 100%;
+  }
+
+  @media(min-width: 991px){
+    .search {
+      width: 30rem;
+    }
+  }
 </style>
 
 <route lang="yaml">

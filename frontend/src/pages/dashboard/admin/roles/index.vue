@@ -152,7 +152,7 @@ const showAlert = function(alert) {
 
       <div class="d-flex align-center flex-wrap gap-4">
         <!-- 👉 Search  -->
-        <div class="rol-list-filter">
+        <div class="search">
           <VTextField
             v-model="searchQuery"
             placeholder="Buscar rol"
@@ -350,38 +350,48 @@ const showAlert = function(alert) {
 </template>
 
 <style lang="scss">
-#rol-list {
-  .rol-list-actions {
-    inline-size: 8rem;
+  #rol-list {
+    .rol-list-actions {
+      inline-size: 8rem;
+    }
+
+    .rol-list-filter {
+      inline-size: 12rem;
+    }
   }
 
-  .rol-list-filter {
-    inline-size: 12rem;
-  }
-}
-
-.v-label {
-  text-overflow: clip;
-}
-
-#permisos-lista {
-  .n1 strong {
-    font-size: 1.7rem;
+  .v-label {
+    text-overflow: clip;
   }
 
-  .n2 strong {
-    font-size: 1.3rem;
+  #permisos-lista {
+    .n1 strong {
+      font-size: 1.7rem;
+    }
+
+    .n2 strong {
+      font-size: 1.3rem;
+    }
+
+    .n3 strong {
+      font-size: 1rem;
+    }
+
+    .tab {
+      margin-block: 4px;
+      margin-inline-start: 2rem;
+    }
   }
 
-  .n3 strong {
-    font-size: 1rem;
+  .search {
+    width: 14rem;
   }
 
-  .tab {
-    margin-block: 4px;
-    margin-inline-start: 2rem;
+  @media(min-width: 991px){
+    .search {
+      width: 30rem;
+    }
   }
-}
 </style>
 
 <route lang="yaml">
