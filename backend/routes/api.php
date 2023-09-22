@@ -14,7 +14,8 @@ use App\Http\Controllers\{
     RoleController,
     PermissionController,
     UserMenuController,
-    CategoryController
+    CategoryController,
+    ProductController
 };
 
 /*
@@ -52,6 +53,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('permissions', PermissionController::class);
     Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('products', ProductController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -82,6 +84,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
      Route::group(['prefix' => 'categories'], function () {
         Route::get('list/order', [CategoryController::class, 'order']);
         Route::post('delete', [CategoryController::class, 'delete']);
+    });
+
+    //Products
+    Route::group(['prefix' => 'products'], function () {
+        Route::post('delete', [ProductController::class, 'delete']);
     });
 
 });

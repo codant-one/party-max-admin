@@ -41,45 +41,65 @@ const closeTreeDialog  = function(){
                     </li>
                     <ul class="tab">
                         <li class="n2">
+                            <strong>Administración</strong>
+                        </li>
+                        <li class="tab n3">
                             <strong>Ver Usuarios</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de usuarios</code>
                         </li>
                         <ul class="tab">
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Crear Usuarios</strong>&emsp;/&emsp;<code>Permite la creacion de usuarios</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Editar Usuarios</strong>&emsp;/&emsp;<code>Permite la edicion de usuarios</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Eliminar Usuarios</strong>&emsp;/&emsp;<code>Permite la eliminacion de usuarios</code>
                             </li>
                         </ul>
-                        <li class="n2">
+                        <li class="tab n3">
                             <strong>Ver Roles</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de roles</code>
                         </li>
                         <ul class="tab">
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Crear Roles</strong>&emsp;/&emsp;<code>Permite la creacion de roles</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Editar Roles</strong>&emsp;/&emsp;<code>Permite la edicion de roles</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Eliminar Roles</strong>&emsp;/&emsp;<code>Permite la eliminacion de roles</code>
                             </li>
                         </ul>
                         <li class="n2">
+                            <strong>Productos</strong>
+                        </li>
+                        <li class="tab n3">
                             <strong>Ver Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías</code>
                         </li>
                         <ul class="tab">
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creacion de categorías</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edicion de categorías</code>
                             </li>
-                            <li class="n3">
+                            <li class="tab n3">
                                 <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminacion de categorías</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Productos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de productos</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Productos</strong>&emsp;/&emsp;<code>Permite la creacion de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Productos</strong>&emsp;/&emsp;<code>Permite la edicion de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminacion de productos</code>
                             </li>
                         </ul>
                     </ul>

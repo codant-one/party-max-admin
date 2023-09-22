@@ -95,7 +95,7 @@ const closeRoleDetailDialog = function(){
      <VDialog
         v-model="isSelectRolesDialog"
         persistent
-        max-width="800"
+        max-width="900"
         >
         <DialogCloseBtn @click="isSelectRolesDialog = !isSelectRolesDialog" />
 
@@ -233,6 +233,35 @@ const closeRoleDetailDialog = function(){
                                 v-model="permissions"
                                 label="eliminar categorías"
                                 value="eliminar categorías"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Productos
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver productos"
+                                value="ver productos"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear productos"
+                                value="crear productos"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar productos"
+                                value="editar productos"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar productos"
+                                value="eliminar productos"
                                 :readonly="readonly"
                             />
                         </div>

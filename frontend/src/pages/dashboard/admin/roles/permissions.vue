@@ -39,7 +39,7 @@ const closeModal = function(){
     <VDialog
         :model-value="props.isDrawerOpen"
         persistent
-        max-width="800"
+        max-width="900"
         >
         <DialogCloseBtn @click="closeModal" />
 
@@ -164,6 +164,31 @@ const closeModal = function(){
                                 v-model="assignedPermissions"
                                 label="eliminar categorías"
                                 value="eliminar categorías"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Productos
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver productos"
+                                value="ver productos"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear productos"
+                                value="crear productos"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar productos"
+                                value="editar productos"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar productos"
+                                value="eliminar productos"
                             />
                         </div>
                     </div>
