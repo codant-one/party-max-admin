@@ -15,7 +15,7 @@ export default [
           icon: { icon: 'tabler-confetti' },
           to: 'dashboard-products-products', 
           action: 'ver' , 
-          subject: 'products', 
+          subject: 'productos', 
         }
       ],
     }
