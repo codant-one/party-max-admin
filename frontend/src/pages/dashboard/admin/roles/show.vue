@@ -202,7 +202,42 @@ const closeRoleDetailDialog = function(){
                         </div>
                     </div>
                 </VCardText>
-                
+                <VCardTitle>
+                    Productos  
+                </VCardTitle>
+                <VCardText>
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            Categorías
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver categorías"
+                                value="ver categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear categorías"
+                                value="crear categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar categorías"
+                                value="editar categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar categorías"
+                                value="eliminar categorías"
+                                :readonly="readonly"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
             </VCardText>
             <VCardText class="d-flex flex-wrap gap-3">
                 <VSpacer />

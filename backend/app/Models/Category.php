@@ -19,12 +19,8 @@ class Category extends Model
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
-        foreach (explode(' ', $search) as $term) {
-            foreach (explode(' ', $search) as $term) {
-                $query->where('name', 'LIKE', '%' . $term . '%')
-                      ->orWhere('description', 'LIKE', '%' . $term . '%');
-            }
-        }
+       $query->where('name', 'LIKE', '%' . $search . '%')
+             ->orWhere('description', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {

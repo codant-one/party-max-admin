@@ -136,6 +136,38 @@ const closeModal = function(){
                         </div>
                     </div>
                 </VCardText>
+                <VCardTitle>
+                    Productos  
+                </VCardTitle>
+                <VCardText>
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            Categorías
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver categorías"
+                                value="ver categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear categorías"
+                                value="crear categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar categorías"
+                                value="editar categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar categorías"
+                                value="eliminar categorías"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
             </VCardText>
             <VCardText class="d-flex flex-wrap gap-3">
                 <VSpacer />

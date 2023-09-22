@@ -68,6 +68,20 @@ const closeTreeDialog  = function(){
                                 <strong>Eliminar Roles</strong>&emsp;/&emsp;<code>Permite la eliminacion de roles</code>
                             </li>
                         </ul>
+                        <li class="n2">
+                            <strong>Ver Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="n3">
+                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creacion de categorías</code>
+                            </li>
+                            <li class="n3">
+                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edicion de categorías</code>
+                            </li>
+                            <li class="n3">
+                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminacion de categorías</code>
+                            </li>
+                        </ul>
                     </ul>
                 </ol>
             </VCardText>

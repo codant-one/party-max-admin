@@ -8,7 +8,7 @@ export default [
           icon: { icon: 'tabler-category' },
           to: 'dashboard-products-categories', 
           action: 'ver', 
-          subject: 'x', 
+          subject: 'categorías', 
         },
         { 
           title: 'Productos', 

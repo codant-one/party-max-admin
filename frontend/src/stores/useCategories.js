@@ -1,0 +1,79 @@
+import { defineStore } from 'pinia'
+import Categories from '@/api/categories'
+
+export const useCategoriesStores = defineStore('categories', {
+    state: () => ({
+        categories: {},
+        loading: false,
+        last_page: 1,
+        categoriesTotalCount: 6
+    }),
+    getters:{
+        getCategories(){
+            return this.categories
+        }
+    },
+    actions: {
+        setLoading(payload){
+            this.loading = payload
+        },
+        fetchCategories(params) {
+            this.setLoading(true)
+            
+            return Categories.get(params)
+                .then((response) => {
+                    this.categories = response.data.categories.data
+                    this.last_page = response.data.categories.last_page
+                    this.categoriesTotalCount = response.data.categoriesTotalCount
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
+        addCategory(data) {
+            this.setLoading(true)
+
+            return Categories.create(data)
+                .then((response) => {
+                    this.categories.push(response.data.data.category)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
+        updateCategory(data, id) {
+            this.setLoading(true)
+            
+            return Categories.update(data, id)
+                .then((response) => {
+                    let pos = this.categories.findIndex((item) => item.id === response.data.data.category.id)
+                    this.categories[pos] = response.data.data.category
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+         
+        },
+        deleteCategory(id) {
+            this.setLoading(true)
+
+            return Categories.delete(id)
+                .then((response) => {
+                    let index = this.categories.findIndex((item) => item.id === id)
+                    this.categories.splice(index, 1)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })  
+        }
+    }
+})

@@ -28,14 +28,14 @@ class CategoryController extends Controller
     {
         $limit = $request->has('limit') ? $request->limit : 10;
     
-        $query = Category::
-            applyFilters(
-                $request->only([
-                    'search',
-                    'orderByField',
-                    'orderBy'
-                ])
-            );
+        $query = Category::with(['category'])
+                         ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                            );
 
         $categories = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
         
