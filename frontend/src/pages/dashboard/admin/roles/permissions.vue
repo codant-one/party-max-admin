@@ -134,41 +134,6 @@ const closeModal = function(){
                                 value="eliminar roles"
                             />
                         </div>
-                        <VLabel style="font-weight: bold;">
-                            Afiliados
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver afiliados"
-                                value="ver afiliados"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
-                            Capturador
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver capturador-enlaces"
-                                value="ver capturador-enlaces"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
-                            Mis Enlaces
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver mis-enlaces"
-                                value="ver mis-enlaces"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="crear mis-enlaces"
-                                value="crear mis-enlaces"
-                            />
-                        </div>
                     </div>
                 </VCardText>
             </VCardText>
