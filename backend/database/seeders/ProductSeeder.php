@@ -11,6 +11,7 @@ use App\Models\ProductDetail;
 use App\Models\ProductImage;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Spatie\Permission\Models\Permission;
 
 class ProductSeeder extends Seeder
 {
