@@ -1,5 +1,7 @@
 <script setup>
 
+import { themeConfig } from '@themeConfig'
+
 const props = defineProps({
     product: {
         type: Object,
@@ -28,6 +30,7 @@ const favourite = ref('')
 const archived = ref('')
 const discarded = ref(null)
 const title = ref('')
+const sku = ref('')
 const image = ref('')
 const description = ref(null)
 const price = ref('')
@@ -49,7 +52,8 @@ watchEffect(() => {
         archived.value = props.product.archived ?? null
         discarded.value = props.product.discarded ?? null
         title.value = props.product.title ?? null
-        image.value = props.product.image ?? null
+        sku.value = props.product.sku ?? null
+        image.value = props.product.image === null ? '' : themeConfig.settings.urlStorage + props.product.image
         description.value = props.product.description ?? null
         price.value = props.product.price ?? null
         currency.value = props.product.currency ?? null
@@ -127,11 +131,11 @@ const updateLink = (text, id) => {
                                     open-on-focus
                                     location="top"
                                     activator="parent">
-                                    Numeros de ventas
+                                    Ver
                                 </VTooltip>
                                 <VIcon
                                     size="28"
-                                    icon="tabler-coin-euro"
+                                    icon="tabler-eye"
                                     class="me-1"
                                 />
                              </span>
@@ -244,7 +248,10 @@ const updateLink = (text, id) => {
                     />
                 </VCol>
                 <VCol cols="12" md="6">
-                    <div>Envio: 
+                    <div class="font-weight-semibold">SKU: 
+                        <span>{{ sku }}</span>
+                    </div>
+                    <div>Envios: 
                         <span v-if="selling_price >= 0">{{ selling_price }}</span>
                         <span v-else>
                             <VIcon
@@ -274,16 +281,6 @@ const updateLink = (text, id) => {
                             />
                         </span>
                     </div>
-                    <div>Valoracion:
-                        <span v-if="rating >= 0">{{ rating }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                             />
-                        </span>
-                    </div>
                     <div>Favoritos:
                         <span v-if="favourite >= 0">{{ favourite }}</span>
                         <span v-else>
@@ -293,7 +290,27 @@ const updateLink = (text, id) => {
                                 class="me-1"
                             />
                         </span>
-                    </div>                                    
+                    </div>  
+                    <div>Valoracion:
+                        <span>
+                            <VIcon
+                                v-for="index in 5"
+                                size="20"
+                                icon="tabler-star"
+                                class="me-1"
+                             />
+                        </span>
+                    </div>
+                    <div>Categorías:
+                        <span v-if="rating >= 0">{{ rating }}</span>
+                        <span v-else>
+                            <VIcon
+                                size="20"
+                                icon="tabler-alarm-filled"
+                                class="me-1"
+                             />
+                        </span>
+                    </div>                                  
                     <VAlert class="text-center mt-5">
                         <VRow>
                             <VCol cols="4">
@@ -384,7 +401,7 @@ const updateLink = (text, id) => {
     }
 
     .header {
-        height: 150px;
+        height: 100px;
         display: block;
 
         @media (max-width: 767px) {

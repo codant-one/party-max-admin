@@ -19,6 +19,10 @@ return new class extends Migration
             $table->string('price');
             $table->string('price_for_sale');
             $table->string('stock');
+            $table->string('slug');
+            $table->boolean('favourite')->default(0);
+            $table->boolean('archived')->default(0);
+            $table->boolean('discarded')->default(0);
             $table->string('image');
             $table->timestamps();
         });

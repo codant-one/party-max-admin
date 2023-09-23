@@ -28,13 +28,14 @@ class ProductController extends Controller
     {
         $limit = $request->has('limit') ? $request->limit : 10;
     
-        $query = Product::applyFilters(
-                                $request->only([
-                                    'search',
-                                    'orderByField',
-                                    'orderBy'
-                                ])
-                            );
+        $query = Product::with(['categories', 'detail', 'images'])
+                        ->applyFilters(
+                            $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy'
+                            ])
+                        );
 
         $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
         
