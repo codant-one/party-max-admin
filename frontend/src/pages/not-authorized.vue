@@ -26,7 +26,7 @@ const back = function(){
   })
 
   if(band.value) {
-    router.replace('/')
+    router.replace('/info')
   } else {
 
     authStores.logout()

@@ -29,7 +29,9 @@ const last_name = ref('')
 const phone = ref('')
 const address = ref('')
 const province_id = ref('')
+const provinceOld_id = ref('')
 const country_id = ref('')
+const countryOld_id = ref('')
 const avatar = ref('')
 
 const avatarOld = ref('')
@@ -80,9 +82,11 @@ async function fetchData() {
     last_name.value = data.last_name
     phone.value = data.user_details?.phone
     address.value = data.user_details?.address
-    province_id.value = data.user_details?.province_id
-    country_id.value = data.user_details?.country_id
-    
+    province_id.value = data.user_details?.province.name
+    provinceOld_id.value = data.user_details?.province_id
+    countryOld_id.value = data.user_details?.province.country.id
+    country_id.value = data.user_details?.province.country.name
+
     avatarOld.value = data.user_details?.avatar
     
 }
@@ -144,7 +148,7 @@ const onSubmit = () =>{
       formData.append('last_name', last_name.value)
       formData.append('phone', phone.value)
       formData.append('address', address.value)
-      formData.append('province_id', province_id.value)
+      formData.append('province_id', Number.isInteger(province_id.value) ? province_id.value : provinceOld_id.value),
       formData.append('image', avatarOld.value)
 
       profileStores.updateData(formData)

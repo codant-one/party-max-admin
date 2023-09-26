@@ -63,8 +63,7 @@ trait UserHelper
             'name' => $request->name,
             'last_name' =>  $request->last_name,
             'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'email' => $request->email
         ]);
 
         $user->roles()->detach();  
