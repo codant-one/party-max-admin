@@ -4,7 +4,7 @@ import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { ref } from "vue"
 import detailsProduct from "@/components/products/detailsProduct.vue";
-// import AddNewCategoryDrawer from './AddNewCategoryDrawer.vue' 
+import show from './show.vue'
 
 const productsStores = useProductsStores()
 const cp = useClipboard()
@@ -20,6 +20,8 @@ const isRequestOngoing = ref(true)
 const isAddNewProductDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedProduct = ref({})
+
+const isProductDetailDialog = ref(false)
 
 const favourite = ref(0)
 const archived = ref(0)
@@ -302,6 +304,11 @@ const download = async (img) => {
     closeAdvisor()
 }
 
+const showProduct = async (id) => {
+  isProductDetailDialog.value = true
+  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
+}
+
 const showAlert = function(alert) {
   advisor.value.show = alert.value.show
   advisor.value.type = alert.value.type
@@ -455,6 +462,7 @@ const showAlert = function(alert) {
                     @open="open"
                     @download="download"
                     @updateLink="updateLink"
+                    @show="showProduct"
                     />
                 </VCol>
               </VRow>
@@ -478,6 +486,10 @@ const showAlert = function(alert) {
         </v-col>
       </v-row>
     </VCard>
+
+    <show 
+      v-model:isDrawerOpen="isProductDetailDialog"
+      :product="selectedProduct"/>
   </section>
 </template>
 

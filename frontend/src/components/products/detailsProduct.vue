@@ -22,7 +22,8 @@ const emit = defineEmits([
     'copy',
     'open',
     'download',
-    'updateLink'
+    'updateLink',
+    'show'
 ])
 
 const id = ref('')
@@ -80,6 +81,10 @@ const open = (link) =>{
     emit('open', link)
 }
 
+const show = (id) => {
+    emit('show', id)
+}
+
 const updateLink = (text, id) => {
 
     let value = 0
@@ -126,7 +131,12 @@ const updateLink = (text, id) => {
                 <VCol cols="12" md="6">
                     <VRow class="text-center pt-2">
                         <VCol>
-                            <span v-if="id">
+                            <VBtn
+                                @click="show(id)"
+                                icon
+                                variant="text"
+                                color="default"
+                                size="x-small">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
@@ -138,14 +148,7 @@ const updateLink = (text, id) => {
                                     icon="tabler-eye"
                                     class="me-1"
                                 />
-                             </span>
-                            <span v-else>
-                                <VIcon
-                                    size="28"
-                                    icon="tabler-coin-euro"
-                                    class="me-1"
-                                />
-                            </span>
+                            </VBtn>                        
                         </VCol>
                         <VCol>
                             <span v-if="id">
