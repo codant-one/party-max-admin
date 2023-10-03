@@ -76,7 +76,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        $product = Product::with(['categories.category', 'detail', 'images'])->find($id);
 
         if (!$product)
             return response()->json([
@@ -86,7 +86,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'product' => $product,
+            'product' => $product
         ]);
     }
 

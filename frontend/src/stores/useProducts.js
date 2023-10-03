@@ -46,6 +46,20 @@ export const useProductsStores = defineStore('products', {
                 })
             
         },
+        showProduct(id) {
+            this.setLoading(true)
+
+            return Products.show(id)
+                .then((response) => {
+                    if(response.data.success)
+                        return Promise.resolve(response.data.product)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         updateProduct(data) {
             this.setLoading(true)
             

@@ -23,7 +23,8 @@ const emit = defineEmits([
     'open',
     'download',
     'updateLink',
-    'show'
+    'show',
+    'editProduct'
 ])
 
 const id = ref('')
@@ -87,6 +88,10 @@ const show = (id) => {
     emit('show', id)
 }
 
+const editProduct = (id) => {
+    emit('editProduct', id)
+}
+
 const updateLink = (text, id) => {
 
     let value = 0
@@ -117,10 +122,12 @@ const updateLink = (text, id) => {
             <template #append>
                 <div class="mt-n4 me-n2">
                     <VBtn
+                        v-if="$can('editar','productos')"
                         icon
                         color="default"
                         size="x-small"
-                        variant="plain">
+                        variant="plain"
+                        @click="editProduct(id)">
                         <VTooltip
                             open-on-focus
                             location="top"
