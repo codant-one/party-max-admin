@@ -5,7 +5,7 @@ import { useThemeConfig } from '@core/composable/useThemeConfig'
 import { hexToRgb } from '@layouts/utils'
 import { useTheme } from 'vuetify'
 import { useAuthStores } from '@/stores/useAuth'
-// import GlobalEvents from "@/components/GlobalEvents.vue";
+import GlobalEvents from "@/components/GlobalEvents.vue";
 
 const ability = useAppAbility()
 const authStores = useAuthStores()
@@ -43,7 +43,7 @@ me()
 
 <template>
    <section>
-    <!-- <GlobalEvents /> -->
+    <GlobalEvents />
     <VLocaleProvider :rtl="isAppRtl">
       <!-- ℹ️ This is required to set the background color of active nav link based on currently active global theme's primary -->
       <VApp :style="`--v-global-theme-primary: ${hexToRgb(global.current.value.colors.primary)}`">

@@ -3,6 +3,7 @@
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { ref } from "vue"
+import Toaster from "@/components/common/Toaster.vue";
 import detailsProduct from "@/components/products/detailsProduct.vue";
 import show from './show.vue'
 
@@ -82,10 +83,12 @@ async function fetchData() {
       price:element.price_for_sale,
       currency: 'COP',
       originalLink: 'https://dominioreal.com/' + element.slug,
+      categories: element.categories.map(item => item.category.name).join(', '),// Utiliza map para extraer los nombres de las categorías
       rating: 0,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: 0,//agregar mas adelante informacion
-      selling_price: 0//agregar mas adelante informacion
+      selling_price: 0,//agregar mas adelante informacion,
+      rating: 2.5//agregar mas adelante informacion,
     })
   );
 
@@ -324,6 +327,7 @@ const showAlert = function(alert) {
       class="mb-6">  
       {{ advisor.message }}
     </v-alert>
+    <Toaster />
 
     <VCard v-if="products"
       id="rol-list"
@@ -333,7 +337,8 @@ const showAlert = function(alert) {
           <VCol cols="12" sm="4">
             <v-btn
               v-if="$can('crear','productos')"
-              prepend-icon="tabler-plus">
+              prepend-icon="tabler-plus"
+              :to="{ name: 'dashboard-products-products-add' }">
               Agregar Producto
             </v-btn>
           </VCol>
