@@ -28,7 +28,7 @@ class ProductController extends Controller
     {
         $limit = $request->has('limit') ? $request->limit : 10;
     
-        $query = Product::with(['categories', 'detail', 'images'])
+        $query = Product::with(['categories.category', 'detail', 'images'])
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -53,6 +53,17 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         $product = Product::createProduct($request);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $path = 'products/main/';
+
+            $file_data = uploadFile($image, $path);
+
+            $product->image = $file_data['filePath'];
+            $product->update();
+        } 
 
         return response()->json([
             'product' => Product::find($product->id),

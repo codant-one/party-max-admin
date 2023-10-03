@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     UserMenuController,
     CategoryController,
     ProductController,
-    FaqController
+    FaqController,
+    ColorController
 };
 
 /*
@@ -104,6 +105,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 //Public Endpoints
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
+Route::apiResource('colors', ColorController::class);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');

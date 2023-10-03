@@ -47,12 +47,13 @@ const stock = ref('')
 const width = ref('')
 const height = ref('')
 const deep = ref('')
+const categories = ref('')
 
 watchEffect(() => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
             productImages.value = props.product.images
-            productImages.value.push({image: props.product.image})
+            productImages.value.unshift({image: props.product.image})
 
             title.value = props.product.name
             description.value = props.product.description
@@ -61,13 +62,14 @@ watchEffect(() => {
             sales.value = props.product.sales ?? 0
             comments.value = props.product.comments ?? 0
             favourite.value = props.product.favourite ?? 0
-            rating.value = props.product.rating ?? 0
+            rating.value = props.product.rating ?? 2.5
             price.value = props.product.price
             price_for_sale.value = props.product.price_for_sale
             stock.value = props.product.stock
             width.value = props.product.detail.width
             height.value = props.product.detail.height
             deep.value = props.product.detail.deep
+            categories.value = props.product.categories.map(item => item.category.name).join(', ')
         }
     }
 })
@@ -128,7 +130,7 @@ const setThumbsSwiper = (swiper) => {
 
                             <Carousel
                                 id="thumbnails"
-                                :items-to-show="4"
+                                :items-to-show="(productImages.length > 4 ) ? 4 : productImages.length"
                                 :wrap-around="true"
                                 v-model="currentSlide"
                                 ref="carousel"
@@ -225,25 +227,18 @@ const setThumbsSwiper = (swiper) => {
                                     />
                                 </span>
                             </div>  
-                            <div>Valoracion:
-                                <span>
-                                    <VIcon
-                                        v-for="index in 5"
-                                        size="20"
-                                        icon="tabler-star"
-                                        class="me-1"
-                                    />
-                                </span>
+                            <div class="d-flex">Valoración:
+                                <VRating
+                                    class="ms-1"
+                                    v-model="rating"
+                                    half-increments
+                                    readonly
+                                    density="compact"
+                                    size="small"
+                                />
                             </div>
                             <div>Categorías:
-                                <span v-if="rating >= 0">{{ rating }}</span>
-                                <span v-else>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-alarm-filled"
-                                        class="me-1"
-                                    />
-                                </span>
+                                <span>{{ categories }}</span>
                             </div> 
                         </div>               
                     </VCol>
