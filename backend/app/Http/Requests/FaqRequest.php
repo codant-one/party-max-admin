@@ -27,6 +27,9 @@ class CategoryRequest extends FormRequest
         $rules = [
             'title' => [
                 'required'
+            ],
+            'description' => [
+                'required'
             ]
         ];
 
@@ -40,11 +43,11 @@ class CategoryRequest extends FormRequest
     public function messages()
     {
         return [
-            'faq_id.required' => 'La categoría es requerida',
-            'faq_id.integer' => 'El formato de categoría debe ser entero.',
-            'faq_id.exists' => 'La categoría ingresada no existe.',
-            'title.required' => 'El nombre de categoría es requerido.'
-            'description.required' => 'El nombre de categoría es requerido.'
+            'faq_id.required' => 'La pregunta es requerida',
+            'faq_id.integer' => 'El formato de pregunta debe ser entero.',
+            'faq_id.exists' => 'La pregunta ingresada no existe.',
+            'title.required' => 'El titulo de la pregunta es requerido.'
+            'description.required' => 'La descripción de la pregunta es requerida.'
         ];
     }
 
