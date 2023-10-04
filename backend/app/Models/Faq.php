@@ -66,6 +66,10 @@ class Faq extends Model
         return $faq;
     }
 
+    public static function deleteFaq($id) {
+        $this->deleteFaqs(array($id));
+    }
+
     public static function deleteFaqs($ids) {
         foreach ($ids as $id) {
             $faq = self::find($id);

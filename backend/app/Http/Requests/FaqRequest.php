@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CategoryRequest extends FormRequest
+class FaqRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -46,7 +46,7 @@ class CategoryRequest extends FormRequest
             'faq_id.required' => 'La pregunta es requerida',
             'faq_id.integer' => 'El formato de pregunta debe ser entero.',
             'faq_id.exists' => 'La pregunta ingresada no existe.',
-            'title.required' => 'El titulo de la pregunta es requerido.'
+            'title.required' => 'El titulo de la pregunta es requerido.',
             'description.required' => 'La descripción de la pregunta es requerida.'
         ];
     }

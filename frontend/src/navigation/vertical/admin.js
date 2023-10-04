@@ -16,7 +16,14 @@ export default [
         to: 'dashboard-admin-roles', 
         action: 'ver' , 
         subject: 'roles', 
-      }  
+      },
+      { 
+        title: 'FAQs', 
+        icon: { icon: 'tabler-help-hexagon' },
+        to: 'dashboard-admin-faqs', 
+        action: 'ver' , 
+        subject: 'faqs', 
+      }   
     ],
   }
 ]

@@ -92,7 +92,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Faqs
      Route::group(['prefix' => 'faqs'], function () {
         Route::get('list/order', [FaqController::class, 'order']);
-        Route::post('delete', [FaqController::class, 'delete']);
+        // Route::post('delete', [FaqController::class, 'delete']);
     });
 
     //Products
