@@ -16,6 +16,7 @@ use App\Http\Controllers\{
     UserMenuController,
     CategoryController,
     ProductController,
+    BlogController,
     FaqController,
     ColorController
 };
@@ -56,6 +57,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('permissions', PermissionController::class);
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('products', ProductController::class);
+    Route::apiResource('blogs', BlogController::class);
     Route::apiResource('faqs', FaqController::class);
 
     //Users
