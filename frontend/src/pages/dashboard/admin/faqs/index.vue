@@ -77,7 +77,7 @@ const showDeleteDialog = faqData => {
 
 const removeFaq = async () => {
   isConfirmDeleteDialogVisible.value = false
-  let res = await faqsStores.deleteFaq({ ids: [selectedFaq.value.id] })
+  let res = await faqsStores.deleteFaq(selectedFaq.value.id)
   selectedFaq.value = {}
 
   advisor.value = {

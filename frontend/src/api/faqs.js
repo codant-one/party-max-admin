@@ -15,7 +15,7 @@ class Faqs {
     }
 
     delete(id){
-        return axios.post(`/faqs/destroy`, id)
+        return axios.delete(`/faqs/${id}`)
     }
 
     order(params){

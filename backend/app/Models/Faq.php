@@ -67,7 +67,7 @@ class Faq extends Model
     }
 
     public static function deleteFaq($id) {
-        $this->deleteFaqs(array($id));
+        self::deleteFaqs(array($id));
     }
 
     public static function deleteFaqs($ids) {

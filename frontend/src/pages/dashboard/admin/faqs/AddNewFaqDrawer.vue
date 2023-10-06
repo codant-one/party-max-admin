@@ -32,9 +32,6 @@ const id = ref(0)
 const title = ref('')
 const faq_id = ref()
 const description = ref('')
-const image = ref('')
-const avatar = ref('')
-const filename = ref([])
 const isEdit = ref(false)
 
 const getTitle = computed(() => {
@@ -54,8 +51,6 @@ watchEffect(async() => {
             id.value = props.faq.id
             title.value = props.faq.title
             description.value = props.faq.description
-            faq_id.value = props.faq.faq_id
-            avatar.value = props.faq.image === null ? '' : themeConfig.settings.urlStorage + props.faq.image
         }
     }
 })
@@ -67,9 +62,6 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
-    image.value = ''
-    avatar.value = ''
-    filename.value = []
     isEdit.value = false
     id.value = 0
   })
@@ -86,15 +78,6 @@ const onSubmit = () => {
 
       emit('faqData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
-      nextTick(() => {
-        refForm.value?.reset()
-        refForm.value?.resetValidation()
-        image.value = ''
-        avatar.value = ''
-        filename.value = []
-        isEdit.value = false
-        id.value = 0
-      })
     }
   })
 }
@@ -146,29 +129,6 @@ const closeDropdown = () => {
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <v-row>
-            <v-col cols="12" class="d-flex justify-center align-center">
-                <VImg
-                    v-if="avatar !== null"
-                    :src="avatar"
-                    :height="200"
-                    aspect-ratio="16/9"
-                    class="border-img"
-                />
-            </v-col>
-
-            <VCol cols="12">
-              <VFileInput
-                v-model="filename"
-                label="Imagen"
-                class="mb-2"
-                accept="image/png, image/jpeg, image/bmp"
-                prepend-icon="tabler-camera"
-                @click:clear="avatar = null"
-              />
-            </VCol>
-          </v-row>
-
           <!-- 👉 Form -->
           <VForm
             ref="refForm"
@@ -176,66 +136,13 @@ const closeDropdown = () => {
             @submit.prevent="onSubmit"
           >
             <VRow>
-              <!-- 👉 Name -->
+              <!-- 👉 Title -->
               <VCol cols="12">
                 <VTextField
                   v-model="title"
                   :rules="[requiredValidator]"
                   label="Titulo"
                 />
-              </VCol>
-
-              <VCol cols="12">
-                <VAutocomplete
-                    id="selectFaq"
-                    v-model="faq_id"
-                    label="FAQs:"
-                    :items="faqs"
-                    :item-title="item => item.title"
-                    :item-value="item => item.id"
-                    autocomplete="off"
-                    :menu-props="{ maxHeight: '300px' }">
-                    <template v-slot:selection="{ item, index }">
-                        <v-chip v-if="index < 2">
-                            <span>{{ item.title }}</span>
-                        </v-chip>
-                        <span
-                            v-if="index === 2"
-                            class="text-grey text-caption align-self-center"
-                        >
-                            (+{{ faq_id.length - 2 }} otros)
-                        </span>
-                    </template>
-                    <template v-slot:item="{ props, item }">
-                        <v-list-item
-                            v-bind="props"
-                            :title="item?.raw?.title"
-                            :style="{ 
-                                paddingLeft: `${(item?.raw?.level) * 20}px`
-                            }"
-                        >
-                            <template v-slot:prepend="{ isActive }">
-                                <v-list-item-action start>
-                                    <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                                </v-list-item-action>
-                            </template>
-                        </v-list-item>
-                    </template>
-                    <template v-slot:append-item>
-                        <v-divider class="mt-2"></v-divider>
-                        <v-list-item title="Cerrar Opciones" class="text-right">
-                        <template v-slot:append>
-                            <VBtn
-                            size="small"
-                            variant="plain"
-                            icon="tabler-x"
-                            color="black"
-                            :ripple="false"
-                            @click="closeDropdown"/>
-                        </template>
-                        </v-list-item>
-                    </template>
-                </VAutocomplete>
               </VCol>
 
               <!-- 👉 description -->
