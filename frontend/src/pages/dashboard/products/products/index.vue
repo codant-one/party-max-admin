@@ -3,8 +3,10 @@
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { ref } from "vue"
+import Toaster from "@/components/common/Toaster.vue";
+import router from '@/router'
 import detailsProduct from "@/components/products/detailsProduct.vue";
-// import AddNewCategoryDrawer from './AddNewCategoryDrawer.vue' 
+import show from './show.vue'
 
 const productsStores = useProductsStores()
 const cp = useClipboard()
@@ -17,9 +19,9 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalProducts = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewProductDrawerVisible = ref(false)
-const isConfirmDeleteDialogVisible = ref(false)
 const selectedProduct = ref({})
+
+const isProductDetailDialog = ref(false)
 
 const favourite = ref(0)
 const archived = ref(0)
@@ -43,9 +45,6 @@ const paginationData = computed(() => {
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
-
-    if (!isAddNewProductDrawerVisible.value)
-        selectedProduct.value = {}
 })
 
 watchEffect(fetchData)
@@ -80,10 +79,12 @@ async function fetchData() {
       price:element.price_for_sale,
       currency: 'COP',
       originalLink: 'https://dominioreal.com/' + element.slug,
+      categories: element.categories.map(item => item.category.name).join(', '),// Utiliza map para extraer los nombres de las categorías
       rating: 0,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: 0,//agregar mas adelante informacion
-      selling_price: 0//agregar mas adelante informacion
+      selling_price: 0,//agregar mas adelante informacion,
+      rating: 2.5//agregar mas adelante informacion,
     })
   );
 
@@ -93,115 +94,8 @@ async function fetchData() {
   isRequestOngoing.value = false
 }
 
-const editProduct = productData => {
-    isAddNewProductDrawerVisible.value = true
-    selectedProducty.value = { ...productData }
-}
-
-const showDeleteDialog = productData => {
-  isConfirmDeleteDialogVisible.value = true
-  selectedProduct.value = { ...productData }
-}
-
-const removeProduct = async () => {
-  isConfirmDeleteDialogVisible.value = false
-  let res = await productsStores.deleteProduct({ ids: [selectedProduct.value.id] })
-  selectedProduct.value = {}
-
-  advisor.value = {
-    type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Producto eliminado con éxito!' : res.data.message,
-    show: true
-  }
-
-  await fetchData()
-
-  setTimeout(() => {
-    advisor.value = {
-      type: '',
-      message: '',
-      show: false
-    }
-  }, 3000)
-
-  return true
-}
-
-const submitForm = async (product, method) => {
-  isRequestOngoing.value = true
-
-  if (method === 'update') {
-    product.data.append('_method', 'PUT')
-    submitUpdate(product)
-    return
-  }
-
-  submitCreate(product.data)
-}
-
-
-const submitCreate = productData => {
-
-    productsStores.addProduct(productData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'Producto creado con éxito',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
-}
-
-const submitUpdate = productData => {
-
-    productsStores.updateProduct(productData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'Producto actualizado con éxito',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
+const editProduct = id => {
+    router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
 }
 
 const updateLink = (data) => {
@@ -302,6 +196,11 @@ const download = async (img) => {
     closeAdvisor()
 }
 
+const showProduct = async (id) => {
+  isProductDetailDialog.value = true
+  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
+}
+
 const showAlert = function(alert) {
   advisor.value.show = alert.value.show
   advisor.value.type = alert.value.type
@@ -317,6 +216,7 @@ const showAlert = function(alert) {
       class="mb-6">  
       {{ advisor.message }}
     </v-alert>
+    <Toaster />
 
     <VCard v-if="products"
       id="rol-list"
@@ -326,7 +226,8 @@ const showAlert = function(alert) {
           <VCol cols="12" sm="4">
             <v-btn
               v-if="$can('crear','productos')"
-              prepend-icon="tabler-plus">
+              prepend-icon="tabler-plus"
+              :to="{ name: 'dashboard-products-products-add' }">
               Agregar Producto
             </v-btn>
           </VCol>
@@ -455,6 +356,8 @@ const showAlert = function(alert) {
                     @open="open"
                     @download="download"
                     @updateLink="updateLink"
+                    @show="showProduct"
+                    @editProduct="editProduct"
                     />
                 </VCol>
               </VRow>
@@ -478,6 +381,10 @@ const showAlert = function(alert) {
         </v-col>
       </v-row>
     </VCard>
+
+    <show 
+      v-model:isDrawerOpen="isProductDetailDialog"
+      :product="selectedProduct"/>
   </section>
 </template>
 

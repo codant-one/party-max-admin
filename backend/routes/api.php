@@ -16,7 +16,9 @@ use App\Http\Controllers\{
     UserMenuController,
     CategoryController,
     ProductController,
-    BlogController
+    BlogController,
+    FaqController,
+    ColorController
 };
 
 /*
@@ -56,6 +58,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('blogs', BlogController::class);
+    Route::apiResource('faqs', FaqController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -88,6 +91,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [CategoryController::class, 'delete']);
     });
 
+    //Faqs
+     Route::group(['prefix' => 'faqs'], function () {
+        Route::get('list/order', [FaqController::class, 'order']);
+        // Route::post('delete', [FaqController::class, 'delete']);
+    });
+
     //Products
     Route::group(['prefix' => 'products'], function () {
         Route::post('delete', [ProductController::class, 'delete']);
@@ -98,6 +107,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 //Public Endpoints
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
+Route::apiResource('colors', ColorController::class);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');

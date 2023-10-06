@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ProductRequest extends FormRequest
+class FaqRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,33 +24,30 @@ class ProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => [
+        $rules = [
+            'title' => [
                 'required'
             ],
-            'sku' => [
-                'required'
-            ],
-            'price' => [
-                'required'
-            ],
-            'price_for_sale' => [
-                'required'
-            ],
-            'stock' => [
+            'description' => [
                 'required'
             ]
         ];
+
+        if (request('is_faq')) {
+            $rules['faq_id'] = 'required|integer|exists:App\Models\Faq,id';
+        }
+
+        return $rules;
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'El nombre del producto es requerido.',
-            'sku.required' => 'El sku requerido',
-            'price.required' => 'El precio es requerido.',
-            'price_for_sale.required' => 'El precio para la venta es requerido.',
-            'stock.required' => 'El stock es requerido.',
+            'faq_id.required' => 'La pregunta es requerida',
+            'faq_id.integer' => 'El formato de pregunta debe ser entero.',
+            'faq_id.exists' => 'La pregunta ingresada no existe.',
+            'title.required' => 'El titulo de la pregunta es requerido.',
+            'description.required' => 'La descripción de la pregunta es requerida.'
         ];
     }
 

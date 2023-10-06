@@ -10,6 +10,10 @@ class Products {
         return axios.post('/products', data)
     }
 
+    show(id) {
+        return axios.get(`/products/${id}`)
+    }
+
     update(data) {
         return axios.post(`/products/${data.id}`, data.data)
     }

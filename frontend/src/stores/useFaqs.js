@@ -1,30 +1,30 @@
 import { defineStore } from 'pinia'
-import Products from '@/api/products'
+import Faqs from '@/api/faqs'
 
-export const useProductsStores = defineStore('products', {
+export const useFaqsStores = defineStore('faqs', {
     state: () => ({
-        products: {},
+        faqs: {},
         loading: false,
         last_page: 1,
-        productsTotalCount: 6
+        faqsTotalCount: 6
     }),
     getters:{
-        getProducts(){
-            return this.products
+        getFaqs(){
+            return this.faqs
         }
     },
     actions: {
         setLoading(payload){
             this.loading = payload
         },
-        fetchProducts(params) {
+        fetchFaqs(params) {
             this.setLoading(true)
             
-            return Products.get(params)
+            return Faqs.get(params)
                 .then((response) => {
-                    this.products = response.data.products.data
-                    this.last_page = response.data.products.last_page
-                    this.productsTotalCount = response.data.productsTotalCount
+                    this.faqs = response.data.faqs.data
+                    this.last_page = response.data.faqs.last_page
+                    this.faqsTotalCount = response.data.faqsTotalCount
                 })
                 .catch(error => console.log(error))
                 .finally(() => {
@@ -32,12 +32,12 @@ export const useProductsStores = defineStore('products', {
                 })
             
         },
-        addProduct(data) {
+        addFaq(data) {
             this.setLoading(true)
 
-            return Products.create(data)
+            return Faqs.create(data)
                 .then((response) => {
-                    this.products.push(response.data.product)
+                    this.faqs.push(response.data.faq)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -46,27 +46,13 @@ export const useProductsStores = defineStore('products', {
                 })
             
         },
-        showProduct(id) {
-            this.setLoading(true)
-
-            return Products.show(id)
-                .then((response) => {
-                    if(response.data.success)
-                        return Promise.resolve(response.data.product)
-                })
-                .catch(error => Promise.reject(error))
-                .finally(() => {
-                    this.setLoading(false)
-                })
-            
-        },
-        updateProduct(data) {
+        updateFaq(data) {
             this.setLoading(true)
             
-            return Products.update(data)
+            return Faqs.update(data)
                 .then((response) => {
-                    let pos = this.products.findIndex((item) => item.id === response.data.product.id)
-                    this.products[pos] = response.data.product
+                    let pos = this.faqs.findIndex((item) => item.id === response.data.faq.id)
+                    this.faqs[pos] = response.data.faq
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -75,19 +61,32 @@ export const useProductsStores = defineStore('products', {
                 })
          
         },
-        deleteProduct(id) {
+        deleteFaq(id) {
             this.setLoading(true)
 
-            return Products.delete(id)
+            return Faqs.delete(id)
                 .then((response) => {
-                    let index = this.products.findIndex((item) => item.id === id)
-                    this.products.splice(index, 1)
+                    let index = this.faqs.findIndex((item) => item.id === id)
+                    this.faqs.splice(index, 1)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
                 .finally(() => {
                     this.setLoading(false)
                 })  
-        }
+        },
+        fetchFaqsOrder(params) {
+            this.setLoading(true)
+            
+            return Faqs.order(params)
+                .then((response) => {
+                    this.faqs = response.data.faqs
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
     }
 })

@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\ProductCategory;
+use App\Models\ProductDetail;
+use App\Models\ProductImage;
 
 class Product extends Model
 {
@@ -62,38 +67,141 @@ class Product extends Model
     }
 
     /**** Public methods ****/
-    public static function createCategory($request) {
-         
-        $slug = self::getSlug($request);
+    public static function createProductCategories($product_id, $request) {
+        foreach(explode(",", $request->category_id) as $category_id){
+            ProductCategory::create([
+                'product_id' => $product_id,
+                'category_id' => $category_id
+            ]);
+        }
+    }
+
+    public static function updateProductCategories($product_id, $request) {
+        ProductCategory::where('product_id', $product_id)->delete();
+
+        foreach(explode(",", $request->category_id) as $category_id){
+            ProductCategory::create([
+                'product_id' => $product_id,
+                'category_id' => $category_id
+            ]);
+        }
+    }
+
+    public static function createProductDetails($product_id, $request) {
+        ProductDetail::create([
+            'product_id' => $product_id,
+            'width' => $request->width,
+            'height' => $request->height,
+            'deep' => $request->deep,
+            'weigth' => $request->weigth
+        ]);
+    }
+
+    public static function updateProductDetails($product_id, $request) {
+        $product_details = ProductDetail::where('product_id', $product_id)->first();
+        $product_details->width = $request->width;
+        $product_details->height = $request->height;
+        $product_details->deep = $request->deep;
+        $product_details->weigth = $request->weigth;
+        $product_details->save();
+    }
+
+    public static function createProductImages($product_id, $request) {
+        foreach(json_decode($request->colors, true) as $color) {
+            if ($request->hasFile('color_'.$color['color_id'])) {
+                $images = $request->file('color_'.$color['color_id']);
+        
+                foreach ($images as $image) {
+
+                    $path = 'products/gallery/';
+        
+                    $file_data = uploadFile($image, $path);
+
+                    $product_image = ProductImage::create([
+                        'product_id' => $product_id,
+                        'color_id' => $color['color_id'],
+                        'image' => $file_data['filePath']
+                    ]);
+                }
+            }
+        }
+    }
+
+    public static function updateProductImages($product_id, $request) {
+
+        if($request->update){
+            $products_images = ProductImage::where('product_id', $product_id)->get();
+
+            foreach($products_images as $products_image){
+                ProductImage::where('product_id', $product_id)->delete();
+                
+                if($products_image->image)
+                    deleteFile($products_image->image);
+            }
+        }
+
+        foreach(json_decode($request->colors, true) as $color) {
+            if ($request->hasFile('color_'.$color['color_id'])) {
+                $images = $request->file('color_'.$color['color_id']);
+            
+                foreach ($images as $image) {
+
+                    $path = 'products/gallery/';
+        
+                    $file_data = uploadFile($image, $path);
+
+                    $product_image = ProductImage::create([
+                        'product_id' => $product_id,
+                        'color_id' => $color['color_id'],
+                        'image' => $file_data['filePath']
+                    ]);
+                }
+            }
+        }
+    }
+
+    public static function createProduct($request) {
  
-        $category = self::create([
-            'category_id' => ($request->is_category) ? $request->category_id : null,
+        $product = self::create([
             'name' => $request->name,
             'description' => $request->description === 'null' ? null : $request->description,
-            'slug' => $slug
+            'sku' => $request->sku,
+            'price' => $request->price,
+            'price_for_sale' => $request->price_for_sale,
+            'stock' => $request->stock,
+            'slug' => Str::slug($request->name)
         ]);
- 
-        return $category;
+
+        self::createProductCategories($product->id, $request);
+        self::createProductDetails($product->id, $request);
+        self::createProductImages($product->id, $request);
+
+        return $product;
     }
  
-    public static function updateCategory($request, $category) {
-        $slug = self::getSlug($request);
+    public static function updateProduct($request, $product) {
  
-        $category->update([
-            'category_id' => ($request->is_category) ? $request->category_id : null,
+        $product->update([
             'name' => $request->name,
             'description' => $request->description === 'null' ? null : $request->description,
-            'slug' => $slug
+            'sku' => $request->sku,
+            'price' => $request->price,
+            'price_for_sale' => $request->price_for_sale,
+            'stock' => $request->stock,
+            'slug' => Str::slug($request->name)
         ]);
+
+        self::updateProductCategories($product->id, $request);
+        self::updateProductDetails($product->id, $request);
+        self::updateProductImages($product->id, $request);
  
-        return $category;
+        return $product;
     }
  
-    public static function deleteCategories($ids) {
+    public static function deleteProducts($ids) {
         foreach ($ids as $id) {
-            $category = self::with(['children.children'])->find($id);
-            $category->delete();
- 
+            $categproductory = self::with(['children.children'])->find($id);
+            $product->delete();
         }
     }
 }

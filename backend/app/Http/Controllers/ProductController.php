@@ -28,7 +28,7 @@ class ProductController extends Controller
     {
         $limit = $request->has('limit') ? $request->limit : 10;
     
-        $query = Product::with(['categories', 'detail', 'images'])
+        $query = Product::with(['categories.category', 'detail', 'images'])
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -54,6 +54,17 @@ class ProductController extends Controller
     {
         $product = Product::createProduct($request);
 
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $path = 'products/main/';
+
+            $file_data = uploadFile($image, $path);
+
+            $product->image = $file_data['filePath'];
+            $product->update();
+        } 
+
         return response()->json([
             'product' => Product::find($product->id),
             'success' => true
@@ -65,7 +76,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        $product = Product::with(['categories.category', 'detail', 'images'])->find($id);
 
         if (!$product)
             return response()->json([
@@ -75,7 +86,7 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'product' => $product,
+            'product' => $product
         ]);
     }
 

@@ -22,7 +22,9 @@ const emit = defineEmits([
     'copy',
     'open',
     'download',
-    'updateLink'
+    'updateLink',
+    'show',
+    'editProduct'
 ])
 
 const id = ref('')
@@ -43,6 +45,7 @@ const selling_price = ref(null)
 
 const is_affiliated = ref(false)
 const message = ref('')
+const categories = ref('')
 
 watchEffect(() => {
 
@@ -62,6 +65,7 @@ watchEffect(() => {
         comments.value = props.product.comments ?? -1
         sales.value = props.product.sales ?? -1
         selling_price.value = props.product.selling_price ?? -1
+        categories.value = props.product.categories
     }
 
     is_affiliated.value = props.is_affiliated ?? false
@@ -78,6 +82,14 @@ const download = (img) => {
 
 const open = (link) =>{
     emit('open', link)
+}
+
+const show = (id) => {
+    emit('show', id)
+}
+
+const editProduct = (id) => {
+    emit('editProduct', id)
 }
 
 const updateLink = (text, id) => {
@@ -104,11 +116,30 @@ const updateLink = (text, id) => {
 
 <template>
     <section>
-        <VCard>
-            <VCardItem class="header">
-                <VCardTitle class="text-h6 title-truncate"> {{ title }} </VCardTitle>
-                <VCardSubtitle v-if="description" class="subtitle-truncate mb-3"> {{ description }} </VCardSubtitle>
-            </VCardItem>
+        <VCard 
+            :title="title"
+            :subtitle="description">
+            <template #append>
+                <div class="mt-n4 me-n2">
+                    <VBtn
+                        v-if="$can('editar','productos')"
+                        icon
+                        color="default"
+                        size="x-small"
+                        variant="plain"
+                        @click="editProduct(id)">
+                        <VTooltip
+                            open-on-focus
+                            location="top"
+                            activator="parent">
+                            Editar
+                        </VTooltip>
+                        <VIcon
+                            :size="22"
+                            icon="tabler-edit"/>
+                    </VBtn>
+                </div>
+            </template>
             <VCardText>
                 <VRow>
                     <VCol cols="12" md="6">
@@ -126,7 +157,12 @@ const updateLink = (text, id) => {
                 <VCol cols="12" md="6">
                     <VRow class="text-center pt-2">
                         <VCol>
-                            <span v-if="id">
+                            <VBtn
+                                @click="show(id)"
+                                icon
+                                variant="text"
+                                color="default"
+                                size="x-small">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
@@ -138,14 +174,7 @@ const updateLink = (text, id) => {
                                     icon="tabler-eye"
                                     class="me-1"
                                 />
-                             </span>
-                            <span v-else>
-                                <VIcon
-                                    size="28"
-                                    icon="tabler-coin-euro"
-                                    class="me-1"
-                                />
-                            </span>
+                            </VBtn>                        
                         </VCol>
                         <VCol>
                             <span v-if="id">
@@ -291,25 +320,18 @@ const updateLink = (text, id) => {
                             />
                         </span>
                     </div>  
-                    <div>Valoracion:
-                        <span>
-                            <VIcon
-                                v-for="index in 5"
-                                size="20"
-                                icon="tabler-star"
-                                class="me-1"
-                             />
-                        </span>
+                    <div class="d-flex">Valoración:
+                        <VRating
+                            class="ms-1"
+                            v-model="rating"
+                            half-increments
+                            readonly
+                            density="compact"
+                            size="small"
+                        />
                     </div>
                     <div>Categorías:
-                        <span v-if="rating >= 0">{{ rating }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                             />
-                        </span>
+                        <span>{{ categories }}</span>
                     </div>                                  
                     <VAlert class="text-center mt-5">
                         <VRow>
