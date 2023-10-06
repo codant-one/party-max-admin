@@ -302,7 +302,7 @@ const submitUpdate = faqData => {
             <tfoot v-show="!faqs.length">
               <tr>
                 <td
-                  colspan="7"
+                  colspan="4"
                   class="text-center">
                   Datos no disponibles
                 </td>
