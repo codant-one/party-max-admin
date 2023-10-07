@@ -27,18 +27,9 @@ class Blog extends Model
 
     public static function updateBlog($request, $blog) {
 
-        if($request->hasFile('image'))
-        {
-            $image = $request->file('image'); 
-            $nameimage = time(). '-' .Str::slug($request->name)."_".$image->getClientOriginalName();
-            $nameimage = str_replace(' ', '', $nameimage);
-            $pathimage = $request->image->storeAs('images/blogs', $nameimage, 'public');
-        }
-
         $blog->update([
             'title' => $request->title,
-            'description' =>  $request->description,
-            'image' => $pathimage
+            'description' =>  $request->description
         ]);
 
         return $blog;
@@ -47,14 +38,15 @@ class Blog extends Model
     public static function deleteBlog($id) {
         $blog = self::find($id);
         $blog->delete();
+
+        if($blog->image)
+            deleteFile($blog->image);
     }
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
-        foreach (explode(' ', $search) as $term) {
-            $query->where('title', 'LIKE', '%' . $term . '%')
-                  ->orWhere('description', 'LIKE', '%' . $term . '%');
-        }
+        $query->where('title', 'LIKE', '%' . $search . '%')
+              ->orWhere('description', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {

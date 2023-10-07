@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\BlogRequest;
-use App\Models\Blog;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+
+use App\Models\Blog;
 
 class BlogController extends Controller
 {
@@ -26,23 +27,17 @@ class BlogController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Blog::query();            
+            $query = Blog::applyFilters(
+                            $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                            );            
 
-            $blogs = $query->applyFilters(
-                        $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        )->paginateData($limit);
+            $blogs = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
     
-            $count = $query->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy'
-                        ])
-                    )->count();
+            $count = $query->count();
 
             return response()->json([
                 'success' => true,
