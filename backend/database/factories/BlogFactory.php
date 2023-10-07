@@ -19,7 +19,7 @@ class BlogFactory extends Factory
         return [
             'title' => $this->faker->words(4, true),
             'description' => $this->faker->text(),
-            'image' => 'blogs/' . $this->faker->file(public_path('storage/blogs'), storage_path('app/public/blogs'), false)
+            'image' => 'blogs/' . $this->faker->file(public_path('images/blogs'), storage_path('app/public/blogs'), false),
         ];
     }
 }
