@@ -236,7 +236,7 @@ const submitUpdate = faqData => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','FAQs')"
+                v-if="$can('crear','faqs')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewFaqDrawerVisible = true">
                   Agregar FAQ
@@ -253,7 +253,7 @@ const submitUpdate = faqData => {
                 <th scope="col"> #ID </th>
                 <th scope="col"> TITULO </th>
                 <th scope="col"> DESCRIPCIÓN </th>
-                <th scope="col" v-if="$can('editar', 'FAQs') || $can('eliminar', 'FAQs')">
+                <th scope="col" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">
                   ACCIONES
                 </th>
               </tr>
@@ -269,9 +269,9 @@ const submitUpdate = faqData => {
                 <td> {{ faq.title }} </td>
                 <td> {{ faq.description }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'FAQs') || $can('eliminar', 'FAQs')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
                   <VBtn
-                    v-if="$can('editar', 'FAQs')"
+                    v-if="$can('editar', 'faqs')"
                     icon
                     size="x-small"
                     color="default"
@@ -284,7 +284,7 @@ const submitUpdate = faqData => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','FAQs')"
+                    v-if="$can('eliminar','faqs')"
                     icon
                     size="x-small"
                     color="default"
