@@ -134,6 +134,31 @@ const closeModal = function(){
                                 value="eliminar roles"
                             />
                         </div>
+                        <VLabel style="font-weight: bold;">
+                            FAQs
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver faqs"
+                                value="ver faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear faqs"
+                                value="crear faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar faqs"
+                                value="editar faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar faqs"
+                                value="eliminar faqs"
+                            />
+                        </div>
                     </div>
                 </VCardText>
                 <VCardTitle>
