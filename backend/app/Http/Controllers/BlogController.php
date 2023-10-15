@@ -69,7 +69,7 @@ class BlogController extends Controller
      */
     public function store(BlogRequest $request): JsonResponse
     {
-        try{
+        try {
             
             $blog = Blog::createBlog($request);
 
@@ -183,7 +183,7 @@ class BlogController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
-        //
+
     }
 
     /**
@@ -205,10 +205,7 @@ class BlogController extends Controller
             $blog->deleteBlog($id);
 
             return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'blog' => $blog
-                ]
+                'success' => true
             ], 200);
 
         } catch(\Illuminate\Database\QueryException $ex) {

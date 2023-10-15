@@ -22,9 +22,9 @@ export const useProductsStores = defineStore('products', {
             
             return Products.get(params)
                 .then((response) => {
-                    this.products = response.data.products.data
-                    this.last_page = response.data.products.last_page
-                    this.productsTotalCount = response.data.productsTotalCount
+                    this.products = response.data.data.products.data
+                    this.last_page = response.data.data.products.last_page
+                    this.productsTotalCount = response.data.data.productsTotalCount
                 })
                 .catch(error => console.log(error))
                 .finally(() => {
@@ -37,7 +37,7 @@ export const useProductsStores = defineStore('products', {
 
             return Products.create(data)
                 .then((response) => {
-                    this.products.push(response.data.product)
+                    this.products.push(response.data.data.product)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -52,7 +52,7 @@ export const useProductsStores = defineStore('products', {
             return Products.show(id)
                 .then((response) => {
                     if(response.data.success)
-                        return Promise.resolve(response.data.product)
+                        return Promise.resolve(response.data.data.product)
                 })
                 .catch(error => Promise.reject(error))
                 .finally(() => {
@@ -65,8 +65,8 @@ export const useProductsStores = defineStore('products', {
             
             return Products.update(data)
                 .then((response) => {
-                    let pos = this.products.findIndex((item) => item.id === response.data.product.id)
-                    this.products[pos] = response.data.product
+                    let pos = this.products.findIndex((item) => item.id === response.data.data.product.id)
+                    this.products[pos] = response.data.data.product
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))

@@ -1,7 +1,5 @@
 <script setup>
 
-import { useFaqsStores } from '@/stores/useFaqs'
-import { themeConfig } from '@themeConfig'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { requiredValidator } from '@validators'
 
@@ -22,12 +20,9 @@ const emit = defineEmits([
   'faqData',
 ])
 
-const faqsStores = useFaqsStores()
-
 const isFormValid = ref(false)
 const refForm = ref()
 
-const faqs = ref([])
 const id = ref(0)
 const title = ref('')
 const faq_id = ref()
@@ -41,10 +36,6 @@ const getTitle = computed(() => {
 watchEffect(async() => {
     if (props.isDrawerOpen) {
         let data = { limit: -1 }
-
-        await faqsStores.fetchFaqsOrder(data)
-
-        faqs.value = faqsStores.getFaqs
 
         if (!(Object.entries(props.faq).length === 0) && props.faq.constructor === Object) {
             isEdit.value = true

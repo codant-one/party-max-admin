@@ -17,10 +17,6 @@ class Faqs {
     delete(id){
         return axios.delete(`/faqs/${id}`)
     }
-
-    order(params){
-        return axios.get(`/faqs/list/order`, {params})
-    }
     
 }
 
