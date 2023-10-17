@@ -2,7 +2,7 @@
 
 import { useFaqsStores } from '@/stores/useFaqs'
 import { ref } from "vue"
-import { themeConfig } from '@themeConfig'
+import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewFaqDrawer from './AddNewFaqDrawer.vue' 
 
 const faqsStores = useFaqsStores()
@@ -176,6 +176,33 @@ const submitUpdate = faqData => {
     }, 3000)
 }
 
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+
+  let data = { limit: -1 }
+
+  await faqsStores.fetchFaqs(data)
+
+  let dataArray = [];
+      
+  faqsStores.getFaqs.forEach(element => {
+    let data = {
+      ID: element.id,
+      TÍTULO: element.title,
+      DESCRIPCIÓN: element.text,
+      CATEGORÍA:  element.category.name
+    }
+          
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "faqs", "csv");
+
+  isRequestOngoing.value = false
+
+}
 </script>
 
 <template>
@@ -221,6 +248,16 @@ const submitUpdate = faqData => {
                 density="compact"
                 variant="outlined"
                 :items="[10, 20, 30, 50]"/>
+            </div>
+
+            <div class="d-flex align-center">
+              <VBtn
+                variant="tonal"
+                color="secondary"
+                prepend-icon="tabler-file-export"
+                @click="downloadCSV">
+                Exportar
+              </VBtn>
             </div>
 
             <v-spacer />

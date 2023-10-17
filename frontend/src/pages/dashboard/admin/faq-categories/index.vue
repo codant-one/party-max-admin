@@ -116,7 +116,7 @@ const downloadCSV = async () => {
   })
 
   excelParser()
-    .exportDataFromJSON(dataArray, "faq-categories", "csv");
+    .exportDataFromJSON(dataArray, "categorías-faqs", "csv");
 
   isRequestOngoing.value = false
 
