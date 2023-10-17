@@ -39,7 +39,7 @@ const closeModal = function(){
     <VDialog
         :model-value="props.isDrawerOpen"
         persistent
-        max-width="900"
+        max-width="1000"
         >
         <DialogCloseBtn @click="closeModal" />
 
@@ -135,7 +135,32 @@ const closeModal = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
-                            FAQs
+                            Categorías FAQ's
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver categorías-faqs"
+                                value="ver categorías-faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear categorías-faqs"
+                                value="crear categorías-faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar categorías-faqs"
+                                value="editar categorías-faqs"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar categorías-faqs"
+                                value="eliminar categorías-faqs"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            FAQ's
                         </VLabel>
                         <div class="demo-space-x ml-5">
                             <VCheckbox
@@ -157,6 +182,23 @@ const closeModal = function(){
                                 v-model="assignedPermissions"
                                 label="eliminar faqs"
                                 value="eliminar faqs"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
+                <VCardTitle>
+                    Utilidades  
+                </VCardTitle>
+                <VCardText>
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            FAQ's
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver página-faqs"
+                                value="ver página-faqs"
                             />
                         </div>
                     </div>

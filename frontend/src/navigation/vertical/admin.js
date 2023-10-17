@@ -17,13 +17,24 @@ export default [
         action: 'ver' , 
         subject: 'roles', 
       },
-      { 
-        title: 'FAQs', 
+      {
+        title: "FAQ's",
         icon: { icon: 'tabler-help-hexagon' },
-        to: 'dashboard-admin-faqs', 
-        action: 'ver' , 
-        subject: 'faqs', 
-      }   
+        children: [
+          { 
+            title: 'Categorías', 
+            to: 'dashboard-admin-faq-categories', 
+            action: 'ver',
+            subject: 'categorías-faqs',
+          },
+          { 
+            title: "Lista de FAQ's", 
+            to: 'dashboard-admin-faqs', 
+            action: 'ver',
+            subject: 'faqs',
+          },
+        ],
+      }  
     ],
   }
 ]

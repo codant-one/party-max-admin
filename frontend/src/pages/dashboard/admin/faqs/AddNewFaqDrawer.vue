@@ -2,6 +2,7 @@
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { requiredValidator } from '@validators'
+import { useCategoriesStores } from '@/stores/useFaqCategories'
 
 const props = defineProps({
   isDrawerOpen: {
@@ -20,12 +21,19 @@ const emit = defineEmits([
   'faqData',
 ])
 
+const categoriesStores = useCategoriesStores()
+
 const isFormValid = ref(false)
 const refForm = ref()
 
+const categories = ref([])
+const searchQuery = ref('')
+const rowPerPage = ref(10)
+const currentPage = ref(1)
+
 const id = ref(0)
+const faq_category_id = ref('')
 const title = ref('')
-const faq_id = ref()
 const description = ref('')
 const isEdit = ref(false)
 
@@ -34,6 +42,8 @@ const getTitle = computed(() => {
 })
 
 watchEffect(async() => {
+  fetchData()
+
     if (props.isDrawerOpen) {
         let data = { limit: -1 }
 
@@ -42,8 +52,33 @@ watchEffect(async() => {
             id.value = props.faq.id
             title.value = props.faq.title
             description.value = props.faq.description
+            faq_category_id.value = props.faq.faq_category_id
         }
     }
+})
+
+async function fetchData() {
+
+  let data = {
+    search: searchQuery.value,
+    orderByField: 'id',
+    orderBy: 'desc',
+    limit: rowPerPage.value,
+    page: currentPage.value
+  }
+
+  await categoriesStores.fetchCategories(data)
+  categories.value = categoriesStores.getCategories
+
+}
+
+const getCategories = computed(() => {
+  return categories.value.map((category) => {
+    return {
+      title: category.name,
+      value: category.id,
+    }
+  })
 })
 
 // 👉 drawer close
@@ -53,6 +88,9 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
+    title.value = ''
+    description.value = ''
+    faq_category_id.value = ''
     isEdit.value = false
     id.value = 0
   })
@@ -66,20 +104,18 @@ const onSubmit = () => {
       formData.append('id', id.value)
       formData.append('title', title.value)
       formData.append('description', description.value)
+      formData.append('faq_category_id', faq_category_id.value)
 
       emit('faqData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
+
+      closeNavigationDrawer()
     }
   })
 }
 
-
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
-}
-
-const closeDropdown = () => { 
-  document.getElementById("selectFaq").blur()
 }
 
 </script>
@@ -127,6 +163,17 @@ const closeDropdown = () => {
             @submit.prevent="onSubmit"
           >
             <VRow>
+              <!-- 👉 Categories -->
+              <VCol cols="12">
+                <v-autocomplete
+                  v-model="faq_category_id"
+                  label="Categoría"
+                  :rules="[requiredValidator]"
+                  :items="getCategories"
+                  :menu-props="{ maxHeight: '200px' }"
+                />
+              </VCol>
+
               <!-- 👉 Title -->
               <VCol cols="12">
                 <VTextField

@@ -25,7 +25,6 @@ class FaqController extends Controller
         $this->middleware(PermissionMiddleware::class . ':eliminar faqs|administrador')->only(['destroy']);
     }
 
-
     /**
      * Display a listing of the resource.
      */
@@ -35,7 +34,8 @@ class FaqController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Faq::applyFilters(
+            $query = Faq::with(['category'])
+                        ->applyFilters(
                             $request->only([
                                 'search',
                                 'orderByField',
@@ -76,7 +76,7 @@ class FaqController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'faq' => Faq::find($faq->id)
+                    'faq' => Faq::with(['category'])->find($faq->id)
                 ]
             ]);
 
@@ -96,7 +96,7 @@ class FaqController extends Controller
     {
         try {
 
-            $faq = Faq::find($id);
+            $faq = Faq::with(['category'])->find($id);
 
             if (!$faq)
                 return response()->json([
@@ -125,13 +125,13 @@ class FaqController extends Controller
      *
      * Update the specified resource in storage.
      */
-    public function update(FaqRequest $request, Faq $faq): JsonResponse
+    public function update(FaqRequest $request, $id): JsonResponse
     {
         try {
 
             $faq = Faq::find($id);
         
-            if (!$blog)
+            if (!$faq)
                 return response()->json([
                     'success' => false,
                     'feedback' => 'not_found',
@@ -143,7 +143,7 @@ class FaqController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'faq' => Faq::find($faq->id)
+                    'faq' => Faq::with(['category'])->find($faq->id)
                 ]
             ]);
 
@@ -189,5 +189,6 @@ class FaqController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    
     }
 }

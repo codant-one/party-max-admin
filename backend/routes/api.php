@@ -18,7 +18,8 @@ use App\Http\Controllers\{
     ProductController,
     BlogController,
     FaqController,
-    ColorController
+    ColorController,
+    FaqCategoryController
 };
 
 /*
@@ -59,6 +60,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('products', ProductController::class);
     Route::apiResource('blogs', BlogController::class);
     Route::apiResource('faqs', FaqController::class);
+    Route::apiResource('faq-categories', FaqCategoryController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -100,6 +102,13 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Products
     Route::group(['prefix' => 'products'], function () {
         Route::post('delete', [ProductController::class, 'delete']);
+    });
+
+
+    //Faq-categories
+    Route::group(['prefix' => 'faq-categories'], function () {
+        Route::post('delete', [FaqCategoryController::class, 'delete']);
+        Route::get('faqs/all', [FaqCategoryController::class, 'faqs']);
     });
 
 });

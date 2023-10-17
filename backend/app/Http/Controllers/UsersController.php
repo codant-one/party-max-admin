@@ -106,23 +106,18 @@ class UsersController extends Controller
             
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = User::with(['roles','userDetail.province.country']);
-
-            $users = $query->applyFilters(
+            $query = User::with(['roles','userDetail.province.country'])
+                         ->applyFilters(
                             $request->only([
                                 'search',
                                 'orderByField',
                                 'orderBy'
                             ])
-                        )->paginateData($limit);
+                        );
 
-            $count = $query->applyFilters(
-                            $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        )->count();
+            $users = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            $count = $query->count();
 
             return response()->json([
                 'success' => true,

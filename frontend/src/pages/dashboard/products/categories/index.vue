@@ -82,7 +82,7 @@ const removeCategory = async () => {
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Categoría eliminada con éxito!' : res.data.message,
+    message: res.data.success ? 'Categoría eliminada!' : res.data.message,
     show: true
   }
 
@@ -119,7 +119,7 @@ const submitCreate = categoryData => {
             if (res.data.success) {
                 advisor.value = {
                     type: 'success',
-                    message: 'Categoría creada con éxito',
+                    message: 'Categoría creada!',
                     show: true
                 }
                 fetchData()
@@ -151,7 +151,7 @@ const submitUpdate = categoryData => {
             if (res.data.success) {
                     advisor.value = {
                     type: 'success',
-                    message: 'Categoría actualizada con éxito',
+                    message: 'Categoría actualizada!',
                     show: true
                 }
                 fetchData()

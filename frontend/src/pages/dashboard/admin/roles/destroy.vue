@@ -42,7 +42,7 @@ const deleteRole = function() {
       
         advisor.value.show = true
         advisor.value.type = 'success'
-        advisor.value.message = 'Rol Eliminado'
+        advisor.value.message = 'Rol Eliminado!'
             
         emit('alert', advisor)
         emit('data')

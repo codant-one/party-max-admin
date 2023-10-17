@@ -1,22 +1,22 @@
 <script setup>
 
-import { useFaqsStores } from '@/stores/useFaqs'
+import { useCategoriesStores } from '@/stores/useFaqCategories'
+import { excelParser } from '@/plugins/csv/excelParser'
 import { ref } from "vue"
-import { themeConfig } from '@themeConfig'
-import AddNewFaqDrawer from './AddNewFaqDrawer.vue' 
+import Toaster from "@/components/common/Toaster.vue";
+import router from '@/router'
 
-const faqsStores = useFaqsStores()
+const categoriesStores = useCategoriesStores()
 
-const faqs = ref([])
+const categories = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalFaqs = ref(0)
+const totalCategories = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewFaqDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
-const selectedFaq = ref({})
+const selectedCategory = ref({})
 
 const advisor = ref({
   type: '',
@@ -26,19 +26,16 @@ const advisor = ref({
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = faqs.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = faqs.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = categories.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = categories.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalFaqs.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalCategories.value } registros`
 })
 
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
-
-    if (!isAddNewFaqDrawerVisible.value)
-        selectedFaq.value = {}
 })
 
 watchEffect(fetchData)
@@ -55,34 +52,32 @@ async function fetchData() {
 
   isRequestOngoing.value = true
 
-  await faqsStores.fetchFaqs(data)
+  await categoriesStores.fetchCategories(data)
 
-  faqs.value = faqsStores.getFaqs
-  totalPages.value = faqsStores.last_page
-  totalFaqs.value = faqsStores.faqsTotalCount
+  categories.value = categoriesStores.getCategories
+  totalPages.value = categoriesStores.last_page
+  totalCategories.value = categoriesStores.categoriesTotalCount
 
   isRequestOngoing.value = false
 }
 
-const editFaq = faqData => {
-    isAddNewFaqDrawerVisible.value = true
-    selectedFaq.value = { ...faqData }
+const editCategory = categoryData => {
+  router.push({ name : 'dashboard-admin-faq-categories-edit-id', params: { id: categoryData.id } })
 }
 
-
-const showDeleteDialog = faqData => {
+const showDeleteDialog = categoryData => {
   isConfirmDeleteDialogVisible.value = true
-  selectedFaq.value = { ...faqData }
+  selectedCategory.value = { ...categoryData }
 }
 
-const removeFaq = async () => {
+const removeCategory = async () => {
   isConfirmDeleteDialogVisible.value = false
-  let res = await faqsStores.deleteFaq(selectedFaq.value.id)
-  selectedFaq.value = {}
+  let res = await categoriesStores.deleteCategory({ ids: [selectedCategory.value.id] })
+  selectedCategory.value = {}
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'FAQ eliminada!' : res.data.message,
+    message: res.data.success ? 'Categoría eliminada!' : res.data.message,
     show: true
   }
 
@@ -99,81 +94,32 @@ const removeFaq = async () => {
   return true
 }
 
-const submitForm = async (faq, method) => {
+const downloadCSV = async () => {
+
   isRequestOngoing.value = true
 
-  if (method === 'update') {
-    faq.data.append('_method', 'PUT')
-    submitUpdate(faq)
-    return
-  }
+  let data = { limit: -1 }
 
-  submitCreate(faq.data)
-}
+  await categoriesStores.fetchCategories(data)
 
+  let dataArray = [];
+      
+  categoriesStores.getCategories.forEach(element => {
+    let data = {
+      ID: element.id,
+      NOMBRE: element.name,
+      DESCRIPCIÓN: element.description ?? '',
+      ICONO:  element.icon
+    }
+        
+    dataArray.push(data)
+  })
 
-const submitCreate = faqData => {
+  excelParser()
+    .exportDataFromJSON(dataArray, "faq-categories", "csv");
 
-    faqsStores.addFaq(faqData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'FAQ creada!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
+  isRequestOngoing.value = false
 
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
-}
-
-const submitUpdate = faqData => {
-
-    faqsStores.updateFaq(faqData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'FAQ actualizada!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
 }
 
 </script>
@@ -209,6 +155,7 @@ const submitUpdate = faqData => {
             
           {{ advisor.message }}
         </v-alert>
+        <Toaster />
 
         <v-card title="">
           <v-card-text class="d-flex flex-wrap py-4 gap-4">
@@ -223,11 +170,21 @@ const submitUpdate = faqData => {
                 :items="[10, 20, 30, 50]"/>
             </div>
 
+            <div class="d-flex align-center">
+              <VBtn
+                variant="tonal"
+                color="secondary"
+                prepend-icon="tabler-file-export"
+                @click="downloadCSV">
+                Exportar
+              </VBtn>
+            </div>
+
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
               <!-- 👉 Search  -->
-              <div class="search">
+              <div style="width: 10rem;">
                 <v-text-field
                   v-model="searchQuery"
                   placeholder="Buscar"
@@ -236,10 +193,10 @@ const submitUpdate = faqData => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','faqs')"
+                v-if="$can('crear','categorías-faqs')"
                 prepend-icon="tabler-plus"
-                @click="isAddNewFaqDrawerVisible = true">
-                  Agregar FAQ
+                :to="{ name: 'dashboard-admin-faq-categories-add' }">
+                  Agregar Categoría
               </v-btn>
             </div>
           </v-card-text>
@@ -251,10 +208,10 @@ const submitUpdate = faqData => {
             <thead>
               <tr>
                 <th scope="col"> #ID </th>
-                <th scope="col"> TITULO </th>
+                <th scope="col"> NOMBRE </th>
                 <th scope="col"> DESCRIPCIÓN </th>
-                <th scope="col"> CATEGORÍA </th>
-                <th scope="col" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">
+                <th scope="col"> ICONO </th>
+                <th scope="col" v-if="$can('editar', 'categorías-faqs') || $can('eliminar', 'categorías-faqs')">
                   ACCIONES
                 </th>
               </tr>
@@ -262,23 +219,30 @@ const submitUpdate = faqData => {
             <!-- 👉 table body -->
             <tbody>
               <tr 
-                v-for="faq in faqs"
-                :key="faq.id"
+                v-for="category in categories"
+                :key="category.id"
                 style="height: 3.75rem;">
 
-                <td> {{ faq.id }} </td>
-                <td class="text-wrap"> {{ faq.title }} </td>
-                <td class="text-wrap"> {{ faq.description }} </td>
-                <td class="text-wrap"> {{ faq.category.name }} </td>
+                <td> {{ category.id }} </td>
+                <td> {{ category.name }} </td>
+                <td> {{ category.description }} </td>
+                <td> 
+                  <VAvatar
+                    :icon="category.icon"
+                    rounded
+                    :color="category.color"
+                    variant="tonal"
+                   />
+                </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías-faqs') || $can('eliminar', 'categorías-faqs')">      
                   <VBtn
-                    v-if="$can('editar', 'faqs')"
+                    v-if="$can('editar', 'categorías-faqs')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="editFaq(faq)">
+                    @click="editCategory(category)">
                               
                     <VIcon
                         size="22"
@@ -286,12 +250,12 @@ const submitUpdate = faqData => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','faqs')"
+                    v-if="$can('eliminar','categorías-faqs')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="showDeleteDialog(faq)">
+                    @click="showDeleteDialog(category)">
                               
                     <VIcon
                       size="22"
@@ -301,10 +265,10 @@ const submitUpdate = faqData => {
               </tr>
             </tbody>
             <!-- 👉 table footer  -->
-            <tfoot v-show="!faqs.length">
+            <tfoot v-show="!categories.length">
               <tr>
                 <td
-                  colspan="4"
+                  colspan="7"
                   class="text-center">
                   Datos no disponibles
                 </td>
@@ -330,12 +294,6 @@ const submitUpdate = faqData => {
       </v-col>
     </v-row>
 
-    <!-- 👉 Add New Faq -->
-    <AddNewFaqDrawer
-      v-model:isDrawerOpen="isAddNewFaqDrawerVisible"
-      :faq="selectedFaq"
-      @faq-data="submitForm"/>
-
     <!-- 👉 Confirm Delete -->
     <VDialog
       v-model="isConfirmDeleteDialogVisible"
@@ -346,9 +304,9 @@ const submitUpdate = faqData => {
       <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar FAQ">
+      <VCard title="Eliminar Categoría">
         <VCardText>
-          Está seguro de eliminar la FAQ de <strong>{{ selectedFaq.title }}</strong>?.
+          Está seguro de eliminar la categoría de <strong>{{ selectedCategory.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -358,7 +316,7 @@ const submitUpdate = faqData => {
             @click="isConfirmDeleteDialogVisible = false">
               Cancelar
           </VBtn>
-          <VBtn @click="removeFaq">
+          <VBtn @click="removeCategory">
               Aceptar
           </VBtn>
         </VCardText>
@@ -367,19 +325,8 @@ const submitUpdate = faqData => {
   </section>
 </template>
 
-<style scope>
-    .search {
-        width: 100%;
-    }
-
-    @media(min-width: 991px){
-        .search {
-            width: 30rem;
-        }
-    }
-</style>
 <route lang="yaml">
   meta:
     action: ver
-    subject: faqs
+    subject: categorías-faqs
 </route>

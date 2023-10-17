@@ -2,43 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\FaqCategoryRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
-use App\Models\Category;
+use App\Models\FaqCategory;
 
-class CategoryController extends Controller
+class FaqCategoryController extends Controller
 {
-    protected $categories;
-
     public function __construct()
     {
-        $this->categories = [];
-
-        $this->middleware(PermissionMiddleware::class . ':ver categorías|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear categorías|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar categorías|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar categorías|administrador')->only(['delete']);
-    }
-
-    function traverseChildren($children, $level = 1)
-    {
-        $children->sortBy('id');
-        
-        foreach ($children as $child) {
-            $data = [
-                'id' => $child->id, 
-                'name' => $child->name, 
-                'level' => $level + 1
-            ];
-
-            array_push($this->categories, $data);
-            $this->traverseChildren($child->children, $level + 1);
-        }
+        $this->middleware(PermissionMiddleware::class . ':ver categorías-faqs|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear categorías-faqs|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar categorías-faqs|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar categorías-faqs|administrador')->only(['delete']);
     }
 
     /**
@@ -50,14 +30,14 @@ class CategoryController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Category::with(['category.category'])
-                            ->applyFilters(
-                                    $request->only([
-                                        'search',
-                                        'orderByField',
-                                        'orderBy'
-                                    ])
-                                );
+            $query = FaqCategory::
+                applyFilters(
+                    $request->only([
+                        'search',
+                        'orderByField',
+                        'orderBy'
+                    ])
+                );
 
             $categories = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
@@ -80,68 +60,19 @@ class CategoryController extends Controller
         }
     }
 
-    public function order(Request $request): JsonResponse
-    {
-        try {
-
-            $query = Category::with('children')
-                                ->whereNull('category_id')
-                                ->orderBy('id')
-                                ->get();
-
-            foreach ($query as $category) {
-                $data = [
-                    'id' => $category->id, 
-                    'name' => $category->name, 
-                    'level' => 1
-                ];
-
-                array_push($this->categories, $data);
-
-                $this->traverseChildren($category->children);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'categories' => $this->categories
-                ]
-            ]);
-
-        } catch(\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-              'success' => false,
-              'message' => 'database_error',
-              'exception' => $ex->getMessage()
-            ], 500);
-        }
-
-    }
-
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoryRequest $request): JsonResponse
+    public function store(FaqCategoryRequest $request): JsonResponse
     {
         try {
 
-            $category = Category::createCategory($request);
-
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-
-                $path = 'categories/';
-
-                $file_data = uploadFile($image, $path);
-
-                $category->image = $file_data['filePath'];
-                $category->update();
-            } 
+            $category = FaqCategory::createCategory($request);
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'category' => Category::find($category->id)
+                    'category' => FaqCategory::find($category->id)
                 ]
             ]);
 
@@ -160,8 +91,8 @@ class CategoryController extends Controller
     public function show($id)
     {
         try {
-            
-            $category = Category::find($id);
+
+            $category = FaqCategory::find($id);
 
             if (!$category)
                 return response()->json([
@@ -189,11 +120,11 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CategoryRequest $request, Category $category): JsonResponse
+    public function update(FaqCategoryRequest $request, $id): JsonResponse
     {
         try {
 
-            $category = Category::find($id);
+            $category = FaqCategory::find($id);
 
             if (!$category)
                 return response()->json([
@@ -204,21 +135,10 @@ class CategoryController extends Controller
 
             $category = $category->updateCategory($request, $category);
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-
-                $path = 'categories/';
-
-                $file_data = uploadFile($image, $path, $category->image);
-
-                $category->image = $file_data['filePath'];
-                $category->save();
-            }
-
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'category' => Category::find($category->id)
+                    'category' => FaqCategory::find($category->id)
                 ]
             ]);
 
@@ -237,8 +157,8 @@ class CategoryController extends Controller
     public function delete(Request $request): JsonResponse
     {
         try {
-
-            $category = Category::find($id);
+                
+            $category = FaqCategory::find($request->ids);
 
             if (!$category)
                 return response()->json([
@@ -246,13 +166,37 @@ class CategoryController extends Controller
                     'feedback' => 'not_found',
                     'message' => 'Categoría no encontrado'
                 ], 404);
-                
-            Category::deleteCategories($request->ids);
+
+            FaqCategory::deleteCategories($request->ids);
 
             return response()->json([
                 'success' => true
             ]);
-            
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function faqs(): JsonResponse
+    {
+        try {
+
+            $categories = 
+                FaqCategory::with(['faqs'])
+                           ->get();
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'categories' => $categories
+                ]
+            ]);
+
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,

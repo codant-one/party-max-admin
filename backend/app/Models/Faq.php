@@ -7,14 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\FaqCategory;
+
 class Faq extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
+    /**** Relationship ****/
+    public function category() {
+        return $this->belongsTo(FaqCategory::class, 'faq_category_id', 'id');
+    }
 
-     /**** Scopes ****/
+    /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('title', 'LIKE', '%' . $search . '%')
              ->orWhere('description', 'LIKE', '%' . $search . '%');
@@ -50,6 +56,7 @@ class Faq extends Model
     /**** Public methods ****/
     public static function createFaq($request) {
         $faq = self::create([
+            'faq_category_id' => $request->faq_category_id,
             'title' => $request->title,
             'description' => $request->description
         ]);
@@ -59,6 +66,7 @@ class Faq extends Model
 
     public static function updateFaq($request, $faq) {
         $faq->update([
+            'faq_category_id' => $request->faq_category_id,
             'title' => $request->title,
             'description' => $request->description
         ]);

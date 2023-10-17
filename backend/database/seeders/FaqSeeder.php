@@ -15,8 +15,6 @@ class FaqSeeder extends Seeder
      */
     public function run(): void
     {
-        Faq::factory(10)->create();
-
         Permission::create(['name' => 'ver faqs']);
         Permission::create(['name' => 'crear faqs']);
         Permission::create(['name' => 'editar faqs']);

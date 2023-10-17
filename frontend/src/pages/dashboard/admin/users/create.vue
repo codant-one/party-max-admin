@@ -140,7 +140,7 @@ const onSubmitCreate = () => {
           
           advisor.value.show = true
           advisor.value.type = 'success'
-          advisor.value.message = 'Usuario Creado'
+          advisor.value.message = 'Usuario Creado!'
           
           emit('alert', advisor)
           emit('data')

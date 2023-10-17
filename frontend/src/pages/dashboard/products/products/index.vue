@@ -116,7 +116,7 @@ else if(data.text === 'discarded')
                 
 //         advisor.value.show = true
 //         advisor.value.type = 'success'
-//         advisor.value.message = 'Enlace Actualizado'
+//         advisor.value.message = 'Enlace actualizado!'
 
 //         closeAdvisor()
 //         fetchData()

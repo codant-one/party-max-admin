@@ -5,7 +5,7 @@ export default [
       children:[      
         {
           title: 'FAQ',
-          icon: { icon: 'tabler-help-hexagon' },
+          icon: { icon: 'mdi-frequently-asked-questions' },
           to: 'dashboard-utils-faqs',
           action: 'ver',
           subject: 'página-faqs',

@@ -11,6 +11,7 @@ import { avatarText } from '@/@core/utils/formatters'
 import { useUsersStores } from '@/stores/useUsers'
 import { useRolesStores } from '@/stores/useRoles'
 import { themeConfig } from '@themeConfig'
+import { excelParser } from '@/plugins/csv/excelParser'
 
 const usersStores = useUsersStores()
 const rolesStores = useRolesStores()
@@ -184,317 +185,360 @@ const showAlert = function(alert) {
   advisor.value.message = alert.value.message
 }
 
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+
+  let data = { limit: -1}
+
+  await usersStores.fetchUsers(data)
+
+  let dataArray = []
+  
+  usersStores.getUsers.forEach(element => {
+    let data = {
+      ID: element.id,
+      NOMBRE: element.name,
+      CORREO: element.email,
+      ROLES: element.roles.map(e => e['name']).join(','),
+      USUARIO: element.username
+    }
+        
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "usuarios", "csv")
+
+  isRequestOngoing.value = false
+}
+
 </script>
 
 <template>
-  <VCard v-if="users" id="rol-list" >
-    <v-alert
-      v-if="advisor.show"
-      :type="advisor.type"
-      class="mb-6"
-    >
-      {{ advisor.message }}
-    </v-alert>
-    
+  <section>
+    <v-row>
+      <VDialog
+        v-model="isRequestOngoing"
+        width="300"
+        persistent>
+          
+        <VCard
+          color="primary"
+          width="300">
+            
+          <VCardText class="pt-3">
+            Cargando
 
-    <VCardText class="d-flex align-center flex-wrap gap-4">
-      <!-- 👉 Rows per page -->
-      <div
-        class="d-flex align-center"
-        style="width: 135px;"
-      >
-        <VSelect
-          v-model="rowPerPage"
-          density="compact"
-          :items="[10, 20, 30, 50]"
-        />
-      </div>
+            <VProgressLinear
+              indeterminate
+              color="white"
+              class="mb-0"/>
+          </VCardText>
+        </VCard>
+      </VDialog>
 
-      <create
-        :rolesList="rolesList"
-        @close="roleUsers = []"
-        @data="fetchData"
-        @alert="showAlert"/>
+      <v-col cols="12">
+        <v-alert
+          v-if="advisor.show"
+          :type="advisor.type"
+          class="mb-6">
+            {{ advisor.message }}
+        </v-alert>
 
-      <VSpacer />
+        <VCard v-if="users" id="rol-list" >
+          <VCardText class="d-flex align-center flex-wrap gap-4">
+            <!-- 👉 Rows per page -->
+            <div
+              class="d-flex align-center"
+              style="width: 135px;"
+            >
+              <VSelect
+                v-model="rowPerPage"
+                density="compact"
+                :items="[10, 20, 30, 50]"
+              />
+            </div>
 
-      <div class="d-flex align-center flex-wrap gap-4">
-        <!-- 👉 Select status -->
-        <div class="invoice-list-filter"
-          style="width: 20rem;"
-        >
-          <VSelect
-            v-model="searchRol"
-            label="Filtrar por rol"
-            clearable
-            clear-icon="tabler-x"
-            single-line
-            :items="rolesList"
-          />
-        </div>
-        
-        <!-- 👉 Search  -->
-        <div class="search">
-          <VTextField
-            v-model="searchQuery"
-            placeholder="Buscar usuario"
-            density="compact"
-          />
-        </div>
-      </div>
-    </VCardText>
-
-    <VDivider />
-
-    <!-- SECTION Table -->
-    <VTable class="text-no-wrap rol-list-table">
-      <!-- 👉 Table head -->
-      <thead class="text-uppercase">
-        <tr>
-          <th scope="col"> #ID </th>
-          <th scope="col"> NOMBRE </th>
-          <th scope="col"> CORREO </th>
-          <th scope="col"> ROLES </th>
-          <th scope="col"> USUARIO </th>
-          <th scope="col" v-if="$can('ver','usuarios') || $can('editar','usuarios') || $can('eliminar','usuarios')">
-            Acciones 
-          </th>
-        </tr>
-      </thead>
-
-      <!-- 👉 Table Body -->
-      <tbody>
-        <tr
-          v-for="user in users"
-          :key="user.id"
-          style="height: 3.75rem;"
-        >
-          <!-- 👉 Id -->
-          <td>
-            #{{ user.id }}
-          </td>
-
-          <!-- 👉 name -->
-          <td>
             <div class="d-flex align-center">
-              <VBadge
-                dot
-                location="bottom right"
-                offset-x="3"
-                offset-y="3"
-                bordered
-                :color="online(user.id)"
+              <VBtn
+                variant="tonal"
+                color="secondary"
+                prepend-icon="tabler-file-export"
+                @click="downloadCSV">
+                  Exportar
+              </VBtn>
+            </div>
+
+            <div class="me-3">
+              <create
+                :rolesList="rolesList"
+                @close="roleUsers = []"
+                @data="fetchData"
+                @alert="showAlert"/>
+            </div>
+
+            <VSpacer />
+
+            <div class="d-flex align-center flex-wrap gap-4">
+              <!-- 👉 Select status -->
+              <div class="invoice-list-filter"
+                style="width: 20rem;"
               >
-                <VAvatar
-                  variant="tonal"
-                  size="38"
-                >
-                  <VImg
-                    v-if="user.avatar"
-                    style="border-radius: 50%;"
-                    :src="themeConfig.settings.urlStorage + user.avatar"
-                  />
-                  <span v-else>{{ avatarText(user.name) }}</span>
-                </VAvatar>
-              </VBadge>
-              <div class="ml-3 d-flex flex-column">
-                {{ user.name }}
+                <VSelect
+                  v-model="searchRol"
+                  label="Filtrar por rol"
+                  clearable
+                  clear-icon="tabler-x"
+                  single-line
+                  :items="rolesList"
+                />
+              </div>
+              
+              <!-- 👉 Search  -->
+              <div class="search rol-list-filter">
+                <VTextField
+                  v-model="searchQuery"
+                  placeholder="Buscar usuario"
+                  density="compact"
+                />
               </div>
             </div>
-          </td>
+          </VCardText>
 
-          <!-- 👉 correo -->
-          <td>
-            {{ user.email }}
-          </td>
+          <VDivider />
 
-          <!-- 👉 roles -->
-          <td>
-            <ul>
-              <li v-for="(value,key) in user.roles">
-                {{ value.name }}
-              </li>
-            </ul>
-          </td>
+          <!-- SECTION Table -->
+          <VTable class="text-no-wrap rol-list-table">
+            <!-- 👉 Table head -->
+            <thead class="text-uppercase">
+              <tr>
+                <th scope="col"> #ID </th>
+                <th scope="col"> NOMBRE </th>
+                <th scope="col"> CORREO </th>
+                <th scope="col"> ROLES </th>
+                <th scope="col"> USUARIO </th>
+                <th scope="col" v-if="$can('ver','usuarios') || $can('editar','usuarios') || $can('eliminar','usuarios')">
+                  Acciones 
+                </th>
+              </tr>
+            </thead>
 
-          <!-- 👉 username -->
-          <td>
-            {{ user.username }}
-          </td>
-
-          <!-- 👉 acciones -->
-          <td style="width: 8rem;">
-            <VBtn
-              v-if="$can('ver','usuarios')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
+            <!-- 👉 Table Body -->
+            <tbody>
+              <tr
+                v-for="user in users"
+                :key="user.id"
+                style="height: 3.75rem;"
               >
-                Ver
-              </VTooltip>
-              <VIcon
-                icon="tabler-eye"
-                
-                :size="22"
-                @click="showUserDetailDialog(user)"
-              />
-            </VBtn>
+                <!-- 👉 Id -->
+                <td>
+                  #{{ user.id }}
+                </td>
 
-            <VBtn
-              v-if="$can('editar','usuarios')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="showUserPasswordDialog(user)"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Cambiar contraseña
-              </VTooltip>
-              <VIcon
-                :size="22"
-                icon="tabler-key"
-              />
-            </VBtn>
+                <!-- 👉 name -->
+                <td>
+                  <div class="d-flex align-center">
+                    <VBadge
+                      dot
+                      location="bottom right"
+                      offset-x="3"
+                      offset-y="3"
+                      bordered
+                      :color="online(user.id)"
+                    >
+                      <VAvatar
+                        variant="tonal"
+                        size="38"
+                      >
+                        <VImg
+                          v-if="user.avatar"
+                          style="border-radius: 50%;"
+                          :src="themeConfig.settings.urlStorage + user.avatar"
+                        />
+                        <span v-else>{{ avatarText(user.name) }}</span>
+                      </VAvatar>
+                    </VBadge>
+                    <div class="ml-3 d-flex flex-column">
+                      {{ user.name }}
+                    </div>
+                  </div>
+                </td>
 
-            <VBtn
-              v-if="$can('editar','usuarios')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="showUserEditDialog(user)"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Editar
-              </VTooltip>
-              <VIcon
-                :size="22"
-                icon="tabler-edit"
-              />
-            </VBtn>
+                <!-- 👉 correo -->
+                <td>
+                  {{ user.email }}
+                </td>
 
-            <VBtn
-              v-if="$can('eliminar','usuarios')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="showUserDeleteDialog(user)"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Eliminar
-              </VTooltip>
-              <VIcon
-                :size="22"
-                icon="tabler-trash"
-              />
-            </VBtn>
-          </td>
-        </tr>
-      </tbody>
+                <!-- 👉 roles -->
+                <td>
+                  <ul>
+                    <li v-for="(value,key) in user.roles">
+                      {{ value.name }}
+                    </li>
+                  </ul>
+                </td>
 
-      <!-- 👉 table footer  -->
-      <tfoot v-show="!users.length">
-        <tr>
-          <td
-            colspan="8"
-            class="text-center text-body-1"
-          >
-            No existen usuarios
-          </td>
-        </tr>
-      </tfoot>
-    </VTable>
-    <!-- !SECTION -->
+                <!-- 👉 username -->
+                <td>
+                  {{ user.username }}
+                </td>
 
-    <VDivider />
+                <!-- 👉 acciones -->
+                <td style="width: 8rem;">
+                  <VBtn
+                    v-if="$can('ver','usuarios')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Ver
+                    </VTooltip>
+                    <VIcon
+                      icon="tabler-eye"
+                      
+                      :size="22"
+                      @click="showUserDetailDialog(user)"
+                    />
+                  </VBtn>
 
-    <!-- SECTION Pagination -->
-    <VCardText class="d-flex align-center flex-wrap gap-4 py-3">
-      <!-- 👉 Pagination meta -->
-      <span class="text-sm text-disabled">
-        {{ paginationData }}
-      </span>
+                  <VBtn
+                    v-if="$can('editar','usuarios')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="showUserPasswordDialog(user)"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Cambiar contraseña
+                    </VTooltip>
+                    <VIcon
+                      :size="22"
+                      icon="tabler-key"
+                    />
+                  </VBtn>
 
-      <VSpacer />
+                  <VBtn
+                    v-if="$can('editar','usuarios')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="showUserEditDialog(user)"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Editar
+                    </VTooltip>
+                    <VIcon
+                      :size="22"
+                      icon="tabler-edit"
+                    />
+                  </VBtn>
 
-      <!-- 👉 Pagination -->
-      <VPagination
-        v-model="currentPage"
-        size="small"
-        :total-visible="5"
-        :length="totalPages"
-        @next="selectedRows = []"
-        @prev="selectedRows = []"
-      />
-    </VCardText>
+                  <VBtn
+                    v-if="$can('eliminar','usuarios')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="showUserDeleteDialog(user)"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Eliminar
+                    </VTooltip>
+                    <VIcon
+                      :size="22"
+                      icon="tabler-trash"
+                    />
+                  </VBtn>
+                </td>
+              </tr>
+            </tbody>
 
-    <show 
-      v-model:isDrawerOpen="isUserDetailDialog"
-      :rolesList="rolesList"
-      :user="selectedUser"
-      @close="roleUsers = []"/>
+            <!-- 👉 table footer  -->
+            <tfoot v-show="!users.length">
+              <tr>
+                <td
+                  colspan="8"
+                  class="text-center text-body-1"
+                >
+                  No existen usuarios
+                </td>
+              </tr>
+            </tfoot>
+          </VTable>
+          <!-- !SECTION -->
 
-    <password
-      v-model:isDrawerOpen="isUserPasswordDialog"
-      :user="selectedUser"
-      @alert="showAlert"/>
+          <VDivider />
 
-    <edit 
-      v-model:isDrawerOpen="isUserEditDialog"
-      :rolesList="rolesList"
-      :user="selectedUser"
-      @data="fetchData"
-      @close="roleUsers = []"
-      @alert="showAlert"/>
+          <!-- SECTION Pagination -->
+          <VCardText class="d-flex align-center flex-wrap gap-4 py-3">
+            <!-- 👉 Pagination meta -->
+            <span class="text-sm text-disabled">
+              {{ paginationData }}
+            </span>
 
-    <destroy 
-      v-model:isDrawerOpen="isUserDeleteDialog"
-      :user="selectedUser"
-      @data="fetchData"
-      @alert="showAlert"/>
+            <VSpacer />
 
-    <!-- DIALOGO DE CARGANDO -->
-    <VDialog
-      v-model="isRequestOngoing"
-      width="300"
-      persistent
-    >
-      <VCard
-        color="primary"
-        width="300"
-      >
-        <VCardText class="pt-3">
-          Cargando
-          <VProgressLinear
-            indeterminate
-            color="white"
-            class="mb-0"
-          />
-        </VCardText>
-      </VCard>
-    </VDialog>
+            <!-- 👉 Pagination -->
+            <VPagination
+              v-model="currentPage"
+              size="small"
+              :total-visible="5"
+              :length="totalPages"
+              @next="selectedRows = []"
+              @prev="selectedRows = []"
+            />
+          </VCardText>
 
-  </VCard>
+          <show 
+            v-model:isDrawerOpen="isUserDetailDialog"
+            :rolesList="rolesList"
+            :user="selectedUser"
+            @close="roleUsers = []"/>
+
+          <password
+            v-model:isDrawerOpen="isUserPasswordDialog"
+            :user="selectedUser"
+            @alert="showAlert"/>
+
+          <edit 
+            v-model:isDrawerOpen="isUserEditDialog"
+            :rolesList="rolesList"
+            :user="selectedUser"
+            @data="fetchData"
+            @close="roleUsers = []"
+            @alert="showAlert"/>
+
+          <destroy 
+            v-model:isDrawerOpen="isUserDeleteDialog"
+            :user="selectedUser"
+            @data="fetchData"
+            @alert="showAlert"/>
+
+        </VCard>
+      </v-col>
+    </v-row>
+  </section>
 </template>
 
 <style lang="scss">
