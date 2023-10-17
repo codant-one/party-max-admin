@@ -6,6 +6,7 @@ use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\UserRequest;
 
 use App\Models\User;
+use App\Models\Client;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -105,8 +106,10 @@ class UsersController extends Controller
         try {
             
             $limit = $request->has('limit') ? $request->limit : 10;
+            $clients = Client::all()->pluck('user_id');
 
             $query = User::with(['roles','userDetail.province.country'])
+                        ->whereNotIn('id', $clients)
                          ->applyFilters(
                             $request->only([
                                 'search',
