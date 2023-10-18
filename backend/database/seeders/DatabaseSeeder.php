@@ -27,7 +27,10 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             FaqCategorySeeder::class,
             
-            BlogCategorySeeder::class
+            BlogCategorySeeder::class,
+            StateSeeder::class,
+            GenderSeeder::class,
+            ClientSeeder::class
         ]);
 
     }

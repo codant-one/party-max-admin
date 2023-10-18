@@ -21,6 +21,10 @@ trait UserHelper
         return $this->hasOne(UserDetails::class, 'user_id', 'id');
     }
 
+    public function client(){
+        return $this->belongsTo(Client::class, 'user_id', 'id');
+    }
+
 
     /**** Public methods ****/
     public function getOnlineAttribute($value) {

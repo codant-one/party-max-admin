@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('states', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('label')->default("");
-            $table->timestamps();
+        Schema::table('clients', function (Blueprint $table) {
+            $table->unsignedBigInteger('gender_id')->after('user_id');
+            
+            $table->foreign('gender_id')->references('id')->on('genders')->onDelete('cascade');
         });
     }
 
@@ -24,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('states');
+        Schema::table('clients', function (Blueprint $table) {
+            $table->dropColumn('gender_id');
+        });
     }
 };

@@ -2,39 +2,36 @@
 
 namespace Database\Factories;
 
-use App\Models\Client;
+use App\Models\UserDetails;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Client>
- */
-class ClientFactory extends Factory
+class UserDetailsFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Client::class;
+    protected $model = UserDetails::class;
+
 
     /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
-    public function definition(): array
+    public function definition()
     {
-        $gender = rand(1,3); //1 Femenino, 2 Masculino, 3: Otro
-
         $mod_create_date = strtotime(Carbon::now()->format('Y-m-d H:m:s')."- ".rand(1,60)." days");
         $created_at = date("Y-m-d H:m:s",$mod_create_date);
+        $arr = array("\r\n", "\n", "\r");
 
         return [
-            'gender_id' => $gender,
-            'birthcountry_id' => rand(1,200),
-            'nationality_id' => 1,
-            'birthday' => $this->faker->date,
+            'province_id' => rand(1,1996),
+            'document' => strval(rand(1,22999999)),
+            'phone' => $this->faker->e164PhoneNumber,
+            'address' => str_replace($arr, '', $this->faker->address),
             'created_at' => $created_at,
             'updated_at' => $created_at
         ];
