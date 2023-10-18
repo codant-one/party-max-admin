@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+use App\Models\BlogCategory;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Blog>
  */
@@ -17,6 +19,7 @@ class BlogFactory extends Factory
     public function definition(): array
     {
         return [
+            'blog_category_id' => BlogCategory::InRandomOrder()->first()->id,
             'title' => $this->faker->words(4, true),
             'description' => $this->faker->text(),
             'image' => 'blogs/' . $this->faker->file(public_path('images/blogs'), storage_path('app/public/blogs'), false),

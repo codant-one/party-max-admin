@@ -19,7 +19,6 @@ class FaqCategorySeeder extends Seeder
      */
     public function run()
     {
-
         $categories = ['Productos', 'Ventas', 'Clientes', 'Proveedores'];
         $icon = ['mdi-cart', 'tabler-discount-2', 'mdi-account-star', 'mdi-account-tie'];
         $color = ['primary', 'success', 'info', 'warning'];

@@ -19,7 +19,8 @@ use App\Http\Controllers\{
     BlogController,
     FaqController,
     ColorController,
-    FaqCategoryController
+    FaqCategoryController,
+    BlogCategoryController
 };
 
 /*
@@ -61,6 +62,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('blogs', BlogController::class);
     Route::apiResource('faqs', FaqController::class);
     Route::apiResource('faq-categories', FaqCategoryController::class);
+    Route::apiResource('blog-categories', BlogCategoryController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -93,17 +95,10 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [CategoryController::class, 'delete']);
     });
 
-    //Faqs
-     Route::group(['prefix' => 'faqs'], function () {
-        Route::get('list/order', [FaqController::class, 'order']);
-        // Route::post('delete', [FaqController::class, 'delete']);
-    });
-
     //Products
     Route::group(['prefix' => 'products'], function () {
         Route::post('delete', [ProductController::class, 'delete']);
     });
-
 
     //Faq-categories
     Route::group(['prefix' => 'faq-categories'], function () {
@@ -111,6 +106,16 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('faqs/all', [FaqCategoryController::class, 'faqs']);
     });
 
+    //Blogs
+    Route::group(['prefix' => 'blogs'], function () {
+        Route::post('upload-image', [BlogController::class, 'uploadImage']);
+    });
+
+     //Blog-categories
+     Route::group(['prefix' => 'blog-categories'], function () {
+        Route::post('delete', [BlogCategoryController::class, 'delete']);
+        Route::get('blogs/all', [BlogCategoryController::class, 'blogs']);
+    });
 });
 
 //Public Endpoints

@@ -103,7 +103,21 @@ const closeTreeDialog  = function(){
                                     <strong>Eliminar FAQ's</strong>&emsp;/&emsp;<code>Permite la eliminación de FAQ's</code>
                                 </li>
                             </ul>
-                        </ul>     
+                        </ul>   
+                        <li class="tab n3">
+                            <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de blogs</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Blogs</strong>&emsp;/&emsp;<code>Permite la creación de blogs</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Blogs</strong>&emsp;/&emsp;<code>Permite la edición de blogs</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de blogs</code>
+                            </li>
+                        </ul>  
                         <li class="n2">
                             <strong>Utilidades</strong>
                         </li>

@@ -34,7 +34,25 @@ export default [
             subject: 'faqs',
           },
         ],
-      }  
+      },
+      { 
+        title: 'Blogs', 
+        icon: { icon: 'mdi-notebook-edit-outline' },
+        children: [
+          { 
+            title: 'Categorías', 
+            to: 'dashboard-admin-blog-categories', 
+            action: 'ver',
+            subject: 'categorías-blogs',
+          },
+          { 
+            title: "Lista de Blogs", 
+            to: 'dashboard-admin-blogs', 
+            action: 'ver',
+            subject: 'blogs',
+          },
+        ]
+      }
     ],
   }
 ]

@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('faqs', function (Blueprint $table) {
-            $table->unsignedBigInteger('faq_category_id')->after('id')->nullable();
-
-            $table->foreign('faq_category_id')->references('id')->on('faq_categories')->onDelete('cascade');
+        Schema::table('blogs', function (Blueprint $table) {
+            $table->date('date')->after('image')->nullable()->default(now());
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('faqs', function (Blueprint $table) {
-            $table->dropColumn('faq_category_id');
+        Schema::table('blogs', function (Blueprint $table) {
+            $table->dropColumn('date');
         });
     }
 };

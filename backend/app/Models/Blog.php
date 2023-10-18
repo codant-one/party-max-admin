@@ -8,16 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; 
 
+use App\Models\BlogCategory;
+
 class Blog extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
+    /**** Relationship ****/
+    public function category() {
+        return $this->belongsTo(BlogCategory::class, 'blog_category_id', 'id');
+    }
+
     /**** Public methods ****/
     public static function createBlog($request) {
 
         $blog = self::create([
+            'blog_category_id' => $request->blog_category_id,
+            'date' => $request->date,
             'title' => $request->title,
             'description' =>  $request->description
         ]);
@@ -28,6 +37,8 @@ class Blog extends Model
     public static function updateBlog($request, $blog) {
 
         $blog->update([
+            'blog_category_id' => $request->blog_category_id,
+            'date' => $request->date,
             'title' => $request->title,
             'description' =>  $request->description
         ]);

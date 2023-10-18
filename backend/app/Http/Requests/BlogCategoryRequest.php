@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class BlogRequest extends FormRequest
+class BlogCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,18 +20,18 @@ class BlogRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
     public function rules(): array
     {
         return [
-            'date' => [
+            'name' => [
                 'required'
             ],
-            'title' => [
+            'icon' => [
                 'required'
             ],
-            'description' => [
+            'color' => [
                 'required'
             ]
         ];
@@ -40,9 +40,9 @@ class BlogRequest extends FormRequest
     public function messages()
     {
         return [
-            'date.required' => 'La fecha del Blog es requerida',
-            'title.required' => 'El título del Blog es requerido',
-            'description.required' => 'La descripción del Blog es requerida'
+            'name.required' => 'El nombre de categoría es requerido.',
+            'icon.required' => 'El icon de categoría es requerido.',
+            'color.required' => 'El color de categoría es requerido.'
         ];
     }
 
