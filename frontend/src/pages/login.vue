@@ -12,15 +12,13 @@ import { useAuthStores } from '@/stores/useAuth'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
 import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustration-dark.png'
-import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
-import authV2MaskDark from '@images/pages/misc-mask-dark.png'
-import authV2MaskLight from '@images/pages/misc-mask-light.png'
+import authV2LoginIllustrationLight from '@images/pages/auth-v2-desktop-wallpaper.jpg'
+import festin from '@images/pages/auth-v2-login-illustration-light.png'
 
 const alertStore = useAlertStore()
 const authStores = useAuthStores()
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
-const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 const isPasswordVisible = ref(false)
 const route = useRoute()
 const router = useRouter()
@@ -116,124 +114,134 @@ const onSubmit = () => {
     class="auth-wrapper"
   >
     <VCol
-      lg="8"
+      cols="12"
+      md="8"
       class="d-none d-lg-flex"
     >
-      <div class="position-relative auth-bg rounded-lg w-100 ma-8 me-0">
+      <div class="position-relative w-100 ma-8 me-0">
         <div class="d-flex align-center justify-center w-100 h-100">
           <VImg
-            max-width="505"
             :src="authThemeImg"
-            class="auth-illustration mt-16 mb-2"
+            class="auth-illustration rounded-lg"            
           />
         </div>
-
-        <VImg
-          :src="authThemeMask"
-          class="auth-footer-mask"
-        />
       </div>
     </VCol>
 
     <VCol
       cols="12"
-      lg="4"
-      class="d-flex align-center justify-center"
+      md="4"
+      class="d-flex align-center justify-center px-5"
     >
-      <VCard
-        flat
-        :max-width="400"
-        class="mt-12 mt-sm-0 pa-4"
-      >
-        <VAlert
-          v-if="alertStore.message"
-          :type="alertStore.type"
-        >
-          {{ alertStore.message }}
-        </VAlert>
-        <VCardText>
-          <VNodeRenderer
-            :nodes="themeConfig.app.logoSlogan"
-            class="mb-6 d-flex align-center"
-            size="100"
+
+      <div class="d-block">
+        <div  class="d-flex align-center justify-center festin d-lg-none">
+          <VImg
+            :src="festin"
+            class="auth-illustration"            
           />
-          
-          <h5 class="text-h5 font-weight-semibold mb-1">
-            Bienvenido a tu Panel! 👋🏻
-          </h5>
-          <p class="mb-0">
-            Inicia sesión en tu cuenta
-          </p>
-        </VCardText>
-        <VCardText>
-          <VForm
-            ref="refVForm"
-            @submit.prevent="onSubmit"
+      </div>
+
+        <VCard
+          flat
+          :max-width="400"
+          class="mt-2 mt-lg-12 pa-4"
+        >
+          <VAlert
+            v-if="alertStore.message"
+            :type="alertStore.type"
           >
-            <VRow>
-              <!-- email -->
-              <VCol cols="12">
-                <VTextField
-                  class="login"
-                  v-model="email"
-                  label="Correo electrónico"
-                  type="email"
-                  :rules="[requiredValidator, emailValidator]"
-                  :error-messages="errors.email"
-                  @input="inputChange()"
-                />
-              </VCol>
-
-              <!-- password -->
-              <VCol cols="12">
-                <VTextField
-                  class="login"
-                  v-model="password"
-                  label="Contraseña"
-                  :error-messages="errors.password"
-                  :rules="[requiredValidator]"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  @input="inputChange()"
-                  @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                />
-
-                <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
-                  <VCheckbox
-                    v-model="remember_me"
-                    label="Recuérdame"
+            {{ alertStore.message }}
+          </VAlert>
+          <VCardText>
+            <VNodeRenderer
+              :nodes="themeConfig.app.logoSlogan"
+              class="mb-6 d-flex align-center"
+              size="100"
+            />
+            
+            <h5 class="text-h5 font-weight-semibold mb-1">
+              Bienvenido a tu Panel! 👋🏻
+            </h5>
+            <p class="mb-0">
+              Inicia sesión en tu cuenta
+            </p>
+          </VCardText>
+          <VCardText>
+            <VForm
+              ref="refVForm"
+              @submit.prevent="onSubmit"
+            >
+              <VRow>
+                <!-- email -->
+                <VCol cols="12">
+                  <VTextField
+                    class="login"
+                    v-model="email"
+                    label="Correo electrónico"
+                    type="email"
+                    :rules="[requiredValidator, emailValidator]"
+                    :error-messages="errors.email"
+                    @input="inputChange()"
                   />
-               
-                    <RouterLink
-                      class="text-primary mb-1"
-                      :to="{ name: 'forgot-password' }"
-                    >
-                    ¿Olvido su contraseña?
-                    </RouterLink>
-                </div>
+                </VCol>
 
-                <VBtn
-                  block
-                  type="submit"
-                > 
-                  Iniciar Sesión
-                  <VProgressCircular
-                    v-if="load"
-                    indeterminate
-                    color="#fff"
+                <!-- password -->
+                <VCol cols="12">
+                  <VTextField
+                    class="login"
+                    v-model="password"
+                    label="Contraseña"
+                    :error-messages="errors.password"
+                    :rules="[requiredValidator]"
+                    :type="isPasswordVisible ? 'text' : 'password'"
+                    :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                    @input="inputChange()"
+                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
                   />
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardText>
-      </VCard>
+
+                  <div class="d-flex align-center flex-wrap justify-space-between mt-2 mb-4">
+                    <VCheckbox
+                      v-model="remember_me"
+                      label="Recuérdame"
+                    />
+                
+                      <RouterLink
+                        class="text-primary mb-1"
+                        :to="{ name: 'forgot-password' }"
+                      >
+                      ¿Olvido su contraseña?
+                      </RouterLink>
+                  </div>
+
+                  <VBtn
+                    block
+                    type="submit"
+                  > 
+                    Iniciar Sesión
+                    <VProgressCircular
+                      v-if="load"
+                      indeterminate
+                      color="#fff"
+                    />
+                  </VBtn>
+                </VCol>
+              </VRow>
+            </VForm>
+          </VCardText>
+        </VCard>
+      </div>
     </VCol>
   </VRow>
 </template>
 
 <style lang="scss">
   @use "@core/scss/template/pages/page-auth.scss";
+
+  .festin {
+    padding-right: 30% !important;
+    padding-left: 30% !important;
+  }
 </style>
 
 <route lang="yaml">
