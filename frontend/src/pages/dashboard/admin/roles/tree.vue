@@ -105,25 +105,47 @@ const closeTreeDialog  = function(){
                             </ul>
                         </ul>   
                         <li class="tab n3">
-                            <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de blogs</code>
+                            <strong>Blogs</strong>
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Blogs</strong>&emsp;/&emsp;<code>Permite la creación de blogs</code>
+                                <strong>Ver Categorías de Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de blogs</code>
                             </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la creación de categorías de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la edición de categorías de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de blogs</code>
+                                </li>
+                            </ul>
                             <li class="tab n3">
-                                <strong>Editar Blogs</strong>&emsp;/&emsp;<code>Permite la edición de blogs</code>
+                                <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de blogs</code>
                             </li>
-                            <li class="tab n3">
-                                <strong>Eliminar Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de blogs</code>
-                            </li>
-                        </ul>  
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Blogs</strong>&emsp;/&emsp;<code>Permite la creación de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Blogs</strong>&emsp;/&emsp;<code>Permite la edición de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de blogs</code>
+                                </li>
+                            </ul>
+                        </ul> 
                         <li class="n2">
                             <strong>Utilidades</strong>
                         </li>
                         <li class="tab n3">
                             <strong>Ver FAQ's</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-faqs</code>
-                        </li>                   
+                        </li>   
+                        <li class="tab n3">
+                            <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-blogs</code>
+                        </li>                 
                         <li class="n2">
                             <strong>Productos</strong>
                         </li>
