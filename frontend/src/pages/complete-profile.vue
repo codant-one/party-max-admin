@@ -287,7 +287,7 @@ const blobToBase64 = blob => {
           ref="refVForm"
           @submit.prevent="onSubmit"
         >
-          <VCardText class="d-flex">
+          <VCardText class="d-block d-md-flex">
             <VAvatar
               rounded
               size="100"
@@ -309,7 +309,7 @@ const blobToBase64 = blob => {
             </VAvatar>
 
             <!-- 👉 Upload Photo -->
-            <div class="d-flex flex-column justify-center gap-4">
+            <div class="d-flex flex-column justify-center gap-4 mt-4">
               <div class="d-flex flex-wrap gap-2">
                 <VFileInput                          
                   label="Avatar"

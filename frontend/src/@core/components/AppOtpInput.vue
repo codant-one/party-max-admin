@@ -48,12 +48,12 @@ const handleKeyDown = (event, index) => {
 
 <template>
   <div>
-    <h6 class="text-base font-weight-bold mb-3">
+    <h6 class="text-base font-weight-bold mb-3 d-none d-md-block">
       Escriba su código de seguridad de 6 dígitos
     </h6>
     <div
       ref="refOtpComp"
-      class="d-flex align-center gap-4"
+      class="d-flex align-center gap-2"
     >
       <VTextField
         v-for="i in props.totalInput"

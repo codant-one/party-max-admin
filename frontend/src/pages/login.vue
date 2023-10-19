@@ -160,7 +160,7 @@ const onSubmit = () => {
               size="100"
             />
             
-            <h5 class="text-h5 font-weight-semibold mb-1">
+            <h5 class="text-h5 font-weight-semibold mb-1 d-none d-md-block">
               Bienvenido a tu Panel! 👋🏻
             </h5>
             <p class="mb-0">
@@ -174,7 +174,7 @@ const onSubmit = () => {
             >
               <VRow>
                 <!-- email -->
-                <VCol cols="12">
+                <VCol cols="12" class="pb-0">
                   <VTextField
                     class="login"
                     v-model="email"
@@ -204,10 +204,11 @@ const onSubmit = () => {
                     <VCheckbox
                       v-model="remember_me"
                       label="Recuérdame"
+                      class="letter"
                     />
                 
                       <RouterLink
-                        class="text-primary mb-1"
+                        class="text-primary mb-1 letter"
                         :to="{ name: 'forgot-password' }"
                       >
                       ¿Olvido su contraseña?
@@ -237,6 +238,21 @@ const onSubmit = () => {
 
 <style lang="scss">
   @use "@core/scss/template/pages/page-auth.scss";
+
+  @media(max-width: 991px){
+    .v-card-text {
+      padding: 10px !important;
+    }
+
+    .letter, .v-selection-control--inline .v-label {
+      font-size: 11.5px !important;
+    }
+
+    .v-selection-control__wrapper {
+      width: 28px !important;
+      margin-left: 4px;
+    }
+  }
 
   .festin {
     padding-right: 30% !important;

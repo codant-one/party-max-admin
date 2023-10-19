@@ -120,19 +120,19 @@ const onSubmit = () => {
             </template>
           </VCardItem>
 
-          <VCardText>
+          <VCardText class="px-2 px-md-6 pb-5">
               <span class="d-flex justify-center"> 
                   <img :src="qrCodeDataUrl"/>
               </span>
             <h5 class="text-h5 font-weight-semibold mb-1">
               Escanee el código QR 💬
             </h5>
-            <p class="mb-1">
+            <p class="mb-1 letter">
               Alternativamente, puede usar el código <strong>{{ token }}</strong>.
             </p>
           </VCardText>
 
-          <VCardText>
+          <VCardText class="px-2 px-md-6">
             <VForm
               @submit.prevent="onSubmit">
               <VRow>
@@ -167,6 +167,11 @@ const onSubmit = () => {
 <style lang="scss">
     @use "@core/scss/template/pages/page-auth.scss";
 
+    .festin {
+      padding-right: 30% !important;
+      padding-left: 30% !important;
+    }
+
     .auth .v-card-item__prepend {
         padding-inline-end: 0 !important;
     }
@@ -176,9 +181,22 @@ const onSubmit = () => {
     }
 
     @media(max-width: 991px){
-        .auth .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+      .auth .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+
+      .letter, .v-selection-control--inline .v-label {
+        font-size: 11.5px !important;
+      }
+
+      .v-selection-control__wrapper {
+        width: 28px !important;
+        margin-left: 4px;
+      }
+      
+      .text-h5 {
+        font-size: 1.25rem !important;
+      }
     }
 </style>
 

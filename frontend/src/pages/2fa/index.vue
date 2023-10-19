@@ -110,22 +110,22 @@ const onSubmit = () => {
             </template>
           </VCardItem>
 
-          <VCardText>
+          <VCardText class="px-2 px-md-6 pb-5">
               <span class="d-flex justify-center"> 
                   <VImg
-                      height="200"
+                      class="padlock"
                       :src="themeConfig.settings.urlPublic + 'images/smartphone.svg'"
                     />
               </span>
             <h5 class="text-h5 font-weight-semibold mb-1 mt-5">
               Google Authenticator 💬
             </h5>
-            <p class="mb-1">
+            <p class="mb-1 letter">
               Alternativamente, puede usar el código <strong>{{ token }}</strong>.
             </p>
           </VCardText>
 
-          <VCardText>
+          <VCardText class="px-2 px-md-6 pb-5">
             <VForm
               @submit.prevent="onSubmit">
               <VRow>
@@ -160,6 +160,11 @@ const onSubmit = () => {
 <style lang="scss">
     @use "@core/scss/template/pages/page-auth.scss";
 
+    .festin {
+      padding-right: 30% !important;
+      padding-left: 30% !important;
+    }
+
     .auth .v-card-item__prepend {
         padding-inline-end: 0 !important;
     }
@@ -168,16 +173,39 @@ const onSubmit = () => {
         padding: 0 24px !important;
     }
 
-    @media(max-width: 991px){
-        .auth .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+    .padlock {
+      height: 200px;
     }
 
     @media(max-width: 991px){
-        .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+      .auth .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+   
+      .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+
+      .v-card-text {
+        padding: 10px !important;
+      }
+
+      .letter, .v-selection-control--inline .v-label {
+        font-size: 11.5px !important;
+      }
+
+      .v-selection-control__wrapper {
+        width: 28px !important;
+        margin-left: 4px;
+      }
+
+      .text-h5 {
+        font-size: 1.2rem !important;
+      }
+
+      .padlock {
+        height: 100px;
+      }
     }
 </style>
 
