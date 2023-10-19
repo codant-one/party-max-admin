@@ -1,8 +1,8 @@
 <script setup>
 
-import InstructionLandingInstructionsOverview from '@/views/pages/instructions/InstructionLandingInstructionsOverview.vue'
-import InstructionLandingCategories from '@/views/pages/instructions/InstructionLandingCategories.vue'
-import { useCategoriesStores } from '@/views/dashboard/categories/useCategories'
+import BlogLandingBlogsOverview from '@/views/pages/blogs/BlogLandingBlogsOverview.vue'
+import BlogLandingCategories from '@/views/pages/blogs/BlogLandingCategories.vue'
+import { useCategoriesStores } from '@/stores/useBlogCategories'
 
 const apiData = ref()
 const categoriesStores = useCategoriesStores()
@@ -11,7 +11,7 @@ const categoriesStores = useCategoriesStores()
 const fetchData = async () => {
 
   apiData.value = await categoriesStores.allCategories()
-
+  console.log('asdsad', apiData.value)
 }
 
 fetchData()
@@ -21,28 +21,28 @@ fetchData()
   <section>
   <VCard v-if="apiData">
     <AppCardTitle
-      title="Wiki de Iznoval"
-      subtitle="¡Aquí encontrarás toda la información necesaria para unirte al equipo!"
+      title="Actualidad"
+      subtitle="¡Aquí encontrarás toda la información necesaria para todos los post!"
       custom-class="rounded-0"
     />
 
-    <!-- 👉 Popular Instructions -->
+    <!-- 👉 Popular Blogs -->
     <VCardText class="py-12">
       <h5 class="text-h5 text-center my-6">
-        Instrucciones Populares
+        Blogs Populares
       </h5>
 
-      <InstructionLandingInstructionsOverview :instructions="apiData.instructionsPopulars" />
+      <BlogLandingBlogsOverview :blogs="apiData.blogsPopulars" />
     </VCardText>
 
     <!-- 👉 Knowledge Base -->
     <div>
       <VCardText class="bg-var-theme-background py-12">
         <h5 class="text-h5 text-center my-6">
-          Instrucciones
+          Blogs
         </h5>
 
-        <InstructionLandingCategories :categories="apiData.categories" />
+        <BlogLandingCategories :categories="apiData.categories" />
       </VCardText>
     </div>
   </VCard>
@@ -52,6 +52,5 @@ fetchData()
 <route lang="yaml">
   meta:
     action: ver
-    subject: página-instrucciones
+    subject: página-blogs
 </route>
-

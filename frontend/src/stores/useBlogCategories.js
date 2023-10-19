@@ -89,10 +89,10 @@ export const useCategoriesStores = defineStore('blog-categories', {
                     this.setLoading(false)
                 })  
         },
-        allBlogs() {
+        allCategories() {
             this.setLoading(true)
             
-            return Categories.blogs()
+            return Categories.all()
                 .then((response) => {
                     return Promise.resolve(response.data.data)
                 })
@@ -101,6 +101,6 @@ export const useCategoriesStores = defineStore('blog-categories', {
                     this.setLoading(false)
                 })
             
-        },
+        }
     }
 })

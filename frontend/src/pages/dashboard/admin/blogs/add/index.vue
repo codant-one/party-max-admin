@@ -6,16 +6,21 @@ import { inject } from "vue"
 import { requiredValidator } from '@validators'
 import { themeConfig } from '@themeConfig'
 import { useBlogsStores } from '@/stores/useBlogs'
+import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const blogsStores = useBlogsStores()
+const categoriesStores = useCategoriesStores()
 
 const refForm = ref()
 const isFormValid = ref(false)
 
 const emitter = inject("emitter")
 
+const categories = ref([])
+const blog_category_id = ref('')
+const is_popular_blog = ref(false)
 const title = ref(null)
 const description = ref('')
 const date = ref('')
@@ -123,6 +128,25 @@ const blobToBase64 = blob => {
   })
 }
 
+const getCategories = computed(() => {
+  return categories.value.map(category => {
+    return {
+      title: category.name,
+      value: category.id,
+    }
+  })
+})
+
+watchEffect(fetchData)
+
+async function fetchData() {
+
+  let data = { limit: -1 }
+
+  await categoriesStores.fetchCategories(data)
+  categories.value = categoriesStores.getCategories
+
+}
 const onSubmit = () => {
 
   refForm.value?.validate().then(({ valid }) => {
@@ -130,6 +154,8 @@ const onSubmit = () => {
 
       let formData = new FormData()
 
+      formData.append('blog_category_id', blog_category_id.value)
+      formData.append('is_popular_blog', (is_popular_blog.value === true) ? 1 : 0)
       formData.append('title', title.value)
       formData.append('description', description.value)
       formData.append('image', image.value)
@@ -170,6 +196,12 @@ const onSubmit = () => {
     }
   })
 }
+
+const capitalizedLabel = label => {
+  const convertLabelText = label.toString()
+  
+  return convertLabelText.charAt(0).toUpperCase() + convertLabelText.slice(1)
+}
 </script>
 
 <template>
@@ -188,6 +220,17 @@ const onSubmit = () => {
           <VCard class="mb-8">
             <VCardText>
               <VRow>
+                <VCol cols="12" md="8"></VCol>
+                <VCol
+                  cols="12"
+                  md="4"
+                  class="d-flex justify-content-end"
+                  >
+                    <VCheckbox
+                      v-model="is_popular_blog"
+                      :label="capitalizedLabel('es Popular?')"
+                    />
+                </VCol>
                 <VCol
                   cols="12"
                   md="6"
@@ -200,7 +243,19 @@ const onSubmit = () => {
                 </VCol>
                 <VCol
                   cols="12"
-                  md="6"
+                  md="3"
+                >
+                  <VAutocomplete
+                        v-model="blog_category_id"
+                        label="Categoría"
+                        :rules="[requiredValidator]"
+                        :items="getCategories"
+                        :menu-props="{ maxHeight: '200px' }"
+                      />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="3"
                 >
                     <AppDateTimePicker
                         :key="JSON.stringify(startDateTimePickerConfig)"
@@ -215,9 +270,10 @@ const onSubmit = () => {
                     <VImg
                         v-if="avatar !== null"
                         :src="avatar"
-                        :height="200"
-                        aspect-ratio="16/9"
+                        :height="300"
+                        aspect-ratio="1/1"
                         class="border-img"
+                        cover
                     />
                 </VCol>
                 <VCol cols="12">
@@ -289,6 +345,10 @@ const onSubmit = () => {
 </route>
 
 <style>
+
+  .justify-content-end{
+    justify-content: end !important;
+  }
     .editor {
         min-block-size: 450px;
         padding-block-end: 100px;

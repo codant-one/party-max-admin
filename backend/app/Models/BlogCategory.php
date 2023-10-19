@@ -19,6 +19,17 @@ class BlogCategory extends Model
     }
 
     /**** Scopes ****/
+    public function scopeBlog($query)
+    {
+        return  $query->addSelect(['blogSlug' => function ($q){
+                    $q->selectRaw('i.slug')
+                      ->from('blog_categories as c')
+                      ->join('blogs as i', 'i.blog_category_id', '=', 'c.id')
+                      ->whereColumn('c.id', 'blog_categories.id')
+                      ->limit(1);
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         foreach (explode(' ', $search) as $term) {
             foreach (explode(' ', $search) as $term) {

@@ -22,7 +22,7 @@ class BlogCategories {
         return axios.post(`/blog-categories/delete`, id)
     }
 
-    blogs(){
+    all(){
         return axios.get('/blog-categories/blogs/all')
     }
 

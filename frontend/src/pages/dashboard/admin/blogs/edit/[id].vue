@@ -6,9 +6,11 @@ import { inject } from "vue"
 import { requiredValidator } from '@validators'
 import { themeConfig } from '@themeConfig'
 import { useBlogsStores } from '@/stores/useBlogs'
+import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
+const categoriesStores = useCategoriesStores()
 const blogsStores = useBlogsStores()
 const route = useRoute()
 
@@ -17,6 +19,9 @@ const isFormValid = ref(false)
 
 const emitter = inject("emitter")
 
+const categories = ref([])
+const blog_category_id = ref('')
+const is_popular_blog = ref(false)
 const blog = ref(null)
 const title = ref(null)
 const description = ref('')
@@ -60,15 +65,31 @@ const modules = {
   }
 }
 
+const getCategories = computed(() => {
+  return categories.value.map((category) => {
+    return {
+      title: category.name,
+      value: category.id,
+    }
+  })
+})
+
 watchEffect(fetchData)
 
 async function fetchData() {
 
   isRequestOngoing.value = true
 
+  let data = { limit: -1 }
+
+  await categoriesStores.fetchCategories(data)
+  categories.value = categoriesStores.getCategories
+
   if(Number(route.params.id)) {
     blog.value = await blogsStores.showBlog(Number(route.params.id))
 
+    blog_category_id.value = blog.value.blog_category_id
+    is_popular_blog.value = blog.value.is_popular_blog === 1 ? true : false
     title.value = blog.value.title
     date.value = blog.value.date
     description.value = blog.value.description
@@ -154,6 +175,8 @@ const onSubmit = () => {
     if (valid) {
       let formData = new FormData()
 
+      formData.append('blog_category_id', blog_category_id.value)
+      formData.append('is_popular_blog', (is_popular_blog.value === true) ? 1 : 0)
       formData.append('title', title.value)
       formData.append('date', date.value)
       formData.append('description', description.value)
@@ -202,6 +225,12 @@ const onSubmit = () => {
     }
   })
 }
+
+const capitalizedLabel = label => {
+  const convertLabelText = label.toString()
+  
+  return convertLabelText.charAt(0).toUpperCase() + convertLabelText.slice(1)
+}
 </script>
 
 
@@ -237,6 +266,17 @@ const onSubmit = () => {
           <VCard class="mb-8">
             <VCardText>
               <VRow>
+                <VCol cols="12" md="8"></VCol>
+                <VCol
+                  cols="12"
+                  md="4"
+                  class="d-flex justify-content-end"
+                  >
+                    <VCheckbox
+                      v-model="is_popular_blog"
+                      :label="capitalizedLabel('es Popular?')"
+                    />
+                </VCol>
                 <VCol cols="12" md="6">
                     <VTextField
                         v-model="title"
@@ -246,7 +286,19 @@ const onSubmit = () => {
                 </VCol>
                 <VCol
                   cols="12"
-                  md="6"
+                  md="3"
+                >
+                  <v-autocomplete
+                        v-model="blog_category_id"
+                        label="Categoría"
+                        :rules="[requiredValidator]"
+                        :items="getCategories"
+                        :menu-props="{ maxHeight: '200px' }"
+                      />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="3"
                 >
                     <AppDateTimePicker
                         :key="JSON.stringify(startDateTimePickerConfig)"
@@ -260,9 +312,10 @@ const onSubmit = () => {
                     <VImg
                         v-if="avatar !== null"
                         :src="avatar"
-                        :height="200"
-                        aspect-ratio="16/9"
+                        :height="300"
+                        aspect-ratio="1/1"
                         class="border-img"
+                        cover
                     />
                 </VCol>
                 <VCol cols="12">
@@ -324,6 +377,10 @@ const onSubmit = () => {
 </route>
 
 <style>
+ .justify-content-end{
+    justify-content: end !important;
+  }
+  
     .editor {
         min-height: 450px;
         padding-bottom: 100px;

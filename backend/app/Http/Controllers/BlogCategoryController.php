@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 use App\Models\BlogCategory;
+use App\Models\Blog;
 
 class BlogCategoryController extends Controller
 {
@@ -197,6 +198,37 @@ class BlogCategoryController extends Controller
                 ]
             ]);
 
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function all(): JsonResponse
+    {
+        try {
+            $categories = 
+                BlogCategory::with(['blogs'])
+                            ->withCount(['blogs'])
+                            ->blog()
+                            ->get();
+
+            $blogsPopulars = 
+                Blog::with(['category'])
+                    ->orderBy('is_popular_blog', 'DESC')
+                    ->orderBy('id', 'DESC')
+                    ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'categories' => $categories,
+                    'blogsPopulars' => $blogsPopulars
+                ]
+            ]);
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,

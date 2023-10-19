@@ -114,7 +114,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
      //Blog-categories
      Route::group(['prefix' => 'blog-categories'], function () {
         Route::post('delete', [BlogCategoryController::class, 'delete']);
-        Route::get('blogs/all', [BlogCategoryController::class, 'blogs']);
+        Route::get('blogs/all', [BlogCategoryController::class, 'all']);
     });
 });
 

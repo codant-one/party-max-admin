@@ -27,13 +27,14 @@ class BlogController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Blog::applyFilters(
+            $query = Blog::with(['category'])
+                         ->applyFilters(
                             $request->only([
                                     'search',
                                     'orderByField',
                                     'orderBy'
                                 ])
-                            );            
+                          );            
 
             $blogs = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
     

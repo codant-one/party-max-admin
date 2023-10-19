@@ -111,6 +111,8 @@ const downloadCSV = async () => {
       ID: element.id,
       TÍTULO: element.title,
       FECHA: element.date,
+      CATEGORÍA: element.category.name,
+      POPULAR: element.is_popular_blog === 1 ? 'SI' : 'NO',
       CONTENIDO: element.description
     }
         
@@ -211,6 +213,8 @@ const downloadCSV = async () => {
                 <th scope="col"> #ID </th>
                 <th scope="col"> TÍTULO </th>
                 <th scope="col"> FECHA </th>
+                <th scope="col"> CATEGORÍA </th>
+                <th scope="col"> POPULAR </th>
                 <th scope="col"> CONTENIDO </th>
                 <th scope="col"> IMAGEN </th>
                 <th scope="col" v-if="$can('editar','blogs') || $can('eliminar','blogs')">
@@ -228,6 +232,15 @@ const downloadCSV = async () => {
                 <td> {{ blog.id }} </td>
                 <td> {{ blog.title }} </td>
                 <td> {{ blog.date }} </td>
+                <td> {{ blog.category.name }} </td>
+                <td> 
+                  <VChip
+                    label
+                    :color="blog.is_popular_blog === 1 ? 'success' : 'error'"
+                    size="small">
+                    {{  blog.is_popular_blog === 1 ? 'SI' : 'NO' }}
+                  </VChip>  
+                </td>
                 <td>
                   <span v-if="blog.description" v-html="blog.description.slice(0,50) + '...'"></span>
                 </td>

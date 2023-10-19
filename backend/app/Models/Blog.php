@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; 
 
@@ -26,9 +25,12 @@ class Blog extends Model
 
         $blog = self::create([
             'blog_category_id' => $request->blog_category_id,
+            'user_id' => auth()->user()->id,
+            'is_popular_blog' => $request->is_popular_blog,
             'date' => $request->date,
             'title' => $request->title,
-            'description' =>  $request->description
+            'description' =>  $request->description,
+            'slug' => Str::slug($request->title)
         ]);
 
         return $blog;
@@ -38,9 +40,12 @@ class Blog extends Model
 
         $blog->update([
             'blog_category_id' => $request->blog_category_id,
+            'user_id' => auth()->user()->id,
+            'is_popular_blog' => $request->is_popular_blog,
             'date' => $request->date,
             'title' => $request->title,
-            'description' =>  $request->description
+            'description' =>  $request->description,
+            'slug' => Str::slug($request->title)
         ]);
 
         return $blog;
