@@ -1,7 +1,10 @@
 <script setup>
+import flatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
+
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import { requiredValidator } from '@validators'
+import { confirmedValidator, passwordValidator, requiredValidator, emailValidator } from '@/@core/utils/validators'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
 
@@ -29,14 +32,28 @@ const isFormValid = ref(false)
 const refForm = ref()
 
 const countries = ref([])
+const provinces = ref([])
+const listProvincesByCountry = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 
 const id = ref(0)
 const client_country_id = ref('')
-const title = ref('')
-const description = ref('')
+const province_id = ref('')
+const name = ref('')
+const last_name = ref('')
+const username = ref('')
+const document = ref('')
+const email = ref('')
+const phone = ref('')
+const address = ref('')
+const birthday = ref('')
+const gender_id = ref('')
+const password = ref('')
+const passwordConfirmation = ref()
+const isNewPasswordVisible = ref(false) 
+const isConfirmPasswordVisible = ref(false)
 const isEdit = ref(false)
 
 const getTitle = computed(() => {
@@ -52,9 +69,23 @@ watchEffect(async() => {
         if (!(Object.entries(props.client).length === 0) && props.client.constructor === Object) {
             isEdit.value = true
             id.value = props.client.id
-            title.value = props.client.title
-            description.value = props.client.description
-            client_country_id.value = props.client.client_country_id
+            name.value = props.client.user.name
+            last_name.value = props.client.user.last_name
+            username.value = props.client.user.username
+            document.value = props.client.user.user_detail.document
+            email.value = props.client.user.email
+            phone.value = props.client.user.user_detail.phone
+            address.value = props.client.user.user_detail.address
+            birthday.value = props.client.birthday
+            gender_id.value = props.client.gender_id
+            password.value = props.client.password
+
+            client_country_id.value = props.client.user.user_detail.province.country.id
+            province_id.value = props.client.user.user_detail.province.id
+
+            passwordConfirmation.value = undefined
+            isNewPasswordVisible.value = false 
+            isConfirmPasswordVisible.value = false 
         }
     }
 })
@@ -72,7 +103,7 @@ async function fetchData() {
   await countriesStores.fetchCountries(data)
   countries.value = countriesStores.getCountries
 
-  await provincesStores.fetchCountries(data)
+  await provincesStores.fetchProvinces(data)
   provinces.value = provincesStores.getProvinces
 
 }
@@ -87,13 +118,24 @@ const getCountries = computed(() => {
 })
 
 const getProvinces = computed(() => {
-  return provinces.value.map((country) => {
+  return listProvincesByCountry.value.map((province) => {
     return {
-      title: country.name,
-      value: country.id,
+      title: province.name,
+      value: province.id,
     }
   })
 })
+
+const selectCountry = country => {
+  if (country) {
+    let _country = countries.value.find(item => item.id === country)
+    client_country_id.value = _country.id
+ 
+    province_id.value = ''
+    
+    listProvincesByCountry.value = provinces.value.filter(item => item.country_id === _country.id)
+  }
+}
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -102,10 +144,22 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
-    title.value = ''
-    description.value = ''
+    name.value = 'Freddy'
+    last_name.value = 'Castro'
+    username.value = 'fcastro'
+    document.value = '15989101'
+    email.value = 'fcastro@gmail.com'
+    phone.value = '04166097023'
+    address.value = 'tal tal tal'
+    birthday.value = '16-10-1982'
+    gender_id.value = '1'
     client_country_id.value = ''
-    isEdit.value = false
+    province_id.value = ''
+    password.value = 'As1dddrrrff'
+    passwordConfirmation.value = 'As1dddrrrff'
+    isNewPasswordVisible.value = false
+    isConfirmPasswordVisible.value = false
+    isEdit.value = false 
     id.value = 0
   })
 }
@@ -114,11 +168,21 @@ const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       let formData = new FormData()
+      const roles = ['Cliente'] //ref({0: 'Cliente'})
 
-      formData.append('id', id.value)
-      formData.append('title', title.value)
-      formData.append('description', description.value)
-      formData.append('client_country_id', client_country_id.value)
+      formData.append('name', name.value)
+      formData.append('last_name', last_name.value)
+      formData.append('username', username.value)
+      formData.append('document', document.value)
+      formData.append('email', email.value)
+      formData.append('phone', phone.value)
+      formData.append('address', address.value)
+      formData.append('birthday', birthday.value)
+      formData.append('gender_id', gender_id.value)
+      // formData.append('client_country_id', client_country_id.value)
+      formData.append('province_id', province_id.value)
+      formData.append('password', password.value) 
+      // formData.append('roles', roles ) 
 
       emit('clientData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
@@ -177,32 +241,131 @@ const handleDrawerModelValueUpdate = val => {
             @submit.prevent="onSubmit"
           >
             <VRow>
+              <!-- 👉 Name -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="name"
+                  :rules="[requiredValidator]"
+                  label="Nombre"
+                />
+              </VCol>
+
+              <!-- 👉 Last Name -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="last_name"
+                  :rules="[requiredValidator]"
+                  label="Apellido"
+                />
+              </VCol>
+
+              <!-- 👉 User Name -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="username"
+                  :rules="[requiredValidator]"
+                  label="Usuario"
+                />
+              </VCol>
+
+              <!-- 👉 Document -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="document"
+                  :rules="[requiredValidator]"
+                  label="Documento de Identidad"
+                />
+              </VCol>
+
+              <!-- 👉 Email -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="email"
+                  :rules="[requiredValidator, emailValidator]"
+                  label="Email"
+                />
+              </VCol>
+
+              <!-- 👉 Phone -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="phone"
+                  :rules="[requiredValidator]"
+                  label="Teléfono"
+                />
+              </VCol>
+
               <!-- 👉 Paises -->
-              <VCol cols="12">
+              <VCol cols="6">
                 <v-autocomplete
                   v-model="client_country_id"
                   label="Países"
                   :rules="[requiredValidator]"
                   :items="getCountries"
                   :menu-props="{ maxHeight: '200px' }"
+                  @update:model-value="selectCountry"
                 />
               </VCol>
 
-              <!-- 👉 Title -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="title"
+              <!-- 👉 Provincias -->
+              <VCol cols="6">
+                <v-autocomplete
+                  v-model="province_id"
+                  label="Provincias"
                   :rules="[requiredValidator]"
-                  label="Titulo"
+                  :items="getProvinces"
+                  :menu-props="{ maxHeight: '200px' }"
                 />
               </VCol>
 
-              <!-- 👉 description -->
+              <!-- 👉 Address -->
               <VCol cols="12">
                 <VTextarea
-                  v-model="description"
+                  v-model="address"
                   rows="4"
-                  label="Descripción"
+                  label="Dirección"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+
+              <!-- 👉 Birthday -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="birthday"
+                  :rules="[requiredValidator]"
+                  label="Fecha de Cumpleaños"
+                />
+              </VCol>
+
+              <!-- 👉 Gender -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="gender_id"
+                  :rules="[requiredValidator]"
+                  label="Genero"
+                />
+              </VCol>
+
+              <!-- 👉 Contraseña -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="password"
+                  label="Nueva contraseña"
+                  :type="isNewPasswordVisible ? 'text' : 'password'"
+                  :append-inner-icon="isNewPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  :rules="[requiredValidator, passwordValidator]"
+                  @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
+                />
+              </VCol>
+              <!-- 👉 Confirmar Contraseña -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="passwordConfirmation"
+                  label="Confirmar Contraseña"
+                  :type="isConfirmPasswordVisible ? 'text' : 'password'"
+                  :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  :rules="[requiredValidator, confirmedValidator(passwordConfirmation, password)]"
+                  @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                 />
               </VCol>
 

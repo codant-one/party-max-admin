@@ -5,10 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\User;
+
 class Client extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'user_id',
+        'gender_id',
+        'birthcountry_id',
+        'nationality_id',
+        'birthday',
+    ];
+
+    /**** Relationship ****/
     public function state(){
         return $this->belongsTo(State::class, 'state_id', 'id');
     }
@@ -57,12 +73,13 @@ class Client extends Model
 
     /**** Public methods ****/
     public static function createClient($request) {
+        $user = User::createUser($request);
         $client = self::create([
-            'user_id' => $request->user_id,
+            'user_id' => $user->id,
             'gender_id' => $request->gender_id,
-            'birthcountry_id' => $request->birthcountry_id,
-            'nationality_id' => $request->nationality_id,
-            'birthday' => $request->birthday
+            'birthcountry_id' => 1,
+            'nationality_id' => 1,
+            'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
 
         return $client;
@@ -72,9 +89,9 @@ class Client extends Model
         $client->update([
             // 'user_id' => $request->user_id,
             'gender_id' => $request->gender_id,
-            'birthcountry_id' => $request->birthcountry_id,
-            'nationality_id' => $request->nationality_id,
-            'birthday' => $request->birthday
+            'birthcountry_id' => 1,
+            'nationality_id' => 1,
+            'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
 
         return $client;

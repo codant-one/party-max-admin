@@ -2,22 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreClientRequest;
-use App\Http\Requests\UpdateClientRequest;
+use App\Http\Requests\ClientRequest;
+use App\Http\Requests\UserRequest;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+use Spatie\Permission\Middlewares\PermissionMiddleware;
+
 use App\Models\Client;
+use App\Models\User;
 
 class ClientController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
         try {
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Client::with(['user, gender, country.province'])
+            $query = Client::with(['user.userDetail.province.country', 'gender'])
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -50,9 +57,25 @@ class ClientController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientRequest $request)
+    public function store(ClientRequest $request)
     {
-        //
+        try {
+            $client = Client::createClient($request);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'client' => Client::with(['user.userDetail.province.country', 'gender'])->find($client->id)
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**

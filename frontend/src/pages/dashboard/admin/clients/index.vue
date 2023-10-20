@@ -187,12 +187,14 @@ const downloadCSV = async () => {
   let dataArray = [];
       
   clientsStores.getClients.forEach(element => {
-    let data = {
-      ID: element.id,
-      TÍTULO: element.title,
-      DESCRIPCIÓN: element.text,
-      CATEGORÍA:  element.category.name
-    }
+    var a = element;
+    // let data = {
+    //   ID: element.id,
+    //   NOMBRE: element.user.name,
+    //   APELLIDO: element.user.last_name,
+    //   USUARIO: element.user.username,
+    //   PAÍS:  element.user.user_detail.province.country.name
+    // }
           
     dataArray.push(data)
   })
@@ -288,9 +290,9 @@ const downloadCSV = async () => {
             <thead>
               <tr>
                 <th scope="col"> #ID </th>
-                <th scope="col"> TITULO </th>
-                <th scope="col"> DESCRIPCIÓN </th>
-                <th scope="col"> CATEGORÍA </th>
+                <th scope="col"> NOMBRE </th>
+                <th scope="col"> USUARIO </th>
+                <th scope="col"> PAÍS </th>
                 <th scope="col" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">
                   ACCIONES
                 </th>
@@ -304,9 +306,9 @@ const downloadCSV = async () => {
                 style="height: 3.75rem;">
 
                 <td> {{ client.id }} </td>
-                <td class="text-wrap"> {{ client.title }} </td>
-                <td class="text-wrap"> {{ client.description }} </td>
-                <td class="text-wrap"> {{ client.category.name }} </td>
+                <td class="text-wrap"> {{ client.user.name }} {{ client.user.last_name }} </td>
+                <td class="text-wrap"> {{ client.user.username }} </td>
+                <td class="text-wrap"> {{ client.user.user_detail.province.country.name }} </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">      
                   <VBtn
@@ -385,7 +387,7 @@ const downloadCSV = async () => {
       <!-- Dialog Content -->
       <VCard title="Eliminar Cliente">
         <VCardText>
-          Está seguro de eliminar el Cliente <strong>{{ selectedClient.name }}</strong>?.
+          Está seguro de eliminar el Cliente <strong>{{ selectedClient.user.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">

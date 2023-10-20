@@ -7,7 +7,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ClientRequest extends FormRequest
+use App\Http\Requests\UserRequest;
+
+class ClientRequest extends UserRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +27,14 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'title' => [
-                'required'
+            'gender_id' => [
+                'required',
+                'integer',
+                'exists:App\Models\Gender,id'
             ],
-            'description' => [
-                'required'
+            'birthday' => [
+                'required',
+                'date_format:d-m-Y'
             ]
         ];
 
@@ -37,18 +42,21 @@ class ClientRequest extends FormRequest
             $rules['client_id'] = 'required|integer|exists:App\Models\Client,id';
         }
 
-        return $rules;
+        return array_merge(parent::rules(), $rules);
     }
 
 
     public function messages()
     {
         return [
-            'faq_id.required' => 'La pregunta es requerida',
-            'faq_id.integer' => 'El formato de pregunta debe ser entero.',
-            'faq_id.exists' => 'La pregunta ingresada no existe.',
-            'title.required' => 'El titulo de la pregunta es requerido.',
-            'description.required' => 'La descripción de la pregunta es requerida.'
+            'client_id.required' => 'El Cliente es requerido',
+            'client_id.integer' => 'El formato del cliente debe ser entero.',
+            'client_id.exists' => 'El Cliente ingresado no existe.',
+            'gender_id.required' => 'El Genero es requerido',
+            'gender_id.integer' => 'El formato del genero debe ser entero.',
+            'gender_id.exists' => 'El Genero ingresado no existe.',
+            'birthday.required' => 'El nombre del Cliente es requerido.',
+            'birthday.date' => 'El formato de la fecha de cumpleaños es incorrecto (dd/mm/YYYY).'
         ];
     }
 

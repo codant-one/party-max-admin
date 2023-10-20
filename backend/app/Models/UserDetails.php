@@ -30,7 +30,7 @@ class UserDetails extends Model
 
      /**** Public methods ****/
     public static function updateOrCreateUser($request, $user) {
-        $user = UserDetails::updateOrCreate(
+        $userD = UserDetails::updateOrCreate(
             [    'user_id' => $user->id ],
             [
                 'province_id' => $request->province_id,
@@ -40,6 +40,6 @@ class UserDetails extends Model
             ]
         );
 
-        return $user;
+        return $userD;
     }
 }
