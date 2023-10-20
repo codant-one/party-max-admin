@@ -28,6 +28,8 @@ const image = ref('')
 const avatar = ref('')
 const filename = ref([])
 
+const isValid =  ref(null)
+
 const startDateTimePickerConfig = computed(() => {
   const config = {
     dateFormat: 'Y-m-d'
@@ -150,6 +152,7 @@ async function fetchData() {
 const onSubmit = () => {
 
   refForm.value?.validate().then(({ valid }) => {
+    isValid.value = valid
     if (valid) {
 
       let formData = new FormData()
@@ -268,19 +271,20 @@ const capitalizedLabel = label => {
               
                 <VCol cols="12">
                     <VImg
-                        v-if="avatar !== null"
-                        :src="avatar"
-                        :height="300"
-                        aspect-ratio="1/1"
-                        class="border-img"
-                        cover
+                      :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+                      v-if="avatar !== null"
+                      :src="avatar"
+                      :height="300"
+                      aspect-ratio="1/1"
+                      class="border-img"
+                      cover
                     />
                 </VCol>
                 <VCol cols="12">
                     <VFileInput
                         v-model="filename"
                         label="Imagen"
-                        class="mb-2"
+                        class="mb-2"                        
                         accept="image/png, image/jpeg, image/bmp"
                         prepend-icon="tabler-camera"
                         @change="onImageSelected"
@@ -381,6 +385,10 @@ const capitalizedLabel = label => {
     .border-img {
         border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
         border-radius: 6px;
+    }
+
+    .border-error {
+        border: 1.8px solid rgb(var(--v-theme-error));
     }
 
     .border-img .v-img__img--contain {

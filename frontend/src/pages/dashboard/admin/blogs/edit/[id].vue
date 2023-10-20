@@ -28,6 +28,7 @@ const description = ref('')
 const date = ref('')
 const image = ref('')
 const avatar = ref('')
+const avatarOld = ref('')
 const filename = ref([])
 
 const isRequestOngoing = ref(true)
@@ -94,6 +95,7 @@ async function fetchData() {
     date.value = blog.value.date
     description.value = blog.value.description
     avatar.value = blog.value.image === null ? '' : themeConfig.settings.urlStorage + blog.value.image
+    avatarOld.value = blog.value.image === null ? '' : themeConfig.settings.urlStorage + blog.value.image
   }
 
   isRequestOngoing.value = false
@@ -166,7 +168,6 @@ const blobToBase64 = blob => {
     }
   })
 }
-
 
 const onSubmit = () => {
 
@@ -326,7 +327,7 @@ const capitalizedLabel = label => {
                         accept="image/png, image/jpeg, image/bmp"
                         prepend-icon="tabler-camera"
                         @change="onImageSelected"
-                        @click:clear="avatar = null"
+                        @click:clear="avatar = avatarOld"
                     />
                 </VCol>
                 <VCol cols="12" class="editor">

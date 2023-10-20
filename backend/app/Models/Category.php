@@ -37,7 +37,6 @@ class Category extends Model
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('name', 'LIKE', '%' . $search . '%')
-             ->orWhere('description', 'LIKE', '%' . $search . '%')
              ->orWhere('slug', 'LIKE', '%' . $search . '%');
     }
 
@@ -112,7 +111,6 @@ class Category extends Model
         $category = self::create([
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
-            'description' => $request->description === 'null' ? null : $request->description,
             'slug' => $slug
         ]);
 
@@ -125,7 +123,6 @@ class Category extends Model
         $category->update([
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
-            'description' => $request->description === 'null' ? null : $request->description,
             'slug' => $slug
         ]);
 
@@ -138,13 +135,24 @@ class Category extends Model
             $category->delete();
 
             if(count($category->children) > 0) {
-                deleteFile($category->children[0]->image);
-                if(count($category->children[0]->children) > 0)
-                    deleteFile($category->children[0]->children[0]->image);
+                deleteFile($category->children[0]->banner);
+                deleteFile($category->children[0]->banner_2);
+                deleteFile($category->children[0]->banner_3);
+                deleteFile($category->children[0]->banner_4);
+                if(count($category->children[0]->children) > 0) {
+                    deleteFile($category->children[0]->children[0]->banner);
+                    deleteFile($category->children[0]->children[0]->banner_2);
+                    deleteFile($category->children[0]->children[0]->banner_3);
+                    deleteFile($category->children[0]->children[0]->banner_4);
+                }
             }
 
-            if($category->image)
-                deleteFile($category->image);
+            if($category->banner) {
+                deleteFile($category->banner);
+                deleteFile($category->banner_2);
+                deleteFile($category->banner_3);
+                deleteFile($category->banner_4);
+            }
         }
     }
 }
