@@ -33,7 +33,22 @@ class Product extends Model
         return $this->hasMany(ProductImage::class, 'product_id');
     }
 
+    public function productlike()
+    {
+        return $this->hasMany(ProductLike::class, 'product_id','id');
+    }
+
     /**** Scopes ****/
+    public function scopeFavorites($query)
+    {
+        return  $query->addSelect(['likes' => function ($q){
+                    $q->selectRaw('COUNT(p.id)')
+                      ->from('products as p')
+                      ->join('product_likes as p_l', 'p.id', '=', 'p_l.product_id')
+                      ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->where('name', 'LIKE', '%' . $search . '%')
               ->orWhere('description', 'LIKE', '%' . $search . '%')

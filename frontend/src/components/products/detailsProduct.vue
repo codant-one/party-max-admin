@@ -42,6 +42,7 @@ const rating = ref(null)
 const comments = ref(null)
 const sales =  ref(null)
 const selling_price = ref(null)
+const likes =  ref(null)
 
 const is_affiliated = ref(false)
 const message = ref('')
@@ -64,6 +65,7 @@ watchEffect(() => {
         rating.value = props.product.rating ?? -1
         comments.value = props.product.comments ?? -1
         sales.value = props.product.sales ?? -1
+        likes.value = props.product.likes ?? -1
         selling_price.value = props.product.selling_price ?? -1
         categories.value = props.product.categories
     }
@@ -329,6 +331,16 @@ const updateLink = (text, id) => {
                             density="compact"
                             size="small"
                         />
+                    </div>
+                    <div>Likes:
+                        <span v-if="likes >= 0">{{ likes }}</span>
+                        <span v-else>
+                            <VIcon
+                                size="20"
+                                icon="tabler-alarm-filled"
+                                class="me-1"
+                            />
+                        </span>
                     </div>
                     <div>Categorías:
                         <span>{{ categories }}</span>
