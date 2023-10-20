@@ -17,18 +17,24 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             ProvinceSeeder::class,
             AdminSeeder::class,
-            
+
+            StateSeeder::class,
+            GenderSeeder::class,
+            ClientSeeder::class,
+
             CategorySeeder::class,
 
             ColorSeeder::class,
             ProductSeeder::class,
+            ProductLikeSeeder::class,
+
 
             BlogSeeder::class,
             FaqSeeder::class,
             FaqCategorySeeder::class,
-            StateSeeder::class,
-            GenderSeeder::class,
-            ClientSeeder::class,
+            BlogCategorySeeder::class,
+          
+            
         ]);
 
     }

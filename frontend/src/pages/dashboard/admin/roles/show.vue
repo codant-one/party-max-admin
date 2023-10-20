@@ -95,7 +95,7 @@ const closeRoleDetailDialog = function(){
      <VDialog
         v-model="isSelectRolesDialog"
         persistent
-        max-width="1000"
+        max-width="1100"
         >
         <DialogCloseBtn @click="isSelectRolesDialog = !isSelectRolesDialog" />
 
@@ -255,6 +255,93 @@ const closeRoleDetailDialog = function(){
                                 v-model="permissions"
                                 label="eliminar faqs"
                                 value="eliminar faqs"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Categorías Blogs
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver categorías-blogs"
+                                value="ver categorías-blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear categorías-blogs"
+                                value="crear categorías-blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar categorías-blogs"
+                                value="editar categorías-blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar categorías-blogs"
+                                value="eliminar categorías-blogs"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Blogs
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver blogs"
+                                value="ver blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear blogs"
+                                value="crear blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar blogs"
+                                value="editar blogs"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar blogs"
+                                value="eliminar blogs"
+                                :readonly="readonly"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
+                <VCardTitle>
+                    Utilidades  
+                </VCardTitle>
+                <VCardText>
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            FAQ's
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver página-faqs"
+                                value="ver página-faqs"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Blogs
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver página-faqs"
+                                value="ver página-faqs"
                                 :readonly="readonly"
                             />
                         </div>

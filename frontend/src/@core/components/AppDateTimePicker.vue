@@ -12,6 +12,7 @@ import {
 
 import { filterInputAttrs } from 'vuetify/lib/util/helpers'
 import { useThemeConfig } from '@core/composable/useThemeConfig'
+import esLocale  from 'flatpickr/dist/l10n/es';
 
 const props = defineProps({
   ...makeVInputProps({
@@ -44,6 +45,12 @@ const refFlatPicker = ref()
 const { focused } = useFocus(refFlatPicker)
 const isCalendarOpen = ref(false)
 const isInlinePicker = ref(false)
+
+// locale
+if (compAttrs.config) {
+  esLocale.es.time_24hr = false
+  compAttrs.config.locale = esLocale.es
+}
 
 // flat picker prop manipulation
 if (compAttrs.config && compAttrs.config.inline) {

@@ -127,14 +127,47 @@ class CategoryController extends Controller
 
             $category = Category::createCategory($request);
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner');
 
                 $path = 'categories/';
 
-                $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($banner, $path);
 
-                $category->image = $file_data['filePath'];
+                $category->banner = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_2')) {
+                $banner_2 = $request->file('banner_2');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_2, $path);
+
+                $category->banner_2 = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_3')) {
+                $banner_3 = $request->file('banner_3');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_3, $path);
+
+                $category->banner_3 = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_4')) {
+                $banner_4 = $request->file('banner_4');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_4, $path);
+
+                $category->banner_4 = $file_data['filePath'];
                 $category->update();
             } 
 
@@ -161,7 +194,7 @@ class CategoryController extends Controller
     {
         try {
             
-            $category = Category::find($id);
+            $category = Category::with(['category.category'])->find($id);
 
             if (!$category)
                 return response()->json([
@@ -189,7 +222,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CategoryRequest $request, Category $category): JsonResponse
+    public function update(CategoryRequest $request, $id): JsonResponse
     {
         try {
 
@@ -204,14 +237,47 @@ class CategoryController extends Controller
 
             $category = $category->updateCategory($request, $category);
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner');
 
                 $path = 'categories/';
 
-                $file_data = uploadFile($image, $path, $category->image);
+                $file_data = uploadFile($banner, $path, $category->banner);
 
-                $category->image = $file_data['filePath'];
+                $category->banner = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_2')) {
+                $banner_2 = $request->file('banner_2');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_2, $path, $category->banner_2);
+
+                $category->banner_2 = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_3')) {
+                $banner_3 = $request->file('banner_3');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_3, $path, $category->banner_3);
+
+                $category->banner_3 = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_4')) {
+                $banner_4 = $request->file('banner_4');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_4, $path, $category->banner_4);
+
+                $category->banner_4 = $file_data['filePath'];
                 $category->save();
             }
 
@@ -238,7 +304,7 @@ class CategoryController extends Controller
     {
         try {
 
-            $category = Category::find($id);
+            $category = Category::find($request->ids);
 
             if (!$category)
                 return response()->json([

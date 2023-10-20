@@ -31,6 +31,7 @@ class ProductController extends Controller
             $limit = $request->has('limit') ? $request->limit : 10;
         
             $query = Product::with(['categories.category', 'detail', 'images'])
+                            ->favorites()
                             ->applyFilters(
                                 $request->only([
                                     'search',

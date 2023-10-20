@@ -46,6 +46,20 @@ export const useCategoriesStores = defineStore('categories', {
                 })
             
         },
+        showCategory(id) {
+            this.setLoading(true)
+
+            return Categories.show(id)
+                .then((response) => {
+                    if(response.data.success)
+                    return Promise.resolve(response.data.data.category)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         updateCategory(data) {
             this.setLoading(true)
             

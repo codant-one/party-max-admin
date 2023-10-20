@@ -5,6 +5,7 @@ import { themeConfig } from '@themeConfig'
 import { useAuthStores } from '@/stores/useAuth'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg'
+import festin from '@images/pages/auth-v2-login-illustration-light.png'
 
 const authStores = useAuthStores()
 const route = useRoute()
@@ -63,7 +64,7 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <div class="auth-wrapper d-flex align-center justify-center pa-4">
+  <div class="auth-wrapper-2fa d-flex align-center justify-center pa-4">
     <div class="position-relative my-sm-16">
       <!-- 👉 Top shape -->
       <VImg
@@ -85,71 +86,84 @@ const onSubmit = () => {
         {{ advisor.message }}
       </v-alert>
 
-      <!-- 👉 Auth card -->
-      <VCard
-        class="auth-card auth pa-4"
-        max-width="448"
-      >
-        <VCardItem class="justify-center">
-          <template #prepend>
-            <div class="d-flex">
-                <VNodeRenderer
-                    :nodes="themeConfig.app.logoSlogan"
-                    class="mb-5 d-flex align-center"
-                    size="100"
-                />
-            </div>
-          </template>
-        </VCardItem>
-
-        <VCardText>
-            <span class="d-flex justify-center"> 
-                <VImg
-                    height="200"
-                    :src="themeConfig.settings.urlPublic + 'images/smartphone.svg'"
+      <div class="d-block">
+        <div  class="d-flex align-center justify-center festin d-lg-none">
+          <VImg
+            :src="festin"
+            class="auth-illustration"            
+          />
+        </div>
+        <!-- 👉 Auth card -->
+        <VCard
+          class="auth-card auth pa-4"
+          max-width="448"
+        >
+          <VCardItem class="justify-center">
+            <template #prepend>
+              <div class="d-flex">
+                  <VNodeRenderer
+                      :nodes="themeConfig.app.logoSlogan"
+                      class="mb-5 d-flex align-center"
+                      size="100"
                   />
-            </span>
-          <h5 class="text-h5 font-weight-semibold mb-1">
-            Google Authenticator 💬
-          </h5>
-          <p class="mb-1">
-            Alternativamente, puede usar el código <strong>{{ token }}</strong>.
-          </p>
-        </VCardText>
+              </div>
+            </template>
+          </VCardItem>
 
-        <VCardText>
-          <VForm
-            @submit.prevent="onSubmit">
-            <VRow>
-              <!-- email -->
-              <VCol cols="12">
-                <AppOtpInput @updateOtp="handleOtp"/>
-              </VCol>
+          <VCardText class="px-2 px-md-6 pb-5">
+              <span class="d-flex justify-center"> 
+                  <VImg
+                      class="padlock"
+                      :src="themeConfig.settings.urlPublic + 'images/smartphone.svg'"
+                    />
+              </span>
+            <h5 class="text-h5 font-weight-semibold mb-1 mt-5">
+              Google Authenticator 💬
+            </h5>
+            <p class="mb-1 letter">
+              Alternativamente, puede usar el código <strong>{{ token }}</strong>.
+            </p>
+          </VCardText>
 
-              <!-- reset password -->
-              <VCol cols="12">
-                <VBtn
-                  block
-                  type="submit"
-                >
-                  Enviar
-                  <VProgressCircular
-                    v-if="load"
-                    indeterminate
-                    color="#fff"
-                  />
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardText>
-      </VCard>
+          <VCardText class="px-2 px-md-6 pb-5">
+            <VForm
+              @submit.prevent="onSubmit">
+              <VRow>
+                <!-- email -->
+                <VCol cols="12">
+                  <AppOtpInput @updateOtp="handleOtp"/>
+                </VCol>
+
+                <!-- reset password -->
+                <VCol cols="12">
+                  <VBtn
+                    block
+                    type="submit"
+                  >
+                    Enviar
+                    <VProgressCircular
+                      v-if="load"
+                      indeterminate
+                      color="#fff"
+                    />
+                  </VBtn>
+                </VCol>
+              </VRow>
+            </VForm>
+          </VCardText>
+        </VCard>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
     @use "@core/scss/template/pages/page-auth.scss";
+
+    .festin {
+      padding-right: 30% !important;
+      padding-left: 30% !important;
+    }
 
     .auth .v-card-item__prepend {
         padding-inline-end: 0 !important;
@@ -159,16 +173,39 @@ const onSubmit = () => {
         padding: 0 24px !important;
     }
 
-    @media(max-width: 991px){
-        .auth .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+    .padlock {
+      height: 200px;
     }
 
     @media(max-width: 991px){
-        .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+      .auth .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+   
+      .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+
+      .v-card-text {
+        padding: 10px !important;
+      }
+
+      .letter, .v-selection-control--inline .v-label {
+        font-size: 11.5px !important;
+      }
+
+      .v-selection-control__wrapper {
+        width: 28px !important;
+        margin-left: 4px;
+      }
+
+      .text-h5 {
+        font-size: 1.2rem !important;
+      }
+
+      .padlock {
+        height: 100px;
+      }
     }
 </style>
 

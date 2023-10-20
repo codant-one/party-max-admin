@@ -17,7 +17,10 @@ class StateSeeder extends Seeder
         $states = ['Inactivo', 'Activo'];
 
         foreach($states as $state){
-            State::create(['name' => $state]);
+            State::create([
+                'name' => $state,
+                'label' => strtolower($state)
+            ]);
         }
 
     }

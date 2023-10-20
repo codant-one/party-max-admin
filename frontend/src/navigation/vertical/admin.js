@@ -20,6 +20,8 @@ export default [
       {
         title: "FAQ's",
         icon: { icon: 'tabler-help-hexagon' },
+        action: 'ver',
+        subject: 'categorías-faqs',
         children: [
           { 
             title: 'Categorías', 
@@ -34,7 +36,27 @@ export default [
             subject: 'faqs',
           },
         ],
-      }  
+      },
+      { 
+        title: 'Blogs', 
+        icon: { icon: 'mdi-notebook-edit-outline' },
+        action: 'ver',
+        subject: 'categorías-blogs',
+        children: [
+          { 
+            title: 'Categorías', 
+            to: 'dashboard-admin-blog-categories', 
+            action: 'ver',
+            subject: 'categorías-blogs',
+          },
+          { 
+            title: "Lista de Blogs", 
+            to: 'dashboard-admin-blogs', 
+            action: 'ver',
+            subject: 'blogs',
+          },
+        ]
+      }
     ],
   }
 ]

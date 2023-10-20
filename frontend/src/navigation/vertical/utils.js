@@ -15,7 +15,7 @@ export default [
           icon: { icon: 'mdi-notebook-outline' },
           to: 'dashboard-utils-blogs', 
           action: 'ver', 
-          subject: 'formulario', 
+          subject: 'página-blogs', 
         },
         {
           title: 'Notificaciones',
