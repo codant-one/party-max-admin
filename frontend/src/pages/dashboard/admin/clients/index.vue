@@ -188,13 +188,13 @@ const downloadCSV = async () => {
       
   clientsStores.getClients.forEach(element => {
     var a = element;
-    // let data = {
-    //   ID: element.id,
-    //   NOMBRE: element.user.name,
-    //   APELLIDO: element.user.last_name,
-    //   USUARIO: element.user.username,
-    //   PAÍS:  element.user.user_detail.province.country.name
-    // }
+    let data = {
+      ID: element.id,
+      NOMBRE: element.user.name,
+      APELLIDO: element.user.last_name,
+      USUARIO: element.user.username,
+      PAÍS:  element.user.user_detail.province.country.name
+    }
           
     dataArray.push(data)
   })

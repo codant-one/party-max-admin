@@ -94,6 +94,9 @@ class Client extends Model
             'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
 
+        $user = User::find($client->user_id);
+        User::updateUser($request, $user);
+
         return $client;
     }
 
@@ -104,7 +107,10 @@ class Client extends Model
     public static function deleteClients($ids) {
         foreach ($ids as $id) {
             $client = self::find($id);
+            $user = User::find($client->user_id);
+
             $client->delete();
+            User::deleteUser($user->id);
         }
     }
 }

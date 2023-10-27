@@ -34,7 +34,7 @@ class ClientRequest extends UserRequest
             ],
             'birthday' => [
                 'required',
-                'date_format:d-m-Y'
+                'date_format:Y-m-d'
             ]
         ];
 
@@ -56,7 +56,7 @@ class ClientRequest extends UserRequest
             'gender_id.integer' => 'El formato del genero debe ser entero.',
             'gender_id.exists' => 'El Genero ingresado no existe.',
             'birthday.required' => 'El nombre del Cliente es requerido.',
-            'birthday.date' => 'El formato de la fecha de cumpleaños es incorrecto (dd/mm/YYYY).'
+            'birthday.date_format' => 'El formato de la fecha de cumpleaños es incorrecto (YYYY/mm/dd).'
         ];
     }
 

@@ -89,16 +89,68 @@ class ClientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(ClientRequest $request, $id): JsonResponse
     {
-        //
+        try {
+
+            $client = Client::with(['user.userDetail.province.country', 'gender'])->find($id);
+        
+            if (!$client)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Cliente no encontrado'
+                ], 404);
+
+            $client->updateClient($request, $client); 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'client' => $client
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Client $client)
+    public function destroy($id)
     {
-        //
+        try {
+
+            $client = Client::find($id);
+        
+            if (!$client)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Cliente no encontrado'
+                ], 404);
+            
+            $client->deleteClient($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'client' => $client
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 }
