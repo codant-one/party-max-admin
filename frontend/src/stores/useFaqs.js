@@ -22,9 +22,9 @@ export const useFaqsStores = defineStore('faqs', {
             
             return Faqs.get(params)
                 .then((response) => {
-                    this.faqs = response.data.faqs.data
-                    this.last_page = response.data.faqs.last_page
-                    this.faqsTotalCount = response.data.faqsTotalCount
+                    this.faqs = response.data.data.faqs.data
+                    this.last_page = response.data.data.faqs.last_page
+                    this.faqsTotalCount = response.data.data.faqsTotalCount
                 })
                 .catch(error => console.log(error))
                 .finally(() => {
@@ -37,7 +37,7 @@ export const useFaqsStores = defineStore('faqs', {
 
             return Faqs.create(data)
                 .then((response) => {
-                    this.faqs.push(response.data.faq)
+                    this.faqs.push(response.data.data.faq)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -51,8 +51,8 @@ export const useFaqsStores = defineStore('faqs', {
             
             return Faqs.update(data)
                 .then((response) => {
-                    let pos = this.faqs.findIndex((item) => item.id === response.data.faq.id)
-                    this.faqs[pos] = response.data.faq
+                    let pos = this.faqs.findIndex((item) => item.id === response.data.data.faq.id)
+                    this.faqs[pos] = response.data.data.faq
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -74,19 +74,6 @@ export const useFaqsStores = defineStore('faqs', {
                 .finally(() => {
                     this.setLoading(false)
                 })  
-        },
-        fetchFaqsOrder(params) {
-            this.setLoading(true)
-            
-            return Faqs.order(params)
-                .then((response) => {
-                    this.faqs = response.data.faqs
-                })
-                .catch(error => console.log(error))
-                .finally(() => {
-                    this.setLoading(false)
-                })
-            
-        },
+        }
     }
 })

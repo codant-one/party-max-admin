@@ -104,23 +104,18 @@ class RoleController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query=Role::with('permissions');
-
-            $roles = $query->applyFilters(
+            $query = Role::with('permissions')
+                         ->applyFilters(
                             $request->only([
                                 'search',
                                 'orderByField',
                                 'orderBy'
                             ])
-                         )->paginateData($limit);
+                         );
 
-            $count = $query->applyFilters(
-                            $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        )->count();
+            $roles = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            $count = $query->count();
 
             return response()->json([
                 'success' => true,

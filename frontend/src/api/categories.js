@@ -10,6 +10,10 @@ class Categories {
         return axios.post('/categories', data)
     }
 
+    show(id) {
+        return axios.get(`/categories/${id}`)
+    }
+
     update(data) {
         return axios.post(`/categories/${data.id}`, data.data)
     }

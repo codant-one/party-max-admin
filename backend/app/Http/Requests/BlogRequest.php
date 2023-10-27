@@ -25,24 +25,24 @@ class BlogRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'date' => [
+                'required'
+            ],
             'title' => [
                 'required'
             ],
             'description' => [
                 'required'
-            ],   
-            'image' => [
-                'required'
-            ] 
+            ]
         ];
     }
 
     public function messages()
     {
         return [
+            'date.required' => 'La fecha del Blog es requerida',
             'title.required' => 'El título del Blog es requerido',
-            'description.required' => 'La descripción del Blog es requerida',
-            'image.required' => 'La imagen del Blog es requerida'
+            'description.required' => 'La descripción del Blog es requerida'
         ];
     }
 

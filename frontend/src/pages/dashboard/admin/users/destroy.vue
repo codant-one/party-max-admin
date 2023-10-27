@@ -40,7 +40,7 @@ const deleteUser = function() {
       
       advisor.value.show = true
       advisor.value.type = 'success'
-      advisor.value.message = 'Usuario Eliminado'
+      advisor.value.message = 'Usuario Eliminado!'
           
       emit('alert', advisor)
       emit('data')

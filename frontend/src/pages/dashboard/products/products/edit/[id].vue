@@ -247,7 +247,7 @@ const onSubmit = () => {
                 if (res.data.success) {
 
                     let data = {
-                        message: 'Producto actualizado con éxito',
+                        message: 'Producto actualizado!',
                         error: false
                     }
 

@@ -3,9 +3,11 @@
 namespace Database\Factories;
 
 use Str;
-use App\Models\Faq;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
+
+use App\Models\Faq;
+use App\Models\FaqCategory;
 
 class FaqFactory extends Factory
 {
@@ -25,6 +27,7 @@ class FaqFactory extends Factory
     public function definition()
     {
         return [
+            'faq_category_id' => FaqCategory::InRandomOrder()->first()->id,
             'title' => '¿'.$this->faker->sentence.'?',
             'description' => $this->faker->paragraph
         ];

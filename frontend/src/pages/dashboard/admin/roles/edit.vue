@@ -86,7 +86,7 @@ const onSubmitEdit = () =>{
                 
                 advisor.value.show = true
                 advisor.value.type = 'success'
-                advisor.value.message = 'Rol Creado'
+                advisor.value.message = 'Rol actualizado!'
 
                 emit('alert', advisor)
                 emit('data')

@@ -48,13 +48,13 @@ const closeTreeDialog  = function(){
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Usuarios</strong>&emsp;/&emsp;<code>Permite la creacion de usuarios</code>
+                                <strong>Crear Usuarios</strong>&emsp;/&emsp;<code>Permite la creación de usuarios</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Usuarios</strong>&emsp;/&emsp;<code>Permite la edicion de usuarios</code>
+                                <strong>Editar Usuarios</strong>&emsp;/&emsp;<code>Permite la edición de usuarios</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Usuarios</strong>&emsp;/&emsp;<code>Permite la eliminacion de usuarios</code>
+                                <strong>Eliminar Usuarios</strong>&emsp;/&emsp;<code>Permite la eliminación de usuarios</code>
                             </li>
                         </ul>
                         <li class="tab n3">
@@ -62,15 +62,90 @@ const closeTreeDialog  = function(){
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Roles</strong>&emsp;/&emsp;<code>Permite la creacion de roles</code>
+                                <strong>Crear Roles</strong>&emsp;/&emsp;<code>Permite la creación de roles</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Roles</strong>&emsp;/&emsp;<code>Permite la edicion de roles</code>
+                                <strong>Editar Roles</strong>&emsp;/&emsp;<code>Permite la edición de roles</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Roles</strong>&emsp;/&emsp;<code>Permite la eliminacion de roles</code>
+                                <strong>Eliminar Roles</strong>&emsp;/&emsp;<code>Permite la eliminación de roles</code>
                             </li>
                         </ul>
+                        <li class="tab n3">
+                            <strong>FAQ's</strong>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Ver Categorías de FAQ's</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de FAQ's</code>
+                            </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Categorías de FAQ's</strong>&emsp;/&emsp;<code>Permite la creación de categorías de FAQ's</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Categorías de FAQ's</strong>&emsp;/&emsp;<code>Permite la edición de categorías de FAQ's</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Categorías de FAQ's</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de FAQ's</code>
+                                </li>
+                            </ul>
+                            <li class="tab n3">
+                                <strong>Ver FAQ's</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de FAQ's</code>
+                            </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear FAQ's</strong>&emsp;/&emsp;<code>Permite la creación de FAQ's</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar FAQ's</strong>&emsp;/&emsp;<code>Permite la edición de FAQ's</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar FAQ's</strong>&emsp;/&emsp;<code>Permite la eliminación de FAQ's</code>
+                                </li>
+                            </ul>
+                        </ul>   
+                        <li class="tab n3">
+                            <strong>Blogs</strong>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Ver Categorías de Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de blogs</code>
+                            </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la creación de categorías de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la edición de categorías de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Categorías de Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de blogs</code>
+                                </li>
+                            </ul>
+                            <li class="tab n3">
+                                <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de blogs</code>
+                            </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Blogs</strong>&emsp;/&emsp;<code>Permite la creación de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Blogs</strong>&emsp;/&emsp;<code>Permite la edición de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de blogs</code>
+                                </li>
+                            </ul>
+                        </ul> 
+                        <li class="n2">
+                            <strong>Utilidades</strong>
+                        </li>
+                        <li class="tab n3">
+                            <strong>Ver FAQ's</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-faqs</code>
+                        </li>   
+                        <li class="tab n3">
+                            <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-blogs</code>
+                        </li>                 
                         <li class="n2">
                             <strong>Productos</strong>
                         </li>
@@ -79,13 +154,13 @@ const closeTreeDialog  = function(){
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creacion de categorías</code>
+                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creación de categorías</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edicion de categorías</code>
+                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edición de categorías</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminacion de categorías</code>
+                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías</code>
                             </li>
                         </ul>
                         <li class="tab n3">
@@ -93,13 +168,13 @@ const closeTreeDialog  = function(){
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Productos</strong>&emsp;/&emsp;<code>Permite la creacion de productos</code>
+                                <strong>Crear Productos</strong>&emsp;/&emsp;<code>Permite la creación de productos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Productos</strong>&emsp;/&emsp;<code>Permite la edicion de productos</code>
+                                <strong>Editar Productos</strong>&emsp;/&emsp;<code>Permite la edición de productos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminacion de productos</code>
+                                <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
                             </li>
                         </ul>
                     </ul>

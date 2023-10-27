@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; 
+
+use App\Models\BlogCategory;
 
 class Blog extends Model
 {
@@ -14,12 +15,22 @@ class Blog extends Model
 
     protected $guarded = [];
 
+    /**** Relationship ****/
+    public function category() {
+        return $this->belongsTo(BlogCategory::class, 'blog_category_id', 'id');
+    }
+
     /**** Public methods ****/
     public static function createBlog($request) {
 
         $blog = self::create([
+            'blog_category_id' => $request->blog_category_id,
+            'user_id' => auth()->user()->id,
+            'is_popular_blog' => $request->is_popular_blog,
+            'date' => $request->date,
             'title' => $request->title,
-            'description' =>  $request->description
+            'description' =>  $request->description,
+            'slug' => Str::slug($request->title)
         ]);
 
         return $blog;
@@ -27,18 +38,14 @@ class Blog extends Model
 
     public static function updateBlog($request, $blog) {
 
-        if($request->hasFile('image'))
-        {
-            $image = $request->file('image'); 
-            $nameimage = time(). '-' .Str::slug($request->name)."_".$image->getClientOriginalName();
-            $nameimage = str_replace(' ', '', $nameimage);
-            $pathimage = $request->image->storeAs('images/blogs', $nameimage, 'public');
-        }
-
         $blog->update([
+            'blog_category_id' => $request->blog_category_id,
+            'user_id' => auth()->user()->id,
+            'is_popular_blog' => $request->is_popular_blog,
+            'date' => $request->date,
             'title' => $request->title,
             'description' =>  $request->description,
-            'image' => $pathimage
+            'slug' => Str::slug($request->title)
         ]);
 
         return $blog;
@@ -47,14 +54,15 @@ class Blog extends Model
     public static function deleteBlog($id) {
         $blog = self::find($id);
         $blog->delete();
+
+        if($blog->image)
+            deleteFile($blog->image);
     }
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
-        foreach (explode(' ', $search) as $term) {
-            $query->where('title', 'LIKE', '%' . $term . '%')
-                  ->orWhere('description', 'LIKE', '%' . $term . '%');
-        }
+        $query->where('title', 'LIKE', '%' . $search . '%')
+              ->orWhere('description', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {

@@ -1,6 +1,13 @@
 .layout-blank {
   .auth-wrapper {
-    background-color: rgb(var(--v-theme-surface));
+    background-image: url('@images/pages/auth-v2-mobile-wallpaper.jpg');
+    background-size: cover;
+    min-block-size: calc(var(--vh, 1vh) * 100);
+  }
+
+  .auth-wrapper-2fa {
+    background-image: url('@images/pages/auth-v2-mobile-wallpaper.jpg');
+    background-size: cover;
     min-block-size: calc(var(--vh, 1vh) * 100);
   }
 
@@ -44,6 +51,16 @@
   .skin--bordered {
     .auth-card-v2 {
       border-inline-start: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    }
+  }
+  .layout-blank {
+    .auth-wrapper {
+      background-image: none !important;
+      background-color: rgb(var(--v-theme-surface));
+    }
+
+    .auth-wrapper-2fa {
+      background-image:  url('@images/pages/auth-v2-desktop-2fa-wallpaper.jpg');
     }
   }
 }

@@ -164,7 +164,7 @@ const onSubmitEdit = () =>{
 
                 advisor.value.show = true
                 advisor.value.type = 'success'
-                advisor.value.message = 'Usuario editado'
+                advisor.value.message = 'Usuario actualizado!'
 
                 emit('alert', advisor)
                 emit('data')

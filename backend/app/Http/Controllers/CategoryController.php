@@ -46,49 +46,75 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $limit = $request->has('limit') ? $request->limit : 10;
-    
-        $query = Category::with(['category.category'])
-                         ->applyFilters(
-                                $request->only([
-                                    'search',
-                                    'orderByField',
-                                    'orderBy'
-                                ])
-                            );
+        try {
 
-        $categories = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            $limit = $request->has('limit') ? $request->limit : 10;
         
-        $count = $query->count();
+            $query = Category::with(['category.category'])
+                            ->applyFilters(
+                                    $request->only([
+                                        'search',
+                                        'orderByField',
+                                        'orderBy'
+                                    ])
+                                );
 
-        return response()->json([
-            'categories' => $categories,
-            'categoriesTotalCount' => $count
-        ]);
+            $categories = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            $count = $query->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'categories' => $categories,
+                    'categoriesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     public function order(Request $request): JsonResponse
     {
-        $query = Category::with('children')
-                              ->whereNull('category_id')
-                              ->orderBy('id')
-                              ->get();
+        try {
 
-        foreach ($query as $category) {
-            $data = [
-                'id' => $category->id, 
-                'name' => $category->name, 
-                'level' => 1
-            ];
+            $query = Category::with('children')
+                                ->whereNull('category_id')
+                                ->orderBy('id')
+                                ->get();
 
-            array_push($this->categories, $data);
+            foreach ($query as $category) {
+                $data = [
+                    'id' => $category->id, 
+                    'name' => $category->name, 
+                    'level' => 1
+                ];
 
-            $this->traverseChildren($category->children);
+                array_push($this->categories, $data);
+
+                $this->traverseChildren($category->children);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'categories' => $this->categories
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'categories' => $this->categories
-        ]);
 
     }
 
@@ -97,23 +123,68 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request): JsonResponse
     {
-        $category = Category::createCategory($request);
+        try {
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+            $category = Category::createCategory($request);
 
-            $path = 'categories/';
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner');
 
-            $file_data = uploadFile($image, $path);
+                $path = 'categories/';
 
-            $category->image = $file_data['filePath'];
-            $category->update();
-        } 
+                $file_data = uploadFile($banner, $path);
 
-        return response()->json([
-            'category' => Category::find($category->id),
-            'success' => true
-        ]);
+                $category->banner = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_2')) {
+                $banner_2 = $request->file('banner_2');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_2, $path);
+
+                $category->banner_2 = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_3')) {
+                $banner_3 = $request->file('banner_3');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_3, $path);
+
+                $category->banner_3 = $file_data['filePath'];
+                $category->update();
+            } 
+
+            if ($request->hasFile('banner_4')) {
+                $banner_4 = $request->file('banner_4');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_4, $path);
+
+                $category->banner_4 = $file_data['filePath'];
+                $category->update();
+            } 
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'category' => Category::find($category->id)
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -121,42 +192,109 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
+        try {
+            
+            $category = Category::with(['category.category'])->find($id);
 
-        if (!$category)
+            if (!$category)
+                return response()->json([
+                    'sucess' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Categoría no encontrado'
+                ], 404);
+
             return response()->json([
-                'sucess' => false,
-                'message' => 'Not found'
-            ], 404);
+                'success' => true,
+                'data' => [ 
+                    'category' => $category
+                ]
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'category' => $category,
-        ]);
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(CategoryRequest $request, Category $category): JsonResponse
+    public function update(CategoryRequest $request, $id): JsonResponse
     {
-        $category = $category->updateCategory($request, $category);
+        try {
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+            $category = Category::find($id);
 
-            $path = 'categories/';
+            if (!$category)
+                return response()->json([
+                    'sucess' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Categoría no encontrado'
+                ], 404);
 
-            $file_data = uploadFile($image, $path, $category->image);
+            $category = $category->updateCategory($request, $category);
 
-            $category->image = $file_data['filePath'];
-            $category->save();
+            if ($request->hasFile('banner')) {
+                $banner = $request->file('banner');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner, $path, $category->banner);
+
+                $category->banner = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_2')) {
+                $banner_2 = $request->file('banner_2');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_2, $path, $category->banner_2);
+
+                $category->banner_2 = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_3')) {
+                $banner_3 = $request->file('banner_3');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_3, $path, $category->banner_3);
+
+                $category->banner_3 = $file_data['filePath'];
+                $category->save();
+            }
+
+            if ($request->hasFile('banner_4')) {
+                $banner_4 = $request->file('banner_4');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($banner_4, $path, $category->banner_4);
+
+                $category->banner_4 = $file_data['filePath'];
+                $category->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'category' => Category::find($category->id)
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'category' => Category::find($category->id),
-            'success' => true
-        ]);
     }
 
     /**
@@ -164,11 +302,30 @@ class CategoryController extends Controller
      */
     public function delete(Request $request): JsonResponse
     {
-        Category::deleteCategories($request->ids);
+        try {
 
-        return response()->json([
-            'success' => true
-        ]);
+            $category = Category::find($request->ids);
+
+            if (!$category)
+                return response()->json([
+                    'sucess' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Categoría no encontrado'
+                ], 404);
+                
+            Category::deleteCategories($request->ids);
+
+            return response()->json([
+                'success' => true
+            ]);
+            
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
 }

@@ -2397,6 +2397,11 @@ execa@^5.1.1:
     signal-exit "^3.0.3"
     strip-final-newline "^2.0.0"
 
+export-from-json@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.npmjs.org/export-from-json/-/export-from-json-1.7.3.tgz"
+  integrity sha512-Xg0L0saYz+CBz2MnaZvSEAHr17hWtHAfFWXw/frllG9t6aijuQukiU40ElOeM9nDTrtQPhLJMLN0q8lo897FYg==
+
 extend@^3.0.2:
   version "3.0.2"
   resolved "https://registry.npmjs.org/extend/-/extend-3.0.2.tgz"

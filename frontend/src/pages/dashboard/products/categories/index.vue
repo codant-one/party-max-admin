@@ -3,7 +3,8 @@
 import { useCategoriesStores } from '@/stores/useCategories'
 import { ref } from "vue"
 import { themeConfig } from '@themeConfig'
-import AddNewCategoryDrawer from './AddNewCategoryDrawer.vue' 
+import Toaster from "@/components/common/Toaster.vue";
+import router from '@/router'
 
 const categoriesStores = useCategoriesStores()
 
@@ -14,7 +15,6 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalCategories = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewCategoryDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedCategory = ref({})
 
@@ -36,9 +36,6 @@ const paginationData = computed(() => {
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
-
-    if (!isAddNewCategoryDrawerVisible.value)
-        selectedCategory.value = {}
 })
 
 watchEffect(fetchData)
@@ -65,8 +62,7 @@ async function fetchData() {
 }
 
 const editCategory = categoryData => {
-    isAddNewCategoryDrawerVisible.value = true
-    selectedCategory.value = { ...categoryData }
+  router.push({ name : 'dashboard-products-categories-edit-id', params: { id: categoryData.id } })
 }
 
 
@@ -82,7 +78,7 @@ const removeCategory = async () => {
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Categoría eliminada con éxito!' : res.data.message,
+    message: res.data.success ? 'Categoría eliminada!' : res.data.message,
     show: true
   }
 
@@ -97,83 +93,6 @@ const removeCategory = async () => {
   }, 3000)
 
   return true
-}
-
-const submitForm = async (category, method) => {
-  isRequestOngoing.value = true
-
-  if (method === 'update') {
-    category.data.append('_method', 'PUT')
-    submitUpdate(category)
-    return
-  }
-
-  submitCreate(category.data)
-}
-
-
-const submitCreate = categoryData => {
-
-    categoriesStores.addCategory(categoryData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'Categoría creada con éxito',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
-}
-
-const submitUpdate = categoryData => {
-
-    categoriesStores.updateCategory(categoryData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'Categoría actualizada con éxito',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
 }
 
 </script>
@@ -209,7 +128,7 @@ const submitUpdate = categoryData => {
             
           {{ advisor.message }}
         </v-alert>
-
+        <Toaster />
         <v-card title="">
           <v-card-text class="d-flex flex-wrap py-4 gap-4">
             <div
@@ -238,7 +157,7 @@ const submitUpdate = categoryData => {
               <v-btn
                 v-if="$can('crear','categorías')"
                 prepend-icon="tabler-plus"
-                @click="isAddNewCategoryDrawerVisible = true">
+                :to="{ name: 'dashboard-products-categories-add' }">
                   Agregar Categoría
               </v-btn>
             </div>
@@ -252,10 +171,9 @@ const submitUpdate = categoryData => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col"> DESCRIPCIÓN </th>
                 <th scope="col"> SUBCATEGORÍA </th>
                 <th scope="col"> SLUG </th>
-                <th scope="col"> IMAGEN </th>
+                <th scope="col"> BANNER </th>
                 <th scope="col" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
@@ -270,13 +188,13 @@ const submitUpdate = categoryData => {
 
                 <td> {{ category.id }} </td>
                 <td> {{ category.name }} </td>
-                <td> {{ category.description }} </td>
                 <td> {{ category.category?.name }} </td>
                 <td> {{ category.slug }} </td>
                 <td>
                     <VImg
-                        v-if="category.image !== null"
-                        :src="themeConfig.settings.urlStorage + category.image"
+                      class="me-6"
+                        v-if="category.banner !== null"
+                        :src="themeConfig.settings.urlStorage + category.banner"
                         :height="50"
                         aspect-ratio="1/1"
                     />
@@ -340,12 +258,6 @@ const submitUpdate = categoryData => {
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- 👉 Add New Category -->
-    <AddNewCategoryDrawer
-      v-model:isDrawerOpen="isAddNewCategoryDrawerVisible"
-      :category="selectedCategory"
-      @category-data="submitForm"/>
 
     <!-- 👉 Confirm Delete -->
     <VDialog

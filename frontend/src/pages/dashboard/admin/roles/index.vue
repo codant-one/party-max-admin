@@ -7,6 +7,7 @@ import edit from './edit.vue'
 import destroy from './destroy.vue'
 
 import { useRolesStores } from '@/stores/useRoles'
+import { excelParser } from '@/plugins/csv/excelParser'
 
 const rolesStores = useRolesStores()
 
@@ -109,244 +110,283 @@ const showAlert = function(alert) {
   advisor.value.message = alert.value.message
 }
 
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+
+  let data = { limit: -1}
+
+  await rolesStores.fetchRoles(data)
+
+  let dataArray = []
+
+  rolesStores.getRoles.forEach(element => {
+    let data = {
+      ID: element.id,
+      ROL: element.name
+    }
+        
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "roles", "csv")
+
+  isRequestOngoing.value = false
+}
+
 </script>
 
 <template>
-  <VCard
-    v-if="roles"
-    id="rol-list"
-  >
-    <v-alert
-      v-if="advisor.show"
-      :type="advisor.type"
-      class="mb-6"
-    >
-      {{ advisor.message }}
-    </v-alert>
-
-    <VCardText class="d-flex align-center flex-wrap gap-4">
-      <!-- 👉 Rows per page -->
-      <div
-        class="d-flex align-center"
-        style="width: 135px;"
-      >
-        <span class="text-no-wrap me-3">Ver:</span>
-        <VSelect
-          v-model="rowPerPage"
-          density="compact"
-          :items="[10, 20, 30, 50]"
-        />
-      </div>
-
-      <div class="me-3">
-        <create
-          @data="fetchData"
-          @alert="showAlert"/>
-      </div>
-
-      <div class="me-3">
-        <tree />
-      </div>
-
-      <VSpacer />
-
-      <div class="d-flex align-center flex-wrap gap-4">
-        <!-- 👉 Search  -->
-        <div class="search">
-          <VTextField
-            v-model="searchQuery"
-            placeholder="Buscar rol"
-            density="compact"
-          />
-        </div>
-      </div>
-    </VCardText>
-
-    <VDivider />
-
-    <!-- SECTION Table -->
-    <VTable class="text-no-wrap rol-list-table">
-      <!-- 👉 Table head -->
-      <thead class="text-uppercase">
-        <tr>
-          <th scope="col">
-            #ID
-          </th>
-
-          <th scope="col">
-            ROL
-          </th>
-
-          <th scope="col" v-if="$can('ver','roles') || $can('editar','roles') || $can('eliminar','roles')">
-            Acciones
-          </th>
-        </tr>
-      </thead>
-
-      <!-- 👉 Table Body -->
-      <tbody>
-        <tr
-          v-for="rol in roles"
-          :key="rol.id"
-          style="height: 3.75rem;"
-        >
-          <!-- 👉 Id -->
-          <td>
-            #{{ rol.id }}
-          </td>
-
-          <!-- 👉 nombre -->
-          <td>
-            {{ rol.name }}
-          </td>
-
-          <!-- 👉 acciones -->
-          <td style="width: 8rem;">
-            <VBtn
-              v-if="$can('ver','roles')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Ver
-              </VTooltip>
-              <VIcon
-                icon="tabler-eye"
-                :size="22"
-                @click="showRoleDetailDialog(rol)"
-              />
-            </VBtn>
-
-            <VBtn
-              v-if="$can('editar','roles')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="showRoleEditDialog(rol)"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Editar
-              </VTooltip>
-              <VIcon
-                :size="22"
-                icon="tabler-edit"
-              />
-            </VBtn>
-
-            <VBtn
-              v-if="$can('eliminar','roles')"
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="showRoledDeleteDialog(rol)"
-            >
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent"
-              >
-                Eliminar
-              </VTooltip>
-              <VIcon
-                :size="22"
-                icon="tabler-trash"
-              />
-            </VBtn>
-          </td>
-        </tr>
-      </tbody>
-
-      <!-- 👉 table footer  -->
-      <tfoot v-show="!roles.length">
-        <tr>
-          <td
-            colspan="8"
-            class="text-center text-body-1"
-          >
-            No existen roles
-          </td>
-        </tr>
-      </tfoot>
-    </VTable>
-    <!-- !SECTION -->
-
-    <VDivider />
-
-    <!-- SECTION Pagination -->
-    <VCardText class="d-flex align-center flex-wrap gap-4 py-3">
-      <!-- 👉 Pagination meta -->
-      <span class="text-sm text-disabled">
-        {{ paginationData }}
-      </span>
-
-      <VSpacer />
-
-      <!-- 👉 Pagination -->
-      <VPagination
-        v-model="currentPage"
-        size="small"
-        :total-visible="5"
-        :length="totalPages"
-        @next="selectedRows = []"
-        @prev="selectedRows = []"
-      />
-    </VCardText>
-
-    <show 
-      v-model:isDrawerOpen="isRoleDetailDialog"
-      :role="selectedRol"
-      :readonly="readonly"
-      @close="permissionsRol = []"
-      @readonly="readonly = false"/>
-    
-    <edit 
-      v-model:isDrawerOpen="isRoleEditDialog"
-      :role="selectedRol"
-      @data="fetchData"
-      @close="permissionsRol = []"
-      @alert="showAlert"
-      @readonly="readonly = true"/>
-
-    <destroy 
-      v-model:isDrawerOpen="isRoleDeleteDialog"
-      :role="selectedRol"
-      @data="fetchData"
-      @alert="showAlert"/>
-
-    <!-- DIALOGO CARGANDO -->
-    <VDialog
-      v-model="isRequestOngoing"
-      width="300"
-      persistent
-    >
-      <VCard
-        color="primary"
+  <section>
+    <v-row>
+      <VDialog
+        v-model="isRequestOngoing"
         width="300"
-      >
-        <VCardText class="pt-3">
-          Cargando
-          <VProgressLinear
-            indeterminate
-            color="white"
-            class="mb-0"
-          />
-        </VCardText>
-      </VCard>
-    </VDialog>
-    <!-- !SECTION -->
-  </VCard>
+        persistent>
+          
+        <VCard
+          color="primary"
+          width="300">
+            
+          <VCardText class="pt-3">
+            Cargando
+
+            <VProgressLinear
+              indeterminate
+              color="white"
+              class="mb-0"/>
+          </VCardText>
+        </VCard>
+      </VDialog>
+
+      <v-col cols="12">
+        <v-alert
+          v-if="advisor.show"
+          :type="advisor.type"
+          class="mb-6">
+            {{ advisor.message }}
+        </v-alert>
+
+        <VCard
+          v-if="roles"
+          id="rol-list"
+        >
+          <VCardText class="d-flex align-center flex-wrap gap-4">
+            <!-- 👉 Rows per page -->
+            <div
+              class="d-flex align-center"
+              style="width: 135px;"
+            >
+              <span class="text-no-wrap me-3">Ver:</span>
+              <VSelect
+                v-model="rowPerPage"
+                density="compact"
+                :items="[10, 20, 30, 50]"
+              />
+            </div>
+
+            <div class="me-3">
+              <create
+                @data="fetchData"
+                @alert="showAlert"/>
+            </div>
+
+            <div class="me-3">
+              <tree />
+            </div>
+
+            <VSpacer />
+
+            <div class="d-flex align-center">
+              <VBtn
+                variant="tonal"
+                color="secondary"
+                prepend-icon="tabler-file-export"
+                @click="downloadCSV"
+              >
+                Exportar
+              </VBtn>
+            </div>
+
+            <div class="d-flex align-center flex-wrap gap-4">
+              <!-- 👉 Search  -->
+              <div class="search rol-list-filter">
+                <VTextField
+                  v-model="searchQuery"
+                  placeholder="Buscar rol"
+                  density="compact"
+                />
+              </div>
+            </div>
+          </VCardText>
+
+          <VDivider />
+
+          <!-- SECTION Table -->
+          <VTable class="text-no-wrap rol-list-table">
+            <!-- 👉 Table head -->
+            <thead class="text-uppercase">
+              <tr>
+                <th scope="col">
+                  #ID
+                </th>
+
+                <th scope="col">
+                  ROL
+                </th>
+
+                <th scope="col" v-if="$can('ver','roles') || $can('editar','roles') || $can('eliminar','roles')">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+
+            <!-- 👉 Table Body -->
+            <tbody>
+              <tr
+                v-for="rol in roles"
+                :key="rol.id"
+                style="height: 3.75rem;"
+              >
+                <!-- 👉 Id -->
+                <td>
+                  #{{ rol.id }}
+                </td>
+
+                <!-- 👉 nombre -->
+                <td>
+                  {{ rol.name }}
+                </td>
+
+                <!-- 👉 acciones -->
+                <td style="width: 8rem;">
+                  <VBtn
+                    v-if="$can('ver','roles')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Ver
+                    </VTooltip>
+                    <VIcon
+                      icon="tabler-eye"
+                      :size="22"
+                      @click="showRoleDetailDialog(rol)"
+                    />
+                  </VBtn>
+
+                  <VBtn
+                    v-if="$can('editar','roles')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="showRoleEditDialog(rol)"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Editar
+                    </VTooltip>
+                    <VIcon
+                      :size="22"
+                      icon="tabler-edit"
+                    />
+                  </VBtn>
+
+                  <VBtn
+                    v-if="$can('eliminar','roles')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="showRoledDeleteDialog(rol)"
+                  >
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                    >
+                      Eliminar
+                    </VTooltip>
+                    <VIcon
+                      :size="22"
+                      icon="tabler-trash"
+                    />
+                  </VBtn>
+                </td>
+              </tr>
+            </tbody>
+
+            <!-- 👉 table footer  -->
+            <tfoot v-show="!roles.length">
+              <tr>
+                <td
+                  colspan="8"
+                  class="text-center text-body-1"
+                >
+                  No existen roles
+                </td>
+              </tr>
+            </tfoot>
+          </VTable>
+          <!-- !SECTION -->
+
+          <VDivider />
+
+          <!-- SECTION Pagination -->
+          <VCardText class="d-flex align-center flex-wrap gap-4 py-3">
+            <!-- 👉 Pagination meta -->
+            <span class="text-sm text-disabled">
+              {{ paginationData }}
+            </span>
+
+            <VSpacer />
+
+            <!-- 👉 Pagination -->
+            <VPagination
+              v-model="currentPage"
+              size="small"
+              :total-visible="5"
+              :length="totalPages"
+              @next="selectedRows = []"
+              @prev="selectedRows = []"
+            />
+          </VCardText>
+
+          <show 
+            v-model:isDrawerOpen="isRoleDetailDialog"
+            :role="selectedRol"
+            :readonly="readonly"
+            @close="permissionsRol = []"
+            @readonly="readonly = false"/>
+          
+          <edit 
+            v-model:isDrawerOpen="isRoleEditDialog"
+            :role="selectedRol"
+            @data="fetchData"
+            @close="permissionsRol = []"
+            @alert="showAlert"
+            @readonly="readonly = true"/>
+
+          <destroy 
+            v-model:isDrawerOpen="isRoleDeleteDialog"
+            :role="selectedRol"
+            @data="fetchData"
+            @alert="showAlert"/>
+        </VCard>
+      </v-col>
+    </v-row>
+  </section>
 </template>
 
 <style lang="scss">

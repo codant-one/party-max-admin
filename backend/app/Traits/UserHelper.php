@@ -21,6 +21,10 @@ trait UserHelper
         return $this->hasOne(UserDetails::class, 'user_id', 'id');
     }
 
+    public function client(){
+        return $this->belongsTo(Client::class, 'user_id', 'id');
+    }
+
 
     /**** Public methods ****/
     public function getOnlineAttribute($value) {
@@ -51,7 +55,9 @@ trait UserHelper
             'password' => Hash::make($request->password)
         ]);
 
-        $user->syncRoles($request->roles);
+        //Si NO es cliente se evalua la existencia del Rol.
+        if (!request('is_client'))
+            $user->syncRoles($request->roles);
 
         UserDetails::updateOrCreateUser($request, $user);
 

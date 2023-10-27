@@ -202,7 +202,7 @@ const onSubmit = () => {
                 if (res.data.success) {
 
                     let data = {
-                        message: 'Producto creado con éxito',
+                        message: 'Producto Creado!',
                         error: false
                     }
 

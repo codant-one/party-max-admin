@@ -2,7 +2,7 @@
 
 import { useFaqsStores } from '@/stores/useFaqs'
 import { ref } from "vue"
-import { themeConfig } from '@themeConfig'
+import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewFaqDrawer from './AddNewFaqDrawer.vue' 
 
 const faqsStores = useFaqsStores()
@@ -82,7 +82,7 @@ const removeFaq = async () => {
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'FAQ eliminada con éxito!' : res.data.message,
+    message: res.data.success ? 'FAQ eliminada!' : res.data.message,
     show: true
   }
 
@@ -119,7 +119,7 @@ const submitCreate = faqData => {
             if (res.data.success) {
                 advisor.value = {
                     type: 'success',
-                    message: 'FAQ creada con éxito',
+                    message: 'FAQ creada!',
                     show: true
                 }
                 fetchData()
@@ -151,7 +151,7 @@ const submitUpdate = faqData => {
             if (res.data.success) {
                     advisor.value = {
                     type: 'success',
-                    message: 'FAQ actualizada con éxito',
+                    message: 'FAQ actualizada!',
                     show: true
                 }
                 fetchData()
@@ -176,6 +176,33 @@ const submitUpdate = faqData => {
     }, 3000)
 }
 
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+
+  let data = { limit: -1 }
+
+  await faqsStores.fetchFaqs(data)
+
+  let dataArray = [];
+      
+  faqsStores.getFaqs.forEach(element => {
+    let data = {
+      ID: element.id,
+      TÍTULO: element.title,
+      DESCRIPCIÓN: element.text,
+      CATEGORÍA:  element.category.name
+    }
+          
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "faqs", "csv");
+
+  isRequestOngoing.value = false
+
+}
 </script>
 
 <template>
@@ -223,6 +250,16 @@ const submitUpdate = faqData => {
                 :items="[10, 20, 30, 50]"/>
             </div>
 
+            <div class="d-flex align-center">
+              <VBtn
+                variant="tonal"
+                color="secondary"
+                prepend-icon="tabler-file-export"
+                @click="downloadCSV">
+                Exportar
+              </VBtn>
+            </div>
+
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
@@ -236,7 +273,7 @@ const submitUpdate = faqData => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','FAQs')"
+                v-if="$can('crear','faqs')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewFaqDrawerVisible = true">
                   Agregar FAQ
@@ -253,7 +290,8 @@ const submitUpdate = faqData => {
                 <th scope="col"> #ID </th>
                 <th scope="col"> TITULO </th>
                 <th scope="col"> DESCRIPCIÓN </th>
-                <th scope="col" v-if="$can('editar', 'FAQs') || $can('eliminar', 'FAQs')">
+                <th scope="col"> CATEGORÍA </th>
+                <th scope="col" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">
                   ACCIONES
                 </th>
               </tr>
@@ -266,12 +304,13 @@ const submitUpdate = faqData => {
                 style="height: 3.75rem;">
 
                 <td> {{ faq.id }} </td>
-                <td> {{ faq.title }} </td>
-                <td> {{ faq.description }} </td>
+                <td class="text-wrap"> {{ faq.title }} </td>
+                <td class="text-wrap"> {{ faq.description }} </td>
+                <td class="text-wrap"> {{ faq.category.name }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'FAQs') || $can('eliminar', 'FAQs')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
                   <VBtn
-                    v-if="$can('editar', 'FAQs')"
+                    v-if="$can('editar', 'faqs')"
                     icon
                     size="x-small"
                     color="default"
@@ -284,7 +323,7 @@ const submitUpdate = faqData => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','FAQs')"
+                    v-if="$can('eliminar','faqs')"
                     icon
                     size="x-small"
                     color="default"
@@ -302,7 +341,7 @@ const submitUpdate = faqData => {
             <tfoot v-show="!faqs.length">
               <tr>
                 <td
-                  colspan="7"
+                  colspan="4"
                   class="text-center">
                   Datos no disponibles
                 </td>
@@ -379,5 +418,5 @@ const submitUpdate = faqData => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: FAQs
+    subject: faqs
 </route>

@@ -21,6 +21,7 @@
         "axios-mock-adapter": "^1.21.2",
         "chart.js": "^3.9.1",
         "eslint-import-resolver-alias": "^1.1.2",
+        "export-from-json": "^1.7.3",
         "jwt-decode": "^3.1.2",
         "mitt": "^3.0.0",
         "moment": "^2.29.4",

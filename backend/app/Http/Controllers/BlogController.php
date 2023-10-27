@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\BlogRequest;
-use App\Models\Blog;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+
+use App\Models\Blog;
 
 class BlogController extends Controller
 {
@@ -26,23 +27,18 @@ class BlogController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Blog::query();            
+            $query = Blog::with(['category'])
+                         ->applyFilters(
+                            $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                          );            
 
-            $blogs = $query->applyFilters(
-                        $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        )->paginateData($limit);
+            $blogs = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
     
-            $count = $query->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy'
-                        ])
-                    )->count();
+            $count = $query->count();
 
             return response()->json([
                 'success' => true,
@@ -74,7 +70,7 @@ class BlogController extends Controller
      */
     public function store(BlogRequest $request): JsonResponse
     {
-        try{
+        try {
             
             $blog = Blog::createBlog($request);
 
@@ -188,7 +184,7 @@ class BlogController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
-        //
+
     }
 
     /**
@@ -210,10 +206,7 @@ class BlogController extends Controller
             $blog->deleteBlog($id);
 
             return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'blog' => $blog
-                ]
+                'success' => true
             ], 200);
 
         } catch(\Illuminate\Database\QueryException $ex) {
@@ -223,5 +216,32 @@ class BlogController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function uploadImage(Request $request): JsonResponse 
+    {
+        try {
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'blogs/';
+
+                $file_data = uploadFile($image, $path);
+
+                return response()->json([
+                    'success' => true,
+                    'url' => $file_data['filePath']
+                ], 200);
+            }
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
     }
 }

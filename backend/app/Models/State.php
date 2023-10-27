@@ -11,4 +11,19 @@ class State extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function clients(){
+        return $this->hasMany(Client::class, 'state_id', 'id');
+    }
+
+
+
+    /**** Public methods ****/
+    public static function forDropdown()
+    {
+        return DB::table('states as s')
+            ->select(['s.id', 's.name' ])
+            ->get()->pluck('name','id');
+        
+    }
 }

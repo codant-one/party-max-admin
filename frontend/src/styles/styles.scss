@@ -23,3 +23,9 @@ div.v-avatar {
 .text-primary:hover {
   color: #6FDDEF !important
 }
+
+.layout-nav-type-vertical .layout-vertical-nav .nav-group .nav-group .nav-link .nav-item-icon,
+.layout-nav-type-vertical .layout-vertical-nav .nav-group .nav-group .nav-group .nav-item-icon {
+  margin-inline-start: 1.25rem;
+  visibility: visible;
+}

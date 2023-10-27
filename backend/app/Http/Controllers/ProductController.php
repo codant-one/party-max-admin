@@ -26,25 +26,39 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $limit = $request->has('limit') ? $request->limit : 10;
-    
-        $query = Product::with(['categories.category', 'detail', 'images'])
-                        ->applyFilters(
-                            $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        );
+        try {
 
-        $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            $limit = $request->has('limit') ? $request->limit : 10;
         
-        $count = $query->count();
+            $query = Product::with(['categories.category', 'detail', 'images'])
+                            ->favorites()
+                            ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                            );
 
-        return response()->json([
-            'products' => $products,
-            'productsTotalCount' => $count
-        ]);
+            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            $count = $query->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'productsTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -52,23 +66,35 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request): JsonResponse
     {
-        $product = Product::createProduct($request);
+        try {
+            $product = Product::createProduct($request);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
 
-            $path = 'products/main/';
+                $path = 'products/main/';
 
-            $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($image, $path);
 
-            $product->image = $file_data['filePath'];
-            $product->update();
-        } 
+                $product->image = $file_data['filePath'];
+                $product->update();
+            } 
 
-        return response()->json([
-            'product' => Product::find($product->id),
-            'success' => true
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'product' => Product::find($product->id)
+                ]
+                
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -76,18 +102,31 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['categories.category', 'detail', 'images'])->find($id);
+        try {
 
-        if (!$product)
+            $product = Product::with(['categories.category', 'detail', 'images'])->find($id);
+
+            if (!$product)
+                return response()->json([
+                    'sucess' => false,
+                    'message' => 'Not found',
+                    'message' => 'Producto no encontrado'
+                ], 404);
+
             return response()->json([
-                'sucess' => false,
-                'message' => 'Not found'
-            ], 404);
+                'success' => true,
+                'data' => [ 
+                    'product' => $product
+                ]
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'product' => $product
-        ]);
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -95,12 +134,34 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product): JsonResponse
     {
-        $product = $product->updateProduct($request, $product);
+        try {
 
-        return response()->json([
-            'product' => Product::find($product->id),
-            'success' => true
-        ]);
+            $product = Product::with(['categories.category', 'detail', 'images'])->find($product->id);
+
+            if (!$product)
+                return response()->json([
+                    'sucess' => false,
+                    'message' => 'Not found',
+                    'message' => 'Producto no encontrado'
+                ], 404);
+
+            $product = $product->updateProduct($request, $product);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'product' => Product::find($product->id)
+                ]               
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
     }
 
     /**
@@ -108,10 +169,29 @@ class ProductController extends Controller
      */
     public function delete(Request $request): JsonResponse
     {
-        Product::deleteProducts($request->ids);
+        try {
 
-        return response()->json([
-            'success' => true
-        ]);
+            $product = Product::find($request->ids);
+
+            if (!$product)
+                return response()->json([
+                    'sucess' => false,
+                    'message' => 'Not found',
+                    'message' => 'Producto no encontrado'
+                ], 404);
+
+            Product::deleteProducts($request->ids);
+
+            return response()->json([
+                'success' => true
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 }

@@ -5,7 +5,7 @@ export default [
       children:[      
         {
           title: 'FAQ',
-          icon: { icon: 'tabler-help-hexagon' },
+          icon: { icon: 'mdi-frequently-asked-questions' },
           to: 'dashboard-utils-faqs',
           action: 'ver',
           subject: 'página-faqs',
@@ -15,7 +15,7 @@ export default [
           icon: { icon: 'mdi-notebook-outline' },
           to: 'dashboard-utils-blogs', 
           action: 'ver', 
-          subject: 'formulario', 
+          subject: 'página-blogs', 
         },
         {
           title: 'Notificaciones',

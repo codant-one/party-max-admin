@@ -39,11 +39,11 @@ class UserRequest extends FormRequest
             'password' => [
                 ($this->user) ? 'nullable' : 'required'
             ],
-            'roles' => [
-                'required',
-                'array',
-                'exists:Spatie\Permission\Models\Role,name'
-            ],
+            // 'roles' => [
+            //     'required',
+            //     'array',
+            //     'exists:Spatie\Permission\Models\Role,name'
+            // ],
             'province_id' => [
                 'integer',
                 'required',
@@ -60,6 +60,11 @@ class UserRequest extends FormRequest
                 'required'
             ]         
         ];
+
+        //Si NO es cliente se evalua la existencia del Rol.
+        if (!request('is_client')) {
+            $rules['roles'] = 'required|array|exists:Spatie\Permission\Models\Role,name';
+        }
     }
 
     public function messages()

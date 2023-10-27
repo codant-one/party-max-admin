@@ -21,8 +21,9 @@ export const emailValidator = value => {
 
 // 👉 Password Validator
 export const passwordValidator = password => {
-  const regExp = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]){8,}/
-  const validPassword = regExp.test(password)
+  // const regExp = /(?=.*\d){0,1}(?=.*[a-z|A-Z]){8,}/
+  const regExp = /^([a-z|A-Z])*(\d)([a-z|A-Z])*$/
+  const validPassword = regExp.test(password) && (password.length>=8)
   
   return (
     // eslint-disable-next-line operator-linebreak

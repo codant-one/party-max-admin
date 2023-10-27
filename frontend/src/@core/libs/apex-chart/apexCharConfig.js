@@ -139,7 +139,7 @@ export const getBarChartConfig = themeColors => {
       parentHeightOffset: 0,
       toolbar: { show: false },
     },
-    colors: ['#00cfe8'],
+    colors: ['#28C76F'],
     dataLabels: { enabled: false },
     plotOptions: {
       bar: {

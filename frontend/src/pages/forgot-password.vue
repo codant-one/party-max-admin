@@ -6,6 +6,7 @@ import { useAuthStores } from '@/stores/useAuth'
 import { emailValidator, requiredValidator } from '@validators'
 import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg'
 import authV1TopShape from '@images/svg/auth-v1-top-shape.svg'
+import festin from '@images/pages/auth-v2-login-illustration-light.png'
 
 const authStores = useAuthStores()
 
@@ -71,7 +72,7 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <div class="auth-wrapper d-flex align-center justify-center pa-4">
+  <div class="auth-wrapper-2fa d-flex align-center justify-center pa-4">
     <div class="position-relative my-sm-16">
       <!-- 👉 Top shape -->
       <VImg
@@ -93,87 +94,100 @@ const onSubmit = () => {
         {{ advisor.message }}
       </v-alert>
 
-      <!-- 👉 Auth card -->
-      <VCard
-        class="auth-card auth pa-4"
-        max-width="448"
-      >
-        <VCardItem class="justify-center">
-          <template #prepend>
-            <div class="d-flex">
-                <VNodeRenderer
-                    :nodes="themeConfig.app.logoSlogan"
-                    class="mb-5 d-flex align-center"
-                    size="100"
-                />
-            </div>
-          </template>
-
-        </VCardItem>
-
-        <VCardText class="pt-2">
-          <h5 class="text-h5 font-weight-semibold mb-1">
-            ¿Olvido su contraseña? 🔒
-          </h5>
-          <p class="mb-0">
-            Ingrese su correo electrónico y enviaremos un link para reiniciar su contraseña
-          </p>
-        </VCardText>
-
-        <VCardText>
-          <VForm 
-            ref="refVForm"
-            @submit.prevent="onSubmit">
-            <VRow>
-              <!-- email -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="email"
-                  label="Correo electrónico"
-                  type="email"
-                  :rules="[requiredValidator, emailValidator]"
-                  :error-messages="errors"
-                />
-              </VCol>
-
-              <!-- reset password -->
-              <VCol cols="12">
-                <VBtn
-                  block
-                  type="submit"
-                >
-                  Enviar
-                  <VProgressCircular
-                    v-if="load"
-                    indeterminate
-                    color="#fff"
+      <div class="d-block">
+        <div  class="d-flex align-center justify-center festin d-lg-none">
+          <VImg
+            :src="festin"
+            class="auth-illustration"            
+          />
+        </div>
+        <!-- 👉 Auth card -->
+        <VCard
+          class="auth-card auth pa-4"
+          max-width="448"
+        >
+          <VCardItem class="justify-center">
+            <template #prepend>
+              <div class="d-flex">
+                  <VNodeRenderer
+                      :nodes="themeConfig.app.logoSlogan"
+                      class="mb-5 d-flex align-center"
+                      size="100"
                   />
-                </VBtn>
-              </VCol>
+              </div>
+            </template>
 
-              <!-- back to login -->
-              <VCol cols="12">
-                <RouterLink
-                  class="d-flex align-center justify-center"
-                  :to="{ name: 'login' }"
-                >
-                  <VIcon
-                    icon="tabler-chevron-left"
-                    class="flip-in-rtl"
+          </VCardItem>
+
+          <VCardText class="pt-2 px-2 px-md-6">
+            <h5 class="text-h5 font-weight-semibold mb-1">
+              ¿Olvido su contraseña? 🔒
+            </h5>
+            <p class="mb-0 letter">
+              Ingrese su correo electrónico y enviaremos un link para reiniciar su contraseña
+            </p>
+          </VCardText>
+
+          <VCardText class="px-2 px-md-6 pb-5">
+            <VForm 
+              ref="refVForm"
+              @submit.prevent="onSubmit">
+              <VRow>
+                <!-- email -->
+                <VCol cols="12">
+                  <VTextField
+                    v-model="email"
+                    label="Correo electrónico"
+                    type="email"
+                    :rules="[requiredValidator, emailValidator]"
+                    :error-messages="errors"
                   />
-                  <span>Atrás para iniciar sesión</span>
-                </RouterLink>
-              </VCol>
-            </VRow>
-          </VForm>
-        </VCardText>
-      </VCard>
+                </VCol>
+
+                <!-- reset password -->
+                <VCol cols="12">
+                  <VBtn
+                    block
+                    type="submit"
+                  >
+                    Enviar
+                    <VProgressCircular
+                      v-if="load"
+                      indeterminate
+                      color="#fff"
+                    />
+                  </VBtn>
+                </VCol>
+
+                <!-- back to login -->
+                <VCol cols="12">
+                  <RouterLink
+                    class="d-flex align-center justify-center"
+                    :to="{ name: 'login' }"
+                  >
+                    <VIcon
+                      icon="tabler-chevron-left"
+                      class="flip-in-rtl"
+                    />
+                    <span>Atrás para iniciar sesión</span>
+                  </RouterLink>
+                </VCol>
+              </VRow>
+            </VForm>
+          </VCardText>
+        </VCard>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
     @use "@core/scss/template/pages/page-auth.scss";
+
+    .festin {
+      padding-right: 30% !important;
+      padding-left: 30% !important;
+    }
 
     .auth .v-card-item__prepend {
         padding-inline-end: 0 !important;
@@ -184,9 +198,17 @@ const onSubmit = () => {
     }
 
     @media(max-width: 991px){
-        .auth .v-card--variant-elevated {
-            box-shadow: none !important;
-        }
+      .auth .v-card--variant-elevated {
+        box-shadow: none !important;
+      }
+
+      .text-h5 {
+        font-size: 1.2rem !important;
+      }
+      
+      .letter, .v-selection-control--inline .v-label {
+        font-size: 11.5px !important;
+      }
     }
 </style>
 
