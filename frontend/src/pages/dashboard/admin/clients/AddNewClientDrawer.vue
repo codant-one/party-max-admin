@@ -56,6 +56,14 @@ const isNewPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
 const isEdit = ref(false)
 
+const startDateTimePickerConfig = computed(() => {
+  const config = {
+    dateFormat: 'Y-m-d'
+  }
+
+  return config
+})
+
 const getTitle = computed(() => {
   return isEdit.value ? 'Actualizar Cliente': 'Agregar Cliente'
 })
@@ -79,11 +87,12 @@ watchEffect(async() => {
             birthday.value = props.client.birthday
             gender_id.value = props.client.gender_id
             password.value = props.client.password
+            passwordConfirmation.value = props.client.password
 
             client_country_id.value = props.client.user.user_detail.province.country.id
             province_id.value = props.client.user.user_detail.province.id
 
-            passwordConfirmation.value = undefined
+            
             isNewPasswordVisible.value = false 
             isConfirmPasswordVisible.value = false 
         }
@@ -144,22 +153,22 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
-    name.value = 'Freddy'
-    last_name.value = 'Castro'
-    username.value = 'fcastro'
-    document.value = '15989101'
-    email.value = 'fcastro@gmail.com'
-    phone.value = '04166097023'
-    address.value = 'tal tal tal'
-    birthday.value = '16-10-1982'
-    gender_id.value = '1'
+    name.value = ''  //name.value = 'Freddy'
+    last_name.value = ''  //last_name.value = 'Castro'
+    username.value = ''  //username.value = 'fcastro'
+    document.value = ''  //document.value = '15989101'
+    email.value = ''  //email.value = 'fcastro@gmail.com'
+    phone.value = ''  //phone.value = '04166097023'
+    address.value = ''  //address.value = 'tal tal tal'
+    birthday.value = ''  //birthday.value = '16-10-1982'
+    gender_id.value = ''  //gender_id.value = '1'
     client_country_id.value = ''
     province_id.value = ''
-    password.value = 'As1dddrrrff'
-    passwordConfirmation.value = 'As1dddrrrff'
+    password.value = '' //password.value = 'As1dddrrrff'
+    passwordConfirmation.value = '' //passwordConfirmation.value = 'As1dddrrrff'
     isNewPasswordVisible.value = false
     isConfirmPasswordVisible.value = false
-    isEdit.value = false 
+    isEdit.value = false  
     id.value = 0
   })
 }
@@ -329,13 +338,15 @@ const handleDrawerModelValueUpdate = val => {
               </VCol>
 
               <!-- 👉 Birthday -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="birthday"
-                  :rules="[requiredValidator]"
-                  label="Fecha de Cumpleaños"
-                />
-              </VCol>
+               <VCol cols="6" >
+                    <AppDateTimePicker
+                        :key="JSON.stringify(startDateTimePickerConfig)"
+                        v-model="birthday"
+                        :rules="[requiredValidator]"
+                        label="Fecha de Cumpleaños"
+                        :config="startDateTimePickerConfig"
+                        />
+                </VCol>
 
               <!-- 👉 Gender -->
               <VCol cols="6">

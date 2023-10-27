@@ -72,8 +72,11 @@ trait UserHelper
             'email' => $request->email
         ]);
 
-        $user->roles()->detach();  
-        $user->syncRoles($request->roles);
+        //Si NO es cliente se evalua la existencia del Rol.
+        if (!request('is_client')){
+            $user->roles()->detach();  
+            $user->syncRoles($request->roles);
+        }
         
         UserDetails::updateOrCreateUser($request, $user);
 
