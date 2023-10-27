@@ -19,6 +19,7 @@ use App\Http\Controllers\{
     BlogController,
     FaqController,
     ColorController,
+    HomeController,
     FaqCategoryController,
     ClientController,
     BlogCategoryController

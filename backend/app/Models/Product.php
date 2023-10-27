@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
 use App\Models\ProductImage;
+use App\Models\User;
 
 class Product extends Model
 {
@@ -36,6 +37,11 @@ class Product extends Model
     public function productlike()
     {
         return $this->hasMany(ProductLike::class, 'product_id','id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id','id');
     }
 
     /**** Scopes ****/

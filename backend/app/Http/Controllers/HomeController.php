@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
-
+use App\Models\ProductLike;
 
 class HomeController extends Controller
 {
@@ -18,92 +18,72 @@ class HomeController extends Controller
         try {
 
             $data = [];
-            $errors = [];
     
-            // Obtener las categorías padres
-            $parentcategories = Category::whereNull('category_id')->get();
-    
-            if ($parentcategories->isEmpty()) {
-                $errors[] = [
-                    'feedback' => 'not_found',
-                    'message' => 'Categorías Padre no encontradas'
-                ];
-            } else {
-                $data['parentCategory'] = $parentcategories;
-            }
-    
+            $data['parentCategories'] = Category::select(['id', 'name', 'slug'])->whereNull('category_id')->get();
+     
+            $recommendations = Product::with(['user'])
+                                      ->where('favourite', true)
+                                      ->orderBy('created_at', 'desc')
+                                      ->limit(5)
+                                      ->get();
+
             // Validate if the user is authenticated
             if (auth()->check()) {
-                $userauth = auth()->user()->id;
-                $lastLike = DB::table('product_likes')
-                    ->where('user_id', $userauth)
-                    ->orderBy('date', 'desc')
-                    ->first();
-                
+
+                $lastLike = ProductLike::where('user_id', auth()->user()->id)
+                            ->orderBy('date', 'desc')
+                            ->first();
+
+            
                 //Validate if the last Like exists
                 if ($lastLike) {
-                    $productLike = ProductCategory::where('product_id', $lastLike->product_id)->first();
+                    $productCategory = ProductCategory::where('product_id', $lastLike->product_id)->first();
     
-                    if ($productLike) {
-                        $categoryLike = $productLike->category_id;
-                        $recommendations = Product::join('product_categories', 'products.id', '=', 'product_categories.product_id')
-                            ->where('product_categories.category_id', $categoryLike)
-                            ->orderBy('products.created_at', 'desc')
-                            ->take(5)
-                            ->get();
-                    } else {
-                        $errors[] = [
-                            'feedback' => 'not_found',
-                            'message' => 'Categoría del último like no encontrada'
-                        ];
+                    if ($productCategory) {
+                        $category_id = $productCategory->category_id;
+
+                        $recommendations = 
+                            Product::join('product_categories', 'products.id', '=', 'product_categories.product_id')
+                                   ->where('product_categories.category_id', $category_id)
+                                   ->orderBy('products.created_at', 'desc')
+                                   ->limit(5)
+                                   ->get();
+
+                        $data['recommendations'] = $recommendations;
                     }
-                } else {
-                    //The last like does not exist, get the top 5 favorite products
-                    $recommendations = Product::where('favourite', true)
-                        ->orderBy('created_at', 'desc')
-                        ->take(5)
-                        ->get();
-                }
-            } else {
-                //User is not authenticated, get top 5 favorite products
-                $recommendations = Product::where('favourite', true)
-                    ->orderBy('created_at', 'desc')
-                    ->take(5)
-                    ->get(); 
-            }
-            
-            
-            if (count($recommendations) == 5) {
+                } else 
                     $data['recommendations'] = $recommendations;
+
+                
             } else {
-                    $errors[] = [
-                        'feedback' => 'not_found',
-                        'message' => 'No se encontraron suficientes recomendaciones'
-                    ];
+               
+                 
+
+                $data['recommendations'] = $recommendations;
             }
+            
+            
+            $data['mostSold'] = [];
+        
 
             // Get the 10 most recent products
-            $latestProducts = Product::orderBy('created_at', 'desc')
-                ->take(10)
-                ->get();
-      
-            // Verificar si hay exactamente 10 elementos en cada uno
-            if (count($latestProducts) == 10) {
-                $data['topProductos'] = [
-                    'latestProducts' => $latestProducts
-                ];
-            } else {
-                $errors[] = [
-                    'feedback' => 'not_found',
-                    'message' => 'No se encontraron suficientes productos recientes o antiguos'
-                ];
-            }
+            $latestProducts = Product::with(['user'])
+                                     ->orderBy('id', 'desc')
+                                     ->limit(10)
+                                     ->get();
+        
+            $bestSellers = Product::with(['user'])
+                                  ->orderBy('id', 'asc')
+                                  ->limit(10)
+                                  ->get();
+        
+            $data['mostSold']['latestProducts'] = $latestProducts;
+            $data['mostSold']['bestSellers'] = $bestSellers;
     
             return response()->json([
-                'success' => empty($errors),
-                'errors' => $errors,
+                'success' => true,
                 'data' => $data
-            ], empty($errors) ? 200 : 404);
+            ], 200);
 
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([
