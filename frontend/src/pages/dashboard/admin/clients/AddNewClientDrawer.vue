@@ -7,6 +7,7 @@ import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { confirmedValidator, passwordValidator, requiredValidator, emailValidator } from '@/@core/utils/validators'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
+import { useGendersStores } from '@/stores/useGenders'
 
 const props = defineProps({
   isDrawerOpen: {
@@ -27,12 +28,14 @@ const emit = defineEmits([
 
 const countriesStores = useCountriesStores()
 const provincesStores = useProvincesStores()
+const gendersStores = useGendersStores()
 
 const isFormValid = ref(false)
 const refForm = ref()
 
 const countries = ref([])
 const provinces = ref([])
+const genders = ref([])
 const listProvincesByCountry = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
@@ -40,6 +43,7 @@ const currentPage = ref(1)
 
 const id = ref(0)
 const client_country_id = ref('')
+const countryOld_id = ref('')
 const province_id = ref('')
 const name = ref('')
 const last_name = ref('')
@@ -85,12 +89,14 @@ watchEffect(async() => {
             phone.value = props.client.user.user_detail.phone
             address.value = props.client.user.user_detail.address
             birthday.value = props.client.birthday
-            gender_id.value = props.client.gender_id
+            
             password.value = props.client.password
             passwordConfirmation.value = props.client.password
-
-            client_country_id.value = props.client.user.user_detail.province.country.id
-            province_id.value = props.client.user.user_detail.province.id
+            countryOld_id.value = props.client.user.user_detail.province.country.id
+            // client_country_id.value = props.client.user.user_detail.province.country.name
+            
+            // listProvincesByCountry.value = provinces.value.filter(item => item.country_id === client_country_id.value)
+            // province_id.value = props.client.user.user_detail.province.id
 
             
             isNewPasswordVisible.value = false 
@@ -115,6 +121,15 @@ async function fetchData() {
   await provincesStores.fetchProvinces(data)
   provinces.value = provincesStores.getProvinces
 
+  await gendersStores.fetchGenders(data)
+  genders.value = gendersStores.getGenders
+
+  await selectCountry(countryOld_id.value)
+  if (!(Object.entries(props.client).length === 0) && props.client.constructor === Object){
+    // client_country_id.value = props.client.user.user_detail.province.country.id ?? ''
+    province_id.value = props.client.user.user_detail.province.id ?? ''
+    gender_id.value = props.client.gender_id
+  }
 }
 
 const getCountries = computed(() => {
@@ -131,6 +146,16 @@ const getProvinces = computed(() => {
     return {
       title: province.name,
       value: province.id,
+    }
+  })
+})
+
+
+const getGenders = computed(() => {
+  return genders.value.map((gender) => {
+    return {
+      title: gender.name,
+      value: gender.id,
     }
   })
 })
@@ -350,10 +375,12 @@ const handleDrawerModelValueUpdate = val => {
 
               <!-- 👉 Gender -->
               <VCol cols="6">
-                <VTextField
+                <v-autocomplete
                   v-model="gender_id"
-                  :rules="[requiredValidator]"
                   label="Genero"
+                  :rules="[requiredValidator]"
+                  :items="getGenders"
+                  :menu-props="{ maxHeight: '200px' }"
                 />
               </VCol>
 

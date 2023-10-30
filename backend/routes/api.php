@@ -22,7 +22,8 @@ use App\Http\Controllers\{
     HomeController,
     FaqCategoryController,
     ClientController,
-    BlogCategoryController
+    BlogCategoryController,
+    GenderController,
 };
 
 /*
@@ -125,6 +126,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
 Route::apiResource('colors', ColorController::class);
+Route::apiResource('genders', GenderController::class);
 Route::get('home', [HomeController::class, 'home']);
 
 //Testing Endpoints
