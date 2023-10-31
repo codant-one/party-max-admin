@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
 
 class Client extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -77,8 +79,6 @@ class Client extends Model
         $client = self::create([
             'user_id' => $user->id,
             'gender_id' => $request->gender_id,
-            'birthcountry_id' => 1,
-            'nationality_id' => 1,
             'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
 
@@ -89,8 +89,6 @@ class Client extends Model
         $client->update([
             // 'user_id' => $request->user_id,
             'gender_id' => $request->gender_id,
-            'birthcountry_id' => 1,
-            'nationality_id' => 1,
             'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
 

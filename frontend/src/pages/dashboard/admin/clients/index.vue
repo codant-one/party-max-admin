@@ -119,7 +119,7 @@ const submitCreate = clientData => {
             if (res.data.success) {
                 advisor.value = {
                     type: 'success',
-                    message: 'Cliente creado!',
+                    message: 'Cliente creado! ' + res.data.email_response,
                     show: true
                 }
                 fetchData()

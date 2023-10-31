@@ -46,11 +46,10 @@ class ClientRequest extends FormRequest
             'last_name' => [
                 'required'
             ],
-            // 'email' => [
-            //     'required',
-            //     'email',
-            //     Rule::unique('users', 'email')->ignore($client->user_id)
-            // ],
+            'email' => [
+                'required_if:user_id,<>'.($client->user_id ?? -1),
+                Rule::unique('users', 'email')->ignore($client->user_id ?? -1)
+            ],
             // 'password' => [
             //     ($this->user) ? 'nullable' : 'required'
             // ],
@@ -93,9 +92,9 @@ class ClientRequest extends FormRequest
 
             'name.required' => 'El nombre es requerido.',
             'last_name.required' => 'El apellido es requerido.',
-            // 'email.required' => 'El correo electrónico es requerido.',
-            // 'email.email' => 'El formato de correo electrónico no es permitido.',
-            // 'email.unique' => 'Ya existe un usuario con el correo electrónico ingresado.',
+            'email.required' => 'El correo electrónico es requerido.',
+            'email.email' => 'El formato de correo electrónico no es permitido.',
+            'email.unique' => 'Ya existe un usuario con el correo electrónico ingresado.',
             // 'password.required' => 'La contraseña es requerida.',
             'roles.required' => 'El rol es requerido.',
             'roles.array' => 'El formato de roles no es permitido.',
