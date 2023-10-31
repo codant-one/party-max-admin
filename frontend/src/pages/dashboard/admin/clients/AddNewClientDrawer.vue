@@ -93,15 +93,13 @@ watchEffect(async() => {
             password.value = props.client.password
             passwordConfirmation.value = props.client.password
             countryOld_id.value = props.client.user.user_detail.province.country.id
-            // client_country_id.value = props.client.user.user_detail.province.country.name
-            
-            // listProvincesByCountry.value = provinces.value.filter(item => item.country_id === client_country_id.value)
-            // province_id.value = props.client.user.user_detail.province.id
-
             
             isNewPasswordVisible.value = false 
             isConfirmPasswordVisible.value = false 
         }
+
+        // if (!isEdit.value)
+        //   email.
     }
 })
 
@@ -126,7 +124,6 @@ async function fetchData() {
 
   await selectCountry(countryOld_id.value)
   if (!(Object.entries(props.client).length === 0) && props.client.constructor === Object){
-    // client_country_id.value = props.client.user.user_detail.province.country.id ?? ''
     province_id.value = props.client.user.user_detail.province.id ?? ''
     gender_id.value = props.client.gender_id
   }
@@ -178,45 +175,43 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
-    name.value = ''  //name.value = 'Freddy'
-    last_name.value = ''  //last_name.value = 'Castro'
-    username.value = ''  //username.value = 'fcastro'
-    document.value = ''  //document.value = '15989101'
-    email.value = ''  //email.value = 'fcastro@gmail.com'
-    phone.value = ''  //phone.value = '04166097023'
-    address.value = ''  //address.value = 'tal tal tal'
-    birthday.value = ''  //birthday.value = '16-10-1982'
-    gender_id.value = ''  //gender_id.value = '1'
+    name.value = '' 
+    last_name.value = ''
+    username.value = ''
+    document.value = ''
+    email.value = ''
+    phone.value = ''
+    address.value = ''
+    birthday.value = ''
+    gender_id.value = ''
     client_country_id.value = ''
     province_id.value = ''
-    password.value = '' //password.value = 'As1dddrrrff'
-    passwordConfirmation.value = '' //passwordConfirmation.value = 'As1dddrrrff'
+    password.value = ''
+    passwordConfirmation.value = ''
     isNewPasswordVisible.value = false
     isConfirmPasswordVisible.value = false
-    isEdit.value = false  
+    
     id.value = 0
   })
+  isEdit.value = false  
 }
 
 const onSubmit = () => {
   refForm.value?.validate().then(({ valid }) => {
     if (valid) {
       let formData = new FormData()
-      const roles = ['Cliente'] //ref({0: 'Cliente'})
 
       formData.append('name', name.value)
       formData.append('last_name', last_name.value)
       formData.append('username', username.value)
+      if (!isEdit.value)
+        formData.append('email', email.value)
       formData.append('document', document.value)
-      formData.append('email', email.value)
       formData.append('phone', phone.value)
       formData.append('address', address.value)
       formData.append('birthday', birthday.value)
       formData.append('gender_id', gender_id.value)
-      // formData.append('client_country_id', client_country_id.value)
       formData.append('province_id', province_id.value)
-      formData.append('password', password.value) 
-      // formData.append('roles', roles ) 
 
       emit('clientData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
@@ -314,9 +309,10 @@ const handleDrawerModelValueUpdate = val => {
               <!-- 👉 Email -->
               <VCol cols="6">
                 <VTextField
+
                   v-model="email"
-                  :rules="[requiredValidator, emailValidator]"
                   label="Email"
+                  :disabled="isEdit"
                 />
               </VCol>
 
@@ -381,29 +377,6 @@ const handleDrawerModelValueUpdate = val => {
                   :rules="[requiredValidator]"
                   :items="getGenders"
                   :menu-props="{ maxHeight: '200px' }"
-                />
-              </VCol>
-
-              <!-- 👉 Contraseña -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="password"
-                  label="Nueva contraseña"
-                  :type="isNewPasswordVisible ? 'text' : 'password'"
-                  :append-inner-icon="isNewPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  :rules="[requiredValidator, passwordValidator]"
-                  @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
-                />
-              </VCol>
-              <!-- 👉 Confirmar Contraseña -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="passwordConfirmation"
-                  label="Confirmar Contraseña"
-                  :type="isConfirmPasswordVisible ? 'text' : 'password'"
-                  :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
-                  :rules="[requiredValidator, confirmedValidator(passwordConfirmation, password)]"
-                  @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
                 />
               </VCol>
 

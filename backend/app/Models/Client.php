@@ -95,6 +95,7 @@ class Client extends Model
         ]);
 
         $user = User::find($client->user_id);
+        $request->merge([ 'email' => $user->email ]);
         User::updateUser($request, $user);
 
         return $client;

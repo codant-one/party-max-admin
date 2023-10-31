@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
-use App\Http\Requests\UserRequest;
+// use App\Http\Requests\UserRequest;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;

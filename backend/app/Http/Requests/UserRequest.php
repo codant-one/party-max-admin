@@ -7,6 +7,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
+use Illuminate\Support\Facades\Log;
+
 class UserRequest extends FormRequest
 {
     /**
@@ -24,6 +26,8 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::info($this->user);
+
         return [
             'name' => [
                 'required'

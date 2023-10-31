@@ -7,9 +7,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-use App\Http\Requests\UserRequest;
+use App\Models\Client;
 
-class ClientRequest extends UserRequest
+// use App\Http\Requests\UserRequest;
+
+class ClientRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,6 +28,7 @@ class ClientRequest extends UserRequest
      */
     public function rules(): array
     {
+        $client = Client::find($this->client);
         $rules = [
             'gender_id' => [
                 'required',
@@ -35,14 +38,44 @@ class ClientRequest extends UserRequest
             'birthday' => [
                 'required',
                 'date_format:Y-m-d'
-            ]
+            ],
+
+            'name' => [
+                'required'
+            ],
+            'last_name' => [
+                'required'
+            ],
+            // 'email' => [
+            //     'required',
+            //     'email',
+            //     Rule::unique('users', 'email')->ignore($client->user_id)
+            // ],
+            // 'password' => [
+            //     ($this->user) ? 'nullable' : 'required'
+            // ],
+            'province_id' => [
+                'integer',
+                'required',
+                'exists:App\Models\Province,id'
+            ],
+            'username' => [
+                'required',
+                Rule::unique('users', 'username')->ignore($client->user_id ?? -1)
+            ],
+            'phone' => [
+                'required'
+            ],
+            'address' => [
+                'required'
+            ]  
         ];
 
         if (request('is_client')) {
             $rules['client_id'] = 'required|integer|exists:App\Models\Client,id';
         }
 
-        return array_merge(parent::rules(), $rules);
+        return $rules;
     }
 
 
@@ -56,7 +89,24 @@ class ClientRequest extends UserRequest
             'gender_id.integer' => 'El formato del genero debe ser entero.',
             'gender_id.exists' => 'El Genero ingresado no existe.',
             'birthday.required' => 'El nombre del Cliente es requerido.',
-            'birthday.date_format' => 'El formato de la fecha de cumpleaños es incorrecto (YYYY/mm/dd).'
+            'birthday.date_format' => 'El formato de la fecha de cumpleaños es incorrecto (YYYY/mm/dd).',
+
+            'name.required' => 'El nombre es requerido.',
+            'last_name.required' => 'El apellido es requerido.',
+            // 'email.required' => 'El correo electrónico es requerido.',
+            // 'email.email' => 'El formato de correo electrónico no es permitido.',
+            // 'email.unique' => 'Ya existe un usuario con el correo electrónico ingresado.',
+            // 'password.required' => 'La contraseña es requerida.',
+            'roles.required' => 'El rol es requerido.',
+            'roles.array' => 'El formato de roles no es permitido.',
+            'roles.exists' => 'El rol ingresado no existe.',
+            'province_id.required' => 'La provincia es requerida.',
+            'province_id.integer' => 'El formato de provincia debe ser entero.',
+            'province_id.exists' => 'La provincia ingresada no existe.',
+            'username.required' => 'El nombre de usuario es requerido.',
+            'username.unique' => 'Ya existe un usuario con el username ingresado.',
+            'phone.required' => 'El teléfono es requerido.',
+            'address.required' => 'La dirección es requerida.'
         ];
     }
 
