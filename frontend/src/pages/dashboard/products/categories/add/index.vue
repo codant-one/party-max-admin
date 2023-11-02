@@ -18,6 +18,10 @@ const emitter = inject("emitter")
 
 const name = ref('')
 const category_id = ref()
+const banner1_category_id = ref()
+const banner2_category_id = ref()
+const banner3_category_id = ref()
+const banner4_category_id = ref()
 const banners = ref([])
 const avatars = ref([])
 const filename = ref([])
@@ -284,7 +288,61 @@ const onSubmit = () => {
                                         @click:clear="avatars[0] = null"
                                         :rules="[requiredValidator]"
                                     />
-                                    </VCol>
+                                </VCol>
+
+                                <!-- 👉 Banner Category 1 -->
+                                <VCol cols="12"  md="6">
+                                    <VAutocomplete
+                                        id="selectBanner1Category"
+                                        v-model="banner1_category_id"
+                                        label="Categoría Banner Principal"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index < 2">
+                                                <span>{{ item.title }}</span>
+                                            </v-chip>
+                                            <span
+                                                v-if="index === 2"
+                                                class="text-grey text-caption align-self-center"
+                                            >
+                                                (+{{ banner1_category_id.length - 2 }} otros)
+                                            </span>
+                                        </template>
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template v-slot:append-item>
+                                            <v-divider class="mt-2"></v-divider>
+                                            <v-list-item title="Cerrar Opciones" class="text-right">
+                                            <template v-slot:append>
+                                                <VBtn
+                                                size="small"
+                                                variant="plain"
+                                                icon="tabler-x"
+                                                color="black"
+                                                :ripple="false"
+                                                @click="closeDropdown"/>
+                                            </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
+                                </VCol>
                                
 
                             </VRow>                          

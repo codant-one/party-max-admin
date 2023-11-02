@@ -21,6 +21,10 @@ const emitter = inject("emitter")
 
 const name = ref('')
 const category_id = ref()
+const banner1_category_id = ref()
+const banner2_category_id = ref()
+const banner3_category_id = ref()
+const banner4_category_id = ref()
 const banners = ref([])
 const avatars = ref([])
 const avatarsOld = ref([])
@@ -46,6 +50,11 @@ async function fetchData() {
         category.value = await categoriesStores.showCategory(Number(route.params.id))
 
         category_id.value = category.value.category_id
+        banner1_category_id.value = category.value.banner_category_id
+        banner2_category_id.value = category.value.banner2_category_id
+        banner3_category_id.value = category.value.banner3_category_id
+        banner4_category_id.value = category.value.banner4_category_id
+
         name.value = category.value.name
         avatars.value[0] = category.value.banner === null ? '' : themeConfig.settings.urlStorage + category.value.banner
         avatarsOld.value[0] = category.value.banner === null ? '' : themeConfig.settings.urlStorage + category.value.banner
@@ -133,6 +142,10 @@ const blobToBase64 = blob => {
 
 const closeDropdown = () => { 
   document.getElementById("selectCategory").blur()
+  document.getElementById("selectBanner1Category").blur()
+  document.getElementById("selectBanner2Category").blur()
+  document.getElementById("selectBanner3Category").blur()
+  document.getElementById("selectBanner4Category").blur()
 }
 
 const onSubmit = () => {
@@ -151,6 +164,10 @@ const onSubmit = () => {
             formData.append('name', name.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
             formData.append('category_id', category_id.value)
+            formData.append('banner1_category_id', banner1_category_id.value)
+            formData.append('banner2_category_id', banner2_category_id.value)
+            formData.append('banner3_category_id', banner3_category_id.value)
+            formData.append('banner4_category_id', banner4_category_id.value)
             formData.append('_method', 'PUT')
             
             let data = {
@@ -301,7 +318,7 @@ const onSubmit = () => {
                                     />
                                 </VCol>
 
-                                <VCol cols="12">
+                                <VCol cols="12"  md="6">
                                     <VFileInput
                                         v-model="filename"
                                         label="Banner Principal"
@@ -311,7 +328,62 @@ const onSubmit = () => {
                                         @change="onImageSelected($event, 0)"
                                         @click:clear="avatars[0] = avatarsOld[0]"
                                     />
-                                    </VCol>
+                                </VCol>
+
+                                <!-- 👉 Banner Category 1 -->
+                                <VCol cols="12" md="6">
+                                    <VAutocomplete
+                                        id="selectBanner1Category"
+                                        v-model="banner1_category_id"
+                                        label="Categoría Banner Principal"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index < 2">
+                                                <span>{{ item.title }}</span>
+                                            </v-chip>
+                                            <span
+                                                v-if="index === 2"
+                                                class="text-grey text-caption align-self-center"
+                                            >
+                                                (+{{ banner1_category_id.length - 2 }} otros)
+                                            </span>
+                                        </template>
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template v-slot:append-item>
+                                            <v-divider class="mt-2"></v-divider>
+                                            <v-list-item title="Cerrar Opciones" class="text-right">
+                                            <template v-slot:append>
+                                                <VBtn
+                                                size="small"
+                                                variant="plain"
+                                                icon="tabler-x"
+                                                color="black"
+                                                :ripple="false"
+                                                @click="closeDropdown"/>
+                                            </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
+                                </VCol>
+
                             </VRow>                          
                         </VCardText>
 
@@ -330,8 +402,8 @@ const onSubmit = () => {
                                         cover
                                     />
                                 </VCol>
-
-                                <VCol cols="12">
+                                
+                                <VCol cols="12"  md="6">
                                     <VFileInput
                                         v-model="filename2"
                                         label="Banner 2"
@@ -341,6 +413,61 @@ const onSubmit = () => {
                                         @change="onImageSelected($event, 1)"
                                         @click:clear="avatars[1] = avatarsOld[1]"
                                     />
+                                </VCol>
+
+
+                                <!-- 👉 Banner Category 2 --> 
+                                <VCol cols="12" md="6">
+                                    <VAutocomplete
+                                        id="selectBanner2Category"
+                                        v-model="banner2_category_id"
+                                        label="Categoría Banner 2"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index < 2">
+                                                <span>{{ item.title }}</span>
+                                            </v-chip>
+                                            <span
+                                                v-if="index === 2"
+                                                class="text-grey text-caption align-self-center"
+                                            >
+                                                (+{{ banner2_category_id.length - 2 }} otros)
+                                            </span>
+                                        </template>
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template v-slot:append-item>
+                                            <v-divider class="mt-2"></v-divider>
+                                            <v-list-item title="Cerrar Opciones" class="text-right">
+                                            <template v-slot:append>
+                                                <VBtn
+                                                size="small"
+                                                variant="plain"
+                                                icon="tabler-x"
+                                                color="black"
+                                                :ripple="false"
+                                                @click="closeDropdown"/>
+                                            </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
                                 </VCol>
                             </VRow>
                         </VCardText>
@@ -361,7 +488,7 @@ const onSubmit = () => {
                                     />
                                 </VCol>
 
-                                <VCol cols="12">
+                                <VCol cols="12"  md="6">
                                     <VFileInput
                                         v-model="filename3"
                                         label="Banner 3"
@@ -371,6 +498,60 @@ const onSubmit = () => {
                                         @change="onImageSelected($event, 2)"
                                         @click:clear="avatars[2] = avatarsOld[2]"
                                     />
+                                </VCol>
+
+                                <!-- 👉 Banner Category 3 -->
+                                <VCol cols="12" md="6">
+                                    <VAutocomplete
+                                        id="selectBanner3Category"
+                                        v-model="banner3_category_id"
+                                        label="Categoría Banner 3"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index < 2">
+                                                <span>{{ item.title }}</span>
+                                            </v-chip>
+                                            <span
+                                                v-if="index === 2"
+                                                class="text-grey text-caption align-self-center"
+                                            >
+                                                (+{{ banner3_category_id.length - 2 }} otros)
+                                            </span>
+                                        </template>
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template v-slot:append-item>
+                                            <v-divider class="mt-2"></v-divider>
+                                            <v-list-item title="Cerrar Opciones" class="text-right">
+                                            <template v-slot:append>
+                                                <VBtn
+                                                size="small"
+                                                variant="plain"
+                                                icon="tabler-x"
+                                                color="black"
+                                                :ripple="false"
+                                                @click="closeDropdown"/>
+                                            </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
                                 </VCol>
                             </VRow>
                         </VCardText>
@@ -391,7 +572,7 @@ const onSubmit = () => {
                                     />
                                 </VCol>
 
-                                <VCol cols="12">
+                                <VCol cols="12"  md="6">
                                     <VFileInput
                                         v-model="filename4"
                                         label="Banner 4"
@@ -401,6 +582,61 @@ const onSubmit = () => {
                                         @change="onImageSelected($event, 3)"
                                         @click:clear="avatars[3] = avatarsOld[3]"
                                     />
+                                </VCol>
+
+
+                                <!-- 👉 Banner Category 4 -->
+                                <VCol cols="12" md="6">
+                                    <VAutocomplete
+                                        id="selectBanner4Category"
+                                        v-model="banner4_category_id"
+                                        label="Categoría Banner 4"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:selection="{ item, index }">
+                                            <v-chip v-if="index < 2">
+                                                <span>{{ item.title }}</span>
+                                            </v-chip>
+                                            <span
+                                                v-if="index === 2"
+                                                class="text-grey text-caption align-self-center"
+                                            >
+                                                (+{{ banner4_category_id.length - 2 }} otros)
+                                            </span>
+                                        </template>
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                        <template v-slot:append-item>
+                                            <v-divider class="mt-2"></v-divider>
+                                            <v-list-item title="Cerrar Opciones" class="text-right">
+                                            <template v-slot:append>
+                                                <VBtn
+                                                size="small"
+                                                variant="plain"
+                                                icon="tabler-x"
+                                                color="black"
+                                                :ripple="false"
+                                                @click="closeDropdown"/>
+                                            </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
                                 </VCol>
                             </VRow>
                         </VCardText>

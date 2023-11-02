@@ -245,6 +245,10 @@ class CategoryController extends Controller
                 $file_data = uploadFile($banner, $path, $category->banner);
 
                 $category->banner = $file_data['filePath'];
+                $category->banner_category_id = $request->banner1_category_id;
+                $category->save();
+            } elseif($request->has('banner1_category_id') && !empty($category->banner) ){
+                $category->banner_category_id = $request->banner1_category_id;
                 $category->save();
             }
 
@@ -256,6 +260,10 @@ class CategoryController extends Controller
                 $file_data = uploadFile($banner_2, $path, $category->banner_2);
 
                 $category->banner_2 = $file_data['filePath'];
+                $category->banner2_category_id = $request->banner2_category_id;
+                $category->save();
+            } elseif($request->has('banner2_category_id') && !empty($category->banner_2) ){
+                $category->banner2_category_id = $request->banner2_category_id;
                 $category->save();
             }
 
@@ -267,6 +275,10 @@ class CategoryController extends Controller
                 $file_data = uploadFile($banner_3, $path, $category->banner_3);
 
                 $category->banner_3 = $file_data['filePath'];
+                $category->banner3_category_id = $request->banner3_category_id;
+                $category->save();
+            } elseif($request->has('banner3_category_id') && !empty($category->banner_3) ){
+                $category->banner3_category_id = $request->banner3_category_id;
                 $category->save();
             }
 
@@ -278,8 +290,13 @@ class CategoryController extends Controller
                 $file_data = uploadFile($banner_4, $path, $category->banner_4);
 
                 $category->banner_4 = $file_data['filePath'];
+                $category->banner4_category_id = $request->banner4_category_id;
+                $category->save();
+            } elseif($request->has('banner4_category_id') && !empty($category->banner_4) ){
+                $category->banner4_category_id = $request->banner4_category_id;
                 $category->save();
             }
+
 
             return response()->json([
                 'success' => true,
