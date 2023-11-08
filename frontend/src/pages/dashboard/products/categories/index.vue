@@ -10,6 +10,7 @@ const categoriesStores = useCategoriesStores()
 
 const categories = ref([])
 const searchQuery = ref('')
+const searchFathers = ref(0)
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
@@ -44,6 +45,7 @@ async function fetchData() {
 
   let data = {
     search: searchQuery.value,
+    fathers: searchFathers.value === true ? 1 : 0,
     orderByField: 'id',
     orderBy: 'desc',
     limit: rowPerPage.value,
@@ -145,6 +147,10 @@ const removeCategory = async () => {
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
+              <VCheckbox
+                v-model="searchFathers"
+                label="Categorías Padres"
+              />
               <!-- 👉 Search  -->
               <div class="search">
                 <v-text-field

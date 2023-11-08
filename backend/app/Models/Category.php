@@ -56,6 +56,10 @@ class Category extends Model
             $query->whereSearch($filters->get('search'));
         }
 
+        if ($filters->get('fathers') === '1') {
+            $query->whereNull('category_id');
+        }
+        
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';

@@ -18,7 +18,7 @@ const emitter = inject("emitter")
 
 const name = ref('')
 const category_id = ref()
-const banner1_category_id = ref()
+const banner_category_id = ref()
 const banner2_category_id = ref()
 const banner3_category_id = ref()
 const banner4_category_id = ref()
@@ -133,6 +133,10 @@ const onSubmit = () => {
             formData.append('name', name.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
             formData.append('category_id', category_id.value)
+            // formData.append('banner_category_id', banner_category_id.value)
+            // formData.append('banner2_category_id', banner2_category_id.value)
+            // formData.append('banner3_category_id', banner3_category_id.value)
+            // formData.append('banner4_category_id', banner4_category_id.value)
 
             categoriesStores.addCategory(formData)
                 .then((res) => {
@@ -203,7 +207,6 @@ const onSubmit = () => {
                     <VCard class="mb-8">
                         <VCardText>
                             <VRow>
-                                <!-- 👉 Name -->
                                 <VCol cols="12" md="6">
                                     <VTextField
                                     v-model="name"
@@ -211,7 +214,6 @@ const onSubmit = () => {
                                     label="Nombre"
                                     />
                                 </VCol>
-
                                 <VCol cols="12"  md="6">
                                     <VAutocomplete
                                         id="selectCategory"
@@ -264,24 +266,17 @@ const onSubmit = () => {
                                         </template>
                                     </VAutocomplete>
                                 </VCol>
-
-                                <VCol cols="12" class="d-flex justify-center align-center">
-                                    <VImg
-                                        :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
-                                        v-if="avatars[0] !== null"
-                                        :src="avatars[0]"
-                                        :height="300"
-                                        aspect-ratio="1/1"
-                                        class="border-img"
-                                        cover
-                                    />
-                                </VCol>
-
-                                <VCol cols="12">
+                            </VRow>
+                        </VCardText>
+                        <!-- <VDivider />
+                        <VCardText>
+                            <VRow no-gutters>
+                                <VCol cols="12"  md="6"></VCol>
+                                <VCol cols="12"  md="3">
                                     <VFileInput
                                         v-model="filename"
                                         label="Banner Principal"
-                                        class="mb-2"
+                                        class="mb-2 me-2"
                                         accept="image/png, image/jpeg, image/bmp"
                                         prepend-icon="tabler-camera"
                                         @change="onImageSelected($event, 0)"
@@ -290,28 +285,16 @@ const onSubmit = () => {
                                     />
                                 </VCol>
 
-                                <!-- 👉 Banner Category 1 -->
-                                <VCol cols="12"  md="6">
+                                <VCol cols="12"  md="3">
                                     <VAutocomplete
                                         id="selectBanner1Category"
-                                        v-model="banner1_category_id"
-                                        label="Categoría Banner Principal"
+                                        v-model="banner_category_id"
+                                        label="Categoría"
                                         :items="categories"
                                         :item-title="item => item.name"
                                         :item-value="item => item.id"
                                         autocomplete="off"
                                         :menu-props="{ maxHeight: '300px' }">
-                                        <template v-slot:selection="{ item, index }">
-                                            <v-chip v-if="index < 2">
-                                                <span>{{ item.title }}</span>
-                                            </v-chip>
-                                            <span
-                                                v-if="index === 2"
-                                                class="text-grey text-caption align-self-center"
-                                            >
-                                                (+{{ banner1_category_id.length - 2 }} otros)
-                                            </span>
-                                        </template>
                                         <template v-slot:item="{ props, item }">
                                             <v-list-item
                                                 v-bind="props"
@@ -343,15 +326,65 @@ const onSubmit = () => {
                                         </template>
                                     </VAutocomplete>
                                 </VCol>
-                               
-
+                                <VCol cols="12" class="d-flex justify-center align-center">
+                                    <VImg
+                                        :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[0] !== null"
+                                        :src="avatars[0]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
+                                    />
+                                </VCol>                              
                             </VRow>                          
                         </VCardText>
 
                         <VDivider />
 
                         <VCardText>
-                            <VRow>
+                            <VRow no-gutters>
+                                <VCol cols="12"  md="6"></VCol>
+                                <VCol cols="12"  md="3">
+                                    <VFileInput
+                                        v-model="filename2"
+                                        label="Banner 2"
+                                        class="mb-2 me-2"
+                                        accept="image/png, image/jpeg, image/bmp"
+                                        prepend-icon="tabler-camera"
+                                        @change="onImageSelected($event, 1)"
+                                        @click:clear="avatars[1] = null"
+                                        :rules="[requiredValidator]"
+                                    />
+                                </VCol>
+                   
+                                <VCol cols="12" md="3">
+                                    <VAutocomplete
+                                        id="selectBanner2Category"
+                                        v-model="banner2_category_id"
+                                        label="Categoría"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
+                                </VCol>
                                 <VCol cols="12" class="d-flex justify-center align-center">
                                     <VImg
                                         :class="((filename2.length === 0 && isValid === false)) ? 'border-error' : ''"
@@ -362,27 +395,55 @@ const onSubmit = () => {
                                         class="border-img"
                                         cover
                                     />
-                                </VCol>
-
-                                <VCol cols="12">
-                                    <VFileInput
-                                        v-model="filename2"
-                                        label="Banner 2"
-                                        class="mb-2"
-                                        accept="image/png, image/jpeg, image/bmp"
-                                        prepend-icon="tabler-camera"
-                                        @change="onImageSelected($event, 1)"
-                                        @click:clear="avatars[1] = null"
-                                        :rules="[requiredValidator]"
-                                    />
-                                </VCol>
+                                </VCol>                                   
                             </VRow>
                         </VCardText>
 
                         <VDivider />
 
                         <VCardText>
-                            <VRow>
+                            <VRow no-gutters>
+                                <VCol cols="12"  md="6"></VCol>
+                                <VCol cols="12"  md="3">
+                                    <VFileInput
+                                        v-model="filename3"
+                                        label="Banner 3"
+                                        class="mb-2 me-2"
+                                        accept="image/png, image/jpeg, image/bmp"
+                                        prepend-icon="tabler-camera"
+                                        @change="onImageSelected($event, 2)"
+                                        @click:clear="avatars[2] = null"
+                                        :rules="[requiredValidator]"
+                                    />
+                                </VCol>
+                       
+                                <VCol cols="12" md="3">
+                                    <VAutocomplete
+                                        id="selectBanner3Category"
+                                        v-model="banner3_category_id"
+                                        label="Categoría"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
+                                </VCol>
                                 <VCol cols="12" class="d-flex justify-center align-center">
                                     <VImg
                                         :class="((filename3.length === 0 && isValid === false)) ? 'border-error' : ''"
@@ -394,26 +455,54 @@ const onSubmit = () => {
                                         cover
                                     />
                                 </VCol>
-
-                                <VCol cols="12">
-                                    <VFileInput
-                                        v-model="filename3"
-                                        label="Banner 3"
-                                        class="mb-2"
-                                        accept="image/png, image/jpeg, image/bmp"
-                                        prepend-icon="tabler-camera"
-                                        @change="onImageSelected($event, 2)"
-                                        @click:clear="avatars[2] = null"
-                                        :rules="[requiredValidator]"
-                                    />
-                                </VCol>
                             </VRow>
                         </VCardText>
 
                         <VDivider />
 
                         <VCardText>
-                            <VRow>
+                            <VRow no-gutters>
+                                <VCol cols="12"  md="6"></VCol>
+                                <VCol cols="12"  md="3">
+                                    <VFileInput
+                                        v-model="filename4"
+                                        label="Banner 4"
+                                        class="mb-2 me-2"
+                                        accept="image/png, image/jpeg, image/bmp"
+                                        prepend-icon="tabler-camera"
+                                        @change="onImageSelected($event, 3)"
+                                        @click:clear="avatars[3] = null"
+                                        :rules="[requiredValidator]"
+                                    />
+                                </VCol>
+                              
+                                <VCol cols="12" md="3">
+                                    <VAutocomplete
+                                        id="selectBanner4Category"
+                                        v-model="banner4_category_id"
+                                        label="Categoría"
+                                        :items="categories"
+                                        :item-title="item => item.name"
+                                        :item-value="item => item.id"
+                                        autocomplete="off"
+                                        :menu-props="{ maxHeight: '300px' }">
+                                        <template v-slot:item="{ props, item }">
+                                            <v-list-item
+                                                v-bind="props"
+                                                :title="item?.raw?.name"
+                                                :style="{ 
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                }"
+                                            >
+                                                <template v-slot:prepend="{ isActive }">
+                                                    <v-list-item-action start>
+                                                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                                                    </v-list-item-action>
+                                                </template>
+                                            </v-list-item>
+                                        </template>
+                                    </VAutocomplete>
+                                </VCol>
                                 <VCol cols="12" class="d-flex justify-center align-center">
                                     <VImg
                                         :class="((filename4.length === 0 && isValid === false)) ? 'border-error' : ''"
@@ -425,21 +514,8 @@ const onSubmit = () => {
                                         cover
                                     />
                                 </VCol>
-
-                                <VCol cols="12">
-                                    <VFileInput
-                                        v-model="filename4"
-                                        label="Banner 4"
-                                        class="mb-2"
-                                        accept="image/png, image/jpeg, image/bmp"
-                                        prepend-icon="tabler-camera"
-                                        @change="onImageSelected($event, 3)"
-                                        @click:clear="avatars[3] = null"
-                                        :rules="[requiredValidator]"
-                                    />
-                                </VCol>
                             </VRow>
-                        </VCardText>
+                        </VCardText> -->
                     </VCard>
                 </VCol>
 

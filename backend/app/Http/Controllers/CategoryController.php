@@ -32,6 +32,7 @@ class CategoryController extends Controller
         foreach ($children as $child) {
             $data = [
                 'id' => $child->id, 
+                'category_id' => $child->category_id,
                 'name' => $child->name, 
                 'level' => $level + 1
             ];
@@ -54,6 +55,7 @@ class CategoryController extends Controller
                             ->applyFilters(
                                     $request->only([
                                         'search',
+                                        'fathers',
                                         'orderByField',
                                         'orderBy'
                                     ])
@@ -92,6 +94,7 @@ class CategoryController extends Controller
             foreach ($query as $category) {
                 $data = [
                     'id' => $category->id, 
+                    'category_id' => $category->category_id,
                     'name' => $category->name, 
                     'level' => 1
                 ];
@@ -245,10 +248,10 @@ class CategoryController extends Controller
                 $file_data = uploadFile($banner, $path, $category->banner);
 
                 $category->banner = $file_data['filePath'];
-                $category->banner_category_id = $request->banner1_category_id;
+                $category->banner_category_id = $request->banner_category_id;
                 $category->save();
-            } elseif($request->has('banner1_category_id') && !empty($category->banner) ){
-                $category->banner_category_id = $request->banner1_category_id;
+            } elseif($request->has('banner_category_id') && !empty($category->banner) ){
+                $category->banner_category_id = $request->banner_category_id;
                 $category->save();
             }
 

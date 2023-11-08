@@ -43,7 +43,8 @@ class HomeController extends Controller
                         $category_id = $productCategory->category_id;
 
                         $recommendations = 
-                            Product::join('product_categories', 'products.id', '=', 'product_categories.product_id')
+                            Product::with(['user'])
+                                   ->join('product_categories', 'products.id', '=', 'product_categories.product_id')
                                    ->where('product_categories.category_id', $category_id)
                                    ->orderBy('products.created_at', 'desc')
                                    ->limit(5)
@@ -54,18 +55,13 @@ class HomeController extends Controller
                 } else 
                     $data['recommendations'] = $recommendations;
 
-                
             } else {
                
-                 
-
                 $data['recommendations'] = $recommendations;
             }
             
-            
             $data['mostSold'] = [];
         
-
             // Get the 10 most recent products
             $latestProducts = Product::with(['user'])
                                      ->orderBy('id', 'desc')
