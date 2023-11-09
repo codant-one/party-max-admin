@@ -24,6 +24,7 @@ use App\Http\Controllers\{
     ClientController,
     BlogCategoryController,
     GenderController,
+    MiscellaneousController
 };
 
 /*
@@ -127,7 +128,9 @@ Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
 Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
+
 Route::get('home', [HomeController::class, 'home']);
+Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');

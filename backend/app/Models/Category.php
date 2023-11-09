@@ -6,7 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+
 use App\Models\Product;
+
 class Category extends Model
 {
     use HasFactory;
@@ -18,9 +20,25 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function banner1() {
+        return $this->belongsTo(Category::class, 'banner_category_id', 'id');
+    }
+    
+    public function banner2() {
+        return $this->belongsTo(Category::class, 'banner2_category_id', 'id');
+    }
+
+    public function banner3() {
+        return $this->belongsTo(Category::class, 'banner3_category_id', 'id');
+    }
+
+    public function banner4() {
+        return $this->belongsTo(Category::class, 'banner4_category_id', 'id');
+    }
+
     public function product()
     {
-        return $this->hasMany(Product::class, 'category_id', 'id');
+        return $this->hasMany(ProductCategory::class, 'category_id', 'id');
     }
 
     public function children()
