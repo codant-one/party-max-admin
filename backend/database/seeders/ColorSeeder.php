@@ -3,11 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Product;
-use App\Models\ProductCategory;
-use App\Models\Color;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+
+use App\Models\Color;
 
 class ColorSeeder extends Seeder
 {
@@ -61,6 +59,21 @@ class ColorSeeder extends Seeder
             ],
             [
                 'name' => 'Naranja',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Multicolor',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Plateado',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Dorado',
                 'created_at' => now(),
                 'updated_at' => now()
             ]

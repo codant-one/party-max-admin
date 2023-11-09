@@ -25,6 +25,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'color_id' => rand(1, 10),
+            'sku' => rand(100000, 999999),
             'image' => 'products/gallery/' . $this->faker->file(public_path('images/products/gallery'), storage_path('app/public/products/gallery'), false),
         ];
         

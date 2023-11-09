@@ -32,8 +32,6 @@ class ClientFactory extends Factory
 
         return [
             'gender_id' => $gender,
-            'birthcountry_id' => rand(1,200),
-            'nationality_id' => 1,
             'birthday' => $this->faker->date,
             'created_at' => $created_at,
             'updated_at' => $created_at

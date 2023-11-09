@@ -21,10 +21,9 @@ class ProductLikeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'=>rand(1,20),
-            'product_id'=>rand(1,10),
-            'date' => $this->randomDate(),
-
+            'user_id'=>rand(1, 20),
+            'product_id'=>rand(1, 10),
+            'date' => $this->randomDate()
         ];
     }
 
@@ -32,6 +31,7 @@ class ProductLikeFactory extends Factory
     {
         $start = strtotime('2023-01-01');
         $end = strtotime('2023-10-19');
+        
         return date('Y-m-d', mt_rand($start, $end));
     }
 }

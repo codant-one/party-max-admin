@@ -19,7 +19,6 @@ class ProductLikeSeeder extends Seeder
      */
     public function run(): void
     {
-
         ProductLike::factory(10)->create();
     }
 

@@ -25,16 +25,14 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
 
             ColorSeeder::class,
+            BrandSeeder::class,
             ProductSeeder::class,
             ProductLikeSeeder::class,
-
 
             BlogSeeder::class,
             FaqSeeder::class,
             FaqCategorySeeder::class,
-            BlogCategorySeeder::class,
-          
-            
+            BlogCategorySeeder::class
         ]);
 
     }

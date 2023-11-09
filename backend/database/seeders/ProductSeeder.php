@@ -36,10 +36,15 @@ class ProductSeeder extends Seeder
         $products = Product::all();
         
         foreach ($products as $product) {
-            ProductCategory::factory(['product_id' => $product->id])->create();
             ProductDetail::factory(['product_id' => $product->id])->create();
             ProductImage::factory(['product_id' => $product->id])->create();
+
+            for($i = 0; $i < 4; $i++){
+                ProductCategory::factory(['product_image_id' => $product->id])->create();
+            }
         }
+
+     
 
         Permission::create(['name' => 'ver productos']);
         Permission::create(['name' => 'crear productos']);

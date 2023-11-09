@@ -27,17 +27,19 @@ class ProductCategoryFactory extends Factory
         //este procedimiento porque 
         //los ID de las Categorias no son continuos.
         //Algunos como el ID 123 no existe.
+
         $category_id = 0;
         $tries = 0;
-        do{
+
+        do {
             $category_id = rand(1, 150);
             $category = Category::find($category_id);
             if (!$category)
                 $category_id = 0;
             $tries++;
-        }while ($tries < 150 && $category_id==0);
+        } while ($tries < 150 && $category_id === 0);
 
-        $category_id = ($category_id == 0) ? 1 : $category_id;
+        $category_id = ($category_id === 0) ? 1 : $category_id;
 
         return [
             'category_id' => $category_id ,

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Tag extends Model
+class Brand extends Model
 {
     use HasFactory;
 
@@ -46,30 +46,30 @@ class Tag extends Model
 
 
     /**** Public methods ****/
-    public static function createTag($request) {
-        $tag = self::create([
+    public static function createBrand($request) {
+        $brand = self::create([
             'name' => $request->name
         ]);
 
-        return $tag;
+        return $brand;
     }
 
-    public static function updateTag($request, $tag) {
-        $tag->update([
+    public static function updateBrand($request, $brand) {
+        $brand->update([
             'name' => $request->name
         ]);
 
-        return $tag;
+        return $brand;
     }
 
-    public static function deleteTag($id) {
-        self::deleteTags(array($id));
+    public static function deleteBrand($id) {
+        self::deleteBrands(array($id));
     }
 
-    public static function deleteTags($ids) {
+    public static function deleteBrands($ids) {
         foreach ($ids as $id) {
-            $tag = self::find($id);
-            $tag->delete();
+            $brand = self::find($id);
+            $brand->delete();
         }
     }
 }
