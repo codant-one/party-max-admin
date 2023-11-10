@@ -67,6 +67,10 @@ const editCategory = categoryData => {
   router.push({ name : 'dashboard-products-categories-edit-id', params: { id: categoryData.id } })
 }
 
+const openCategory = function (categoryData) {
+  window.open(`${themeConfig.settings.urlDomain + 'categories/' + categoryData.slug}`)
+}
+
 
 const showDeleteDialog = categoryData => {
   isConfirmDeleteDialogVisible.value = true
@@ -174,13 +178,14 @@ const removeCategory = async () => {
           <v-table class="text-no-wrap">
             <!-- 👉 table head -->
             <thead>
-              <tr>
-                <th scope="col"> #ID </th>
-                <th scope="col"> NOMBRE </th>
-                <th scope="col"> SUBCATEGORÍA </th>
-                <th scope="col"> SLUG </th>
-                <th scope="col"> BANNER </th>
-                <th scope="col" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
+              <tr class="text-no-wrap">
+                <th> #ID </th>
+                <th> NOMBRE </th>
+                <th> SUBCATEGORÍA </th>
+                <th class="text-end pe-4"> TOTAL PRODUCTOS </th>
+                <th class="text-end pe-4"> GANANCIA TOTAL </th>
+                <th> BANNER </th>
+                <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
               </tr>
@@ -193,9 +198,42 @@ const removeCategory = async () => {
                 style="height: 3.75rem;">
 
                 <td> {{ category.id }} </td>
-                <td> {{ category.name }} </td>
+                <td>
+                  <div class="d-flex gap-x-3">
+                    <VAvatar
+                      variant="tonal"
+                      rounded
+                      size="38"
+                    >
+                      <img
+                        v-if="category.banner !== null"
+                        :src="themeConfig.settings.urlStorage + category.banner"
+                        :alt="category.name"
+                        width="38"
+                        height="38"
+                      />
+                    </VAvatar>
+                    <div class="d-block">
+                      <span class="d-block text-base">
+                        {{ category.name }}
+                      </span>
+                      <span class="d-block text-sm text-disabled">
+                        {{ category.slug }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
                 <td> {{ category.category?.name }} </td>
-                <td> {{ category.slug }} </td>
+                <td> 
+                  <div class="text-end">
+                    {{ (category.product_count).toLocaleString() }}
+                  </div> 
+                </td>
+                <td>
+                  <h4 class="text-sm text-end">
+                    {{ (1000).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
+                  </h4>
+                </td>
                 <td>
                     <VImg
                       class="me-6"
@@ -208,13 +246,38 @@ const removeCategory = async () => {
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">      
                   <VBtn
+                    v-if="category.category_id === null"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small">  
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                      >
+                      Abrir
+                    </VTooltip>
+                    <VIcon
+                      icon="mdi-open-in-new"
+                      :size="22"
+                      @click="openCategory(category)"
+                      />
+                  </VBtn>
+                  <VBtn
                     v-if="$can('editar', 'categorías')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
                     @click="editCategory(category)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                      >
+                      Editar
+                    </VTooltip>      
                     <VIcon
                         size="22"
                         icon="tabler-edit" />
@@ -227,7 +290,13 @@ const removeCategory = async () => {
                     color="default"
                     variant="text"
                     @click="showDeleteDialog(category)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                      >
+                      Eliminar
+                    </VTooltip>     
                     <VIcon
                       size="22"
                       icon="tabler-trash" />

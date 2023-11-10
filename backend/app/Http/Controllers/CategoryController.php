@@ -52,6 +52,7 @@ class CategoryController extends Controller
             $limit = $request->has('limit') ? $request->limit : 10;
         
             $query = Category::with(['category.category'])
+                            ->withCount(['product'])
                             ->applyFilters(
                                     $request->only([
                                         'search',
