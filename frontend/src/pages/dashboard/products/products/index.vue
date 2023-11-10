@@ -79,7 +79,7 @@ async function fetchData() {
       price:element.price_for_sale,
       currency: 'COP',
       originalLink: 'https://dominioreal.com/' + element.slug,
-      categories: element.categories.map(item => item.category.name).join(', '),// Utiliza map para extraer los nombres de las categorías
+      categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion

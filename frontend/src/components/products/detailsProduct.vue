@@ -342,8 +342,17 @@ const updateLink = (text, id) => {
                             />
                         </span>
                     </div>
-                    <div>Categorías:
-                        <span>{{ categories }}</span>
+                    <div style="height: 150px;">Categorías:
+                        <span v-for="category in categories">
+                            <VChip
+                                class="me-4"
+                                label
+                                size="x-small"
+                                color="secondary"
+                                >
+                                {{ category }}
+                            </VChip>
+                        </span>
                     </div>                                  
                     <VAlert class="text-center mt-5">
                         <VRow>

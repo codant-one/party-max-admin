@@ -184,7 +184,6 @@ const removeCategory = async () => {
                 <th> SUBCATEGORÍA </th>
                 <th class="text-end pe-4"> TOTAL PRODUCTOS </th>
                 <th class="text-end pe-4"> GANANCIA TOTAL </th>
-                <th> BANNER </th>
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
@@ -233,15 +232,6 @@ const removeCategory = async () => {
                   <h4 class="text-sm text-end">
                     {{ (parseFloat(category.sum ?? 0)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
                   </h4>
-                </td>
-                <td>
-                    <VImg
-                      class="me-6"
-                        v-if="category.banner !== null"
-                        :src="themeConfig.settings.urlStorage + category.banner"
-                        :height="50"
-                        aspect-ratio="1/1"
-                    />
                 </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">      
