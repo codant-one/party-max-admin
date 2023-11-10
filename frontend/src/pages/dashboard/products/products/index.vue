@@ -3,6 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
+import { useCategoriesStores } from '@/stores/useCategories'
 import { ref } from "vue"
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
@@ -10,6 +11,7 @@ import detailsProduct from "@/components/products/detailsProduct.vue";
 import show from './show.vue'
 
 const productsStores = useProductsStores()
+const categoriesStores = useCategoriesStores()
 const cp = useClipboard()
 
 const myProductsList = ref([])
@@ -27,6 +29,38 @@ const isProductDetailDialog = ref(false)
 const favourite = ref(null)
 const archived = ref(null)
 const discarded = ref(null)
+
+const selectedStatus = ref()
+const selectedCategory = ref()
+const selectedStock = ref()
+
+const status = ref([
+  {
+    title: 'Publicado',
+    value: 3
+  },
+  {
+    title: 'Pendiente',
+    value: 4
+  },
+  {
+    title: 'Eliminado',
+    value: 5
+  },
+])
+
+const categories = ref([])
+
+const stockStatus = ref([
+  {
+    title: 'In Stock',
+    value: 1
+  },
+  {
+    title: 'Agotado',
+    value: 0
+  },
+])
 
 const advisor = ref({
   type: '',
@@ -65,6 +99,9 @@ async function fetchData() {
     favourite: favourite.value,
     archived: archived.value,
     discarded: discarded.value,
+    state_id: selectedStatus.value,
+    in_stock: selectedStock.value,
+    category_id: selectedCategory.value,
     orderByField: 'id',
     orderBy: 'desc',
     limit: rowPerPage.value,
@@ -72,6 +109,10 @@ async function fetchData() {
   }
 
   isRequestOngoing.value = true
+  
+  await categoriesStores.fetchCategoriesOrder({ limit: -1 })
+
+  categories.value = categoriesStores.getCategories
 
   await productsStores.fetchProducts(data)
 
@@ -82,20 +123,21 @@ async function fetchData() {
       id: element.id,
       favourite: element.favourite,
       discarded: element.discarded,
-      link: '',
-      description: element.description,
+      user: element.user,
+      state: element.state,
+      in_stock: element.in_stock,
+      stock: element.stock,
       archived: element.archived,            
       title: element.name,
       image: element.image,
-      price:element.price_for_sale,
+      price: element.price_for_sale,
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+      categories: element.images[0].categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
       selling_price: 0,//agregar mas adelante informacion,
-      likes: element.likes,
-      
+      likes: element.likes
     })
   );
 
@@ -111,42 +153,41 @@ const editProduct = id => {
 
 const updateLink = (data) => {
 
-let request = {}
+  let request = {}
 
-if(data.text === 'favourite')
-    request = { favourite: data.value }
-else if(data.text === 'archived')
-    request = { archived: data.value }
-else if(data.text === 'discarded')
-    request = { discarded: data.value }
+  if(data.text === 'favourite')
+      request = { favourite: data.value }
+  else if(data.text === 'archived')
+      request = { archived: data.value }
+  else if(data.text === 'discarded')
+      request = { discarded: data.value }
 
-// userlinksStores.updateLink(request, data.id)
-//     .then(response => {
+  productsStores.updateLink(request, data.id)
+      .then(response => {
 
-//         window.scrollTo(0, 0)
-                
-//         advisor.value.show = true
-//         advisor.value.type = 'success'
-//         advisor.value.message = 'Enlace actualizado!'
+          window.scrollTo(0, 0)
+                  
+          advisor.value.show = true
+          advisor.value.type = 'success'
+          advisor.value.message = 'Producto actualizado!'
 
-//         closeAdvisor()
-//         fetchData()
+          closeAdvisor()
+          fetchData()
 
-//     }).catch(error => {
-//         closeRoleEditDialog()
-//         window.scrollTo(0, 0)
-                
-//         advisor.value.show = true
-//         advisor.value.type = 'error'
+      }).catch(error => {
+          window.scrollTo(0, 0)
+                  
+          advisor.value.show = true
+          advisor.value.type = 'error'
 
-//         if (error.feedback === 'params_validation_failed') {
-//             advisor.value.message = error.message
-//         } else {
-//             advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
-//         }
+          if (error.feedback === 'params_validation_failed') {
+              advisor.value.message = error.message
+          } else {
+              advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+          }
 
-//         closeAdvisor()  
-//     })
+          closeAdvisor()  
+      })
 }
 
 const findArchived = () => {
@@ -235,16 +276,20 @@ const showAlert = function(alert) {
   advisor.value.type = alert.value.type
   advisor.value.message = alert.value.message
 }
+
+const closeDropdown = () => { 
+  document.getElementById("selectCategory").blur()
+}
 </script>
 
 <template>
   <section>
-    <v-alert
+    <VAlert
       v-if="advisor.show"
       :type="advisor.type"
       class="mb-6">  
       {{ advisor.message }}
-    </v-alert>
+    </VAlert>
     <Toaster />
 
     <VCard v-if="products"
@@ -252,15 +297,7 @@ const showAlert = function(alert) {
       title="Filtros">
       <VCardText>
         <VRow>
-          <VCol cols="12" sm="4">
-            <v-btn
-              v-if="$can('crear','productos')"
-              prepend-icon="tabler-plus"
-              :to="{ name: 'dashboard-products-products-add' }">
-              Agregar Producto
-            </v-btn>
-          </VCol>
-          <VCol cols="12" sm="6">
+          <VCol cols="12" sm="10">
             <VTextField
               v-model="searchQuery"
               label="Buscar"
@@ -322,17 +359,92 @@ const showAlert = function(alert) {
                 </VTooltip>
                 <VIcon
                   size="20"
-                  icon="tabler-trash"
+                  icon="mdi-cart-remove"
                   class="me-1"
                   :color="discarded === 1 ? 'error' : 'default'"
                 />
               </VBtn>
             </div> 
           </VCol>
+
+          <!-- 👉 Select Status -->
+          <VCol
+            cols="12"
+            sm="4"
+          >
+            <AppSelect
+              v-model="selectedStatus"
+              placeholder="Estados"
+              :items="status"
+              clearable
+              clear-icon="tabler-x"
+            />
+          </VCol>
+
+          <!-- 👉 Select Category -->
+          <VCol
+            cols="12"
+            sm="4"
+          >
+            <VAutocomplete
+              id="selectCategory"
+              v-model="selectedCategory"
+              label="Categoría"
+              :items="categories"
+              :item-title="item => item.name"
+              :item-value="item => item.id"
+              autocomplete="off"
+              clearable
+              :menu-props="{ maxHeight: '300px' }">
+              <template v-slot:item="{ props, item }">
+                <v-list-item
+                  v-bind="props"
+                  :title="item?.raw?.name"
+                  :style="{ 
+                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                  }"
+                >
+                  <template v-slot:prepend="{ isActive }">
+                    <v-list-item-action start>
+                      <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                    </v-list-item-action>
+                  </template>
+                </v-list-item>
+              </template>
+              <template v-slot:append-item>
+                <v-divider class="mt-2"></v-divider>
+                <v-list-item title="Cerrar Opciones" class="text-right">
+                  <template v-slot:append>
+                    <VBtn
+                      size="small"
+                      variant="plain"
+                      icon="tabler-x"
+                      color="black"
+                      :ripple="false"
+                      @click="closeDropdown"/>
+                  </template>
+                </v-list-item>
+              </template>
+            </VAutocomplete>
+          </VCol>
+
+          <!-- 👉 Select Stock Status -->
+          <VCol
+            cols="12"
+            sm="4"
+          >
+            <AppSelect
+              v-model="selectedStock"
+              placeholder="Stock"
+              :items="stockStatus"
+              clearable
+              clear-icon="tabler-x"
+            />
+          </VCol>
         </VRow>
       </VCardText>
 
-      <v-row>
+      <VRow>
         <VDialog
           v-model="isRequestOngoing"
           width="300"
@@ -351,9 +463,9 @@ const showAlert = function(alert) {
           </VCard>
         </VDialog>
 
-        <v-col cols="12">
-          <v-card title="">
-            <v-card-text class="d-flex align-center flex-wrap gap-4">
+        <VCol cols="12">
+          <VCard title="">
+            <VCardText class="d-flex align-center flex-wrap gap-4">
               <div
                 class="d-flex align-center"
                 style="width: 135px;">
@@ -365,9 +477,18 @@ const showAlert = function(alert) {
                   :items="[10, 20, 30, 50]"
                 />
               </div>
-            </v-card-text>
 
-            <v-divider />
+              <VSpacer />
+
+              <VBtn
+                v-if="$can('crear','productos')"
+                prepend-icon="tabler-plus"
+                :to="{ name: 'dashboard-products-products-add' }">
+                Agregar Producto
+              </VBtn>
+            </VCardText>
+
+            <VDivider />
                             
             <VCardText>
               <VRow  class="gap-y-4">
@@ -392,7 +513,7 @@ const showAlert = function(alert) {
               </VRow>
             </VCardText>
 
-            <v-divider />
+            <VDivider />
 
             <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
               <span class="text-sm text-disabled">
@@ -406,9 +527,9 @@ const showAlert = function(alert) {
                 :length="totalPages"
               />
             </VCardText>
-          </v-card>
-        </v-col>
-      </v-row>
+          </VCard>
+        </VCol>
+      </VRow>
     </VCard>
 
     <show 

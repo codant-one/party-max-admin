@@ -21,6 +21,10 @@ class Products {
     delete(id){
         return axios.post(`/products/delete`, id)
     }
+
+    updateLink(data, id) {
+        return axios.put(`/products/updateStatus/${id}`, data)
+    }
 }
 
 const products = new Products();

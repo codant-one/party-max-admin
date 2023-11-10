@@ -11,4 +11,11 @@ class ProductImage extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    /**** Relationship ****/
+    public function categories()
+    {
+        return $this->hasMany(ProductCategory::class, 'product_image_id');
+    }
+
 }

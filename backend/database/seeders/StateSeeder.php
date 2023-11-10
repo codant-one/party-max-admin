@@ -14,7 +14,7 @@ class StateSeeder extends Seeder
      */
     public function run()
     {
-        $states = ['Inactivo', 'Activo', 'En Stock', 'Agotado'];
+        $states = ['Inactivo', 'Activo', 'Publicado', 'Pendiente', 'Eliminado'];
 
         foreach($states as $state){
             State::create([

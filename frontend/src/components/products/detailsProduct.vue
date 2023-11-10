@@ -25,7 +25,10 @@ const archived = ref('')
 const discarded = ref(null)
 const title = ref('')
 const image = ref('')
-const description = ref(null)
+const store = ref(null)
+const state = ref(null)
+const in_stock = ref(null)
+const stock = ref(null)
 const price = ref('')
 const originalLink = ref('')
 const rating = ref(null)
@@ -45,7 +48,10 @@ watchEffect(() => {
         discarded.value = props.product.discarded ?? null
         title.value = props.product.title ?? null
         image.value = props.product.image === null ? '' : themeConfig.settings.urlStorage + props.product.image
-        description.value = props.product.description ?? null
+        store.value = props.product.user.name + ' ' + (props.product.user.last_name ?? '')
+        state.value = props.product.state
+        in_stock.value = props.product.in_stock
+        stock.value = props.product.stock
         price.value = props.product.price ?? null
         originalLink.value = props.product.originalLink ?? null
         rating.value = props.product.rating ?? -1
@@ -97,13 +103,41 @@ const updateLink = (text, id) => {
     emit('updateLink', data)
 }
 
+
+const colors = (id) => {
+    let color = ''
+    
+    switch(id) {
+        case 3:
+            color = 'success'
+            break
+        case 4:
+            color = 'error'
+            break
+        case 5:
+            color = 'warning'
+            break
+    }
+
+    return color
+} 
+
 </script>
 
 <template>
     <section>
-        <VCard 
-            :title="title"
-            :subtitle="description">
+        <VCard >
+            <template v-slot:title>
+                {{ title }}
+            </template>
+            <template v-slot:subtitle>
+                <strong>Tienda: </strong>
+                    {{ store.toUpperCase() }}
+                <strong>Status: </strong>
+                    <VChip label :color="colors(state.id)" >
+                        {{ state.name }}
+                    </VChip>
+            </template>
             <template #append>
                 <div class="mt-n4 me-n2">
                     <VBtn
@@ -237,7 +271,7 @@ const updateLink = (text, id) => {
                                         </VTooltip>
                                         <VIcon
                                             size="28"
-                                            icon="tabler-trash"
+                                            icon="mdi-cart-remove"
                                             class="me-1"
                                             :color="discarded === 1 ? 'error' : 'default'"
                                         />
@@ -262,6 +296,25 @@ const updateLink = (text, id) => {
                         />
                     </VCol>
                     <VCol cols="12" md="7">
+                        <div>En Stock: 
+                                <VBadge
+                                v-if="in_stock"
+                                    :content="stock"
+                                    bordered
+                                    color="primary"
+                                    >
+                                    <VIcon
+                                        size="25"
+                                        icon="mdi-cart"
+                                    />
+                                    </VBadge>
+                                <VIcon
+                                v-else
+                                    size="25"
+                                    icon="mdi-cart-off"
+                                    class="me-1"
+                                />
+                        </div>
                         <div>Envios: 
                             <span v-if="selling_price >= 0">{{ selling_price }}</span>
                             <span v-else>

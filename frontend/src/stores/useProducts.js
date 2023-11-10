@@ -88,6 +88,21 @@ export const useProductsStores = defineStore('products', {
                 .finally(() => {
                     this.setLoading(false)
                 })  
+        },
+        updateLink(data, id) {
+            this.setLoading(true)
+            
+            return Products.updateLink(data, id)
+                .then((response) => {
+                    let pos = this.products.findIndex((item) => item.id === response.data.data.product.id)
+                    this.products[pos] = response.data.data.product
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+         
         }
     }
 })

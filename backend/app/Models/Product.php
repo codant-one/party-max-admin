@@ -11,6 +11,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductDetail;
 use App\Models\ProductImage;
 use App\Models\User;
+use App\Models\State;
 
 class Product extends Model
 {
@@ -19,11 +20,6 @@ class Product extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
-    public function categories()
-    {
-        return $this->hasMany(ProductCategory::class, 'product_image_id');
-    }
-
     public function detail()
     {
         return $this->hasOne(ProductDetail::class, 'product_id');
@@ -44,6 +40,11 @@ class Product extends Model
         return $this->belongsTo(User::class, 'user_id','id');
     }
 
+    public function state()
+    {
+        return $this->belongsTo(State::class, 'state_id','id');
+    }
+
     /**** Scopes ****/
     public function scopeFavorites($query)
     {
@@ -58,6 +59,12 @@ class Product extends Model
     public function scopeWhereSearch($query, $search) {
         $query->where('name', 'LIKE', '%' . $search . '%')
               ->orWhere('description', 'LIKE', '%' . $search . '%');
+    }
+
+    public function scopeWhereCategory($query, $search) {
+        $query->whereHas('images.categories', function ($q) use ($search) {
+            $q->where('category_id', $search);
+        });
     }
  
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
@@ -81,6 +88,18 @@ class Product extends Model
         
         if ($filters->get('discarded') !== null) {
             $query->where('discarded', $filters->get('discarded'));
+        }
+
+        if ($filters->get('state_id') !== null) {
+            $query->where('state_id', $filters->get('state_id'));
+        }
+
+        if ($filters->get('in_stock') !== null) {
+            $query->where('in_stock', $filters->get('in_stock'));
+        }
+
+        if ($filters->get('category_id') !== null) {
+            $query->whereCategory($filters->get('category_id'));
         }
  
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
@@ -235,5 +254,34 @@ class Product extends Model
             $categproductory = self::with(['children.children'])->find($id);
             $product->delete();
         }
+    }
+
+    public static function updateStatusProduct($request, $field, $product) {
+
+        $favourite = 0;
+        $archived = 0;
+        $discarded = 0;
+
+        if($field === 'favourite'){
+            $favourite = ($request->input($field) === '1') ? 0 : 1;
+            $archived = 0;
+            $discarded = 0;
+        } else if($field === 'archived'){
+            $archived = ($request->input($field) === '1') ? 0 : 1;
+            $favourite = 0;
+            $discarded = 0;
+        } else {
+            $discarded = ($request->input($field) === '1') ? 0 : 1;
+            $favourite = 0;
+            $archived = 0;
+        }
+
+        $product->update([
+            'favourite' => $favourite,
+            'archived' => $archived,
+            'discarded' => $discarded
+        ]);  
+
+        return $product;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\StatusProductRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class ProductController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Product::with(['categories.category', 'detail', 'images'])
+            $query = Product::with(['images.categories.category', 'detail', 'user', 'state'])
                             ->favorites()
                             ->applyFilters(
                                 $request->only([
@@ -39,7 +40,10 @@ class ProductController extends Controller
                                     'orderBy',
                                     'favourite',
                                     'archived',
-                                    'discarded'
+                                    'discarded',
+                                    'state_id',
+                                    'in_stock',
+                                    'category_id'
                                 ])
                             );
 
@@ -188,6 +192,41 @@ class ProductController extends Controller
             return response()->json([
                 'success' => true
             ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateStatus(StatusProductRequest $request, $id): JsonResponse
+    {
+        try {
+
+            $product = Product::find($id);
+        
+            if (!$product)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Producto no encontrado'
+                ], 404);
+
+            $field = $request->has('favourite')
+                     ? 'favourite'
+                     : ($request->has('discarded') ? 'discarded' : ($request->has('archived') ? 'archived' : null));
+
+            $product->updateStatusProduct($request, $field, $product); 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'product' => $product
+                ]
+            ], 200);
 
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([
