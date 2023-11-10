@@ -53,6 +53,7 @@ class CategoryController extends Controller
         
             $query = Category::with(['category.category'])
                             ->withCount(['product'])
+                            ->categoryTotalPrice()
                             ->applyFilters(
                                     $request->only([
                                         'search',
