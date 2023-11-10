@@ -52,6 +52,8 @@ const categories = ref('')
 watchEffect(() => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
+            categories.value = props.product.images[0]?.categories.map(item => item.category.name)
+
             productImages.value = props.product.images
             productImages.value.unshift({image: props.product.image})
 
@@ -69,7 +71,6 @@ watchEffect(() => {
             width.value = props.product.detail.width
             height.value = props.product.detail.height
             deep.value = props.product.detail.deep
-            categories.value = props.product.categories.map(item => item.category.name).join(', ')
         }
     }
 })
@@ -238,7 +239,16 @@ const setThumbsSwiper = (swiper) => {
                                 />
                             </div>
                             <div>Categorías:
-                                <span>{{ categories }}</span>
+                                <span v-for="category in categories">
+                                    <VChip
+                                        class="me-4"
+                                        label
+                                        size="x-small"
+                                        color="secondary"
+                                        >
+                                        {{ category }}
+                                    </VChip>
+                                </span>
                             </div> 
                         </div>               
                     </VCol>

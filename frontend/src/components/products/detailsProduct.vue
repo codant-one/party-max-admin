@@ -146,6 +146,7 @@ const colors = (id) => {
                         color="default"
                         size="x-small"
                         variant="plain"
+                        :disabled="state.id === 5"
                         @click="editProduct(id)">
                         <VTooltip
                             open-on-focus
@@ -156,6 +157,24 @@ const colors = (id) => {
                         <VIcon
                             :size="22"
                             icon="tabler-edit"/>
+                    </VBtn>
+                    <VBtn
+                        v-if="$can('eliminar','productos')"
+                        icon
+                        color="default"
+                        size="x-small"
+                        variant="plain"
+                        :disabled="state.id === 5"
+                        @click="editProduct(id)">
+                        <VTooltip
+                            open-on-focus
+                            location="top"
+                            activator="parent">
+                            Eliminar
+                        </VTooltip>
+                        <VIcon
+                            :size="22"
+                            icon="tabler-trash"/>
                     </VBtn>
                 </div>
             </template>

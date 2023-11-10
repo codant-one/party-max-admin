@@ -111,7 +111,7 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['categories.category', 'detail', 'images'])->find($id);
+            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($id);
 
             if (!$product)
                 return response()->json([
@@ -143,7 +143,7 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['categories.category', 'detail', 'images'])->find($product->id);
+            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($product->id);
 
             if (!$product)
                 return response()->json([
