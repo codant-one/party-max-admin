@@ -1,592 +1,679 @@
 <script setup>
+import {
+  useDropZone,
+  useFileDialog,
+  useObjectUrl,
+} from '@vueuse/core'
+import { ref } from 'vue'
 
-import router from '@/router'
-import { inject } from "vue"
-import { requiredValidator } from '@validators'
-import { useCategoriesStores } from '@/stores/useCategories'
-import { useColorsStores } from '@/stores/useColors'
-import { useProductsStores } from '@/stores/useProducts'
-
-const categoriesStores = useCategoriesStores()
-const colorsStores = useColorsStores()
-const productsStores = useProductsStores()
-
-const isRequestOngoing = ref(true)
-
-const categories = ref([])
-const refForm = ref()
-const isFormValid = ref(false)
-const error = ref(undefined)
-
-const emitter = inject("emitter")
-
-const category_id = ref()
-const name = ref(null)
-const description = ref('')
-const sku = ref('')
-const price = ref('')
-const price_for_sale = ref('')
-const stock = ref('')
-const image = ref('')
-const avatar = ref('')
-const filename = ref([])
-const width = ref([])
-const height = ref([])
-const deep = ref([])
-const weigth = ref([])
-
-const listColors = ref([])
-const colors = ref([{
-  color_id: '',
-  filenameImages: [],
-  images: [],
-  gallery: []
-}])
-
-const activeTab = ref(0)
-
-watchEffect(fetchData)
-
-async function fetchData() {
-
-    isRequestOngoing.value = true
-
-    let data = { limit: -1 }
-
-    await colorsStores.fetchColors();
-    await categoriesStores.fetchCategoriesOrder(data)
-
-    listColors.value = colorsStores.getColors
-    categories.value = categoriesStores.getCategories
-
-    isRequestOngoing.value = false
-}
-
-const handleFileChange = (event, color_id) => {
-    const findColor = colors.value.find((color) => color.color_id === color_id)
-
-    findColor.images = []
-    findColor.gallery = []
-
-    for (let i = 0; i < findColor.filenameImages.length; i++) {
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-            const file = event.target.files[i]
-
-            if (findColor) {
-                URL.createObjectURL(file)
-                findColor.images.push(e.target.result)
-
-                resizeImage(file, 400, 400, 0.9)
-                    .then(async blob => {
-                        findColor.gallery.push(blob)
-                    })
-            }
-        };
-       
-        reader.readAsDataURL(findColor.filenameImages[i]);
-    }  
-}
-
-const onImageSelected = event => {
-  const file = event.target.files[0]
-
-  if (!file) return
-  // image.value = file
-
-  URL.createObjectURL(file)
-
-  resizeImage(file, 400, 400, 0.9)
-    .then(async blob => {
-        image.value = blob
-        let r = await blobToBase64(blob)
-        avatar.value = 'data:image/jpeg;base64,' + r
+const optionCounter = ref(1)
+const dropZoneRef = ref()
+const fileData = ref([])
+const { open, onChange } = useFileDialog({ accept: 'image/*' })
+function onDrop(DroppedFiles) {
+  DroppedFiles?.forEach(file => {
+    if (file.type.slice(0, 6) !== 'image/') {
+      alert('Only image files are allowed')
+      
+      return
+    }
+    fileData.value.push({
+      file,
+      url: useObjectUrl(file).value ?? '',
     })
-}
-
-const resizeImage = function(file, maxWidth, maxHeight, quality) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-
-    img.src = URL.createObjectURL(file)
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-
-      let width = img.width
-      let height = img.height
-
-      if (maxWidth && width > maxWidth) {
-        height *= maxWidth / width
-        width = maxWidth
-      }
-
-      if (maxHeight && height > maxHeight) {
-        width *= maxHeight / height
-        height = maxHeight
-      }
-
-      canvas.width = width
-      canvas.height = height
-
-      ctx.drawImage(img, 0, 0, width, height)
-
-      canvas.toBlob(blob => {
-        resolve(blob)
-      }, file.type, quality)
-    }
-    img.onerror = error => {
-      reject(error)
-    }
   })
 }
+onChange(selectedFiles => {
+  if (!selectedFiles)
+    return
+  for (const file of selectedFiles) {
+    fileData.value.push({
+      file,
+      url: useObjectUrl(file).value ?? '',
+    })
+  }
+})
+useDropZone(dropZoneRef, onDrop)
 
-const blobToBase64 = blob => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
+const content = ref('')
+const activeTab = ref('Restock')
+const isTaxChargeToProduct = ref(true)
 
-    reader.readAsDataURL(blob)
-    reader.onload = () => {
-      resolve(reader.result.split(',')[1])
-    }
-    reader.onerror = error => {
-      reject(error)
-    }
-  })
-}
+const shippingList = [
+  {
+    desc: 'You\'ll be responsible for product delivery.Any damage or delay during shipping may cost you a Damage fee',
+    title: 'Fulfilled by Seller',
+    value: 'Fulfilled by Seller',
+  },
+  {
+    desc: 'Your product, Our responsibility.For a measly fee, we will handle the delivery process for you.',
+    title: 'Fulfilled by Company name',
+    value: 'Fulfilled by Company name',
+  },
+]
 
-const addItem = () => {
+const shippingType = ref('Fulfilled by Company name')
+const deliveryType = ref('Worldwide delivery')
 
-  // eslint-disable-next-line vue/no-mutating-props
-  colors.value.push({
-    color_id: '',
-    filenameImages: [],
-    images: [],
-    gallery: []
-  })
-}
+const selectedAttrs = ref([
+  'Biodegradable',
+  'Expiry Date',
+])
 
-const onSubmit = () => {
-
-    refForm.value?.validate().then(({ valid }) => {
-        
-        if (valid) {
-            error.value = undefined
-
-            let formData = new FormData()
-
-            formData.append('name', name.value)
-            formData.append('description', description.value)
-            formData.append('sku', sku.value)
-            formData.append('price', price.value)
-            formData.append('price_for_sale', price_for_sale.value)
-            formData.append('stock', stock.value)
-            formData.append('image', image.value)
-            formData.append('category_id', category_id.value)
-            formData.append('width', width.value)
-            formData.append('height', height.value)
-            formData.append('deep', deep.value)
-            formData.append('weigth', weigth.value)
-            formData.append('colors', JSON.stringify(colors.value))
-            formData.append('gallery[]', colors.value[0].gallery)
-
-            colors.value.forEach(function callback(value, index) {
-                colors.value[index].gallery.forEach(function callback(value, i) {
-                    formData.append('color_'+colors.value[index]['color_id']+'[]', colors.value[index].gallery[i])
-                });
-            });
-
-            productsStores.addProduct(formData)
-                .then((res) => {
-                if (res.data.success) {
-
-                    let data = {
-                        message: 'Producto Creado!',
-                        error: false
-                    }
-
-                    router.push({ name : 'dashboard-products-products'})
-                    emitter.emit('toast', data)
-
-                } else {
-
-                    let data = {
-                        message: 'ERROR',
-                        error: true
-                    }
-
-                    router.push({ name : 'dashboard-products-products'})
-                    emitter.emit('toast', data)
-                }
-                })
-                .catch((err) => {
-                    let data = {
-                        message: err,
-                        error: true
-                    }
-
-                    router.push({ name : 'dashboard-products-products'})
-                    emitter.emit('toast', data)
-                })
-
-        }
-  })
-}
-
-const closeDropdown = () => { 
-  document.getElementById("selectCategory").blur()
-}
-
+const inventoryTabsData = [
+  {
+    icon: 'tabler-cube',
+    title: 'Restock',
+    value: '0',
+  },
+  {
+    icon: 'tabler-car',
+    title: 'Shipping',
+    value: '1',
+  },
+  {
+    icon: 'tabler-map-pin',
+    title: 'Global Delivery',
+    value: '2',
+  },
+  {
+    icon: 'tabler-world',
+    title: 'Attributes',
+    value: '3',
+  },
+  {
+    icon: 'tabler-lock',
+    title: 'Advanced',
+    value: '4',
+  },
+]
 </script>
 
 <template>
-    <section>
-        <VRow>
-            <VDialog
-                v-model="isRequestOngoing"
-                width="300"
-                persistent>
-                <VCard
-                    color="primary"
-                    width="300">
-                    <VCardText class="pt-3">
-                        Cargando
-                        <VProgressLinear
-                            indeterminate
-                            color="white"
-                            class="mb-0"
-                        />
-                    </VCardText>
-                </VCard>
-            </VDialog>
-        </VRow>
-        <div>
-            <VTabs
-                v-model="activeTab"
-                class="v-tabs-pill my-5"
-            >
-                <VTab> Detalles </VTab>
-                <VTab> Galería </VTab>
-            </VTabs>
-        </div>
-        <!-- 👉 Form -->
-        <VForm
-            ref="refForm"
-            v-model="isFormValid"
-            @submit.prevent="onSubmit">
+  <div>
+    <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
+      <div class="d-flex flex-column justify-center">
+        <h4 class="text-h4 font-weight-medium">
+          Añadir un nuevo producto
+        </h4>
+        <span>Recarga tu fiesta de productos</span>
+      </div>
+
+      <div class="d-flex gap-4 align-center flex-wrap">
+        <VBtn
+          block
+          color="default"
+          variant="tonal"
+          class="mb-2"
+          :to="{ name: 'dashboard-products-products' }"
+          >
+          Regresar
+       </VBtn>
+      </div>
+    </div>
+
+    <VRow>
+      <VCol md="8">
+        <!-- 👉 Product Information -->
+        <VCard
+          class="mb-6"
+          title="Información del Producto"
+        >
+          <VCardText>
             <VRow>
-                <VCol cols="12" md="9">
-                    <VCard class="mb-8">
-                        <VWindow v-model="activeTab">
-                            <VWindowItem>
-                                <VCardText>
-                                    <VRow>
-                                        <VCol cols="12">
-                                            <VAutocomplete
-                                                id="selectCategory"
-                                                v-model="category_id"
-                                                label="Categorías:"
-                                                autocomplete="off"
-                                                multiple
-                                                :items="categories"
-                                                :item-title="item => item.name"
-                                                :item-value="item => item.id"
-                                                :rules="[requiredValidator]"
-                                                :menu-props="{ maxHeight: '300px' }">
-                                                <template v-slot:selection="{ item, index }">
-                                                    <v-chip v-if="index < 4">
-                                                        <span>{{ item.title }}</span>
-                                                    </v-chip>
-                                                    <span
-                                                        v-if="index === 4"
-                                                        class="text-grey text-caption align-self-center"
-                                                    >
-                                                        (+{{ category_id.length - 4 }} otros)
-                                                    </span>
-                                                </template>
-                                                <template v-slot:item="{ props, item }">
-                                                    <v-list-item
-                                                        v-bind="props"
-                                                        :title="item?.raw?.name"
-                                                        :style="{ 
-                                                            paddingLeft: `${(item?.raw?.level) * 20}px`
-                                                        }"
-                                                    >
-                                                        <template v-slot:prepend="{ isActive }">
-                                                            <v-list-item-action start>
-                                                                <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                                                            </v-list-item-action>
-                                                        </template>
-                                                    </v-list-item>
-                                                </template>
-                                                <template v-slot:append-item>
-                                                    <v-divider class="mt-2"></v-divider>
-                                                    <v-list-item title="Cerrar Opciones" class="text-right">
-                                                        <template v-slot:append>
-                                                            <VBtn
-                                                                size="small"
-                                                                variant="plain"
-                                                                icon="tabler-x"
-                                                                color="black"
-                                                                :ripple="false"
-                                                                @click="closeDropdown"/>
-                                                        </template>
-                                                    </v-list-item>
-                                                </template>
-                                            </VAutocomplete>
-                                        </VCol>
-                                        <VCol cols="12" md="8">
-                                            <VRow>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="name"
-                                                        :rules="[requiredValidator]"
-                                                        label="Nombre"
-                                                    />
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextarea
-                                                        v-model="description"
-                                                        rows="4"                                                
-                                                        label="Descripción"
-                                                    />
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VImg
-                                                        v-if="avatar !== null"
-                                                        :src="avatar"
-                                                        :height="200"
-                                                        aspect-ratio="16/9"
-                                                        class="border-img"
-                                                    />
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VFileInput
-                                                        v-model="filename"
-                                                        label="Imagen"
-                                                        class="mb-2"
-                                                        accept="image/png, image/jpeg, image/bmp"
-                                                        prepend-icon="tabler-camera"
-                                                        @change="onImageSelected"
-                                                        @click:clear="avatar = null"
-                                                        :rules="[requiredValidator]"
-                                                    />
-                                                </VCol>
-                                            </VRow>
-                                        </VCol>
-
-                                        <VCol cols="12" md="4">
-                                            <VRow>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="sku"
-                                                        clearable
-                                                        clear-icon="tabler-circle-x"
-                                                        label="SKU"
-                                                        type="text"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12" class="pb-0">
-                                                    <VTextField
-                                                        v-model="price"
-                                                        label="Precio"
-                                                        prefix="COP"
-                                                        type="number"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12" class="pb-0">
-                                                    <VTextField
-                                                        v-model="price_for_sale"
-                                                        label="Precio a la venta"
-                                                        prefix="COP"
-                                                        type="number"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="stock"
-                                                        label="STOCK"
-                                                        type="number"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="width"
-                                                        label="Ancho"
-                                                        type="number"
-                                                        suffix="Cm"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="height"
-                                                        label="Alto"
-                                                        type="number"
-                                                        suffix="Cm"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="deep"
-                                                        label="Profundo"
-                                                        type="number"
-                                                        suffix="Cm"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                                <VCol cols="12">
-                                                    <VTextField
-                                                        v-model="weigth"
-                                                        label="Peso"
-                                                        type="number"
-                                                        suffix="gr"
-                                                        :rules="[requiredValidator]">
-                                                    </VTextField>
-                                                </VCol>
-                                            </VRow>
-                                        </VCol>
-                                    
-                                    </VRow>
-                                </VCardText>
-                            </VWindowItem>
-                            <VWindowItem>
-                                <VCardText>
-                                    <VCardTitle class="text-h6 title-truncate"> Galería de imágenes </VCardTitle>
-                                    <VRow>
-                                        <VCol cols="12">
-                                            <div
-                                                v-for="(color, index) in colors"
-                                                :key="index"
-                                                class="mb-3 border-img p-1"
-                                            >             
-                                                <VRow>
-                                                    <VCol cols="12" md="4">
-                                                        <VSelect
-                                                            v-model="color.color_id"
-                                                            label="Colores"
-                                                            :items="listColors"
-                                                            item-value="id"
-                                                            item-title="name"
-                                                            clearable
-                                                            clear-icon="tabler-x"
-                                                            no-data-text="No disponible"
-                                                            />
-                                                    </VCol>
-                                                    <VCol cols="12" md="8">
-                                                        <VFileInput
-                                                            v-model="color.filenameImages"
-                                                            label="Imágenes"
-                                                            class="mb-2"
-                                                            chips
-                                                            accept="image/png, image/jpeg, image/bmp"
-                                                            prepend-icon="tabler-camera"
-                                                            @change="handleFileChange($event, color.color_id)"
-                                                            multiple
-                                                        />
-                                                    </VCol>
-                                                    <VCol 
-                                                        v-for="(image, index) in color.images"
-                                                        :key="index"
-                                                        cols="4"
-                                                        class="text-center">
-                                                        <v-img
-                                                            class="border-img"
-                                                            :src="image"
-                                                            :alt="`Imagen ${index + 1}`"
-                                                            width="200"
-                                                            height="200"
-                                                        />
-                                                    </VCol>  
-                                                </VRow>
-                                            </div>
-
-                                            <div class="my-4">
-                                                <VBtn @click="addItem">
-                                                Agregar color
-                                                </VBtn>
-                                            </div>
-                                        </VCol>
-                                        
-                                                            
-                                    </VRow>
-                                </VCardText>
-                            </VWindowItem>
-                        </VWindow>
-                        
-                    </VCard>
-                </VCol>
-
-                <VCol cols="12" md="3">
-                    <VCard class="mb-8">
-                        <VCardText>
-                            <!-- 👉 Send Category -->
-                            <VBtn
-                                block
-                                prepend-icon="tabler-plus"
-                                class="mb-2"
-                                type="submit">
-                                Agregar
-                            </VBtn>
-
-                            <!-- 👉 Preview -->
-                            <v-btn
-                                block
-                                color="default"
-                                variant="tonal"
-                                class="mb-2"
-                                :to="{ name: 'dashboard-products-products' }">
-                                Regresar
-                            </v-btn>
-                        </VCardText>
-                    </VCard>  
-                </VCol>
+              <VCol cols="12">
+                <AppTextField
+                  label="Nombre"
+                  placeholder="Nombre"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  label="SKU"
+                  placeholder="FXSK123U"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  label="Barcode"
+                  placeholder="0123-4567"
+                />
+              </VCol>
+              <VCol>
+                <span class="mb-1">Description (optional)</span>
+                <TiptapEditor
+                  v-model="content"
+                  placeholder="Product Description"
+                  class="border rounded"
+                />
+              </VCol>
             </VRow>
-        </VForm>
-    </section>
+          </VCardText>
+        </VCard>
+
+        <!-- 👉 Media -->
+        <VCard class="mb-6">
+          <VCardItem>
+            <template #title>
+              Media
+            </template>
+            <template #append>
+              <span class="text-primary font-weight-medium text-sm cursor-pointer">Add Media from URL</span>
+            </template>
+          </VCardItem>
+
+          <VCardText>
+            <div class="flex">
+              <div class="w-full h-auto relative">
+                <div
+                  ref="dropZoneRef"
+                  class="cursor-pointer"
+                  @click="() => open()"
+                >
+                  <div
+                    v-if="fileData.length === 0"
+                    class="d-flex flex-column justify-center align-center gap-y-3 px-6 py-10 border-dashed drop-zone"
+                  >
+                    <VBtn
+                      variant="tonal"
+                      class="rounded-sm"
+                    >
+                      <VIcon icon="tabler-upload" />
+                    </VBtn>
+                    <div class="text-base text-high-emphasis font-weight-medium">
+                      Drag and Drop Your Image Here.
+                    </div>
+                    <span class="text-disabled">or</span>
+
+                    <VBtn variant="tonal">
+                      Browse Images
+                    </VBtn>
+                  </div>
+
+                  <div
+                    v-else
+                    class="d-flex justify-center align-center gap-3 pa-8 border-dashed drop-zone flex-wrap"
+                  >
+                    <VRow class="match-height w-100">
+                      <template
+                        v-for="(item, index) in fileData"
+                        :key="index"
+                      >
+                        <VCol
+                          cols="12"
+                          sm="4"
+                        >
+                          <VCard
+                            :ripple="false"
+                            border
+                          >
+                            <VCardText
+                              class="d-flex flex-column"
+                              @click.stop
+                            >
+                              <VImg
+                                :src="item.url"
+                                width="200px"
+                                height="150px"
+                                class="w-100 mx-auto"
+                              />
+                              <div class="mt-2">
+                                <span class="clamp-text text-wrap">
+                                  {{ item.file.name }}
+                                </span>
+                                <span>
+                                  {{ item.file.size / 1000 }} KB
+                                </span>
+                              </div>
+                            </VCardText>
+                            <VSpacer />
+                            <VCardActions>
+                              <VBtn
+                                variant="outlined"
+                                block
+                                @click.stop="fileData.splice(index, 1)"
+                              >
+                                Remove File
+                              </VBtn>
+                            </VCardActions>
+                          </VCard>
+                        </VCol>
+                      </template>
+                    </VRow>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </VCardText>
+        </VCard>
+
+        <!-- 👉 Variants -->
+        <VCard
+          title="Variants"
+          class="mb-6"
+        >
+          <VCardText>
+            <template
+              v-for="i in optionCounter"
+              :key="i"
+            >
+              <VRow>
+                <VCol
+                  cols="12"
+                  md="4"
+                >
+                  <AppSelect
+                    :items="['Size', 'Color', 'Weight', 'Smell']"
+                    placeholder="Select Variant"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="8"
+                >
+                  <AppTextField
+                    placeholder="38"
+                    type="number"
+                  />
+                </VCol>
+              </VRow>
+            </template>
+
+            <VBtn
+              class="mt-6"
+              @click="optionCounter++"
+            >
+              Add another option
+            </VBtn>
+          </VCardText>
+        </VCard>
+
+        <!-- 👉 Inventory -->
+        <VCard
+          title="Inventory"
+          class="inventory-card"
+        >
+          <VCardText>
+            <VRow>
+              <VCol
+                cols="12"
+                md="4"
+              >
+                <div class="pe-3"> {{activeTab  }}
+                  <VTabs
+                    v-model="activeTab"
+                    direction="vertical"
+                    color="primary"
+                    class="v-tabs-pill"
+                  >
+                    <VTab
+                      v-for="(tab, index) in inventoryTabsData"
+                      :key="index"
+                    >
+                      <VIcon
+                        :icon="tab.icon"
+                        class="me-2"
+                      />
+                      <div class="text-truncate font-weight-medium text-start">
+                        {{ tab.title }}
+                      </div>
+                    </VTab>
+                  </VTabs>
+                </div>
+              </VCol>
+
+              <VDivider :vertical="!$vuetify.display.smAndDown" />
+
+              <VCol
+                cols="12"
+                md="8"
+              >
+                <VWindow
+                  v-model="activeTab"
+                  class="w-100"
+                  :touch="false"
+                >
+                  <VWindowItem value="0">
+                    <div class="d-flex flex-column gap-y-4 ps-3">
+                      <h5 class="text-h5">
+                        Options
+                      </h5>
+
+                      <div class="d-flex gap-x-4 align-center">
+                        <AppTextField
+                          label="Add to Stock"
+                          placeholder="Quantity"
+                          density="compact"
+                        />
+                        <VBtn
+                          prepend-icon="tabler-check"
+                          class="align-self-end"
+                        >
+                          Confirm
+                        </VBtn>
+                      </div>
+
+                      <div>
+                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
+                          Product in stock now: 54
+                        </div>
+                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
+                          Product in transit: 390
+                        </div>
+                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
+                          Last time restocked: 24th June, 2022
+                        </div>
+                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
+                          Total stock over lifetime: 2,430
+                        </div>
+                      </div>
+                    </div>
+                  </VWindowItem>
+
+                  <VWindowItem value="1">
+                    <VRadioGroup
+                      v-model="shippingType"
+                      label="Shipping Type"
+                      class="ms-3"
+                    >
+                      <VRadio
+                        v-for="item in shippingList"
+                        :key="item.value"
+                        :value="item.value"
+                        class="mb-4"
+                      >
+                        <template #label>
+                          <div>
+                            <div class="text-high-emphasis font-weight-medium mb-1">
+                              {{ item.title }}
+                            </div>
+                            <div class="text-sm">
+                              {{ item.desc }}
+                            </div>
+                          </div>
+                        </template>
+                      </VRadio>
+                    </VRadioGroup>
+                  </VWindowItem>
+
+                  <VWindowItem value="Global Delivery">
+                    <div class="ps-3">
+                      <h5 class="text-h5 mb-6">
+                        Global Delivery
+                      </h5>
+
+                      <VRadioGroup
+                        v-model="deliveryType"
+                        label="Global Delivery"
+                        class="ms-3"
+                      >
+                        <VRadio
+                          value="Worldwide delivery"
+                          class="mb-4"
+                        >
+                          <template #label>
+                            <div>
+                              <div class="text-high-emphasis font-weight-medium mb-1">
+                                Worldwide delivery
+                              </div>
+                              <div class="text-sm">
+                                Only available with Shipping method:
+                                <span class="text-primary">
+                                  Fulfilled by Company name
+                                </span>
+                              </div>
+                            </div>
+                          </template>
+                        </VRadio>
+
+                        <VRadio
+                          value="Selected Countries"
+                          class="mb-4"
+                        >
+                          <template #label>
+                            <div>
+                              <div class="text-high-emphasis font-weight-medium mb-1">
+                                Selected Countries
+                              </div>
+                              <VTextField
+                                placeholder="USA"
+                                density="compact"
+                                style="min-inline-size: 200px;"
+                              />
+                            </div>
+                          </template>
+                        </VRadio>
+
+                        <VRadio>
+                          <template #label>
+                            <div>
+                              <div class="text-high-emphasis font-weight-medium mb-1">
+                                Local delivery
+                              </div>
+                              <div class="text-sm">
+                                Deliver to your country of residence
+                                <span class="text-primary">
+                                  Change profile address
+                                </span>
+                              </div>
+                            </div>
+                          </template>
+                        </VRadio>
+                      </VRadioGroup>
+                    </div>
+                  </VWindowItem>
+
+                  <VWindowItem value="Attributes">
+                    <div class="mb-6 text-h6">
+                      Attributes
+                    </div>
+                    <div>
+                      <VCheckbox
+                        v-model="selectedAttrs"
+                        label="Fragile Product"
+                        value="Fragile Product"
+                      />
+                      <VCheckbox
+                        v-model="selectedAttrs"
+                        value="Biodegradable"
+                        label="Biodegradable"
+                      />
+                      <VCheckbox
+                        v-model="selectedAttrs"
+                        value="Frozen Product"
+                      >
+                        <template #label>
+                          <div class="d-flex flex-column mb-1">
+                            <div>Frozen Product</div>
+                            <VTextField
+                              placeholder="40 C"
+                              type="number"
+                              style="min-inline-size: 250px;"
+                            />
+                          </div>
+                        </template>
+                      </VCheckbox>
+
+                      <VCheckbox
+                        v-model="selectedAttrs"
+                        value="Expiry Date"
+                      >
+                        <template #label>
+                          <div class="d-flex flex-column mb-1">
+                            <div>Expiry Date of Product</div>
+                            <AppDateTimePicker
+                              model-value="2025-06-14"
+                              placeholder="Select a Date"
+                              density="compact"
+                            />
+                          </div>
+                        </template>
+                      </VCheckbox>
+                    </div>
+                  </VWindowItem>
+
+                  <VWindowItem value="Advanced">
+                    <div class="ps-3">
+                      <h5 class="text-h5 mb-6">
+                        Advanced
+                      </h5>
+                      <div class="d-flex flex-sm-row flex-column flex-wrap justify-space-between gap-x-6 gap-y-4">
+                        <AppSelect
+                          label="Product ID Type"
+                          placeholder="Select Product Type"
+                          :items="['ISBN', 'UPC', 'EAN', 'JAN']"
+                        />
+                        <AppTextField
+                          label="Product Id"
+                          placeholder="100023"
+                        />
+                      </div>
+                    </div>
+                  </VWindowItem>
+                </VWindow>
+              </VCol>
+            </VRow>
+          </VCardText>
+        </VCard>
+      </VCol>
+
+      <VCol
+        md="4"
+        cols="12"
+      >
+        <!-- 👉 Pricing -->
+        <VCard
+          title="Pricing"
+          class="mb-6"
+        >
+          <VCardText>
+            <AppTextField
+              label="Best Price"
+              placeholder="Price"
+              class="mb-6"
+            />
+            <AppTextField
+              label="Discounted Price"
+              placeholder="$499"
+              class="mb-4"
+            />
+
+            <VCheckbox
+              v-model="isTaxChargeToProduct"
+              label="Charge Tax on this product"
+            />
+
+            <VDivider class="my-2" />
+
+            <div class="d-flex flex-raw align-center justify-space-between ">
+              <span>In stock</span>
+              <VSwitch density="compact" />
+            </div>
+          </VCardText>
+        </VCard>
+
+        <!-- 👉 Organize -->
+        <VCard title="Organize">
+          <VCardText>
+            <div class="d-flex flex-column gap-y-4">
+              <AppSelect
+                placeholder="Select Vendor"
+                label="Vendor"
+                :items="['Men\'s Clothing', 'Women\'s Clothing', 'Kid\'s Clothing']"
+              />
+              <div>
+                <VLabel class="d-flex">
+                  <div class="d-flex text-sm justify-space-between w-100">
+                    <div class="text-high-emphasis">
+                      Category
+                    </div>
+                    <div class="text-primary cursor-pointer">
+                      Add new category
+                    </div>
+                  </div>
+                </VLabel>
+
+                <AppSelect
+                  placeholder="Select Category"
+                  :items="['Household', 'Office', 'Electronics', 'Management', 'Automotive']"
+                />
+              </div>
+              <AppSelect
+                placeholder="Select Collection"
+                label="Collection"
+                :items="['Men\'s Clothing', 'Women\'s Clothing', 'Kid\'s Clothing']"
+              />
+              <AppSelect
+                placeholder="Select Status"
+                label="Status"
+                :items="['Published', 'Inactive', 'Scheduled']"
+              />
+              <AppTextField
+                label="Tags"
+                placeholder="Fashion, Trending, Summer"
+              />
+            </div>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
+  </div>
 </template>
 
-<route lang="yaml">
-    meta:
-        action: crear
-        subject: productos
-</route>
+<style lang="scss" scoped>
+  .drop-zone {
+    border: 2px dashed rgba(var(--v-theme-on-surface), 0.12);
+    border-radius: 6px;
+  }
+</style>
 
-<style>
-    .p-0 {
-        padding: 0;
+<style lang="scss">
+.inventory-card{
+  .v-radio-group,
+  .v-checkbox {
+    .v-selection-control {
+      align-items: start !important;
+
+      .v-selection-control__wrapper{
+        margin-block-start: -0.375rem !important;
+      }
     }
 
-    .p-1 {
-        padding: 1rem;
+    .v-label.custom-input {
+      border: none !important;
     }
+  }
 
-    .button-icon {
-        height: 60px !important; 
-        border-radius: 8px !important;
-        margin: 2px;
+  .v-tabs.v-tabs-pill {
+    .v-slide-group-item--active.v-tab--selected.text-primary {
+      h6{
+        color: #fff !important
+      }
     }
+  }
 
-    .button-color {
-        height: 40px !important; 
-        border-radius: 8px !important;
-        margin: 1px !important;
-        font-size: 10px !important;
-        padding: 5px !important;
-    } 
+}
 
-    .border-img {
-        border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
-        border-radius: 6px;
-    }
+.ProseMirror{
+  p{
+    margin-block-end: 0;
+  }
 
-    .border-img .v-img__img--contain {
-        padding: 10px;
-    }
+  padding: 0.5rem;
+  outline: none;
+
+  p.is-editor-empty:first-child::before {
+    block-size: 0;
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: inline-start;
+    pointer-events: none;
+  }
+}
 </style>

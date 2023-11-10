@@ -11,7 +11,7 @@ const categoriesStores = useCategoriesStores()
 const fetchData = async () => {
 
   apiData.value = await categoriesStores.allCategories()
-  console.log('asdsad', apiData.value)
+  
 }
 
 fetchData()
