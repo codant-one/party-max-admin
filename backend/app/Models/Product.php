@@ -57,8 +57,7 @@ class Product extends Model
 
     public function scopeWhereSearch($query, $search) {
         $query->where('name', 'LIKE', '%' . $search . '%')
-              ->orWhere('description', 'LIKE', '%' . $search . '%')
-              ->orWhere('sku', 'LIKE', '%' . $search . '%');
+              ->orWhere('description', 'LIKE', '%' . $search . '%');
     }
  
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
@@ -70,6 +69,18 @@ class Product extends Model
  
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
+        }
+
+        if ($filters->get('favourite') !== null) {
+            $query->where('favourite', $filters->get('favourite'));
+        }
+
+        if ($filters->get('archived') !== null) {
+            $query->where('archived', $filters->get('archived'));
+        }
+        
+        if ($filters->get('discarded') !== null) {
+            $query->where('discarded', $filters->get('discarded'));
         }
  
         if ($filters->get('orderByField') || $filters->get('orderBy')) {

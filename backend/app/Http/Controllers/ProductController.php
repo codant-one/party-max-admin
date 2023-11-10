@@ -36,7 +36,10 @@ class ProductController extends Controller
                                 $request->only([
                                     'search',
                                     'orderByField',
-                                    'orderBy'
+                                    'orderBy',
+                                    'favourite',
+                                    'archived',
+                                    'discarded'
                                 ])
                             );
 

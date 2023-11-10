@@ -6,14 +6,6 @@ const props = defineProps({
     product: {
         type: Object,
         required: true
-    },
-    is_affiliated: {
-        type: Boolean,
-        required: false
-    },
-    message: {
-        type: String,
-        required: false
     }
 })
 
@@ -32,11 +24,9 @@ const favourite = ref('')
 const archived = ref('')
 const discarded = ref(null)
 const title = ref('')
-const sku = ref('')
 const image = ref('')
 const description = ref(null)
 const price = ref('')
-const currency = ref('')
 const originalLink = ref('')
 const rating = ref(null)
 const comments = ref(null)
@@ -44,8 +34,6 @@ const sales =  ref(null)
 const selling_price = ref(null)
 const likes =  ref(null)
 
-const is_affiliated = ref(false)
-const message = ref('')
 const categories = ref('')
 
 watchEffect(() => {
@@ -56,11 +44,9 @@ watchEffect(() => {
         archived.value = props.product.archived ?? null
         discarded.value = props.product.discarded ?? null
         title.value = props.product.title ?? null
-        sku.value = props.product.sku ?? null
         image.value = props.product.image === null ? '' : themeConfig.settings.urlStorage + props.product.image
         description.value = props.product.description ?? null
         price.value = props.product.price ?? null
-        currency.value = props.product.currency ?? null
         originalLink.value = props.product.originalLink ?? null
         rating.value = props.product.rating ?? -1
         comments.value = props.product.comments ?? -1
@@ -69,9 +55,6 @@ watchEffect(() => {
         selling_price.value = props.product.selling_price ?? -1
         categories.value = props.product.categories
     }
-
-    is_affiliated.value = props.is_affiliated ?? false
-    message.value = props.message ?? ''
 })
 
 const copy = (link) => {
@@ -144,9 +127,9 @@ const updateLink = (text, id) => {
             </template>
             <VCardText>
                 <VRow>
-                    <VCol cols="12" md="6">
+                    <VCol cols="12" md="5">
                         <p class="mb-0 mt-3 font-weight-semibold" v-if="price !== null">
-                            {{ price }} {{ currency }}
+                            {{ (parseFloat(price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
                         </p>
                         <span v-else>
                             <VIcon
@@ -156,32 +139,11 @@ const updateLink = (text, id) => {
                             />
                         </span>
                     </VCol>
-                <VCol cols="12" md="6">
-                    <VRow class="text-center pt-2">
-                        <VCol>
-                            <VBtn
-                                @click="show(id)"
-                                icon
-                                variant="text"
-                                color="default"
-                                size="x-small">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Ver
-                                </VTooltip>
-                                <VIcon
-                                    size="28"
-                                    icon="tabler-eye"
-                                    class="me-1"
-                                />
-                            </VBtn>                        
-                        </VCol>
-                        <VCol>
-                            <span v-if="id">
+                    <VCol cols="12" md="7">
+                        <VRow class="text-center pt-2">
+                            <VCol>
                                 <VBtn
-                                    @click="updateLink('archived', id)"
+                                    @click="show(id)"
                                     icon
                                     variant="text"
                                     color="default"
@@ -190,248 +152,253 @@ const updateLink = (text, id) => {
                                         open-on-focus
                                         location="top"
                                         activator="parent">
-                                        Archivar
+                                        Ver
                                     </VTooltip>
+                                    <VIcon
+                                        size="28"
+                                        icon="tabler-eye"
+                                        class="me-1"
+                                    />
+                                </VBtn>                        
+                            </VCol>
+                            <VCol>
+                                <span v-if="id">
+                                    <VBtn
+                                        @click="updateLink('archived', id)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Archivar
+                                        </VTooltip>
+                                        <VIcon
+                                            size="28"
+                                            icon="tabler-building-store"
+                                            class="me-1"
+                                            :color="archived === 1 ? 'warning' : 'default'"
+                                        />
+                                    </VBtn>
+                                </span>
+                                <span v-else>
                                     <VIcon
                                         size="28"
                                         icon="tabler-building-store"
                                         class="me-1"
-                                        :color="archived === 1 ? 'warning' : 'default'"
                                     />
-                                </VBtn>
-                            </span>
-                            <span v-else>
-                                <VIcon
-                                    size="28"
-                                    icon="tabler-building-store"
-                                    class="me-1"
-                                />
-                            </span>
-                        </VCol>
-                        <VCol>
-                            <span v-if="id">
-                                <VBtn
-                                    @click="updateLink('favourite', id)"
-                                    icon
-                                    variant="text"
-                                    color="default"
-                                    size="x-small">
-                                    <VTooltip
-                                        open-on-focus
-                                        location="top"
-                                        activator="parent">
-                                        Favorito
-                                    </VTooltip>
+                                </span>
+                            </VCol>
+                            <VCol>
+                                <span v-if="id">
+                                    <VBtn
+                                        @click="updateLink('favourite', id)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Favorito
+                                        </VTooltip>
+                                        <VIcon
+                                            size="28"
+                                            icon="tabler-star-filled"
+                                            class="me-1"
+                                            :color="favourite === 1 ? 'info' : 'default'"
+                                        />
+                                    </VBtn>
+                                </span>
+                                <span v-else>
                                     <VIcon
                                         size="28"
                                         icon="tabler-star-filled"
                                         class="me-1"
-                                        :color="favourite === 1 ? 'info' : 'default'"
                                     />
-                                </VBtn>
-                            </span>
-                            <span v-else>
-                                <VIcon
-                                    size="28"
-                                    icon="tabler-star-filled"
-                                    class="me-1"
-                                />
-                            </span>
-                        </VCol>
-                        <VCol v-if="discarded !== null">
-                            <span v-if="id">
-                                <VBtn
-                                    @click="updateLink('discarded', id)"
-                                    icon
-                                    variant="text"
-                                    color="default"
-                                    size="x-small">
-                                    <VTooltip
-                                        open-on-focus
-                                        location="top"
-                                        activator="parent">
-                                        Descartar
-                                    </VTooltip>
+                                </span>
+                            </VCol>
+                            <VCol v-if="discarded !== null">
+                                <span v-if="id">
+                                    <VBtn
+                                        @click="updateLink('discarded', id)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Descartar
+                                        </VTooltip>
+                                        <VIcon
+                                            size="28"
+                                            icon="tabler-trash"
+                                            class="me-1"
+                                            :color="discarded === 1 ? 'error' : 'default'"
+                                        />
+                                    </VBtn>
+                                </span>
+                                <span v-else>
                                     <VIcon
                                         size="28"
                                         icon="tabler-trash"
                                         class="me-1"
-                                        :color="discarded === 1 ? 'error' : 'default'"
                                     />
-                                </VBtn>
-                            </span>
+                                </span>
+                            </VCol>
+                        </VRow>
+                        <v-divider></v-divider>
+                    </VCol>
+                    <VCol cols="12" md="5">
+                        <VImg
+                            :height="200"
+                            :src="image"
+                            class="mx-auto"
+                        />
+                    </VCol>
+                    <VCol cols="12" md="7">
+                        <div>Envios: 
+                            <span v-if="selling_price >= 0">{{ selling_price }}</span>
                             <span v-else>
                                 <VIcon
-                                    size="28"
-                                    icon="tabler-trash"
+                                    size="20"
+                                    icon="tabler-alarm-filled"
                                     class="me-1"
                                 />
                             </span>
-                        </VCol>
-                    </VRow>
-                    <v-divider></v-divider>
-                </VCol>
-                <VCol cols="12" md="6">
-                    <VImg
-                        :height="200"
-                        :src="image"
-                        class="mx-auto"
-                    />
-                </VCol>
-                <VCol cols="12" md="6">
-                    <div class="font-weight-semibold">SKU: 
-                        <span>{{ sku }}</span>
-                    </div>
-                    <div>Envios: 
-                        <span v-if="selling_price >= 0">{{ selling_price }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
+                        </div>
+                        <div>Ventas:
+                            <span v-if="sales >= 0">{{ sales }}</span>
+                            <span v-else>
+                                <VIcon
+                                    size="20"
+                                    icon="tabler-alarm-filled"
+                                    class="me-1"
+                                />
+                            </span>
+                        </div>
+                        <div>Comentarios:
+                            <span v-if="comments >= 0">{{ comments }}</span>
+                            <span v-else>
+                                <VIcon
+                                    size="20"
+                                    icon="tabler-alarm-filled"
+                                    class="me-1"
+                                />
+                            </span>
+                        </div>
+                        <div>Favoritos:
+                            <span v-if="favourite >= 0">{{ favourite }}</span>
+                            <span v-else>
+                                <VIcon
+                                    size="20"
+                                    icon="tabler-alarm-filled"
+                                    class="me-1"
+                                />
+                            </span>
+                        </div>  
+                        <div class="d-flex">Valoración:
+                            <VRating
+                                class="ms-1"
+                                v-model="rating"
+                                half-increments
+                                readonly
+                                density="compact"
+                                size="small"
                             />
-                        </span>
-                    </div>
-                    <div>Ventas:
-                        <span v-if="sales >= 0">{{ sales }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                            />
-                        </span>
-                    </div>
-                    <div>Comentarios:
-                        <span v-if="comments >= 0">{{ comments }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                            />
-                        </span>
-                    </div>
-                    <div>Favoritos:
-                        <span v-if="favourite >= 0">{{ favourite }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                            />
-                        </span>
-                    </div>  
-                    <div class="d-flex">Valoración:
-                        <VRating
-                            class="ms-1"
-                            v-model="rating"
-                            half-increments
-                            readonly
-                            density="compact"
-                            size="small"
-                        />
-                    </div>
-                    <div>Likes:
-                        <span v-if="likes >= 0">{{ likes }}</span>
-                        <span v-else>
-                            <VIcon
-                                size="20"
-                                icon="tabler-alarm-filled"
-                                class="me-1"
-                            />
-                        </span>
-                    </div>
-                    <div style="height: 150px;">Categorías:
-                        <span v-for="category in categories">
-                            <VChip
-                                class="me-4"
-                                label
-                                size="x-small"
-                                color="secondary"
-                                >
-                                {{ category }}
-                            </VChip>
-                        </span>
-                    </div>                                  
-                    <VAlert class="text-center mt-5">
-                        <VRow>
-                            <VCol cols="4">
-                                <VBtn
-                                    @click="download(image)"
-                                    icon
-                                    variant="text"
-                                    color="default"
-                                    size="x-small">
-                                    <VTooltip
-                                        open-on-focus
-                                        location="top"
-                                        activator="parent">
-                                        Descargar imagen
-                                    </VTooltip>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-photo"
-                                        class="me-1"
-                                    />
-                                </VBtn>
-                            </VCol>
-                            <VCol cols="4">
-                                <VBtn
-                                    @click="open(originalLink)"
-                                    icon
-                                    variant="text"
-                                    color="default"
-                                    size="x-small">
-                                    <VTooltip
-                                        open-on-focus
-                                        location="top"
-                                        activator="parent">
-                                        Abrir Link
-                                    </VTooltip>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-shopping-cart"
-                                        class="me-1"
-                                    />
-                                </VBtn>
-                            </VCol>
-                            <VCol cols="4">
-                                <VBtn
-                                    @click="copy(originalLink)"
-                                    icon
-                                    variant="text"
-                                    color="default"
-                                    size="x-small">
-                                    <VTooltip
-                                        open-on-focus
-                                        location="top"
-                                        activator="parent">
-                                        Copiar
-                                    </VTooltip>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-layers-subtract"
-                                        class="me-1"
-                                    />
-                                </VBtn>
-                            </VCol>
-                        </VRow>
-                    </VAlert>
-                </VCol>
-                <VCol cols="12" md="6" v-if="is_affiliated">
-                    <VCheckbox
-                        v-model="is_affiliated"
-                        class="checkbox-opacity text-center"
-                        label="Es afiliado"
-                        readonly
-                        />
-                </VCol>
-                <VCol cols="12"  md="12"  sm="12" v-if="message">
-                    <p style="font-weight: bold;">
-                        {{ message }}
-                    </p>
-                </VCol>
+                        </div>
+                        <div>Likes:
+                            <span v-if="likes >= 0">{{ likes }}</span>
+                            <span v-else>
+                                <VIcon
+                                    size="20"
+                                    icon="tabler-alarm-filled"
+                                    class="me-1"
+                                />
+                            </span>
+                        </div>
+                        <div style="height: 150px;">Categorías:
+                            <span v-for="category in categories">
+                                <VChip
+                                    class="me-4"
+                                    label
+                                    size="x-small"
+                                    color="secondary"
+                                    >
+                                    {{ category }}
+                                </VChip>
+                            </span>
+                        </div>                                  
+                        <VAlert class="text-center mt-5">
+                            <VRow>
+                                <VCol cols="4">
+                                    <VBtn
+                                        @click="download(image)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Descargar imagen
+                                        </VTooltip>
+                                        <VIcon
+                                            size="20"
+                                            icon="tabler-photo"
+                                            class="me-1"
+                                        />
+                                    </VBtn>
+                                </VCol>
+                                <VCol cols="4">
+                                    <VBtn
+                                        @click="open(originalLink)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Abrir Link
+                                        </VTooltip>
+                                        <VIcon
+                                            size="20"
+                                            icon="tabler-shopping-cart"
+                                            class="me-1"
+                                        />
+                                    </VBtn>
+                                </VCol>
+                                <VCol cols="4">
+                                    <VBtn
+                                        @click="copy(originalLink)"
+                                        icon
+                                        variant="text"
+                                        color="default"
+                                        size="x-small">
+                                        <VTooltip
+                                            open-on-focus
+                                            location="top"
+                                            activator="parent">
+                                            Copiar
+                                        </VTooltip>
+                                        <VIcon
+                                            size="20"
+                                            icon="tabler-layers-subtract"
+                                            class="me-1"
+                                        />
+                                    </VBtn>
+                                </VCol>
+                            </VRow>
+                        </VAlert>
+                    </VCol>
                 </VRow>
             </VCardText>
         </VCard>      

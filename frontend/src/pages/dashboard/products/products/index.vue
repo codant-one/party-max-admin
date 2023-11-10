@@ -1,5 +1,6 @@
 <script setup>
 
+import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { ref } from "vue"
@@ -23,9 +24,9 @@ const selectedProduct = ref({})
 
 const isProductDetailDialog = ref(false)
 
-const favourite = ref(0)
-const archived = ref(0)
-const discarded = ref(0)
+const favourite = ref(null)
+const archived = ref(null)
+const discarded = ref(null)
 
 const advisor = ref({
   type: '',
@@ -51,8 +52,19 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
+  products.value =  []
+
+  if(favourite.value === 0 && archived.value === 0 && discarded.value === 0) {
+    favourite.value = null
+    archived.value = null
+    discarded.value = null
+  }
+
   let data = {
     search: searchQuery.value,
+    favourite: favourite.value,
+    archived: archived.value,
+    discarded: discarded.value,
     orderByField: 'id',
     orderBy: 'desc',
     limit: rowPerPage.value,
@@ -75,10 +87,8 @@ async function fetchData() {
       archived: element.archived,            
       title: element.name,
       image: element.image,
-      sku: element.sku,
       price:element.price_for_sale,
-      currency: 'COP',
-      originalLink: 'https://dominioreal.com/' + element.slug,
+      originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
       categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
@@ -137,6 +147,24 @@ else if(data.text === 'discarded')
 
 //         closeAdvisor()  
 //     })
+}
+
+const findArchived = () => {
+  archived.value = (archived.value === 1) ? 0 : 1
+  favourite.value = 0
+  discarded.value = 0
+}
+
+const findFavourite = () => {
+  favourite.value = (favourite.value === 1) ? 0 : 1
+  archived.value = 0
+  discarded.value = 0
+}
+
+const findDiscarded = () => {
+    discarded.value = (discarded.value === 1) ? 0 : 1
+    archived.value = 0
+    favourite.value = 0
 }
 
 const closeAdvisor = () => {
