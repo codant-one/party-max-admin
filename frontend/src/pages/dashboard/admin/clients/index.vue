@@ -1,7 +1,6 @@
 <script setup>
 
 import { useClientsStores } from '@/stores/useClients'
-import { ref } from "vue"
 import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewClientDrawer from './AddNewClientDrawer.vue' 
 

@@ -1,7 +1,6 @@
 <script setup>
 
 import { useBrandsStores } from '@/stores/useBrands'
-import { ref } from "vue"
 import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewBrandDrawer from './AddNewBrandDrawer.vue' 
 

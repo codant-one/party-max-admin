@@ -2,7 +2,7 @@
 
 import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { useRoute } from 'vue-router'
-import { ref, onBeforeUnmount } from 'vue';
+import { onBeforeUnmount } from 'vue';
 
 const images = ref([])
 const imageZoom = ref(null)

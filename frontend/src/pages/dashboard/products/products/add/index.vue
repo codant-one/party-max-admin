@@ -5,11 +5,10 @@ import {
   useObjectUrl,
 } from '@vueuse/core'
 
-import { ref } from 'vue'
 import { useColorsStores } from '@/stores/useColors'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { useTagsStores } from '@/stores/useTags'
-import tags from '@/api/tags'
+
 
 const optionCounter = ref(1)
 const dropZoneRef = ref()

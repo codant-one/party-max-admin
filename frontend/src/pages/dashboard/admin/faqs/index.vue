@@ -1,7 +1,6 @@
 <script setup>
 
 import { useFaqsStores } from '@/stores/useFaqs'
-import { ref } from "vue"
 import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewFaqDrawer from './AddNewFaqDrawer.vue' 
 
