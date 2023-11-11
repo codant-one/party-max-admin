@@ -52,7 +52,7 @@ const categories = ref([])
 
 const stockStatus = ref([
   {
-    title: 'In Stock',
+    title: 'En Stock',
     value: 1
   },
   {

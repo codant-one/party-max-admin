@@ -107,6 +107,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Products
     Route::group(['prefix' => 'products'], function () {
         Route::post('delete', [ProductController::class, 'delete']);
+        Route::post('upload-image', [ProductController::class, 'uploadImage']);
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
     });
 

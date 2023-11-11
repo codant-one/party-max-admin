@@ -236,4 +236,31 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    public function uploadImage(Request $request): JsonResponse 
+    {
+        try {
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'products/';
+
+                $file_data = uploadFile($image, $path);
+
+                return response()->json([
+                    'success' => true,
+                    'url' => $file_data['filePath']
+                ], 200);
+            }
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
+    }
 }
