@@ -4,12 +4,29 @@ import {
   useFileDialog,
   useObjectUrl,
 } from '@vueuse/core'
+
 import { ref } from 'vue'
+import { useColorsStores } from '@/stores/useColors'
+import { useCategoriesStores } from '@/stores/useCategories'
+import { useTagsStores } from '@/stores/useTags'
+import tags from '@/api/tags'
 
 const optionCounter = ref(1)
 const dropZoneRef = ref()
 const fileData = ref([])
+
 const { open, onChange } = useFileDialog({ accept: 'image/*' })
+
+
+
+const colorsStores = useColorsStores()
+const categoriesStores = useCategoriesStores()
+const tagsStores = useTagsStores() 
+
+const categories = ref([])
+const listColors = ref([])
+const listtags = ref([])
+
 function onDrop(DroppedFiles) {
   DroppedFiles?.forEach(file => {
     if (file.type.slice(0, 6) !== 'image/') {
@@ -87,6 +104,21 @@ const inventoryTabsData = [
     value: '4',
   },
 ]
+
+watchEffect(fetchData)
+async function fetchData() {
+
+  let data = { limit: -1 }
+
+await colorsStores.fetchColors();
+await categoriesStores.fetchCategoriesOrder(data)
+
+listColors.value = colorsStores.getColors
+categories.value = categoriesStores.getCategories
+listtags.value = tagsStores.getTags
+
+console.log(listtags.value)
+}
 </script>
 
 <template>
@@ -129,24 +161,72 @@ const inventoryTabsData = [
               </VCol>
               <VCol
                 cols="12"
-                md="6"
+                md="3"
               >
                 <AppTextField
-                  label="SKU"
-                  placeholder="FXSK123U"
+                  label="Alto"
+                  placeholder="Alto"
                 />
               </VCol>
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <AppTextField
+                  label="Ancho"
+                  placeholder="Ancho"
+                />
+              </VCol>
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <AppTextField
+                  label="Peso"
+                  placeholder="Peso"
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="3"
+              >
+                <AppTextField
+                  label="Profundo"
+                  placeholder="Profundo"
+                />
+              </VCol>
+
               <VCol
                 cols="12"
                 md="6"
               >
                 <AppTextField
-                  label="Barcode"
-                  placeholder="0123-4567"
+                  label="Material"
+                  placeholder="Material"
                 />
               </VCol>
-              <VCol>
-                <span class="mb-1">Description (optional)</span>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  label="Tiempo de entregada"
+                  placeholder="Tiempo estimado de entrega"
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <span class="mb-1">Description (simple)</span>
+                <TiptapEditor
+                  v-model="content"
+                  placeholder="Product Description"
+                  class="border rounded"
+                />
+              </VCol>
+              <VCol cols="12">
+                <span class="mb-1">Description (detallada)</span>
                 <TiptapEditor
                   v-model="content"
                   placeholder="Product Description"
@@ -264,22 +344,36 @@ const inventoryTabsData = [
               :key="i"
             >
               <VRow>
+                
                 <VCol
                   cols="12"
-                  md="4"
+                  md="3"
                 >
                   <AppSelect
-                    :items="['Size', 'Color', 'Weight', 'Smell']"
-                    placeholder="Select Variant"
+                    :items="listColors"
+                    item-value="id"
+                    item-title="name"
+                    placeholder="Color"
                   />
                 </VCol>
                 <VCol
                   cols="12"
-                  md="8"
+                  md="3"
                 >
                   <AppTextField
-                    placeholder="38"
+                    placeholder="SKU"
                     type="number"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppSelect
+                    :items="categories"
+                    item-value="id"
+                    item-title="name"
+                    placeholder="Categoría"
                   />
                 </VCol>
               </VRow>
@@ -295,252 +389,7 @@ const inventoryTabsData = [
         </VCard>
 
         <!-- 👉 Inventory -->
-        <VCard
-          title="Inventory"
-          class="inventory-card"
-        >
-          <VCardText>
-            <VRow>
-              <VCol
-                cols="12"
-                md="4"
-              >
-                <div class="pe-3"> {{activeTab  }}
-                  <VTabs
-                    v-model="activeTab"
-                    direction="vertical"
-                    color="primary"
-                    class="v-tabs-pill"
-                  >
-                    <VTab
-                      v-for="(tab, index) in inventoryTabsData"
-                      :key="index"
-                    >
-                      <VIcon
-                        :icon="tab.icon"
-                        class="me-2"
-                      />
-                      <div class="text-truncate font-weight-medium text-start">
-                        {{ tab.title }}
-                      </div>
-                    </VTab>
-                  </VTabs>
-                </div>
-              </VCol>
-
-              <VDivider :vertical="!$vuetify.display.smAndDown" />
-
-              <VCol
-                cols="12"
-                md="8"
-              >
-                <VWindow
-                  v-model="activeTab"
-                  class="w-100"
-                  :touch="false"
-                >
-                  <VWindowItem value="0">
-                    <div class="d-flex flex-column gap-y-4 ps-3">
-                      <h5 class="text-h5">
-                        Options
-                      </h5>
-
-                      <div class="d-flex gap-x-4 align-center">
-                        <AppTextField
-                          label="Add to Stock"
-                          placeholder="Quantity"
-                          density="compact"
-                        />
-                        <VBtn
-                          prepend-icon="tabler-check"
-                          class="align-self-end"
-                        >
-                          Confirm
-                        </VBtn>
-                      </div>
-
-                      <div>
-                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
-                          Product in stock now: 54
-                        </div>
-                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
-                          Product in transit: 390
-                        </div>
-                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
-                          Last time restocked: 24th June, 2022
-                        </div>
-                        <div class="text-base text-high-emphasis font-weight-medium mb-1">
-                          Total stock over lifetime: 2,430
-                        </div>
-                      </div>
-                    </div>
-                  </VWindowItem>
-
-                  <VWindowItem value="1">
-                    <VRadioGroup
-                      v-model="shippingType"
-                      label="Shipping Type"
-                      class="ms-3"
-                    >
-                      <VRadio
-                        v-for="item in shippingList"
-                        :key="item.value"
-                        :value="item.value"
-                        class="mb-4"
-                      >
-                        <template #label>
-                          <div>
-                            <div class="text-high-emphasis font-weight-medium mb-1">
-                              {{ item.title }}
-                            </div>
-                            <div class="text-sm">
-                              {{ item.desc }}
-                            </div>
-                          </div>
-                        </template>
-                      </VRadio>
-                    </VRadioGroup>
-                  </VWindowItem>
-
-                  <VWindowItem value="Global Delivery">
-                    <div class="ps-3">
-                      <h5 class="text-h5 mb-6">
-                        Global Delivery
-                      </h5>
-
-                      <VRadioGroup
-                        v-model="deliveryType"
-                        label="Global Delivery"
-                        class="ms-3"
-                      >
-                        <VRadio
-                          value="Worldwide delivery"
-                          class="mb-4"
-                        >
-                          <template #label>
-                            <div>
-                              <div class="text-high-emphasis font-weight-medium mb-1">
-                                Worldwide delivery
-                              </div>
-                              <div class="text-sm">
-                                Only available with Shipping method:
-                                <span class="text-primary">
-                                  Fulfilled by Company name
-                                </span>
-                              </div>
-                            </div>
-                          </template>
-                        </VRadio>
-
-                        <VRadio
-                          value="Selected Countries"
-                          class="mb-4"
-                        >
-                          <template #label>
-                            <div>
-                              <div class="text-high-emphasis font-weight-medium mb-1">
-                                Selected Countries
-                              </div>
-                              <VTextField
-                                placeholder="USA"
-                                density="compact"
-                                style="min-inline-size: 200px;"
-                              />
-                            </div>
-                          </template>
-                        </VRadio>
-
-                        <VRadio>
-                          <template #label>
-                            <div>
-                              <div class="text-high-emphasis font-weight-medium mb-1">
-                                Local delivery
-                              </div>
-                              <div class="text-sm">
-                                Deliver to your country of residence
-                                <span class="text-primary">
-                                  Change profile address
-                                </span>
-                              </div>
-                            </div>
-                          </template>
-                        </VRadio>
-                      </VRadioGroup>
-                    </div>
-                  </VWindowItem>
-
-                  <VWindowItem value="Attributes">
-                    <div class="mb-6 text-h6">
-                      Attributes
-                    </div>
-                    <div>
-                      <VCheckbox
-                        v-model="selectedAttrs"
-                        label="Fragile Product"
-                        value="Fragile Product"
-                      />
-                      <VCheckbox
-                        v-model="selectedAttrs"
-                        value="Biodegradable"
-                        label="Biodegradable"
-                      />
-                      <VCheckbox
-                        v-model="selectedAttrs"
-                        value="Frozen Product"
-                      >
-                        <template #label>
-                          <div class="d-flex flex-column mb-1">
-                            <div>Frozen Product</div>
-                            <VTextField
-                              placeholder="40 C"
-                              type="number"
-                              style="min-inline-size: 250px;"
-                            />
-                          </div>
-                        </template>
-                      </VCheckbox>
-
-                      <VCheckbox
-                        v-model="selectedAttrs"
-                        value="Expiry Date"
-                      >
-                        <template #label>
-                          <div class="d-flex flex-column mb-1">
-                            <div>Expiry Date of Product</div>
-                            <AppDateTimePicker
-                              model-value="2025-06-14"
-                              placeholder="Select a Date"
-                              density="compact"
-                            />
-                          </div>
-                        </template>
-                      </VCheckbox>
-                    </div>
-                  </VWindowItem>
-
-                  <VWindowItem value="Advanced">
-                    <div class="ps-3">
-                      <h5 class="text-h5 mb-6">
-                        Advanced
-                      </h5>
-                      <div class="d-flex flex-sm-row flex-column flex-wrap justify-space-between gap-x-6 gap-y-4">
-                        <AppSelect
-                          label="Product ID Type"
-                          placeholder="Select Product Type"
-                          :items="['ISBN', 'UPC', 'EAN', 'JAN']"
-                        />
-                        <AppTextField
-                          label="Product Id"
-                          placeholder="100023"
-                        />
-                      </div>
-                    </div>
-                  </VWindowItem>
-                </VWindow>
-              </VCol>
-            </VRow>
-          </VCardText>
-        </VCard>
+        
       </VCol>
 
       <VCol
@@ -549,75 +398,70 @@ const inventoryTabsData = [
       >
         <!-- 👉 Pricing -->
         <VCard
-          title="Pricing"
+          title="Precios"
           class="mb-6"
         >
           <VCardText>
             <AppTextField
-              label="Best Price"
-              placeholder="Price"
+              label="Costo"
+              placeholder="Costo"
               class="mb-6"
             />
             <AppTextField
-              label="Discounted Price"
-              placeholder="$499"
+              label="Precio al detal"
+              placeholder="Precio por unidad"
               class="mb-4"
             />
 
+            <AppTextField
+              label="Precio por mayor"
+              placeholder="Precio por mayor"
+              class="mb-4"
+            />
+
+            <AppTextField
+              label="Stock"
+              placeholder="Stock"
+              class="mb-4"
+            />
+            <!--
             <VCheckbox
               v-model="isTaxChargeToProduct"
               label="Charge Tax on this product"
             />
-
+              -->
             <VDivider class="my-2" />
 
-            <div class="d-flex flex-raw align-center justify-space-between ">
+            <!--<div class="d-flex flex-raw align-center justify-space-between ">
               <span>In stock</span>
               <VSwitch density="compact" />
-            </div>
+            </div>-->
           </VCardText>
         </VCard>
 
         <!-- 👉 Organize -->
-        <VCard title="Organize">
+        <VCard title="Detalles">
           <VCardText>
             <div class="d-flex flex-column gap-y-4">
               <AppSelect
-                placeholder="Select Vendor"
-                label="Vendor"
-                :items="['Men\'s Clothing', 'Women\'s Clothing', 'Kid\'s Clothing']"
+                placeholder="Marca"
+                label="Marca"
+                :items="['Apple', 'Samsung', 'Google']"
               />
-              <div>
-                <VLabel class="d-flex">
-                  <div class="d-flex text-sm justify-space-between w-100">
-                    <div class="text-high-emphasis">
-                      Category
-                    </div>
-                    <div class="text-primary cursor-pointer">
-                      Add new category
-                    </div>
-                  </div>
-                </VLabel>
-
-                <AppSelect
-                  placeholder="Select Category"
-                  :items="['Household', 'Office', 'Electronics', 'Management', 'Automotive']"
-                />
-              </div>
+              
               <AppSelect
-                placeholder="Select Collection"
-                label="Collection"
-                :items="['Men\'s Clothing', 'Women\'s Clothing', 'Kid\'s Clothing']"
-              />
-              <AppSelect
-                placeholder="Select Status"
-                label="Status"
-                :items="['Published', 'Inactive', 'Scheduled']"
-              />
-              <AppTextField
+                placeholder="Tags"
                 label="Tags"
-                placeholder="Fashion, Trending, Summer"
+                :items="listtags"
+                item-value="id"
+                item-title="name"
               />
+              <AppSelect
+                placeholder="Estado"
+                label="Seleccione estado"
+                :items="['Públicado', 'Eliminado', 'Pendiente']"
+              />
+              
             </div>
           </VCardText>
         </VCard>
