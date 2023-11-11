@@ -4,7 +4,6 @@ import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
-import { ref } from "vue"
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import detailsProduct from "@/components/products/detailsProduct.vue";

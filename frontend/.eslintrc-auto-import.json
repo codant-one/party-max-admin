@@ -316,10 +316,10 @@
     "useAnimate": true,
     "useArrayDifference": true,
     "useArrayIncludes": true,
-    "useClipboardItems": true,
     "useParentElement": true,
     "usePerformanceObserver": true,
     "watchDeep": true,
-    "watchImmediate": true
+    "watchImmediate": true,
+    "useClipboardItems": true
   }
 }

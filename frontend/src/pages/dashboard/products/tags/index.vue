@@ -1,7 +1,6 @@
 <script setup>
 
 import { useTagsStores } from '@/stores/useTags'
-import { ref } from "vue"
 import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewTagDrawer from './AddNewTagDrawer.vue' 
 

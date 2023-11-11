@@ -4,7 +4,6 @@ import {
   useFileDialog,
   useObjectUrl,
 } from '@vueuse/core'
-import { ref } from 'vue'
 
 const optionCounter = ref(1)
 const dropZoneRef = ref()

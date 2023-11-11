@@ -1,7 +1,6 @@
 <script setup>
 
 import { useCategoriesStores } from '@/stores/useCategories'
-import { ref } from "vue"
 import { themeConfig } from '@themeConfig'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
