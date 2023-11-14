@@ -1,26 +1,28 @@
 <script setup>
 
+import { inject } from "vue"
 import { themeConfig } from '@themeConfig'
 import { requiredValidator } from '@validators'
-import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
+import { useProductsStores } from '@/stores/useProducts'
 import { useColorsStores } from '@/stores/useColors'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { useBrandsStores } from '@/stores/useBrands'
 import { useTagsStores } from '@/stores/useTags'
 import { QuillEditor } from '@vueup/vue-quill'
 import ImageUploader from 'quill-image-uploader'
+import FileInput from "@/components/common/FileInput.vue";
+import router from '@/router'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
-const { open, onChange } = useFileDialog({ accept: 'image/*' })
-
+const productsStores = useProductsStores()
 const colorsStores = useColorsStores()
 const categoriesStores = useCategoriesStores()
 const brandsStores = useBrandsStores() 
 const tagsStores = useTagsStores() 
 
+const emitter = inject("emitter")
+
 const optionCounter = ref(1)
-const dropZoneRef = ref()
-const fileData = ref([])
 
 const categories = ref([])
 const listColors = ref([])
@@ -31,12 +33,15 @@ const isValid =  ref(null)
 const isFormValid = ref(false)
 const refForm = ref()
 
-const category_id = ref()
+const tag_id = ref()
+const color_id = ref([])
+const category_id = ref([])
+const sku = ref([])
+const product_files = ref([])
 const brand_id = ref()
 const name = ref(null)
-const single_description = ref('')
-const description = ref('')
-const sku = ref('')
+const single_description = ref(' ')
+const description = ref(' ')
 const price = ref('')
 const price_for_sale = ref('')
 const wholesale_price = ref('')
@@ -76,33 +81,6 @@ const modules = {
   },
 }
 
-
-function onDrop(DroppedFiles) {
-  DroppedFiles?.forEach(file => {
-    if (file.type.slice(0, 6) !== 'image/') {
-      alert('Only image files are allowed')
-      
-      return
-    }
-    fileData.value.push({
-      file,
-      url: useObjectUrl(file).value ?? '',
-    })
-  })
-}
-
-onChange(selectedFiles => {
-  if (!selectedFiles)
-    return
-  for (const file of selectedFiles) {
-    fileData.value.push({
-      file,
-      url: useObjectUrl(file).value ?? '',
-    })
-  }
-})
-
-useDropZone(dropZoneRef, onDrop)
 
 watchEffect(fetchData)
   async function fetchData() {
@@ -188,75 +166,93 @@ const blobToBase64 = blob => {
   })
 }
 
-const closeDropdown = () => { 
-  document.getElementById("selectCategory").blur()
+const closeDropdown = (i) => { 
+  document.getElementById("selectCategory_"+i).blur()
+}
+
+const getFiles = (files, i) => {
+  product_files.value[i-1] = files    
+  
 }
 
 const onSubmit = () => {
 
-refForm.value?.validate().then(({ valid }) => {
-    isValid.value = valid
-    // if (valid) {
-    //     error.value = undefined
+  refForm.value?.validate().then(({ valid }) => {
+      isValid.value = valid
+      if (valid) {
 
-    //     let formData = new FormData()
+          let formData = new FormData()
 
-    //     formData.append('name', name.value)
-    //     formData.append('description', description.value)
-    //     formData.append('sku', sku.value)
-    //     formData.append('price', price.value)
-    //     formData.append('price_for_sale', price_for_sale.value)
-    //     formData.append('stock', stock.value)
-    //     formData.append('image', image.value)
-    //     formData.append('category_id', category_id.value)
-    //     formData.append('width', width.value)
-    //     formData.append('height', height.value)
-    //     formData.append('deep', deep.value)
-    //     formData.append('weigth', weigth.value)
-    //     formData.append('colors', JSON.stringify(colors.value))
-    //     formData.append('gallery[]', colors.value[0].gallery)
+          //product
+          formData.append('brand_id', brand_id.value)
+          formData.append('name', name.value)
+          formData.append('single_description', single_description.value)
+          formData.append('description', description.value)
+          formData.append('price', price.value)
+          formData.append('price_for_sale', price_for_sale.value)
+          formData.append('wholesale_price', wholesale_price.value)
+          formData.append('stock', stock.value)
+          formData.append('image', image.value)
 
-    //     colors.value.forEach(function callback(value, index) {
-    //         colors.value[index].gallery.forEach(function callback(value, i) {
-    //             formData.append('color_'+colors.value[index]['color_id']+'[]', colors.value[index].gallery[i])
-    //         });
-    //     });
+          //product_details
+          formData.append('width', width.value)
+          formData.append('height', height.value)
+          formData.append('deep', deep.value)
+          formData.append('weigth', weigth.value)
+          formData.append('material', material.value)
 
-    //     productsStores.addProduct(formData)
-    //         .then((res) => {
-    //         if (res.data.success) {
+          //product_tags
+          formData.append('tag_id', tag_id.value)
 
-    //             let data = {
-    //                 message: 'Producto Creado!',
-    //                 error: false
-    //             }
+          //product_categories
+          formData.append('category_id', JSON.stringify(category_id.value))
 
-    //             router.push({ name : 'dashboard-products-products'})
-    //             emitter.emit('toast', data)
+          //product_images
+          formData.append('color_id', color_id.value)
+          formData.append('sku', sku.value)
+          formData.append('product_files', product_files.value)
 
-    //         } else {
+          product_files.value.forEach(function callback(value, index) {
+            value.forEach(function callback(image, i) {
+              formData.append('images_'+index+'[]', image.blob)
+            });
+          });
 
-    //             let data = {
-    //                 message: 'ERROR',
-    //                 error: true
-    //             }
+          productsStores.addProduct(formData)
+            .then((res) => {
+              if (res.data.success) {
 
-    //             router.push({ name : 'dashboard-products-products'})
-    //             emitter.emit('toast', data)
-    //         }
-    //         })
-    //         .catch((err) => {
-    //             let data = {
-    //                 message: err,
-    //                 error: true
-    //             }
+                  let data = {
+                      message: 'Producto Creado!',
+                      error: false
+                  }
 
-    //             router.push({ name : 'dashboard-products-products'})
-    //             emitter.emit('toast', data)
-    //         })
+                  router.push({ name : 'dashboard-products-products'})
+                  emitter.emit('toast', data)
 
-    // }
-})
+              } else {
+
+                  let data = {
+                      message: 'ERROR',
+                      error: true
+                  }
+
+                  router.push({ name : 'dashboard-products-products'})
+                  emitter.emit('toast', data)
+              }
+            })
+            .catch((err) => {
+                  let data = {
+                      message: err,
+                      error: true
+                  }
+
+                  router.push({ name : 'dashboard-products-products'})
+                  emitter.emit('toast', data)
+            })
+
+      }
+  })
 }
 </script>
 
@@ -326,30 +322,6 @@ refForm.value?.validate().then(({ valid }) => {
                     :rules="[requiredValidator]"
                   />
               </VCol>
-
-              <VCol cols="12">
-                <span class="mb-1">Imagen</span>
-                <VImg
-                  v-if="avatar !== null"
-                  :src="avatar"
-                  :height="200"
-                  aspect-ratio="16/9"
-                  class="border-img"
-                  :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
-                />
-              </VCol>
-              <VCol cols="12">
-                <VFileInput
-                  v-model="filename"
-                  label="Imagen"
-                  class="mb-2"
-                  accept="image/png, image/jpeg, image/bmp"
-                  prepend-icon="tabler-camera"
-                  @change="onImageSelected"
-                  @click:clear="avatar = null"
-                  :rules="[requiredValidator]"
-                 />
-              </VCol>
             </VRow>
           </VCardText>
         </VCard>
@@ -370,6 +342,7 @@ refForm.value?.validate().then(({ valid }) => {
                   md="3"
                 >
                 <VSelect
+                  v-model="color_id[i-1]"
                   label="Colores"
                   :items="listColors"
                   item-value="id"
@@ -377,6 +350,7 @@ refForm.value?.validate().then(({ valid }) => {
                   clearable
                   clear-icon="tabler-x"
                   no-data-text="No disponible"
+                  :rules="[requiredValidator]"
                  />
                 </VCol>
                 <VCol
@@ -384,8 +358,9 @@ refForm.value?.validate().then(({ valid }) => {
                   md="3"
                 >
                   <AppTextField
+                    v-model="sku[i-1]"
                     placeholder="SKU"
-                    type="number"
+                    :rules="[requiredValidator]"
                   />
                 </VCol>
                 <VCol
@@ -393,8 +368,8 @@ refForm.value?.validate().then(({ valid }) => {
                   md="6"
                 >
                   <VAutocomplete
-                    id="selectCategory"
-                    v-model="category_id"
+                    :id="'selectCategory_' + i"
+                    v-model="category_id[i-1]"
                     label="Categorías:"
                     autocomplete="off"
                     multiple
@@ -403,6 +378,17 @@ refForm.value?.validate().then(({ valid }) => {
                     :item-value="item => item.id"
                     :rules="[requiredValidator]"
                     :menu-props="{ maxHeight: '300px' }">
+                    <template v-slot:selection="{ item, index }">
+                      <v-chip v-if="index < 2">
+                        <span>{{ item.title }}</span>
+                      </v-chip>
+                      <span
+                        v-if="index === 2"
+                        class="text-grey text-caption align-self-center"
+                      >
+                        (+{{ category_id[i-1].length - 2 }} otros)
+                      </span>
+                    </template>
                     <template v-slot:item="{ props, item }">
                       <v-list-item
                         v-bind="props"
@@ -428,99 +414,15 @@ refForm.value?.validate().then(({ valid }) => {
                             icon="tabler-x"
                             color="black"
                             :ripple="false"
-                            @click="closeDropdown"/>
+                            @click="closeDropdown(i)"/>
                         </template>
                       </v-list-item>
                     </template>
                   </VAutocomplete>
                 </VCol>
                 <VCol cols="12">
-                  <VCard class="mb-6">
-                    <VCardItem>
-                      <template #title>
-                        Galería
-                      </template>
-                    </VCardItem>
-
-                    <VCardText>
-                      <div class="flex">
-                        <div class="w-full h-auto relative">
-                          <div
-                            ref="dropZoneRef"
-                            class="cursor-pointer"
-                            @click="() => open()"
-                          >
-                            <div
-                              v-if="fileData.length === 0"
-                              class="d-flex flex-column justify-center align-center gap-y-3 px-6 py-10 border-dashed drop-zone"
-                            >
-                              <VBtn
-                                variant="tonal"
-                                class="rounded-sm"
-                              >
-                                <VIcon icon="tabler-upload" />
-                              </VBtn>
-                              <div class="text-base text-high-emphasis font-weight-medium">
-                                Arrastra y suelta tu imagen aquí.
-                              </div>
-                            </div>
-
-                            <div
-                              v-else
-                              class="d-flex justify-center align-center gap-3 pa-8 border-dashed drop-zone flex-wrap"
-                            >
-                              <VRow class="match-height w-100">
-                                <template
-                                  v-for="(item, index) in fileData"
-                                  :key="index"
-                                >
-                                  <VCol
-                                    cols="12"
-                                    sm="4"
-                                  >
-                                    <VCard
-                                      :ripple="false"
-                                      border
-                                    >
-                                      <VCardText
-                                        class="d-flex flex-column"
-                                        @click.stop
-                                      >
-                                        <VImg
-                                          :src="item.url"
-                                          width="200px"
-                                          height="150px"
-                                          class="w-100 mx-auto"
-                                        />
-                                        <div class="mt-2">
-                                          <span class="clamp-text text-wrap">
-                                            {{ item.file.name }}
-                                          </span>
-                                          <span>
-                                            {{ item.file.size / 1000 }} KB
-                                          </span>
-                                        </div>
-                                      </VCardText>
-                                      <VSpacer />
-                                      <VCardActions>
-                                        <VBtn
-                                          variant="outlined"
-                                          block
-                                          @click.stop="fileData.splice(index, 1)"
-                                        >
-                                          Remove File
-                                        </VBtn>
-                                      </VCardActions>
-                                    </VCard>
-                                  </VCol>
-                                </template>
-                              </VRow>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </VCardText>
-                  </VCard>
+                  <FileInput 
+                    @files="getFiles($event, i)"/>
                 </VCol>
               </VRow>
             </template>
@@ -540,6 +442,34 @@ refForm.value?.validate().then(({ valid }) => {
         md="4"
         cols="12"
       >
+
+        <VCard
+          title="Imagen Principal"
+          class="mb-6"
+        >
+          <VCardText>
+            <VImg
+              v-if="avatar !== null"
+              :src="avatar"
+              :height="200"
+              aspect-ratio="16/9"
+              class="border-img mb-2"
+              :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+            />
+
+            <VFileInput
+              v-model="filename"
+              label="Imagen"
+              class="mb-2"
+              accept="image/png, image/jpeg, image/bmp"
+              prepend-icon="tabler-camera"
+              @change="onImageSelected"
+              @click:clear="avatar = null"
+              :rules="[requiredValidator]"
+            />
+          </VCardText>
+        </VCard>
+
         <VCard
           title="Precios"
           class="mb-6"
@@ -597,6 +527,7 @@ refForm.value?.validate().then(({ valid }) => {
               />
 
               <AppSelect
+                v-model="tag_id"
                 chips
                 multiple
                 closable-chips
@@ -647,13 +578,11 @@ refForm.value?.validate().then(({ valid }) => {
               />
               
               <AppTextField
+                readonly
                 v-model="estimated_delivery_time"
                 label="Tiempo de entregada"
                 placeholder="Tiempo estimado de entrega"
-                :rules="[requiredValidator]"
               />
-              
-              
             </div>
           </VCardText>
         </VCard>
@@ -661,13 +590,6 @@ refForm.value?.validate().then(({ valid }) => {
     </VRow>
   </VForm>
 </template>
-
-<style lang="scss" scoped>
-  .drop-zone {
-    border: 2px dashed rgba(var(--v-theme-on-surface), 0.12);
-    border-radius: 6px;
-  }
-</style>
 
 <style lang="scss">
   .inventory-card{

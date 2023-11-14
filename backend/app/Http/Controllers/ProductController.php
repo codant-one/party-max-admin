@@ -31,7 +31,7 @@ class ProductController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Product::with(['images.categories.category', 'detail', 'user', 'state'])
+            $query = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])
                             ->favorites()
                             ->applyFilters(
                                 $request->only([
@@ -74,6 +74,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         try {
+
             $product = Product::createProduct($request);
 
             if ($request->hasFile('image')) {
@@ -111,7 +112,7 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($id);
+            $product = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])->find($id);
 
             if (!$product)
                 return response()->json([
@@ -143,7 +144,7 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($product->id);
+            $product = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])->find($product->id);
 
             if (!$product)
                 return response()->json([

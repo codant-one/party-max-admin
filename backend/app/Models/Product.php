@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
 use App\Models\ProductImage;
+use App\Models\ProductColor;
+use App\Models\ProductTag;
 use App\Models\User;
 use App\Models\State;
 
@@ -23,6 +25,11 @@ class Product extends Model
     public function detail()
     {
         return $this->hasOne(ProductDetail::class, 'product_id');
+    }
+
+    public function colors()
+    {
+        return $this->hasMany(ProductColor::class, 'product_id');
     }
 
     public function images()
@@ -118,10 +125,12 @@ class Product extends Model
     }
 
     /**** Public methods ****/
-    public static function createProductCategories($product_id, $request) {
-        foreach(explode(",", $request->category_id) as $category_id){
+    public static function createProductCategories($product_color_id, $key, $request) {
+        $categories = json_decode($request->category_id, true);
+
+        foreach($categories[$key] as $category_id) {
             ProductCategory::create([
-                'product_id' => $product_id,
+                'product_color_id' => $product_color_id,
                 'category_id' => $category_id
             ]);
         }
@@ -144,8 +153,18 @@ class Product extends Model
             'width' => $request->width,
             'height' => $request->height,
             'deep' => $request->deep,
-            'weigth' => $request->weigth
+            'weigth' => $request->weigth,
+            'material' => $request->material
         ]);
+    }
+
+    public static function createProductTags($product_id, $request) {
+        foreach(explode(",", $request->tag_id) as $tag_id) {
+            ProductTag::create([
+                'product_id' => $product_id,
+                'tag_id' => $tag_id
+            ]);
+        }
     }
 
     public static function updateProductDetails($product_id, $request) {
@@ -157,11 +176,25 @@ class Product extends Model
         $product_details->save();
     }
 
-    public static function createProductImages($product_id, $request) {
-        foreach(json_decode($request->colors, true) as $color) {
-            if ($request->hasFile('color_'.$color['color_id'])) {
-                $images = $request->file('color_'.$color['color_id']);
-        
+    public static function createProductColors($product_id, $request) {
+        foreach(explode(",", $request->color_id) as $key => $color) {
+            
+            $product_color = ProductColor::create([
+                'product_id' => $product_id,
+                'color_id' => $color,
+                'sku' => explode(",", $request->sku)[$key]
+            ]);
+
+            self::createProductImages($product_color->id, $request);
+            self::createProductCategories($product_color->id, $key, $request);
+        }
+    }
+
+    public static function createProductImages($product_color_id, $request) {
+        foreach(explode(",", $request->color_id) as $key => $color) {
+            if ($request->hasFile('images_'.$key)) {
+                $images = $request->file('images_'.$key);
+                
                 foreach ($images as $image) {
 
                     $path = 'products/gallery/';
@@ -169,8 +202,7 @@ class Product extends Model
                     $file_data = uploadFile($image, $path);
 
                     $product_image = ProductImage::create([
-                        'product_id' => $product_id,
-                        'color_id' => $color['color_id'],
+                        'product_color_id' => $product_color_id,
                         'image' => $file_data['filePath']
                     ]);
                 }
@@ -214,18 +246,21 @@ class Product extends Model
     public static function createProduct($request) {
  
         $product = self::create([
+            'brand_id' => $request->brand_id,
+            'state_id' => 3,
             'name' => $request->name,
+            'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
-            'sku' => $request->sku,
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
+            'wholesale_price' => $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
 
-        self::createProductCategories($product->id, $request);
         self::createProductDetails($product->id, $request);
-        self::createProductImages($product->id, $request);
+        self::createProductTags($product->id, $request);
+        self::createProductColors($product->id, $request);
 
         return $product;
     }

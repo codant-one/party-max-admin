@@ -131,7 +131,7 @@ async function fetchData() {
       image: element.image,
       price: element.price_for_sale,
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.images[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+      categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
