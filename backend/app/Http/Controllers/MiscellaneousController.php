@@ -20,8 +20,8 @@ class MiscellaneousController extends Controller
                                 ->first();
     
             $products = Product::with(['user'])
-                               ->join('product_images', 'products.id', '=', 'product_images.product_id')
-                               ->join('product_categories', 'product_images.id', '=', 'product_categories.product_image_id')
+                               ->join('product_colors', 'products.id', '=', 'product_colors.product_id')
+                               ->join('product_categories', 'product_colors.id', '=', 'product_categories.product_color_id')
                                ->where('product_categories.category_id', $category->id)
                                ->orderBy('products.created_at', 'desc')
                                ->limit(5)
