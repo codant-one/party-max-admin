@@ -76,7 +76,7 @@ class Product extends Model
     }
 
     public function scopeWhereCategory($query, $search) {
-        $query->whereHas('images.categories', function ($q) use ($search) {
+        $query->whereHas('colors.categories', function ($q) use ($search) {
             $q->where('category_id', $search);
         });
     }
