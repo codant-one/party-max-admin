@@ -51,7 +51,8 @@ class ProductController extends Controller
                                 'in_stock',
                                 'category_id'
                             ])
-                        );
+                        )
+                        ->withTrashed();
 
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             

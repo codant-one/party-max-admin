@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
@@ -18,6 +19,7 @@ use App\Models\State;
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -287,7 +289,9 @@ class Product extends Model
  
     public static function deleteProducts($ids) {
         foreach ($ids as $id) {
-            $categproductory = self::with(['children.children'])->find($id);
+            $product = self::find($id);
+            $product->state_id = 5;
+            $product->update();
             $product->delete();
         }
     }

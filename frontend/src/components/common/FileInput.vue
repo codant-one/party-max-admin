@@ -43,10 +43,10 @@ onChange(selectedFiles => {
 
 watchEffect(() => {
 
-    // if (!(Object.entries(props.images).length === 0) && props.images.constructor === Object) {
+    if (typeof props.images !== 'undefined') {
         fileData.value = props.images
         emit('files', fileData.value)
-    // }
+    }
 })
 
 
