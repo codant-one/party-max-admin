@@ -138,8 +138,8 @@ class Category extends Model
                      $q->selectRaw('SUM(CAST(p.price_for_sale AS DECIMAL(10, 2)))')
                      ->from('categories as c')
                      ->leftJoin('product_categories as pc', 'c.id', '=', 'pc.category_id')
-                     ->leftJoin('product_images as pi', 'pi.id', '=', 'pc.product_image_id')
-                     ->leftJoin('products as p', 'pi.product_id', '=', 'p.id')
+                     ->leftJoin('product_colors as pco', 'pco.id', '=', 'pc.product_color_id')
+                     ->leftJoin('products as p', 'pco.product_id', '=', 'p.id')
                      ->whereColumn('c.id', 'categories.id')
                      ->groupBy('c.id');
         }]);

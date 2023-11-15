@@ -2,6 +2,13 @@
 
 import { useDropZone, useFileDialog, useObjectUrl } from '@vueuse/core'
 
+const props = defineProps({
+    images: {
+        type: Object,
+        required: false
+    }
+})
+
 const emit = defineEmits([
     'files'
 ])
@@ -34,8 +41,16 @@ onChange(selectedFiles => {
   emit('files', fileData.value)
 })
 
-const onImageSelected = (file) => {
+watchEffect(() => {
 
+    // if (!(Object.entries(props.images).length === 0) && props.images.constructor === Object) {
+        fileData.value = props.images
+        emit('files', fileData.value)
+    // }
+})
+
+
+const onImageSelected = (file) => {
 
   URL.createObjectURL(file)
 
@@ -107,7 +122,7 @@ useDropZone(dropZoneRef, onDrop)
                             @click="() => open()"
                         >
                             <div
-                                v-if="fileData.length === 0"
+                                v-if="fileData?.length === 0"
                                 class="d-flex flex-column justify-center align-center gap-y-3 px-6 py-10 border-dashed drop-zone"
                             >
                                 <VBtn
@@ -149,7 +164,7 @@ useDropZone(dropZoneRef, onDrop)
                                                         class="w-100 mx-auto"
                                                     />
                                                     <div class="mt-2">
-                                                        <span class="clamp-text text-wrap">
+                                                        <span class="clamp-text text-wrap me-3">
                                                             {{ item.file.name }}
                                                         </span>
                                                         <span>

@@ -31,21 +31,27 @@ class ProductController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])
-                            ->favorites()
-                            ->applyFilters(
-                                $request->only([
-                                    'search',
-                                    'orderByField',
-                                    'orderBy',
-                                    'favourite',
-                                    'archived',
-                                    'discarded',
-                                    'state_id',
-                                    'in_stock',
-                                    'category_id'
-                                ])
-                            );
+            $query = Product::with([
+                            'colors.categories.category', 
+                            'colors.images', 
+                            'detail', 
+                            'user', 
+                            'state',
+                            'tags'
+                        ])->favorites()
+                        ->applyFilters(
+                            $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy',
+                                'favourite',
+                                'archived',
+                                'discarded',
+                                'state_id',
+                                'in_stock',
+                                'category_id'
+                            ])
+                        );
 
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
@@ -112,7 +118,14 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])->find($id);
+            $product = Product::with([
+                'colors.categories.category', 
+                'colors.images', 
+                'detail', 
+                'user', 
+                'state',
+                'tags'
+            ])->find($id);
 
             if (!$product)
                 return response()->json([
@@ -144,7 +157,14 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['colors.categories.category', 'colors.images', 'detail', 'user', 'state'])->find($product->id);
+            $product = Product::with([
+                'colors.categories.category', 
+                'colors.images', 
+                'detail', 
+                'user', 
+                'state',
+                'tags'
+            ])->find($product->id);
 
             if (!$product)
                 return response()->json([
@@ -154,6 +174,17 @@ class ProductController extends Controller
                 ], 404);
 
             $product = $product->updateProduct($request, $product);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'products/main/';
+
+                $file_data = uploadFile($image, $path, $product->image);
+
+                $product->image = $file_data['filePath'];
+                $product->update();
+            } 
 
             return response()->json([
                 'success' => true,

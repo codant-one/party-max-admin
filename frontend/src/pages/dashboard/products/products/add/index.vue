@@ -21,6 +21,7 @@ const brandsStores = useBrandsStores()
 const tagsStores = useTagsStores() 
 
 const emitter = inject("emitter")
+const isRequestOngoing = ref(true)
 
 const optionCounter = ref(1)
 
@@ -83,7 +84,10 @@ const modules = {
 
 
 watchEffect(fetchData)
-  async function fetchData() {
+
+async function fetchData() {
+
+  isRequestOngoing.value = true
 
   let data = { limit: -1 }
 
@@ -97,6 +101,7 @@ watchEffect(fetchData)
   listBrands.value = brandsStores.getBrands
   listTags.value = tagsStores.getTags
 
+  isRequestOngoing.value = false
 }
 
 const onImageSelected = event => {
@@ -257,338 +262,359 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <VForm
-    ref="refForm"
-    v-model="isFormValid"
-    @submit.prevent="onSubmit">
-    <div class="d-flex flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
-      <div class="d-flex flex-column justify-center">
-        <h4 class="text-h4 font-weight-medium">
-          Añadir un nuevo producto
-        </h4>
-        <span>Recarga tu fiesta de productos</span>
-      </div>
-
-      <div class="d-flex gap-4 align-center flex-wrap">
-       <VBtn
-          color="default"
-          variant="tonal"
-          class="mb-2"
-          :to="{ name: 'dashboard-products-products' }">
-          Regresar
-       </VBtn>
-       <VBtn
-          prepend-icon="tabler-plus"
-          class="mb-2"
-         type="submit">
-          Agregar
-       </VBtn>
-      </div>
-    </div>
-
+  <section>
     <VRow>
-      <VCol md="8">
+      <VDialog
+        v-model="isRequestOngoing"
+        width="300"
+        persistent>
         <VCard
-          class="mb-6"
-          title="Información del Producto"
-        >
-          <VCardText>
-            <VRow>
-              <VCol cols="12">
-                <AppTextField
-                  v-model="name"
-                  label="Nombre"
-                  placeholder="Nombre"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol cols="12">
-                <span class="mb-1">Descripción (simple)</span>
-                <TiptapEditor
-                  placeholder=" "
-                  v-model="single_description"
-                  class="border rounded"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-              <VCol cols="12">
-                <span class="mb-1">Descripción (detallada)</span>
-                <QuillEditor
-                    v-model:content="description" 
-                    :modules="modules" 
-                    content-type="html"
-                    toolbar="full"
-                    :rules="[requiredValidator]"
-                  />
-              </VCol>
-            </VRow>
+          color="primary"
+          width="300">
+          <VCardText class="pt-3">
+            Cargando
+            <VProgressLinear
+              indeterminate
+              color="white"
+              class="mb-0"
+             />
           </VCardText>
         </VCard>
+      </VDialog>
+    </VRow>
+    <VForm
+      ref="refForm"
+      v-model="isFormValid"
+      @submit.prevent="onSubmit">
+      <div class="d-flex mt-5 flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
+        <div class="d-flex flex-column justify-center">
+          <h4 class="text-h4 font-weight-medium">
+            Añadir un nuevo producto 😃🌟
+          </h4>
+          <span>Recarga tu fiesta de productos 🎉</span>
+        </div>
 
-        <VCard
-          title="Colores"
-          class="mb-6"
-        >
-          <VCardText>
-            <template
-              v-for="i in optionCounter"
-              :key="i"
-            >
+        <div class="d-flex gap-4 align-center flex-wrap">
+        <VBtn
+            color="default"
+            variant="tonal"
+            class="mb-2"
+            :to="{ name: 'dashboard-products-products' }">
+            Regresar
+        </VBtn>
+        <VBtn
+            prepend-icon="tabler-plus"
+            class="mb-2"
+          type="submit">
+            Agregar
+        </VBtn>
+        </div>
+      </div>
+
+      <VRow>
+        <VCol md="8">
+          <VCard
+            class="mb-6"
+            title="Información del Producto"
+          >
+            <VCardText>
               <VRow>
-                
-                <VCol
-                  cols="12"
-                  md="3"
-                >
-                <VSelect
-                  v-model="color_id[i-1]"
-                  label="Colores"
-                  :items="listColors"
-                  item-value="id"
-                  item-title="name"
-                  clearable
-                  clear-icon="tabler-x"
-                  no-data-text="No disponible"
-                  :rules="[requiredValidator]"
-                 />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12">
                   <AppTextField
-                    v-model="sku[i-1]"
-                    placeholder="SKU"
+                    v-model="name"
+                    label="Nombre"
+                    placeholder="Nombre"
                     :rules="[requiredValidator]"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
-                  <VAutocomplete
-                    :id="'selectCategory_' + i"
-                    v-model="category_id[i-1]"
-                    label="Categorías:"
-                    autocomplete="off"
-                    multiple
-                    :items="categories"
-                    :item-title="item => item.name"
-                    :item-value="item => item.id"
+
+                <VCol cols="12">
+                  <span class="mb-1">Descripción (simple)</span>
+                  <TiptapEditor
+                    placeholder=" "
+                    v-model="single_description"
+                    class="border rounded"
                     :rules="[requiredValidator]"
-                    :menu-props="{ maxHeight: '300px' }">
-                    <template v-slot:selection="{ item, index }">
-                      <v-chip v-if="index < 2">
-                        <span>{{ item.title }}</span>
-                      </v-chip>
-                      <span
-                        v-if="index === 2"
-                        class="text-grey text-caption align-self-center"
-                      >
-                        (+{{ category_id[i-1].length - 2 }} otros)
-                      </span>
-                    </template>
-                    <template v-slot:item="{ props, item }">
-                      <v-list-item
-                        v-bind="props"
-                        :title="item?.raw?.name"
-                        :style="{ 
-                          paddingLeft: `${(item?.raw?.level) * 20}px`
-                        }"
-                      >
-                        <template v-slot:prepend="{ isActive }">
-                          <v-list-item-action start>
-                            <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-                          </v-list-item-action>
-                        </template>
-                      </v-list-item>
-                    </template>
-                    <template v-slot:append-item>
-                      <v-divider class="mt-2"></v-divider>
-                      <v-list-item title="Cerrar Opciones" class="text-right">
-                        <template v-slot:append>
-                          <VBtn
-                            size="small"
-                            variant="plain"
-                            icon="tabler-x"
-                            color="black"
-                            :ripple="false"
-                            @click="closeDropdown(i)"/>
-                        </template>
-                      </v-list-item>
-                    </template>
-                  </VAutocomplete>
+                  />
                 </VCol>
                 <VCol cols="12">
-                  <FileInput 
-                    @files="getFiles($event, i)"/>
+                  <span class="mb-1">Descripción (detallada)</span>
+                  <QuillEditor
+                      v-model:content="description" 
+                      :modules="modules" 
+                      content-type="html"
+                      toolbar="full"
+                      :rules="[requiredValidator]"
+                    />
                 </VCol>
               </VRow>
-            </template>
+            </VCardText>
+          </VCard>
 
-            <VBtn
-              class="mt-6"
-              @click="optionCounter++"
-            >
-             Agregar Color
-            </VBtn>
-          </VCardText>
-        </VCard>
-        
-      </VCol>
+          <VCard
+            title="Colores"
+            class="mb-6"
+          >
+            <VCardText>
+              <template
+                v-for="i in optionCounter"
+                :key="i"
+              >
+                <VRow>
+                  
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
+                  <VSelect
+                    v-model="color_id[i-1]"
+                    label="Colores"
+                    :items="listColors"
+                    item-value="id"
+                    item-title="name"
+                    clearable
+                    clear-icon="tabler-x"
+                    no-data-text="No disponible"
+                    :rules="[requiredValidator]"
+                  />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
+                    <AppTextField
+                      v-model="sku[i-1]"
+                      placeholder="SKU"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VAutocomplete
+                      :id="'selectCategory_' + i"
+                      v-model="category_id[i-1]"
+                      label="Categorías:"
+                      autocomplete="off"
+                      multiple
+                      :items="categories"
+                      :item-title="item => item.name"
+                      :item-value="item => item.id"
+                      :rules="[requiredValidator]"
+                      :menu-props="{ maxHeight: '300px' }">
+                      <template v-slot:selection="{ item, index }">
+                        <v-chip v-if="index < 2">
+                          <span>{{ item.title }}</span>
+                        </v-chip>
+                        <span
+                          v-if="index === 2"
+                          class="text-grey text-caption align-self-center"
+                        >
+                          (+{{ category_id[i-1].length - 2 }} otros)
+                        </span>
+                      </template>
+                      <template v-slot:item="{ props, item }">
+                        <v-list-item
+                          v-bind="props"
+                          :title="item?.raw?.name"
+                          :style="{ 
+                            paddingLeft: `${(item?.raw?.level) * 20}px`
+                          }"
+                        >
+                          <template v-slot:prepend="{ isActive }">
+                            <v-list-item-action start>
+                              <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                            </v-list-item-action>
+                          </template>
+                        </v-list-item>
+                      </template>
+                      <template v-slot:append-item>
+                        <v-divider class="mt-2"></v-divider>
+                        <v-list-item title="Cerrar Opciones" class="text-right">
+                          <template v-slot:append>
+                            <VBtn
+                              size="small"
+                              variant="plain"
+                              icon="tabler-x"
+                              color="black"
+                              :ripple="false"
+                              @click="closeDropdown(i)"/>
+                          </template>
+                        </v-list-item>
+                      </template>
+                    </VAutocomplete>
+                  </VCol>
+                  <VCol cols="12">
+                    <FileInput 
+                      @files="getFiles($event, i)"/>
+                  </VCol>
+                </VRow>
+              </template>
 
-      <VCol
-        md="4"
-        cols="12"
-      >
+              <VBtn
+                class="mt-6"
+                @click="optionCounter++"
+              >
+              Agregar Color
+              </VBtn>
+            </VCardText>
+          </VCard>
+          
+        </VCol>
 
-        <VCard
-          title="Imagen Principal"
-          class="mb-6"
+        <VCol
+          md="4"
+          cols="12"
         >
-          <VCardText>
-            <VImg
-              v-if="avatar !== null"
-              :src="avatar"
-              :height="200"
-              aspect-ratio="16/9"
-              class="border-img mb-2"
-              :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
-            />
 
-            <VFileInput
-              v-model="filename"
-              label="Imagen"
-              class="mb-2"
-              accept="image/png, image/jpeg, image/bmp"
-              prepend-icon="tabler-camera"
-              @change="onImageSelected"
-              @click:clear="avatar = null"
-              :rules="[requiredValidator]"
-            />
-          </VCardText>
-        </VCard>
-
-        <VCard
-          title="Precios"
-          class="mb-6"
-        >
-          <VCardText>
-            <AppTextField
-              v-model="price"
-              prefix="COP"
-              type="number"
-              label="Costo"
-              class="mb-6"
-              :rules="[requiredValidator]"
-            />
-
-            <AppTextField
-              v-model="price_for_sale"
-              prefix="COP"
-              type="number"
-              label="Precio al detal"
-              class="mb-4"
-              :rules="[requiredValidator]"
-            />
-
-            <AppTextField
-              v-model="wholesale_price"
-              prefix="COP"
-              type="number"
-              label="Precio por mayor"
-              class="mb-4"
-              :rules="[requiredValidator]"
-            />
-
-            <AppTextField
-              v-model="stock"
-              type="number"
-              label="Stock"
-              class="mb-4"
-              :rules="[requiredValidator]"
-            />
-
-          </VCardText>
-        </VCard>
-
-        <VCard title="Detalles">
-          <VCardText>
-            <div class="d-flex flex-column gap-y-4">
-
-              <AppSelect
-                v-model="brand_id"
-                :items="listBrands"
-                item-value="id"
-                item-title="name"
-                placeholder="Marca"
-                :rules="[requiredValidator]"
+          <VCard
+            title="Imagen Principal"
+            class="mb-6"
+          >
+            <VCardText>
+              <VImg
+                v-if="avatar !== null"
+                :src="avatar"
+                :height="200"
+                aspect-ratio="16/9"
+                class="border-img mb-2"
+                :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
               />
 
-              <AppSelect
-                v-model="tag_id"
-                chips
-                multiple
-                closable-chips
-                :items="listTags"
-                item-value="id"
-                item-title="name"
-                placeholder="Tags"
-                color="primary"
+              <VFileInput
+                v-model="filename"
+                label="Imagen"
+                class="mb-2"
+                accept="image/png, image/jpeg, image/bmp"
+                prepend-icon="tabler-camera"
+                @change="onImageSelected"
+                @click:clear="avatar = null"
                 :rules="[requiredValidator]"
               />
+            </VCardText>
+          </VCard>
 
+          <VCard
+            title="Precios"
+            class="mb-6"
+          >
+            <VCardText>
               <AppTextField
-                v-model="height"
-                label="Alto"
+                v-model="price"
+                prefix="COP"
                 type="number"
-                suffix="Cm"
+                label="Costo"
+                class="mb-6"
                 :rules="[requiredValidator]"
               />
 
               <AppTextField
-                v-model="width"
-                label="Ancho"
+                v-model="price_for_sale"
+                prefix="COP"
                 type="number"
-                suffix="Cm"
+                label="Precio al detal"
+                class="mb-4"
                 :rules="[requiredValidator]"
               />
 
               <AppTextField
-                v-model="weigth"
-                label="Peso"
+                v-model="wholesale_price"
+                prefix="COP"
                 type="number"
-                suffix="Cm"
+                label="Precio por mayor"
+                class="mb-4"
                 :rules="[requiredValidator]"
               />
 
               <AppTextField
-                v-model="deep"
-                label="Profundo"
+                v-model="stock"
                 type="number"
-                suffix="Cm"
+                label="Stock"
+                class="mb-4"
                 :rules="[requiredValidator]"
               />
-              
-              <AppTextField
-                v-model="material"
-                label="Material"
-                :rules="[requiredValidator]"
-              />
-              
-              <AppTextField
-                readonly
-                v-model="estimated_delivery_time"
-                label="Tiempo de entregada"
-                placeholder="Tiempo estimado de entrega"
-              />
-            </div>
-          </VCardText>
-        </VCard>
-      </VCol>
-    </VRow>
-  </VForm>
+
+            </VCardText>
+          </VCard>
+
+          <VCard title="Detalles">
+            <VCardText>
+              <div class="d-flex flex-column gap-y-4">
+
+                <AppSelect
+                  v-model="brand_id"
+                  :items="listBrands"
+                  item-value="id"
+                  item-title="name"
+                  placeholder="Marca"
+                  :rules="[requiredValidator]"
+                />
+
+                <AppSelect
+                  v-model="tag_id"
+                  chips
+                  multiple
+                  closable-chips
+                  :items="listTags"
+                  item-value="id"
+                  item-title="name"
+                  placeholder="Tags"
+                  color="primary"
+                  :rules="[requiredValidator]"
+                />
+
+                <AppTextField
+                  v-model="height"
+                  label="Alto"
+                  type="number"
+                  suffix="Cm"
+                  :rules="[requiredValidator]"
+                />
+
+                <AppTextField
+                  v-model="width"
+                  label="Ancho"
+                  type="number"
+                  suffix="Cm"
+                  :rules="[requiredValidator]"
+                />
+
+                <AppTextField
+                  v-model="weigth"
+                  label="Peso"
+                  type="number"
+                  suffix="Cm"
+                  :rules="[requiredValidator]"
+                />
+
+                <AppTextField
+                  v-model="deep"
+                  label="Profundo"
+                  type="number"
+                  suffix="Cm"
+                  :rules="[requiredValidator]"
+                />
+                
+                <AppTextField
+                  v-model="material"
+                  label="Material"
+                  :rules="[requiredValidator]"
+                />
+                
+                <AppTextField
+                  readonly
+                  v-model="estimated_delivery_time"
+                  label="Tiempo de entregada"
+                  placeholder="Tiempo estimado de entrega"
+                />
+              </div>
+            </VCardText>
+          </VCard>
+        </VCol>
+      </VRow>
+    </VForm>
+  </section>
 </template>
 
 <style lang="scss">
