@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\FaqCategory;
+use App\Models\Blog;
 
 class MiscellaneousController extends Controller
 {
@@ -34,6 +36,57 @@ class MiscellaneousController extends Controller
                     'products' => $products
                 ]
             ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function faqs(): JsonResponse
+    {
+        try {
+
+            $categories = 
+                FaqCategory::with(['faqs'])
+                           ->get();
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'categories' => $categories
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function popularsBlogs(): JsonResponse
+    {
+        try {
+
+            $blogs = 
+                Blog::with(['category', 'user'])
+                           ->get();
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'blogs' => $blogs
+                ]
+            ]);
 
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([

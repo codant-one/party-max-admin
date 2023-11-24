@@ -137,6 +137,8 @@ Route::apiResource('genders', GenderController::class);
 
 Route::get('home', [HomeController::class, 'home']);
 Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
+Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
+Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
