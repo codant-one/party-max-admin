@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\FaqCategory;
 use App\Models\Blog;
+use App\Models\BlogCategory;
 
 class MiscellaneousController extends Controller
 {
@@ -80,11 +81,16 @@ class MiscellaneousController extends Controller
             $blogs = 
                 Blog::with(['category', 'user'])
                            ->get();
+
+            $blogCategory = BlogCategory::with(['blogs'])
+                           ->get();
+
         
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'blogs' => $blogs
+                    'blogs' => $blogs,
+                    'categories' => $blogCategory
                 ]
             ]);
 
