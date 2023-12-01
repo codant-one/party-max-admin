@@ -18,8 +18,7 @@ class ClientSeeder extends Seeder
     {
         User::factory()->count(20)->create();
 
-        $users = User::where("id", ">", 1)
-                     ->orderBy('desc')
+        $users = User::orderBy('id', 'desc')
                      ->limit(20)
                      ->get();
 
