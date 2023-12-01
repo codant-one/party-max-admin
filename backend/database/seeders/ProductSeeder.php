@@ -11,6 +11,7 @@ use App\Models\ProductDetail;
 use App\Models\ProductImage;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use Spatie\Permission\Models\Permission;
 
 class ProductSeeder extends Seeder
@@ -37,14 +38,13 @@ class ProductSeeder extends Seeder
         
         foreach ($products as $product) {
             ProductDetail::factory(['product_id' => $product->id])->create();
-            ProductImage::factory(['product_id' => $product->id])->create();
+            ProductColor::factory(['product_id' => $product->id])->create();
+            ProductImage::factory(['product_color_id' => $product->id])->create();
 
             for($i = 0; $i < 4; $i++){
-                ProductCategory::factory(['product_image_id' => $product->id])->create();
+                ProductCategory::factory(['product_color_id' => $product->id])->create();
             }
         }
-
-     
 
         Permission::create(['name' => 'ver productos']);
         Permission::create(['name' => 'crear productos']);

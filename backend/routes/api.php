@@ -107,6 +107,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Products
     Route::group(['prefix' => 'products'], function () {
         Route::post('delete', [ProductController::class, 'delete']);
+        Route::post('upload-image', [ProductController::class, 'uploadImage']);
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
     });
 
@@ -137,6 +138,9 @@ Route::apiResource('genders', GenderController::class);
 Route::get('home', [HomeController::class, 'home']);
 Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
 Route::post('register/client',[ClientController::class, 'register_client']);
+
+Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
+Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');

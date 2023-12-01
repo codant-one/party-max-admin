@@ -16,7 +16,8 @@ const emit = defineEmits([
     'download',
     'updateLink',
     'show',
-    'editProduct'
+    'editProduct',
+    'deleteProduct'
 ])
 
 const id = ref('')
@@ -81,6 +82,10 @@ const show = (id) => {
 
 const editProduct = (id) => {
     emit('editProduct', id)
+}
+
+const deleteProduct = (id) => {
+    emit('deleteProduct', id)
 }
 
 const updateLink = (text, id) => {
@@ -165,7 +170,7 @@ const colors = (id) => {
                         size="x-small"
                         variant="plain"
                         :disabled="state.id === 5"
-                        @click="editProduct(id)">
+                        @click="deleteProduct(id)">
                         <VTooltip
                             open-on-focus
                             location="top"

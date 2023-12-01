@@ -52,10 +52,10 @@ const categories = ref('')
 watchEffect(() => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
-            categories.value = props.product.images[0]?.categories.map(item => item.category.name)
+            categories.value = props.product.colors[0]?.categories.map(item => item.category.name)
 
-            productImages.value = props.product.images
-            productImages.value.unshift({image: props.product.image})
+            productImages.value = props.product.colors[0]?.images
+            // productImages.value.unshift({image: props.product.image})
 
             title.value = props.product.name
             description.value = props.product.description

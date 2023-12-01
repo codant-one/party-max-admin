@@ -24,12 +24,13 @@ const isRequestOngoing = ref(true)
 const selectedProduct = ref({})
 
 const isProductDetailDialog = ref(false)
+const isConfirmDeleteDialogVisible = ref(false)
 
 const favourite = ref(null)
 const archived = ref(null)
 const discarded = ref(null)
 
-const selectedStatus = ref()
+const selectedStatus = ref(3)
 const selectedCategory = ref()
 const selectedStock = ref()
 
@@ -52,7 +53,7 @@ const categories = ref([])
 
 const stockStatus = ref([
   {
-    title: 'In Stock',
+    title: 'En Stock',
     value: 1
   },
   {
@@ -132,7 +133,7 @@ async function fetchData() {
       image: element.image,
       price: element.price_for_sale,
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.images[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+      categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
@@ -149,6 +150,11 @@ async function fetchData() {
 
 const editProduct = id => {
     router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
+}
+
+const deleteProduct = id => {
+  isConfirmDeleteDialogVisible.value = true
+  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
 }
 
 const updateLink = (data) => {
@@ -279,6 +285,31 @@ const showAlert = function(alert) {
 
 const closeDropdown = () => { 
   document.getElementById("selectCategory").blur()
+}
+
+const removeProduct = async () => {
+  isConfirmDeleteDialogVisible.value = false
+
+  let res = await productsStores.deleteProduct({ ids: [selectedProduct.value.id] })
+  selectedProduct.value = {}
+
+  advisor.value = {
+    type: res.data.success ? 'success' : 'error',
+    message: res.data.success ? 'Producto eliminado!' : res.data.message,
+    show: true
+  }
+
+  await fetchData()
+
+  setTimeout(() => {
+    advisor.value = {
+      type: '',
+      message: '',
+      show: false
+    }
+  }, 3000)
+
+  return true
 }
 </script>
 
@@ -508,6 +539,7 @@ const closeDropdown = () => {
                     @updateLink="updateLink"
                     @show="showProduct"
                     @editProduct="editProduct"
+                    @deleteProduct="deleteProduct"
                     />
                 </VCol>
               </VRow>
@@ -535,6 +567,35 @@ const closeDropdown = () => {
     <show 
       v-model:isDrawerOpen="isProductDetailDialog"
       :product="selectedProduct"/>
+
+    <!-- 👉 Confirm Delete -->
+    <VDialog
+      v-model="isConfirmDeleteDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Eliminar Producto">
+        <VCardText>
+          Está seguro de eliminar el producto de <strong>{{ selectedProduct.name }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmDeleteDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="removeProduct">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 </template>
 

@@ -31,21 +31,28 @@ class ProductController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Product::with(['images.categories.category', 'detail', 'user', 'state'])
-                            ->favorites()
-                            ->applyFilters(
-                                $request->only([
-                                    'search',
-                                    'orderByField',
-                                    'orderBy',
-                                    'favourite',
-                                    'archived',
-                                    'discarded',
-                                    'state_id',
-                                    'in_stock',
-                                    'category_id'
-                                ])
-                            );
+            $query = Product::with([
+                            'colors.categories.category', 
+                            'colors.images', 
+                            'detail', 
+                            'user', 
+                            'state',
+                            'tags'
+                        ])->favorites()
+                        ->applyFilters(
+                            $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy',
+                                'favourite',
+                                'archived',
+                                'discarded',
+                                'state_id',
+                                'in_stock',
+                                'category_id'
+                            ])
+                        )
+                        ->withTrashed();
 
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
@@ -74,6 +81,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request): JsonResponse
     {
         try {
+
             $product = Product::createProduct($request);
 
             if ($request->hasFile('image')) {
@@ -111,7 +119,14 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($id);
+            $product = Product::with([
+                'colors.categories.category', 
+                'colors.images', 
+                'detail', 
+                'user', 
+                'state',
+                'tags'
+            ])->find($id);
 
             if (!$product)
                 return response()->json([
@@ -143,7 +158,14 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with(['images.categories.category', 'detail', 'images'])->find($product->id);
+            $product = Product::with([
+                'colors.categories.category', 
+                'colors.images', 
+                'detail', 
+                'user', 
+                'state',
+                'tags'
+            ])->find($product->id);
 
             if (!$product)
                 return response()->json([
@@ -153,6 +175,17 @@ class ProductController extends Controller
                 ], 404);
 
             $product = $product->updateProduct($request, $product);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'products/main/';
+
+                $file_data = uploadFile($image, $path, $product->image);
+
+                $product->image = $file_data['filePath'];
+                $product->update();
+            } 
 
             return response()->json([
                 'success' => true,
@@ -235,5 +268,32 @@ class ProductController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function uploadImage(Request $request): JsonResponse 
+    {
+        try {
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'products/';
+
+                $file_data = uploadFile($image, $path);
+
+                return response()->json([
+                    'success' => true,
+                    'url' => $file_data['filePath']
+                ], 200);
+            }
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
     }
 }

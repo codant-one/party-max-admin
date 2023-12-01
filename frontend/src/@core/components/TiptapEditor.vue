@@ -113,6 +113,13 @@ watch(() => props.modelValue, () => {
         size="20"
         @click="editor.chain().focus().setTextAlign('justify').run()"
       />
+
+      <VIcon
+        :color="editor.isActive('bulletList') ? 'primary' : ''"
+        icon="tabler-list"
+        size="20"
+        @click="editor.chain().focus().toggleBulletList().run()"
+      />
     </div>
 
     <VDivider />
@@ -139,6 +146,18 @@ watch(() => props.modelValue, () => {
     content: attr(data-placeholder);
     float: inline-start;
     pointer-events: none;
+  }
+
+  ul,
+  ol {
+    padding-block: 0;
+    padding-inline: 1rem;
+    list-style: disc;
+  }
+
+  blockquote {
+    border-inline-start: 2px solid rgba(#0d0d0d, 0.1);
+    padding-inline-start: 1rem;
   }
 }
 </style>

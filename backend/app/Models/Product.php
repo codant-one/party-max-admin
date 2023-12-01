@@ -6,16 +6,20 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
 use App\Models\ProductImage;
+use App\Models\ProductColor;
+use App\Models\ProductTag;
 use App\Models\User;
 use App\Models\State;
 
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -23,6 +27,16 @@ class Product extends Model
     public function detail()
     {
         return $this->hasOne(ProductDetail::class, 'product_id');
+    }
+
+    public function colors()
+    {
+        return $this->hasMany(ProductColor::class, 'product_id');
+    }
+
+    public function tags()
+    {
+        return $this->hasMany(ProductTag::class, 'product_id');
     }
 
     public function images()
@@ -62,7 +76,7 @@ class Product extends Model
     }
 
     public function scopeWhereCategory($query, $search) {
-        $query->whereHas('images.categories', function ($q) use ($search) {
+        $query->whereHas('colors.categories', function ($q) use ($search) {
             $q->where('category_id', $search);
         });
     }
@@ -118,21 +132,12 @@ class Product extends Model
     }
 
     /**** Public methods ****/
-    public static function createProductCategories($product_id, $request) {
-        foreach(explode(",", $request->category_id) as $category_id){
-            ProductCategory::create([
-                'product_id' => $product_id,
-                'category_id' => $category_id
-            ]);
-        }
-    }
+    public static function createProductCategories($product_color_id, $key, $request) {
+        $categories = json_decode($request->category_id, true);
 
-    public static function updateProductCategories($product_id, $request) {
-        ProductCategory::where('product_id', $product_id)->delete();
-
-        foreach(explode(",", $request->category_id) as $category_id){
+        foreach($categories[$key] as $category_id) {
             ProductCategory::create([
-                'product_id' => $product_id,
+                'product_color_id' => $product_color_id,
                 'category_id' => $category_id
             ]);
         }
@@ -144,7 +149,8 @@ class Product extends Model
             'width' => $request->width,
             'height' => $request->height,
             'deep' => $request->deep,
-            'weigth' => $request->weigth
+            'weigth' => $request->weigth,
+            'material' => $request->material
         ]);
     }
 
@@ -154,59 +160,85 @@ class Product extends Model
         $product_details->height = $request->height;
         $product_details->deep = $request->deep;
         $product_details->weigth = $request->weigth;
+        $product_details->material = $request->material;
         $product_details->save();
     }
 
-    public static function createProductImages($product_id, $request) {
-        foreach(json_decode($request->colors, true) as $color) {
-            if ($request->hasFile('color_'.$color['color_id'])) {
-                $images = $request->file('color_'.$color['color_id']);
-        
-                foreach ($images as $image) {
+    public static function createProductColors($product_id, $request) {
+        foreach(explode(",", $request->color_id) as $key => $color) {
+            
+            $product_color = ProductColor::create([
+                'product_id' => $product_id,
+                'color_id' => $color,
+                'sku' => explode(",", $request->sku)[$key]
+            ]);
 
-                    $path = 'products/gallery/';
-        
-                    $file_data = uploadFile($image, $path);
-
-                    $product_image = ProductImage::create([
-                        'product_id' => $product_id,
-                        'color_id' => $color['color_id'],
-                        'image' => $file_data['filePath']
-                    ]);
-                }
-            }
+            self::createProductImages($product_color->id, $key, $request);
+            self::createProductCategories($product_color->id, $key, $request);
         }
     }
 
-    public static function updateProductImages($product_id, $request) {
+    public static function updateProductColors($product_id, $request) {
+        $productColors = ProductColor::where('product_id', $product_id)->get();
 
-        if($request->update){
-            $products_images = ProductImage::where('product_id', $product_id)->get();
+        foreach($productColors as $productColor) {
+            $products_images = ProductImage::where('product_color_id', $productColor->id)->get();
 
-            foreach($products_images as $products_image){
-                ProductImage::where('product_id', $product_id)->delete();
-                
+            foreach($products_images as $products_image) {
                 if($products_image->image)
                     deleteFile($products_image->image);
             }
+
+            $productColor->delete();
         }
 
-        foreach(json_decode($request->colors, true) as $color) {
-            if ($request->hasFile('color_'.$color['color_id'])) {
-                $images = $request->file('color_'.$color['color_id']);
+        foreach(explode(",", $request->color_id) as $key => $color) {
             
-                foreach ($images as $image) {
+            $product_color = ProductColor::create([
+                'product_id' => $product_id,
+                'color_id' => $color,
+                'sku' => explode(",", $request->sku)[$key]
+            ]);
 
-                    $path = 'products/gallery/';
+            self::createProductImages($product_color->id, $key, $request);
+            self::createProductCategories($product_color->id, $key, $request);
+        }
+    }
+
+    public static function createProductTags($product_id, $request) {
+        foreach(explode(",", $request->tag_id) as $tag_id) {
+            ProductTag::create([
+                'product_id' => $product_id,
+                'tag_id' => $tag_id
+            ]);
+        }
+    }
+
+    public static function updateProductTags($product_id, $request) {
+        ProductTag::where('product_id', $product_id)->delete();
+
+        foreach(explode(",", $request->tag_id) as $tag_id) {
+            ProductTag::create([
+                'product_id' => $product_id,
+                'tag_id' => $tag_id
+            ]);
+        }
+    }
+
+    public static function createProductImages($product_color_id, $key, $request) {
+        if ($request->hasFile('images_'.$key)) {
+            $images = $request->file('images_'.$key);
+                
+            foreach ($images as $image) {
+
+                $path = 'products/gallery/';
         
-                    $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($image, $path);
 
-                    $product_image = ProductImage::create([
-                        'product_id' => $product_id,
-                        'color_id' => $color['color_id'],
+                $product_image = ProductImage::create([
+                        'product_color_id' => $product_color_id,
                         'image' => $file_data['filePath']
                     ]);
-                }
             }
         }
     }
@@ -214,18 +246,21 @@ class Product extends Model
     public static function createProduct($request) {
  
         $product = self::create([
+            'brand_id' => $request->brand_id,
+            'state_id' => 3,
             'name' => $request->name,
+            'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
-            'sku' => $request->sku,
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
+            'wholesale_price' => $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
 
-        self::createProductCategories($product->id, $request);
         self::createProductDetails($product->id, $request);
-        self::createProductImages($product->id, $request);
+        self::createProductTags($product->id, $request);
+        self::createProductColors($product->id, $request);
 
         return $product;
     }
@@ -233,25 +268,30 @@ class Product extends Model
     public static function updateProduct($request, $product) {
  
         $product->update([
+            'brand_id' => $request->brand_id,
+            'state_id' => 3,
             'name' => $request->name,
+            'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
-            'sku' => $request->sku,
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
+            'wholesale_price' => $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
 
-        self::updateProductCategories($product->id, $request);
         self::updateProductDetails($product->id, $request);
-        self::updateProductImages($product->id, $request);
+        self::updateProductTags($product->id, $request);
+        self::updateProductColors($product->id, $request);
  
         return $product;
     }
  
     public static function deleteProducts($ids) {
         foreach ($ids as $id) {
-            $categproductory = self::with(['children.children'])->find($id);
+            $product = self::find($id);
+            $product->state_id = 5;
+            $product->update();
             $product->delete();
         }
     }

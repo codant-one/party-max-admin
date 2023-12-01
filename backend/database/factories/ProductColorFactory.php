@@ -2,18 +2,18 @@
 
 namespace Database\Factories;
 
-use App\Models\ProductImage;
+use App\Models\ProductColor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
 
-class ProductImageFactory extends Factory
+class ProductColorFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = ProductImage::class;
+    protected $model = ProductColor::class;
 
 
     /**
@@ -24,7 +24,8 @@ class ProductImageFactory extends Factory
     public function definition()
     {
         return [
-            'image' => 'products/gallery/' . $this->faker->file(public_path('images/products/gallery'), storage_path('app/public/products/gallery'), false),
+            'color_id' => rand(1, 10),
+            'sku' => rand(100000, 999999)
         ];
         
     }
