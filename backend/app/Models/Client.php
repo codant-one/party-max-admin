@@ -79,7 +79,7 @@ class Client extends Model
             'gender_id' => $request->gender_id,
             'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);
-
+        
         return $client;
     }
 

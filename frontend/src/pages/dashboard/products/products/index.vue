@@ -108,6 +108,7 @@ async function fetchData() {
     page: currentPage.value
   }
 
+
   isRequestOngoing.value = true
   
   await categoriesStores.fetchCategoriesOrder({ limit: -1 })

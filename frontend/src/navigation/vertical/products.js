@@ -30,6 +30,13 @@ export default [
           to: 'dashboard-products-products', 
           action: 'ver' , 
           subject: 'productos', 
+        },
+        { 
+          title: 'Pendientes', 
+          icon: { icon: 'tabler-confetti' },
+          to: 'dashboard-products-pendings', 
+          action: 'ver' , 
+          subject: 'pendientes', 
         }
       ],
     }
