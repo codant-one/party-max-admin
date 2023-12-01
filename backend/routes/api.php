@@ -135,10 +135,12 @@ Route::apiResource('provinces', ProvinceController::class);
 Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
 
-Route::get('home', [HomeController::class, 'home']);
-Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
 Route::post('register/client',[ClientController::class, 'register_client']);
 
+Route::get('home', [HomeController::class, 'home']);
+Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
+Route::get('miscellaneous/categories', [MiscellaneousController::class, 'categoriesAll']);
+Route::get('miscellaneous/products', [MiscellaneousController::class, 'products']);
 Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
 Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
 
