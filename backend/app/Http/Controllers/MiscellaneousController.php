@@ -95,7 +95,13 @@ class MiscellaneousController extends Controller
     {
         try {
     
-            $product = Product::with(['user', 'brand', 'colors.color', 'colors.categories.category'])
+            $product = Product::with([
+                                'user', 
+                                'brand', 
+                                'colors.color', 
+                                'colors.categories.category', 
+                                'tags.tag'
+                              ])
                               ->where('slug', $slug)
                               ->first();
 

@@ -58,7 +58,7 @@ watchEffect(() => {
             // productImages.value.unshift({image: props.product.image})
 
             title.value = props.product.name
-            description.value = props.product.description
+            description.value = props.product.single_description
             sku.value = props.product.sku ?? null
             selling_price.value = props.product.selling_price ?? 0
             sales.value = props.product.sales ?? 0
@@ -165,7 +165,9 @@ const setThumbsSwiper = (swiper) => {
                     </VCol>
                     <VCol md="7" cols="12">
                         <VCardTitle class="text-h6 title-truncate py-0"> {{ title }} </VCardTitle>
-                        <VCardSubtitle v-if="description" class="subtitle-truncate mb-3"> {{ description }} </VCardSubtitle>
+                        <VCardSubtitle v-if="description" class="subtitle-truncate mb-3"> 
+                            <span v-html="description"></span>
+                        </VCardSubtitle>
                         <div class="px-4">
                             <div class="font-weight-semibold">PRECIO: 
                                 <span>{{ price }}</span>
