@@ -14,6 +14,7 @@ use App\Models\ProductImage;
 use App\Models\ProductColor;
 use App\Models\ProductTag;
 use App\Models\User;
+use App\Models\Brand;
 use App\Models\State;
 
 class Product extends Model
@@ -57,6 +58,11 @@ class Product extends Model
     public function state()
     {
         return $this->belongsTo(State::class, 'state_id','id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id','id');
     }
 
     /**** Scopes ****/

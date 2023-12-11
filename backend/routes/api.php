@@ -141,6 +141,7 @@ Route::get('home', [HomeController::class, 'home']);
 Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
 Route::get('miscellaneous/categories', [MiscellaneousController::class, 'categoriesAll']);
 Route::get('miscellaneous/products', [MiscellaneousController::class, 'products']);
+Route::get('miscellaneous/products/{slug}', [MiscellaneousController::class, 'productDetail']);
 Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
 Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
 
