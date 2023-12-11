@@ -99,6 +99,7 @@ class MiscellaneousController extends Controller
                                 'user', 
                                 'brand', 
                                 'colors.color', 
+                                'colors.images',
                                 'colors.categories.category', 
                                 'tags.tag'
                               ])
