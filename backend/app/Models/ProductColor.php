@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-use App\Models\Color;
-use App\Models\Product;
-
 class ProductColor extends Model
 {
     use HasFactory;
@@ -16,6 +13,16 @@ class ProductColor extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
+    public function categories()
+    {
+        return $this->hasMany(ProductCategory::class, 'product_color_id');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_color_id');
+    }
+
     public function color()
     {
         return $this->belongsTo(Color::class, 'color_id');
