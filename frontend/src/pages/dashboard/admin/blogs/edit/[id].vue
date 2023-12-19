@@ -8,16 +8,21 @@ import { themeConfig } from '@themeConfig'
 import { useBlogsStores } from '@/stores/useBlogs'
 import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { QuillEditor } from '@vueup/vue-quill'
+import { useTagsStores } from '@/stores/useTags'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const categoriesStores = useCategoriesStores()
 const blogsStores = useBlogsStores()
+const tagsStores = useTagsStores() 
 const route = useRoute()
 
 const refForm = ref()
 const isFormValid = ref(false)
 
 const emitter = inject("emitter")
+
+const listTags = ref([])
+const tag_id = ref()
 
 const categories = ref([])
 const blog_category_id = ref('')
@@ -86,6 +91,14 @@ async function fetchData() {
   await categoriesStores.fetchCategories(data)
   categories.value = categoriesStores.getCategories
 
+  let tags = { 
+    tag_type_id: 2,
+    limit: -1 
+  }
+
+  await tagsStores.fetchTags(tags)
+  listTags.value = tagsStores.getTags
+  
   if(Number(route.params.id)) {
     blog.value = await blogsStores.showBlog(Number(route.params.id))
 
@@ -96,6 +109,8 @@ async function fetchData() {
     description.value = blog.value.description
     avatar.value = blog.value.image === null ? '' : themeConfig.settings.urlStorage + blog.value.image
     avatarOld.value = blog.value.image === null ? '' : themeConfig.settings.urlStorage + blog.value.image
+
+    tag_id.value = blog.value.tags.map(element => element.tag_id)
   }
 
   isRequestOngoing.value = false
@@ -183,6 +198,9 @@ const onSubmit = () => {
       formData.append('description', description.value)
       formData.append('date', date.value)
       formData.append('_method', 'PUT')
+
+      //blog_tags
+      formData.append('tag_id', tag_id.value)
             
       let data = {
         data: formData, 
@@ -308,6 +326,19 @@ const capitalizedLabel = label => {
                         label="Fecha"
                         :config="startDateTimePickerConfig"
                         />
+                </VCol>
+                <VCol cols="12">
+                  <AppSelect
+                    v-model="tag_id"
+                    chips
+                    multiple
+                    closable-chips
+                    :items="listTags"
+                    item-value="id"
+                    item-title="name"
+                    placeholder="Tags"
+                    color="primary"
+                  />
                 </VCol>
                 <VCol cols="12">
                     <VImg

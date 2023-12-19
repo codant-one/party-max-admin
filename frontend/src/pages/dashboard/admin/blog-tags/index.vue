@@ -48,7 +48,7 @@ async function fetchData() {
     search: searchQuery.value,
     orderByField: 'id',
     orderBy: 'desc',
-    tag_type_id: 1,
+    tag_type_id: 2,
     limit: rowPerPage.value,
     page: currentPage.value
   }
@@ -181,7 +181,7 @@ const downloadCSV = async () => {
   isRequestOngoing.value = true
 
   let data = { 
-    tag_type_id: 1,
+    tag_type_id: 2,
     limit: -1 
   }
 

@@ -8,15 +8,20 @@ import { themeConfig } from '@themeConfig'
 import { useBlogsStores } from '@/stores/useBlogs'
 import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { QuillEditor } from '@vueup/vue-quill'
+import { useTagsStores } from '@/stores/useTags'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const blogsStores = useBlogsStores()
 const categoriesStores = useCategoriesStores()
+const tagsStores = useTagsStores() 
 
 const refForm = ref()
 const isFormValid = ref(false)
 
 const emitter = inject("emitter")
+
+const listTags = ref([])
+const tag_id = ref()
 
 const categories = ref([])
 const blog_category_id = ref('')
@@ -148,6 +153,13 @@ async function fetchData() {
   await categoriesStores.fetchCategories(data)
   categories.value = categoriesStores.getCategories
 
+  let tags = { 
+    tag_type_id: 2,
+    limit: -1 
+  }
+
+  await tagsStores.fetchTags(tags)
+  listTags.value = tagsStores.getTags
 }
 const onSubmit = () => {
 
@@ -163,6 +175,9 @@ const onSubmit = () => {
       formData.append('description', description.value)
       formData.append('image', image.value)
       formData.append('date', date.value)
+
+      //product_tags
+      formData.append('tag_id', tag_id.value)
 
       blogsStores.addBlog(formData)
         .then(res => {
@@ -269,6 +284,19 @@ const capitalizedLabel = label => {
                         />
                 </VCol>
               
+                <VCol cols="12">
+                  <AppSelect
+                    v-model="tag_id"
+                    chips
+                    multiple
+                    closable-chips
+                    :items="listTags"
+                    item-value="id"
+                    item-title="name"
+                    placeholder="Tags"
+                    color="primary"
+                  />
+                </VCol>
                 <VCol cols="12">
                     <VImg
                       :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"

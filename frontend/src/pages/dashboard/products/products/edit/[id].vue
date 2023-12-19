@@ -91,7 +91,10 @@ async function fetchData() {
 
     isRequestOngoing.value = true
 
-    let data = { limit: -1 }
+    let data = { 
+      tag_type_id: 1,
+      limit: -1 
+    }
 
     await colorsStores.fetchColors();
     await categoriesStores.fetchCategoriesOrder(data)

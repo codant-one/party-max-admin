@@ -50,6 +50,12 @@ export default [
             subject: 'categorías-blogs',
           },
           { 
+            title: 'Tags', 
+            to: 'dashboard-admin-blog-tags', 
+            action: 'ver', 
+            subject: 'tags', 
+          },
+          { 
             title: "Lista de Blogs", 
             to: 'dashboard-admin-blogs', 
             action: 'ver',

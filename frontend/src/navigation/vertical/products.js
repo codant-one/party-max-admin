@@ -25,7 +25,7 @@ export default [
           subject: 'categorías', 
         },
         { 
-          title: 'Productos', 
+          title: 'Todos los Productos', 
           icon: { icon: 'tabler-confetti' },
           to: 'dashboard-products-products', 
           action: 'ver' , 
@@ -33,7 +33,7 @@ export default [
         },
         { 
           title: 'Pendientes', 
-          icon: { icon: 'tabler-confetti' },
+          icon: { icon: 'mdi-clock-time-two-outline' },
           to: 'dashboard-products-pendings', 
           action: 'ver' , 
           subject: 'pendientes', 

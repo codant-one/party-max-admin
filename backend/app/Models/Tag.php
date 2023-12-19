@@ -7,11 +7,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\TagType;
+
 class Tag extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
+
+    /**** Relationship ****/
+    public function tag_type() {
+        return $this->belongsTo(TagType::class, 'tag_type_id', 'id');
+    }
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
@@ -48,6 +55,7 @@ class Tag extends Model
     /**** Public methods ****/
     public static function createTag($request) {
         $tag = self::create([
+            'tag_type_id' => $request->tag_type_id,
             'name' => $request->name
         ]);
 
@@ -56,6 +64,7 @@ class Tag extends Model
 
     public static function updateTag($request, $tag) {
         $tag->update([
+            'tag_type_id' => $request->tag_type_id,
             'name' => $request->name
         ]);
 

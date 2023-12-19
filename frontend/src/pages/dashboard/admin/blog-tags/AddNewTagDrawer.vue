@@ -61,8 +61,8 @@ const onSubmit = () => {
       let formData = new FormData()
 
       formData.append('id', id.value)
-      formData.append('tag_type_id', 1)
       formData.append('name', name.value)
+      formData.append('tag_type_id', 2)
 
       emit('tagData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)

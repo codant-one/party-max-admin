@@ -30,14 +30,15 @@ class TagController extends Controller
         try {
 
             $limit = $request->has('limit') ? $request->limit : 10;
-        
+            $tag_type_id = $request->has('tag_type_id') ? $request->tag_type_id : 1;
+
             $query = Tag::applyFilters(
                         $request->only([
                             'search',
                             'orderByField',
                             'orderBy'
                         ])
-                    );
+                    )->where('tag_type_id', $tag_type_id);
 
             $tags = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             

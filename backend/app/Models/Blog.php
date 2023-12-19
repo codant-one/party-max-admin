@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; 
 
 use App\Models\BlogCategory;
+use App\Models\BlogTag;
 
 class Blog extends Model
 {
@@ -24,7 +25,21 @@ class Blog extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function tags()
+    {
+        return $this->hasMany(BlogTag::class, 'blog_id');
+    }
+
     /**** Public methods ****/
+    public static function createBlogTags($blog_id, $request) {
+        foreach(explode(",", $request->tag_id) as $tag_id) {
+            BlogTag::create([
+                'blog_id' => $blog_id,
+                'tag_id' => $tag_id
+            ]);
+        }
+    }
+
     public static function createBlog($request) {
 
         $blog = self::create([
@@ -37,7 +52,20 @@ class Blog extends Model
             'slug' => Str::slug($request->title)
         ]);
 
+        self::createBlogTags($blog->id, $request);
+
         return $blog;
+    }
+
+    public static function updateBlogTags($blog_id, $request) {
+        BlogTag::where('blog_id', $blog_id)->delete();
+
+        foreach(explode(",", $request->tag_id) as $tag_id) {
+            BlogTag::create([
+                'blog_id' => $blog_id,
+                'tag_id' => $tag_id
+            ]);
+        }
     }
 
     public static function updateBlog($request, $blog) {
@@ -51,6 +79,8 @@ class Blog extends Model
             'description' =>  $request->description,
             'slug' => Str::slug($request->title)
         ]);
+
+        self::updateBlogTags($blog->id, $request);
 
         return $blog;
     }

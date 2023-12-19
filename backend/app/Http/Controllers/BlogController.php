@@ -108,7 +108,7 @@ class BlogController extends Controller
     {
         try {
 
-            $blog = Blog::find($id);
+            $blog = Blog::with(['tags'])->find($id);
         
             if (!$blog)
                 return response()->json([
