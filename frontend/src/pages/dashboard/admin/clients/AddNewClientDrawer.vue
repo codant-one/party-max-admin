@@ -1,10 +1,7 @@
 <script setup>
-import flatPickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
-
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import { confirmedValidator, passwordValidator, requiredValidator, emailValidator } from '@/@core/utils/validators'
+import { requiredValidator } from '@/@core/utils/validators'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
 import { useGendersStores } from '@/stores/useGenders'
@@ -92,14 +89,11 @@ watchEffect(async() => {
             
             password.value = props.client.password
             passwordConfirmation.value = props.client.password
-            countryOld_id.value = props.client.user.user_detail.province.country.id
+            countryOld_id.value = props.client.user.user_detail.province.country.name
             
             isNewPasswordVisible.value = false 
             isConfirmPasswordVisible.value = false 
         }
-
-        // if (!isEdit.value)
-        //   email.
     }
 })
 
@@ -129,14 +123,6 @@ async function fetchData() {
   }
 }
 
-const getCountries = computed(() => {
-  return countries.value.map((country) => {
-    return {
-      title: country.name,
-      value: country.id,
-    }
-  })
-})
 
 const getProvinces = computed(() => {
   return listProvincesByCountry.value.map((province) => {
@@ -146,7 +132,6 @@ const getProvinces = computed(() => {
     }
   })
 })
-
 
 const getGenders = computed(() => {
   return genders.value.map((gender) => {
@@ -159,8 +144,8 @@ const getGenders = computed(() => {
 
 const selectCountry = country => {
   if (country) {
-    let _country = countries.value.find(item => item.id === country)
-    client_country_id.value = _country.id
+    let _country = countries.value.find(item => item.name === country)
+    client_country_id.value = _country.name
  
     province_id.value = ''
     
@@ -223,6 +208,17 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
+}
+
+const getFlagCountry = country => {
+  let val = countries.value.find(item => {
+    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  })
+
+  if(val)
+    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
+  else
+    return ''
 }
 
 </script>
@@ -327,14 +323,28 @@ const handleDrawerModelValueUpdate = val => {
 
               <!-- 👉 Paises -->
               <VCol cols="6">
-                <v-autocomplete
+                <VAutocomplete
                   v-model="client_country_id"
-                  label="Países"
+                  label="País"
                   :rules="[requiredValidator]"
-                  :items="getCountries"
+                  :items="countries"
+                  item-title="name"
+                  item-value="name"
                   :menu-props="{ maxHeight: '200px' }"
                   @update:model-value="selectCountry"
-                />
+                >
+                  <template
+                    v-if="client_country_id"
+                    #prepend
+                    >
+                    <VAvatar
+                      start
+                      style="margin-top: -8px;"
+                      size="36"
+                      :image="getFlagCountry(client_country_id)"
+                    />
+                  </template>
+                </VAutocomplete>
               </VCol>
 
               <!-- 👉 Provincias -->

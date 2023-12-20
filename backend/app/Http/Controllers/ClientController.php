@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
-// use App\Http\Requests\UserRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +16,14 @@ use App\Models\User;
 
 class ClientController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(PermissionMiddleware::class . ':ver clientes|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear clientes|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar clientes|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar clientes|administrador')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -1,5 +1,7 @@
 <script setup>
 
+import { useCountriesStores } from '@/stores/useCountries'
+
 const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
@@ -21,6 +23,8 @@ const emit = defineEmits([
   'close'
 ])
 
+const countriesStores = useCountriesStores()
+
 const email = ref('')
 const name = ref('')
 const password = ref('')
@@ -35,6 +39,18 @@ const province = ref('')
 const country_id = ref('')
 const country = ref('')
 const assignedRoles = ref([])
+const listCountries = ref([])
+
+const loadCountries = () => {
+  listCountries.value = countriesStores.getCountries
+}
+
+onMounted(async () => {
+
+    await countriesStores.fetchCountries()
+
+    loadCountries()
+})
 
 watchEffect(() => {
     if (props.isDrawerOpen) {
@@ -61,6 +77,17 @@ watchEffect(() => {
 const closeUserDetailDialog = function() {
     emit('update:isDrawerOpen', false)
     emit('close')
+}
+
+const getFlagCountry = country => {
+  let val = listCountries.value.find(item => {
+    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  })
+
+  if(val)
+    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
+  else
+    return ''
 }
 
 </script>
@@ -121,7 +148,15 @@ const closeUserDetailDialog = function() {
                             readonly
                         />
                     </VCol>
-                    <VCol md="6" cols="12">
+                    <VCol md="1" cols="1">
+                        <VAvatar
+                            class="mt-2"
+                            start
+                            size="25"
+                            :image="getFlagCountry(country)"
+                         />
+                    </VCol>
+                    <VCol md="5" cols="11">
                         <VTextField
                             v-model="country"
                             label="País"

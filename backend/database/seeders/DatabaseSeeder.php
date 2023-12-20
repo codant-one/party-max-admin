@@ -35,7 +35,8 @@ class DatabaseSeeder extends Seeder
             BlogCategorySeeder::class,
 
             MoreColorSeeder::class,
-            MoreStateSeeder::class
+            MoreStateSeeder::class,
+            MorePermissionSeeder::class
         ]);
 
     }

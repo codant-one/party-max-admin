@@ -60,15 +60,6 @@ const listCountries = ref([])
 const listProvinces = ref([])
 const listProvincesByCountry = ref([])
 
-const getCountries = computed(() => {
-  return listCountries.value.map((country) => {
-    return {
-      title: country.name,
-      value: country.id,
-    }
-  })
-})
-
 const getProvinces = computed(() => {
   return listProvincesByCountry.value.map((province) => {
     return {
@@ -88,8 +79,8 @@ const loadProvinces = () => {
 
 const selectCountry = country => {
   if (country) {
-    let _country = listCountries.value.find(item => item.id === country)
-    country_id.value = _country.id
+    let _country = listCountries.value.find(item => item.name === country)
+    country_id.value = _country.name
  
     province_id.value = ''
     
@@ -124,7 +115,7 @@ async function fetchData() {
             document.value = props.user.user_detail?.document
             province_id.value = props.user.user_detail?.province.name
             provinceOld_id.value = props.user.user_detail?.province_id
-            countryOld_id.value = props.user.user_detail?.province.country.id
+            countryOld_id.value = props.user.user_detail?.province.country.name
             country_id.value = props.user.user_detail?.province.country.name
             province.value = props.user.user_detail?.province.name
             country.value = props.user.user_detail?.province.country.name
@@ -207,6 +198,17 @@ const onSubmitEdit = () =>{
     }
 
   })
+}
+
+const getFlagCountry = country => {
+  let val = listCountries.value.find(item => {
+    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  })
+
+  if(val)
+    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
+  else
+    return ''
 }
 
 </script>
@@ -293,14 +295,28 @@ const onSubmitEdit = () =>{
                           cols="12"
                           md="6"
                         >
-                          <v-autocomplete
+                          <VAutocomplete
                             v-model="country_id"
                             label="País"
                             :rules="[requiredValidator]"
-                            :items="getCountries"
+                            :items="listCountries"
+                            item-title="name"
+                            item-value="name"
                             :menu-props="{ maxHeight: '200px' }"
                             @update:model-value="selectCountry"
-                          />
+                          >
+                          <template
+                            v-if="country_id"
+                            #prepend
+                            >
+                            <VAvatar
+                              start
+                              style="margin-top: -8px;"
+                              size="36"
+                              :image="getFlagCountry(country_id)"
+                            />
+                          </template>
+                        </VAutocomplete>
                         </VCol>
                         <VCol
                           cols="12"

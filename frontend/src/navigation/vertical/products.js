@@ -8,14 +8,14 @@ export default [
           icon: { icon: 'mdi-tag-faces' },
           to: 'dashboard-products-brands', 
           action: 'ver', 
-          subject: 'categorías', 
+          subject: 'marcas', 
         },
         { 
           title: 'Tags', 
           icon: { icon: 'mdi-tag-multiple-outline' },
           to: 'dashboard-products-tags', 
           action: 'ver', 
-          subject: 'categorías', 
+          subject: 'tag-productos', 
         },
         { 
           title: 'Categorías', 
@@ -36,7 +36,7 @@ export default [
           icon: { icon: 'mdi-clock-time-two-outline' },
           to: 'dashboard-products-pendings', 
           action: 'ver' , 
-          subject: 'pendientes', 
+          subject: 'productos-pendientes', 
         }
       ],
     }

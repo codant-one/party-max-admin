@@ -8,3 +8,9 @@
         ~notifications~
     </div>
 </template>
+
+<route lang="yaml">
+    meta:
+      action: ver
+      subject: página-notificaciones
+  </route>

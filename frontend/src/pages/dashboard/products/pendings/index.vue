@@ -370,7 +370,9 @@ const downloadCSV = async () => {
                         <th class="pe-4"> PRECIO </th>
                         <th class="pe-4"> QTY </th>
                         <th class="pe-4"> STATUS </th>
-                        <th class="pe-4"> ACTION </th>
+                        <th scope="pe-4" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
+                            ACCIONES
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -410,9 +412,9 @@ const downloadCSV = async () => {
                                 label
                             />
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
+                        <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">      
                             <!-- <VBtn
-                                v-if="$can('editar', 'faqs')"
+                                v-if="$can('editar', 'productos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -429,7 +431,7 @@ const downloadCSV = async () => {
                                     icon="tabler-edit" />
                             </VBtn> -->
                             <VBtn
-                                v-if="$can('editar', 'faqs')"
+                                v-if="$can('aprobar', 'productos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -447,7 +449,7 @@ const downloadCSV = async () => {
                             </VBtn>
 
                             <VBtn
-                                v-if="$can('editar', 'faqs')"
+                                v-if="$can('rechazar', 'productos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -465,7 +467,7 @@ const downloadCSV = async () => {
                             </VBtn>
 
                             <VBtn
-                                v-if="$can('eliminar','faqs')"
+                                v-if="$can('eliminar','productos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -589,3 +591,8 @@ const downloadCSV = async () => {
         padding-block-end: 1rem;
     }
 </style>
+<route lang="yaml">
+    meta:
+      action: ver
+      subject: productos-pendientes
+</route>

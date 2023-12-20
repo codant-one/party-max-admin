@@ -274,7 +274,7 @@ const downloadCSV = async () => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','tags')"
+                v-if="$can('crear','tag-productos')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewTagDrawerVisible = true">
                   Agregar Tag
@@ -290,7 +290,7 @@ const downloadCSV = async () => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col" v-if="$can('editar', 'tags') || $can('eliminar', 'tags')">
+                <th scope="col" v-if="$can('editar', 'tag-productos') || $can('eliminar', 'tag-productos')">
                   ACCIONES
                 </th>
               </tr>
@@ -305,9 +305,9 @@ const downloadCSV = async () => {
                 <td> {{ tag.id }} </td>
                 <td class="text-wrap"> {{ tag.name }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'tags') || $can('eliminar', 'tags')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'tag-productos') || $can('eliminar', 'tag-productos')">      
                   <VBtn
-                    v-if="$can('editar', 'tags')"
+                    v-if="$can('editar', 'tag-productos')"
                     icon
                     size="x-small"
                     color="default"
@@ -320,7 +320,7 @@ const downloadCSV = async () => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','tags')"
+                    v-if="$can('eliminar','tag-productos')"
                     icon
                     size="x-small"
                     color="default"
@@ -415,5 +415,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: tags
+    subject: tag-productos
 </route>

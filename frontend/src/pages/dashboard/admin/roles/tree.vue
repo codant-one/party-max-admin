@@ -41,6 +41,34 @@ const closeTreeDialog  = function(){
                     </li>
                     <ul class="tab">
                         <li class="n2">
+                            <strong>Proveedores</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de proveedores</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Proveedores</strong>&emsp;/&emsp;<code>Permite la creación de proveedores</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Proveedores</strong>&emsp;/&emsp;<code>Permite la edición de proveedores</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Proveedores</strong>&emsp;/&emsp;<code>Permite la eliminación de proveedores</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
+                            <strong>Clientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de clientes</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Clientes</strong>&emsp;/&emsp;<code>Permite la creación de clientes</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Clientes</strong>&emsp;/&emsp;<code>Permite la edición de clientes</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Clientes</strong>&emsp;/&emsp;<code>Permite la eliminación de clientes</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">
@@ -123,6 +151,20 @@ const closeTreeDialog  = function(){
                                 </li>
                             </ul>
                             <li class="tab n3">
+                                <strong>Ver Tags de Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de tags de blogs</code>
+                            </li>
+                            <ul class="tab">
+                                <li class="tab n3">
+                                    <strong>Crear Tags de Blogs</strong>&emsp;/&emsp;<code>Permite la creación de tags de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Editar Tags de Blogs</strong>&emsp;/&emsp;<code>Permite la edición de tags de blogs</code>
+                                </li>
+                                <li class="tab n3">
+                                    <strong>Eliminar Tags de Blogs</strong>&emsp;/&emsp;<code>Permite la eliminación de tags de blogs</code>
+                                </li>
+                            </ul>
+                            <li class="tab n3">
                                 <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de blogs</code>
                             </li>
                             <ul class="tab">
@@ -145,22 +187,53 @@ const closeTreeDialog  = function(){
                         </li>   
                         <li class="tab n3">
                             <strong>Ver Blogs</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-blogs</code>
-                        </li>                 
+                        </li>   
+                        <li class="tab n3">
+                            <strong>Ver Notificaciones</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-notificaciones</code>
+                        </li>              
                         <li class="n2">
                             <strong>Productos</strong>
                         </li>
                         <li class="tab n3">
-                            <strong>Ver Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías</code>
+                            <strong>Ver Marcas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de marcas de productos</code>
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creación de categorías</code>
+                                <strong>Crear Marcas</strong>&emsp;/&emsp;<code>Permite la creación de marcas de productos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edición de categorías</code>
+                                <strong>Editar Marcas</strong>&emsp;/&emsp;<code>Permite la edición de marcas de productos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías</code>
+                                <strong>Eliminar Marcas</strong>&emsp;/&emsp;<code>Permite la eliminación de marcas de productos</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Tags de Productos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de tags de productos</code>
+                            </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Tags de Productos</strong>&emsp;/&emsp;<code>Permite la creación de tags de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Tags de Productos</strong>&emsp;/&emsp;<code>Permite la edición de tags de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Tags de Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de tags de productos</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de productos</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creación de categorías de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edición de categorías de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de productos</code>
                             </li>
                         </ul>
                         <li class="tab n3">
@@ -172,6 +245,20 @@ const closeTreeDialog  = function(){
                             </li>
                             <li class="tab n3">
                                 <strong>Editar Productos</strong>&emsp;/&emsp;<code>Permite la edición de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Productos Pendientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de productos pendientes</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Aprobar Productos</strong>&emsp;/&emsp;<code>Permite la aprobación de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Rechazar Productos</strong>&emsp;/&emsp;<code>Permite rechazar productos</code>
                             </li>
                             <li class="tab n3">
                                 <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>

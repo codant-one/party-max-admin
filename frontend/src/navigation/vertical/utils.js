@@ -22,7 +22,7 @@ export default [
           icon: { icon: 'mdi-bell-badge' },
           to: 'dashboard-utils-notifications',
           action: 'ver' ,
-          subject: 'horarios',
+          subject: 'página-notificaciones', 
         }
       ],
     }

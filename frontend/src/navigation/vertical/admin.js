@@ -53,7 +53,7 @@ export default [
             title: 'Tags', 
             to: 'dashboard-admin-blog-tags', 
             action: 'ver', 
-            subject: 'tags', 
+            subject: 'tag-blogs', 
           },
           { 
             title: "Lista de Blogs", 

@@ -301,7 +301,7 @@ const getFlagCountry = country => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','clients')"
+                v-if="$can('crear','clientes')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewClientDrawerVisible = true">
                   Agregar Cliente
@@ -321,7 +321,7 @@ const getFlagCountry = country => {
                 <th scope="col"> PAÍS </th>
                 <th scope="col"> PEDIDOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
-                <th scope="col" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">
+                <th scope="col" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">
                   ACCIONES
                 </th>
               </tr>
@@ -373,9 +373,9 @@ const getFlagCountry = country => {
                   <span class="text-body-1 font-weight-medium text-high-emphasis">$100</span>
                 </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">      
                   <VBtn
-                    v-if="$can('editar', 'clients')"
+                    v-if="$can('editar', 'clientes')"
                     icon
                     size="x-small"
                     color="default"
@@ -388,7 +388,7 @@ const getFlagCountry = country => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','clients')"
+                    v-if="$can('eliminar','clientes')"
                     icon
                     size="x-small"
                     color="default"
@@ -483,5 +483,5 @@ const getFlagCountry = country => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: clients
+    subject: clientes
 </route>
