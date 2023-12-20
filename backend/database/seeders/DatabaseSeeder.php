@@ -32,7 +32,10 @@ class DatabaseSeeder extends Seeder
             BlogSeeder::class,
             FaqSeeder::class,
             FaqCategorySeeder::class,
-            BlogCategorySeeder::class
+            BlogCategorySeeder::class,
+
+            MoreColorSeeder::class,
+            MoreStateSeeder::class
         ]);
 
     }

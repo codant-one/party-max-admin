@@ -330,4 +330,13 @@ class Product extends Model
 
         return $product;
     }
+
+    public static function updateStatesProduct($request, $product) {
+
+        $product->update([
+            'state_id' => $request->state_id
+        ]);  
+
+        return $product;
+    }
 }

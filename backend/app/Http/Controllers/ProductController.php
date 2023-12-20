@@ -296,4 +296,35 @@ class ProductController extends Controller
         }
 
     }
+
+    public function updateStates(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $product = Product::find($id);
+        
+            if (!$product)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Producto no encontrado'
+                ], 404);
+
+            $product->updateStatesProduct($request, $product); 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'product' => $product
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
 }

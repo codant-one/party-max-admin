@@ -109,6 +109,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [ProductController::class, 'delete']);
         Route::post('upload-image', [ProductController::class, 'uploadImage']);
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
+        Route::put('updateStates/{id}', [ProductController::class, 'updateStates']);
     });
 
     //Faq-categories

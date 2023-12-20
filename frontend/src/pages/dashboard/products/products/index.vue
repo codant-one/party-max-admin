@@ -47,6 +47,10 @@ const status = ref([
     title: 'Eliminado',
     value: 5
   },
+  {
+    title: 'Rechazado',
+    value: 6
+  },
 ])
 
 const categories = ref([])

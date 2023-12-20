@@ -25,6 +25,10 @@ class Products {
     updateLink(data, id) {
         return axios.put(`/products/updateStatus/${id}`, data)
     }
+
+    updateState(data, id) {
+        return axios.put(`/products/updateStates/${id}`, data)
+    }
 }
 
 const products = new Products();
