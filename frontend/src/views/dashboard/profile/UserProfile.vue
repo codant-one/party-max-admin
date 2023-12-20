@@ -42,15 +42,6 @@ const alert = ref({
     type: ''
 })
 
-const getCountries = computed(() => {
-  return listCountries.value.map((country) => {
-    return {
-      title: country.name,
-      value: country.id,
-    }
-  })
-})
-
 const getProvinces = computed(() => {
   return listProvincesByCountry.value.map((province) => {
     return {
@@ -70,8 +61,8 @@ const loadProvinces = () => {
 
 const selectCountry = country => {
   if (country) {
-    let _country = listCountries.value.find(item => item.id === country)
-    country_id.value = _country.id
+    let _country = listCountries.value.find(item => item.name === country)
+    country_id.value = _country.name
  
     province_id.value = ''
     
@@ -106,7 +97,7 @@ async function fetchData() {
     document.value = data.user_details?.document
     province_id.value = data.user_details?.province.name
     provinceOld_id.value = data.user_details?.province_id
-    countryOld_id.value = data.user_details?.province.country.id
+    countryOld_id.value = data.user_details?.province.country.name
     country_id.value = data.user_details?.province.country.name
     province.value = data.user_details?.province.name
     country.value = data.user_details?.province.country.name
@@ -253,6 +244,17 @@ const closeUserEditDialog = ()=>{
   isUserEditDialog.value = false
   fetchData()
 }
+
+const getFlagCountry = country => {
+  let val = listCountries.value.find(item => {
+    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  })
+
+  if(val)
+    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
+  else
+    return ''
+}
 </script>
 
 <template>
@@ -363,9 +365,14 @@ const closeUserEditDialog = ()=>{
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
                   País:
-                  <span class="text-body-2">
+                  <span class="text-body-2 me-2">
                     {{ country }}
                   </span>
+                  <VAvatar
+                    start
+                    size="25"
+                    :image="getFlagCountry(country)"
+                  />
                 </h6>
               </VListItemTitle>
               <VListItemTitle>
@@ -537,26 +544,39 @@ const closeUserEditDialog = ()=>{
                 cols="12"
                 md="6"
               >
-                <v-autocomplete
+                <VAutocomplete
                   v-model="country_id"
                   label="País"
                   :rules="[requiredValidator]"
-                  :items="getCountries"
+                  :items="listCountries"
+                  item-title="name"
+                  item-value="name"
                   :menu-props="{ maxHeight: '200px' }"
-                  @update:model-value="selectCountry"
-                />
+                  @update:model-value="selectCountry">
+                  <template
+                    v-if="country_id"
+                    #prepend
+                    >
+                    <VAvatar
+                      start
+                      style="margin-top: -8px;"
+                      size="36"
+                      :image="getFlagCountry(country_id)"
+                    />
+                  </template>
+                </VAutocomplete>
               </VCol>
               <VCol
                 cols="12"
                 md="6"
               >
-                <v-autocomplete
-                    v-model="province_id"
-                    label="Estado"
-                    :rules="[requiredValidator]"
-                    :items="getProvinces"
-                    :menu-props="{ maxHeight: '200px' }"
-                  />
+                <VAutocomplete
+                  v-model="province_id"
+                  label="Estado"
+                  :rules="[requiredValidator]"
+                  :items="getProvinces"
+                  :menu-props="{ maxHeight: '200px' }"
+                />
               </VCol>
               <VCol
                 cols="12"

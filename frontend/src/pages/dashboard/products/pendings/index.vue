@@ -3,6 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { prefixWithPlus } from '@/@core/utils/formatters'
 import { useProductsStores } from '@/stores/useProducts'
+import { excelParser } from '@/plugins/csv/excelParser'
 import router from '@/router'
 
 const productsStores = useProductsStores()
@@ -197,6 +198,41 @@ const removeProduct = async () => {
     return true
 }
 
+const downloadCSV = async () => {
+
+    isRequestOngoing.value = true
+
+    let data = { 
+        state_id: 4,
+        limit: -1 
+    }
+
+    await productsStores.fetchProducts(data)
+
+    let dataArray = [];
+        
+    productsStores.getProducts.forEach(element => {
+
+    let data = {
+        ID: element.id,
+        PRODUCTO: element.name,
+        TIENDA: element.user.name + '' + (element.user.last_name ?? ''),
+        STOCK: element.in_stock === 0 ? 'NO' : 'SI',
+        SKU: element.colors[0].sku,
+        PRECIO: element.price_for_sale,
+        QTY:  element.stock
+    }
+            
+    dataArray.push(data)
+    })
+
+    excelParser()
+    .exportDataFromJSON(dataArray, "pending-products", "csv");
+
+    isRequestOngoing.value = false
+
+}
+
 </script>
 
 <template>
@@ -312,7 +348,8 @@ const removeProduct = async () => {
                     <VBtn
                         variant="tonal"
                         color="secondary"
-                        prepend-icon="tabler-upload"
+                        prepend-icon="tabler-file-export"
+                        @click="downloadCSV"
                     >
                         Exportar
                     </VBtn>
@@ -330,7 +367,7 @@ const removeProduct = async () => {
                         <th> PRODUCTO </th>
                         <th class="pe-4"> STOCK </th>
                         <th class="pe-4"> SKU </th>
-                        <th class="pe-4"> PRICE </th>
+                        <th class="pe-4"> PRECIO </th>
                         <th class="pe-4"> QTY </th>
                         <th class="pe-4"> STATUS </th>
                         <th class="pe-4"> ACTION </th>

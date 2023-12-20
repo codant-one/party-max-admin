@@ -1,10 +1,14 @@
 <script setup>
 
 import { useClientsStores } from '@/stores/useClients'
+import { useCountriesStores } from '@/stores/useCountries'
 import { excelParser } from '@/plugins/csv/excelParser'
+import { themeConfig } from '@themeConfig'
+import { avatarText } from '@/@core/utils/formatters'
 import AddNewClientDrawer from './AddNewClientDrawer.vue' 
 
 const clientsStores = useClientsStores()
+const countriesStores = useCountriesStores()
 
 const clients = ref([])
 const searchQuery = ref('')
@@ -16,6 +20,7 @@ const isRequestOngoing = ref(true)
 const isAddNewClientDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedClient = ref({})
+const listCountries = ref([])
 
 const advisor = ref({
   type: '',
@@ -31,6 +36,10 @@ const paginationData = computed(() => {
   return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalClients.value } registros`
 })
 
+const loadCountries = () => {
+  listCountries.value = countriesStores.getCountries
+}
+
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
@@ -38,6 +47,13 @@ watchEffect(() => {
 
     if (!isAddNewClientDrawerVisible.value)
         selectedClient.value = {}
+})
+
+onMounted(async () => {
+
+  await countriesStores.fetchCountries()
+
+  loadCountries()
 })
 
 watchEffect(fetchData)
@@ -186,11 +202,11 @@ const downloadCSV = async () => {
   let dataArray = [];
       
   clientsStores.getClients.forEach(element => {
-    var a = element;
+
     let data = {
       ID: element.id,
       NOMBRE: element.user.name,
-      APELLIDO: element.user.last_name,
+      APELLIDO: element.user.last_name ?? '',
       USUARIO: element.user.username,
       PAÍS:  element.user.user_detail.province.country.name
     }
@@ -203,6 +219,17 @@ const downloadCSV = async () => {
 
   isRequestOngoing.value = false
 
+}
+
+const getFlagCountry = country => {
+  let val = listCountries.value.find(item => {
+    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  })
+
+  if(val)
+    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
+  else
+    return ''
 }
 </script>
 
@@ -292,6 +319,8 @@ const downloadCSV = async () => {
                 <th scope="col"> NOMBRE </th>
                 <th scope="col"> USUARIO </th>
                 <th scope="col"> PAÍS </th>
+                <th scope="col"> PEDIDOS </th>
+                <th scope="col"> TOTAL VENTAS </th>
                 <th scope="col" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">
                   ACCIONES
                 </th>
@@ -305,9 +334,44 @@ const downloadCSV = async () => {
                 style="height: 3.75rem;">
 
                 <td> {{ client.id }} </td>
-                <td class="text-wrap"> {{ client.user.name }} {{ client.user.last_name }} </td>
+                <td class="text-wrap">
+                  <div class="d-flex align-center gap-x-3">
+                    <VAvatar
+                      variant="tonal"
+                      size="38"
+                      >
+                      <VImg
+                        v-if="client.user.avatar"
+                        style="border-radius: 50%;"
+                        :src="themeConfig.settings.urlStorage + client.user.avatar"
+                      />
+                        <span v-else>{{ avatarText(client.user.name) }}</span>
+                    </VAvatar>
+                    <div class="d-flex flex-column">
+                      <span class="font-weight-medium" >
+                        {{ client.user.name }} {{ client.user.last_name }} 
+                      </span>
+                      <span class="text-sm text-disabled">{{ client.user.email }}</span>
+                    </div>
+                  </div>
+                </td>
                 <td class="text-wrap"> {{ client.user.username }} </td>
-                <td class="text-wrap"> {{ client.user.user_detail.province.country.name }} </td>
+                <td class="text-wrap"> 
+                  <VAvatar
+                    start
+                    size="25"
+                    :image="getFlagCountry(client.user.user_detail.province.country.name)"
+                  />
+                  <span class="text-body-2 ms-2">
+                    {{ client.user.user_detail.province.country.name }} 
+                  </span>
+                </td>
+                <td>
+                  324
+                </td>
+                <td>
+                  <span class="text-body-1 font-weight-medium text-high-emphasis">$100</span>
+                </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clients') || $can('eliminar', 'clients')">      
                   <VBtn
