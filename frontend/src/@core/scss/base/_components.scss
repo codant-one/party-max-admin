@@ -95,3 +95,23 @@
     }
   }
 }
+
+// 👉 Custom Input
+.v-label.custom-input {
+  padding: 1rem;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  opacity: 1;
+  white-space: normal;
+
+  &:hover {
+    border-color: rgba(var(--v-border-color), 0.25);
+  }
+
+  &.active {
+    border-color: rgb(var(--v-theme-primary));
+
+    .v-icon {
+      color: rgb(var(--v-theme-primary)) !important;
+    }
+  }
+}

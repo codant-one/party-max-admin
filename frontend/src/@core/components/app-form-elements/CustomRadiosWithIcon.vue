@@ -18,6 +18,7 @@ const emit = defineEmits(['update:selectedRadio'])
 
 const updateSelectedOption = value => {
   emit('update:selectedRadio', value)
+  emit('change', { id: value })
 }
 </script>
 

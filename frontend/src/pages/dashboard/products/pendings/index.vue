@@ -486,6 +486,16 @@ const downloadCSV = async () => {
                         </td>
                     </tr>
                 </tbody>
+                <!-- 👉 table footer  -->
+                <tfoot v-show="!products.length">
+                    <tr>
+                        <td
+                        colspan="7"
+                        class="text-center">
+                        Datos no disponibles
+                        </td>
+                    </tr>
+                </tfoot>
             </v-table>
         
             <v-divider />

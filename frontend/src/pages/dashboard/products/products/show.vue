@@ -1,7 +1,7 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import { FreeMode, Navigation, Thumbs, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Carousel, Slide } from 'vue3-carousel'
 
@@ -9,6 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/free-mode';
 import 'swiper/css/thumbs';
+import 'swiper/css/scrollbar';
 import 'vue3-carousel/dist/carousel.css'
 
 const props = defineProps({
@@ -30,7 +31,7 @@ const emit = defineEmits([
 
 const productImages = ref([])
 const currentSlide = ref(0)
-const modules = ref([FreeMode, Navigation, Thumbs])
+const modules = ref([FreeMode, Navigation, Thumbs, Scrollbar])
 const thumbsSwiper = ref(null);
 
 const title = ref('')
@@ -43,23 +44,47 @@ const favourite = ref('')
 const rating = ref(null)
 const price = ref('')
 const price_for_sale = ref('')
+const wholesale_price = ref('')
 const stock = ref('')
 const width = ref('')
 const height = ref('')
 const deep = ref('')
+const weigth = ref('')
+const material = ref('')
 const categories = ref('')
+const store = ref('')
+const color = ref('')
+const imageAux = ref('')
+
+const radioContent = ref([])
+const selectedColor = ref(null)
+const tab = ref(null)
 
 watchEffect(() => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
+            console.log(props.product.image)
+            imageAux.value = [{ image : props.product.image }]
+
             categories.value = props.product.colors[0]?.categories.map(item => item.category.name)
+            productImages.value = (props.product.colors[0]?.images.length === 0) ? imageAux.value : props.product.colors[0]?.images
+            color.value = props.product.colors[0]?.color.name
+            selectedColor.value = props.product.colors[0]?.color.id.toString()
 
-            productImages.value = props.product.colors[0]?.images
-            // productImages.value.unshift({image: props.product.image})
+            props.product.colors.forEach(element => { 
+                var aux = {
+                    value: element.color.id.toString(),
+                    title: element.color.name,
+                    image:  (element.images.length === 0) ? props.product.image : element.images[0].image
+                }
 
+                radioContent.value.push(aux)
+            });
+
+            store.value = props.product.user.name + ' ' + (props.product.user.last_name ?? '')
             title.value = props.product.name
             description.value = props.product.single_description
-            sku.value = props.product.sku ?? null
+            sku.value = props.product.colors[0]?.sku ?? null
             selling_price.value = props.product.selling_price ?? 0
             sales.value = props.product.sales ?? 0
             comments.value = props.product.comments ?? 0
@@ -67,10 +92,13 @@ watchEffect(() => {
             rating.value = props.product.rating ?? 2.5
             price.value = props.product.price
             price_for_sale.value = props.product.price_for_sale
+            wholesale_price.value = props.product.wholesale_price
             stock.value = props.product.stock
             width.value = props.product.detail.width
+            weigth.value = props.product.detail.weigth
             height.value = props.product.detail.height
             deep.value = props.product.detail.deep
+            material.value = props.product.detail.material
         }
     }
 })
@@ -78,6 +106,7 @@ watchEffect(() => {
 const closeProductDetailDialog = function() {
     thumbsSwiper.value = null
     productImages.value = []
+    radioContent.value = []
     
     emit('update:isDrawerOpen', false)
 }
@@ -90,6 +119,18 @@ const setThumbsSwiper = (swiper) => {
     thumbsSwiper.value = swiper;
 }
 
+const chanceRadio = (value) => {
+
+    if (Number.isInteger(Number(value.id))) {        
+        var seleted = props.product.colors.filter(item => item.color_id === Number(value.id))[0]
+        
+        categories.value = seleted.categories.map(item => item.category.name)
+        productImages.value = (seleted?.images.length === 0) ? imageAux.value : seleted?.images
+        color.value = seleted?.color.name
+        selectedColor.value = seleted?.color.id.toString()
+        sku.value = seleted?.sku ?? null
+    }
+}
 </script>
 
 <template>
@@ -144,15 +185,13 @@ const setThumbsSwiper = (swiper) => {
                             </Carousel>
                         </div>
                     </VCol>
-                    <VCol md="4" cols="12">
+                    <VCol md="3" cols="12">
                         <div class="d-none d-md-block">
                             <swiper
-                                :style="{
-                                    '--swiper-navigation-color': '#fff',
-                                    '--swiper-pagination-color': '#fff',
+                                :scrollbar="{
+                                    hide: true,
                                 }"
                                 :spaceBetween="10"
-                                :navigation="true"
                                 :thumbs="{ swiper: thumbsSwiper }"
                                 :modules="modules"
                                 class="mySwiper2"
@@ -163,96 +202,185 @@ const setThumbsSwiper = (swiper) => {
                             </swiper>
                         </div>
                     </VCol>
-                    <VCol md="7" cols="12">
+                    <VCol md="8" cols="12">
                         <VCardTitle class="text-h6 title-truncate py-0"> {{ title }} </VCardTitle>
-                        <VCardSubtitle v-if="description" class="subtitle-truncate mb-3"> 
-                            <span v-html="description"></span>
+                        <VCardSubtitle v-if="store" class="subtitle-truncate mb-3"> 
+                            <span><strong class="me-2">Store:</strong> {{ store }}</span>
                         </VCardSubtitle>
-                        <div class="px-4">
-                            <div class="font-weight-semibold">PRECIO: 
-                                <span>{{ price }}</span>
+                        <VDivider />
+                        <VCardText class="py-4">
+                            <div>SKU: 
+                                <span  class="font-weight-semibold">{{ sku }}</span>
                             </div>
-                            <div class="font-weight-semibold">PRECIO A LA VENTA: 
-                                <span>{{ price_for_sale }}</span>
+                            <div>Color: 
+                                <span class="font-weight-semibold text-uppercase">{{ color }}</span>
                             </div>
-                            <div class="font-weight-semibold">SKU: 
-                                <span>{{ sku }}</span>
+                            <div> 
+                                <CustomRadiosWithIcon
+                                    v-model:selected-radio="selectedColor"
+                                    :radio-content="radioContent"
+                                    :grid-column="{ sm: '3', cols: '12' }"
+                                    class="custom-input-setting"
+                                    @change="chanceRadio"
+                                >
+                                    <template #default="{ item }">
+                                        <div class="text-center">
+                                            <span class="font-weight-semibold text-uppercase">
+                                                {{ item.title }}
+                                            </span>
+                                            <div class="d-flex align-center justify-center">
+                                                <img 
+                                                    width="100"
+                                                    :src="themeConfig.settings.urlStorage + item.image" />
+                                            </div>
+                                        </div>
+                                    </template>
+                                </CustomRadiosWithIcon>
                             </div>
-                            <div>Stock: 
-                                <span>{{ stock }}</span>
-                            </div>
-                            <div>Ancho: 
-                                <span>{{ width }}</span>
-                            </div>
-                            <div>Alto: 
-                                <span>{{ height }}</span>
-                            </div>
-                            <div>Profundo: 
-                                <span>{{ deep }}</span>
-                            </div>
-                            <div>Envios: 
-                                <span v-if="selling_price >= 0">{{ selling_price }}</span>
-                                <span v-else>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-alarm-filled"
-                                        class="me-1"
-                                    />
-                                </span>
-                            </div>
-                            <div>Ventas:
-                                <span v-if="sales >= 0">{{ sales }}</span>
-                                <span v-else>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-alarm-filled"
-                                        class="me-1"
-                                    />
-                                </span>
-                            </div>
-                            <div>Comentarios:
-                                <span v-if="comments >= 0">{{ comments }}</span>
-                                <span v-else>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-alarm-filled"
-                                        class="me-1"
-                                    />
-                                </span>
-                            </div>
-                            <div>Favoritos:
-                                <span v-if="favourite >= 0">{{ favourite }}</span>
-                                <span v-else>
-                                    <VIcon
-                                        size="20"
-                                        icon="tabler-alarm-filled"
-                                        class="me-1"
-                                    />
-                                </span>
-                            </div>  
-                            <div class="d-flex">Valoración:
-                                <VRating
-                                    class="ms-1"
-                                    v-model="rating"
-                                    half-increments
-                                    readonly
-                                    density="compact"
-                                    size="small"
-                                />
-                            </div>
-                            <div>Categorías:
-                                <span v-for="category in categories">
-                                    <VChip
-                                        class="me-4"
-                                        label
-                                        size="x-small"
-                                        color="secondary"
-                                        >
-                                        {{ category }}
-                                    </VChip>
-                                </span>
-                            </div> 
-                        </div>               
+                        </VCardText>
+                        <VDivider />
+                        <VCardText class="px-4 py-2">
+                            <VTabs
+                                v-model="tab"
+                                color="deep-purple-accent-4"
+                                align-tabs="center"
+                            >
+                                <VTab>Descripción</VTab>
+                                <VTab>Especificaciones</VTab>
+                                <VTab>Detalles</VTab>
+                            </VTabs>
+                            <VWindow v-model="tab">
+                                <VWindowItem>
+                                    <VContainer fluid>
+                                        <VRow>
+                                            <VCol cols="12">
+                                                <span class="text-xs description" v-html="description"></span>
+                                            </VCol>
+                                        </VRow>
+                                    </VContainer>
+                                </VWindowItem>
+                                <VWindowItem>
+                                    <VContainer fluid>
+                                        <VRow>
+                                            <VCol cols="12">
+                                                <div>
+                                                    <span class="font-weight-semibold"> Costo: </span>
+                                                    <span>COP {{ price }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Precio al detal: </span>
+                                                    <span>COP {{ price_for_sale }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Precio al mayor: </span>
+                                                    <span>COP {{ wholesale_price }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Stock: </span>
+                                                    <span>{{ stock }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Alto: </span>
+                                                    <span>{{ height }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Ancho: </span>
+                                                    <span>{{ width }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Peso: </span>
+                                                    <span>{{ weigth }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Profundo: </span>
+                                                    <span>{{ deep }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Material: </span>
+                                                    <span>{{ material }}</span>
+                                                </div>
+                                            </VCol>
+                                        </VRow>
+                                    </VContainer>
+                                </VWindowItem>
+                                <VWindowItem>
+                                    <VContainer fluid>
+                                        <VRow>
+                                            <VCol cols="12">
+                                                <div> 
+                                                    <span class="font-weight-semibold"> Envios: </span>
+                                                    <span v-if="selling_price >= 0">{{ selling_price }}</span>
+                                                    <span v-else>
+                                                        <VIcon
+                                                            size="20"
+                                                            icon="tabler-alarm-filled"
+                                                            class="me-1"
+                                                        />
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Ventas: </span>
+                                                    <span v-if="sales >= 0">{{ sales }}</span>
+                                                    <span v-else>
+                                                        <VIcon
+                                                            size="20"
+                                                            icon="tabler-alarm-filled"
+                                                            class="me-1"
+                                                        />
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Comentarios: </span>
+                                                    <span v-if="comments >= 0">{{ comments }}</span>
+                                                    <span v-else>
+                                                        <VIcon
+                                                            size="20"
+                                                            icon="tabler-alarm-filled"
+                                                            class="me-1"
+                                                        />
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Favoritos: </span>
+                                                    <span v-if="favourite >= 0">{{ favourite }}</span>
+                                                    <span v-else>
+                                                        <VIcon
+                                                            size="20"
+                                                            icon="tabler-alarm-filled"
+                                                            class="me-1"
+                                                        />
+                                                    </span>
+                                                </div>  
+                                                <div class="d-flex">
+                                                    <span class="font-weight-semibold"> Valoración: </span>
+                                                    <VRating
+                                                        class="ms-1"
+                                                        v-model="rating"
+                                                        half-increments
+                                                        readonly
+                                                        density="compact"
+                                                        size="small"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <span class="font-weight-semibold"> Categorías: </span>
+                                                    <span v-for="category in categories">
+                                                        <VChip
+                                                            class="me-4"
+                                                            label
+                                                            size="x-small"
+                                                            color="secondary"
+                                                            >
+                                                            {{ category }}
+                                                        </VChip>
+                                                    </span>
+                                                </div> 
+                                            </VCol>
+                                        </VRow>
+                                    </VContainer>
+                                </VWindowItem>
+                            </VWindow>
+                        </VCardText>              
                     </VCol>
                 </VRow>
             </VCardText>
@@ -260,7 +388,14 @@ const setThumbsSwiper = (swiper) => {
     </VDialog>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+
+    .custom-input-setting {
+
+        :deep(.custom-input) {
+            padding: 10px !important;
+        }
+    }
 
     .carousel__item img {
         width: 60%;
@@ -324,6 +459,15 @@ const setThumbsSwiper = (swiper) => {
         height: 100%;
         object-fit: contain;
         border-radius: 8px;
+    }
+
+    .description {
+        line-height: 5px;
+
+        :deep(ul) {
+            list-style: disc;
+            padding-inline-start: 1.5em;
+        }
     }
 
 </style>

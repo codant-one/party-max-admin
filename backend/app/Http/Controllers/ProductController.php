@@ -34,6 +34,7 @@ class ProductController extends Controller
             $query = Product::with([
                             'colors.categories.category', 
                             'colors.images', 
+                            'colors.color', 
                             'detail', 
                             'user', 
                             'state',
