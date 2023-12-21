@@ -20,6 +20,11 @@ class Tag extends Model
         return $this->belongsTo(TagType::class, 'tag_type_id', 'id');
     }
 
+    public function blogTags()
+    {
+        return $this->hasMany(BlogTag::class, 'tag_id', 'id');
+    }
+
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
        $query->where('name', 'LIKE', '%' . $search . '%');
