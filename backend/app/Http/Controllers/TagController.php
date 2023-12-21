@@ -39,10 +39,17 @@ class TagController extends Controller
                             'orderBy'
                         ])
                     )->where('tag_type_id', $tag_type_id);
+            
+            $count = $query->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )->where('tag_type_id', $tag_type_id)
+                    ->count();
 
             $tags = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            
-            $count = $query->count();
 
             return response()->json([
                 'success' => true,

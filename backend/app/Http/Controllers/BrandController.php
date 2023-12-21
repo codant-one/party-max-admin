@@ -39,9 +39,15 @@ class BrandController extends Controller
                         ])
                     );
 
+            $count = $query->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )->count();
+
             $brands = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            
-            $count = $query->count();
 
             return response()->json([
                 'success' => true,

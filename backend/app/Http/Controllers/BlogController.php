@@ -36,9 +36,15 @@ class BlogController extends Controller
                                 ])
                           );            
 
+            $count = $query->applyFilters(
+                        $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy'
+                            ])
+                    )->count();
+
             $blogs = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-    
-            $count = $query->count();
 
             return response()->json([
                 'success' => true,

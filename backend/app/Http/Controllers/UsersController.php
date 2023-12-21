@@ -118,9 +118,16 @@ class UsersController extends Controller
                             ])
                         );
 
+            $count = $query->whereNotIn('id', $clients)
+                        ->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )->count();
+
             $users = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            
-            $count = $query->count();
 
             return response()->json([
                 'success' => true,

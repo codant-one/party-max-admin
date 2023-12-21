@@ -69,16 +69,38 @@ class MiscellaneousController extends Controller
         }
     }
 
-    public function products(): JsonResponse
+    public function products(Request $request): JsonResponse
     {
         try {
 
+            $limit = $request->has('limit') ? $request->limit : 12;
+
             $products = Product::with(['user'])->get();
 
+            $query = Product::with(['user'])
+                    ->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    );
+
+            $count = $query->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )->count();
+
+            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'products' => $products
+                    'products' => $products,
+                    'productsTotalCount' => $count
                 ]
             ], 200);
 

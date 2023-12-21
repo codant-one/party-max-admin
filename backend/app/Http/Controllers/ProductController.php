@@ -54,10 +54,23 @@ class ProductController extends Controller
                             ])
                         )
                         ->withTrashed();
-
-            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
-            $count = $query->count();
+            $count = $query->applyFilters(
+                            $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy',
+                                'favourite',
+                                'archived',
+                                'discarded',
+                                'state_id',
+                                'in_stock',
+                                'category_id'
+                            ])
+                        )
+                        ->withTrashed()->count();
+            
+            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
             return response()->json([
                 'success' => true,

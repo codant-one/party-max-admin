@@ -40,9 +40,15 @@ class BlogCategoryController extends Controller
                     ])
                 );
 
+            $count = $query->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )->count();
+
             $categories = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            
-            $count = $query->count();
 
             return response()->json([
                 'success' => true,
