@@ -9,8 +9,6 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 use App\Models\Client;
 
-// use App\Http\Requests\UserRequest;
-
 class ClientRequest extends FormRequest
 {
     /**

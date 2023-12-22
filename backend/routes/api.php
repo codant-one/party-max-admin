@@ -45,6 +45,7 @@ Route::group([
     'middleware' => 'cors'
 ], function () {
     Route::post('login', [AuthController::class , 'login'])->name('login');
+    Route::post('register', [AuthController::class, 'register']);
     Route::post('forgot-password', [PasswordResetController::class, 'forgot_password'])->name('forgot.password');
     Route::get('password/find/{token}', [PasswordResetController::class, 'find'])->name("find");
     Route::post('change', [PasswordResetController::class, 'change'])->name("change");
@@ -137,8 +138,6 @@ Route::apiResource('provinces', ProvinceController::class);
 Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
 
-Route::post('register/client',[ClientController::class, 'register_client']);
-
 Route::get('home', [HomeController::class, 'home']);
 Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
 Route::get('miscellaneous/categories', [MiscellaneousController::class, 'categoriesAll']);
@@ -149,3 +148,4 @@ Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'pop
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
+Route::get('emails', [TestingController::class , 'emails'])->name('emails');
