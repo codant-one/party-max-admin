@@ -53,6 +53,7 @@ Route::group([
         Route::post('2fa/validate', [AuthController::class, 'validate_double_factor_auth'])->name('2fa.validate');
         Route::post('logout', [AuthController::class , 'logout'])->name('logout');
         Route::post('me', [AuthController::class , 'me'])->name('me');
+        Route::get('generateQR', [AuthController::class , 'generateQR'])->name('generateQR');
     });
 });
 

@@ -66,6 +66,14 @@ export const useAuthStores = defineStore('auth', {
                 }).catch(error => {
                     return Promise.reject(error)
                 })
-        }
+        },
+        generateQR() {
+            return Auth.generateQR()
+                .then((response) => {
+                    return Promise.resolve(response.data.data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                })            
+        },
     }
 })

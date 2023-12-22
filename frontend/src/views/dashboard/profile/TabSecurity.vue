@@ -2,13 +2,24 @@
 
 import { confirmedValidator, passwordValidator, requiredValidator } from '@/@core/utils/validators'
 import { useProfileStores } from '@/stores/useProfile'
+import { useAuthStores } from '@/stores/useAuth'
+import AddAuthenticatorAppDialog from "@/components/dialogs/AddAuthenticatorAppDialog.vue";
+import QRCode from 'qrcode-generator';
 
 const profileStores = useProfileStores()
+const authStores = useAuthStores()
+
 const refVForm = ref()
 const password = ref()
 const passwordConfirmation = ref()
 const isNewPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
+
+const isDialogVisible = ref(false)
+const is_2fa = ref(false)
+const data = ref(null)
+const qr = ref(null)
+const token = ref(null)
 
 const alert = ref({
     message: '',
@@ -16,7 +27,62 @@ const alert = ref({
     type: '',
 })
 
-const onSubmit = () =>{
+const enabled2fa = () => {
+  isDialogVisible.value = true
+}
+
+watchEffect(fetchData)
+
+async function fetchData() {
+  data.value = await authStores.generateQR()
+
+  const typeNumber = 0;
+  const errorCorrectionLevel = 'L';
+  const qr_ = QRCode(typeNumber, errorCorrectionLevel);
+  qr_.addData(data.value.qr);
+  qr_.make();
+
+  qr.value = qr_.createDataURL(4)
+  token.value = data.value.token
+  is_2fa.value = data.value.is_2fa
+
+}
+
+const chance2fa = (code) => {
+
+  let data = {
+    token_2fa: code,
+    token: token.value
+  }
+
+  authStores.validate(data)
+    .then(response => {
+      alert.value.show = true
+      alert.value.message = 'Información actualizada'
+      alert.value.type = 'success' 
+    }).catch(err => {
+
+      window.scrollTo(0, 0)
+
+      if(err.message === 'invalid_code'){
+        alert.value.show = true
+        alert.value.type = 'error'
+        alert.value.message = err.errors
+      }
+
+      console.error(err.message)
+    })
+
+  setTimeout(() => {
+    alert.value.show = false
+    alert.value.type = ''
+    alert.value.message = ''
+  }, 5000)
+
+  fetchData()
+}
+
+const onSubmit = () => {
     refVForm.value?.validate().then(({ valid: isValid }) => {
         if(isValid) {
             
@@ -66,6 +132,7 @@ const onSubmit = () =>{
 </script>
 
 <template>
+  <section>
   <VRow>
     <VCol 
       v-if="alert.show" 
@@ -133,6 +200,43 @@ const onSubmit = () =>{
           </VForm>
         </VCardText>
       </VCard>
+      <VCard title="Habilitar" class="mt-2">
+        <VCardText>
+          <VTable class="text-no-wrap rounded border">
+            <thead>
+              <tr>
+                <th scope="col">
+                  TIPO
+                </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col">HABILITAR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td> Factor doble autenticación (2FA)  </td>
+                <td> </td>
+                <td> </td>
+                <td>
+                  <VCheckbox 
+                    v-model="is_2fa"
+                    @update:model-value="enabled2fa" />
+                </td>
+              </tr>
+            </tbody>
+          </VTable>
+        </VCardText>
+      </VCard>
     </VCol>
   </VRow>
+
+  <AddAuthenticatorAppDialog
+    v-model:isDialogVisible="isDialogVisible"
+    :qr="qr"
+    :token="token"
+    :is_2fa="is_2fa"
+    @submit="chance2fa"
+  />
+  </section>
 </template>

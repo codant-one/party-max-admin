@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tags', function (Blueprint $table) {
-            $table->unsignedBigInteger('tag_type_id')->default(1)->after('id');
-
-            $table->foreign('tag_type_id')->references('id')->on('tag_types')->onDelete('cascade');
+        Schema::table('users', function (Blueprint $table) {
+            $table->tinyInteger('is_2fa')->after('token_2fa')->default(0);
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tags', function (Blueprint $table) {
-            $table->dropColumn('tag_type_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_2fa');
         });
     }
 };

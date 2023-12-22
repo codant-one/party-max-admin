@@ -104,7 +104,7 @@ class AuthController extends Controller
         $user->online = Carbon::now();
         $user->save();
 
-        if (env('APP_DEBUG')) {
+        if (env('APP_DEBUG') || ($user->is_2fa === 0)) {
             return response()->json([
                 'success' => true,
                 'message' => 'login_success',
@@ -157,12 +157,52 @@ class AuthController extends Controller
 
         if ($google2fa->verifyKey($user->token_2fa, $request->token_2fa)) {
             session()->put('2fa', '1');
+            $user->is_2fa =  ($user->is_2fa === 0) ? 1 : 0;
+            $user->update();
 
             return response()->json([
                 'success' => true,
                 'message' => 'login_success'
             ], 200);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'invalid_code',
+            'errors' => 'Código de verificación incorrecto'
+        ], 400);
+    }
+
+    public function generateQR()
+    {
+        $user = Auth::user();
+        $google2fa = app('pragmarx.google2fa');
+        $token2FA = '';
+
+        if (empty($user->token_2fa)) {
+            $token2FA = $google2fa->generateSecretKey();
+
+            $user->token_2fa = $token2FA;
+            $user->update();
+        }
+
+        $qr = $google2fa->getQRCodeUrl(
+            config('app.name'),
+            $user->email,
+            empty($user->token_2fa) ? $token2FA : $user->token_2fa
+        );
+
+        $data = [
+            'qr' => $qr,
+            'is_2fa' => ($user->is_2fa === 0) ? false : true,
+            'token' => empty($user->token_2fa) ? $token2FA : $user->token_2fa
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'generate-qr',
+            'data' => $data
+        ], 200);
 
         return response()->json([
             'success' => false,

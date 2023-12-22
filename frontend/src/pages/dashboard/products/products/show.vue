@@ -63,7 +63,6 @@ const tab = ref(null)
 watchEffect(() => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
-            console.log(props.product.image)
             imageAux.value = [{ image : props.product.image }]
 
             categories.value = props.product.colors[0]?.categories.map(item => item.category.name)
