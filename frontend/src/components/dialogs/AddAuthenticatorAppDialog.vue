@@ -26,6 +26,7 @@ const props = defineProps({
 const emit = defineEmits([
   'update:isDialogVisible',
   'submit',
+  'close'
 ])
 
 const authCode = ref(structuredClone(toRaw(props.authCode)))
@@ -40,6 +41,7 @@ const formSubmit = () => {
 const resetAuthCode = () => {
   authCode.value = structuredClone(toRaw(props.authCode))
   emit('update:isDialogVisible', false)
+  emit('close')
 }
 
 const handleOtp = (value) => {
@@ -55,7 +57,7 @@ const handleOtp = (value) => {
     @update:model-value="(val) => $emit('update:isDialogVisible', val)"
   >
     <!-- Dialog close btn -->
-    <DialogCloseBtn @click="$emit('update:isDialogVisible', false)" />
+    <DialogCloseBtn @click="resetAuthCode" />
 
     <VCard class="pa-5 pa-sm-8">
       <VCardItem>

@@ -157,8 +157,11 @@ class AuthController extends Controller
 
         if ($google2fa->verifyKey($user->token_2fa, $request->token_2fa)) {
             session()->put('2fa', '1');
-            $user->is_2fa =  ($user->is_2fa === 0) ? 1 : 0;
-            $user->update();
+            
+            if($request->panel) {
+                $user->is_2fa =  ($user->is_2fa === 0) ? 1 : 0;
+                $user->update();
+            }
 
             return response()->json([
                 'success' => true,
