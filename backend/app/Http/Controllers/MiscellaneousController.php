@@ -123,7 +123,8 @@ class MiscellaneousController extends Controller
                                 'colors.color', 
                                 'colors.images',
                                 'colors.categories.category', 
-                                'tags.tag'
+                                'tags.tag',
+                                'detail'
                               ])
                               ->where('slug', $slug)
                               ->first();
