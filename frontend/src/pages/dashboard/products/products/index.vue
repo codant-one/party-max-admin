@@ -718,7 +718,27 @@ const removeProduct = async () => {
                           v-if="$can('aprobar', 'productos') ||
                                 $can('rechazar', 'productos') || 
                                 $can('editar', 'productos') || 
-                                $can('eliminar', 'productos')">      
+                                $can('eliminar', 'productos')"> 
+                                
+                          <VBtn
+                          v-if="$can('ver', 'productos')"
+                            @click="showProduct(product.id)"
+                            icon
+                            variant="text"
+                            color="default"
+                            size="x-small">
+                            <VTooltip
+                              open-on-focus
+                              location="top"
+                              activator="parent">
+                              Ver
+                            </VTooltip>
+                            <VIcon
+                              size="28"
+                              icon="tabler-eye"
+                              class="me-1"
+                            />
+                          </VBtn>          
                           <VBtn
                                 v-if="$can('aprobar', 'productos') && product.state_id === 4"
                                 icon
