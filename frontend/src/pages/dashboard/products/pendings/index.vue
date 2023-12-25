@@ -111,21 +111,27 @@ const checkIfMobile = () => {
 }
 
 const resolveStatus = statusMsg => {
-  if (statusMsg === 3)
-    return {
-      text: 'Publicado',
-      color: 'success',
-    }
-  if (statusMsg === 5)
-    return {
-      text: 'Eliminado',
-      color: 'warning',
-    }
-  if (statusMsg === 4)
-    return {
-      text: 'Pendiente',
-      color: 'error',
-    }
+    if (statusMsg === 3)
+        return {
+            text: 'Publicado',
+            color: 'success',
+        }
+    if (statusMsg === 5)
+        return {
+            text: 'Eliminado',
+            color: 'warning',
+        }
+    if (statusMsg === 4)
+        return {
+            text: 'Pendiente',
+            color: 'error',
+        }
+
+    if (statusMsg === 6)
+        return {
+            text: 'Rechazado',
+            color: 'info',
+        }
 }
 
 const editProduct = data => {
@@ -398,7 +404,7 @@ const downloadCSV = async () => {
                         </td>
                         <td>   
                             <VSwitch 
-                                :model-value="product.in_stock"
+                                :model-value="product.in_stock === 1 ? true : false"
                                 readonly
                             /> 
                         </td>
