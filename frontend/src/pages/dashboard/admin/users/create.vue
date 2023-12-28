@@ -223,6 +223,7 @@ const getFlagCountry = country => {
     <DialogCloseBtn @click="closeUserCreateDialog " />
 
     <VCard title="Crear usuario">
+      <VDivider class="mt-4"/>
       <VCardText>
         <VForm
           ref="refFormCreate"

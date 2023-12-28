@@ -60,6 +60,7 @@ const closeRoleDetailDialog = function(){
 
         <!-- Dialog Content -->
         <VCard title="Detalle Rol">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <VRow>
                     <VCol cols="12" >
@@ -100,6 +101,7 @@ const closeRoleDetailDialog = function(){
         <DialogCloseBtn @click="isSelectRolesDialog = !isSelectRolesDialog" />
 
         <VCard title="Permisos">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <VCardTitle>
                     Administrador General  

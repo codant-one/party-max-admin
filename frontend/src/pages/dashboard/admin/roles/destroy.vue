@@ -85,6 +85,7 @@ const deleteRole = function() {
 
         <!-- Dialog Content -->
         <VCard title="Eliminar Rol">
+          <VDivider class="mt-4"/>
             <VCardText>
                 Esta seguro que desea eliminar el rol <strong>{{ role.name }}</strong>?
             </VCardText>

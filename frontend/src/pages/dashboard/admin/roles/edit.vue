@@ -150,6 +150,7 @@ const onSubmitEdit = () =>{
 
         <!-- Dialog Content -->
         <VCard title="Editar Rol">
+            <VDivider class="mt-4"/>
             <VForm
                 ref="refFormEdit"
                 @submit.prevent="onSubmitEdit"

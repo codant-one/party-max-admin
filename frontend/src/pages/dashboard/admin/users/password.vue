@@ -106,6 +106,7 @@ const editUserPassword = function(){
 
         <!-- Dialog Content -->
         <VCard title="Editar contraseña de usuario">
+            <VDivider class="mt-4"/>
             <VForm
                 ref="refForm"
                 @submit.prevent="editUserPassword"

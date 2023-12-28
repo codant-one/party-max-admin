@@ -313,7 +313,12 @@ const downloadCSV = async () => {
                     color="default"
                     variant="text"
                     @click="editTag(tag)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Editar
+                    </VTooltip>          
                     <VIcon
                         size="22"
                         icon="tabler-edit" />
@@ -326,7 +331,12 @@ const downloadCSV = async () => {
                     color="default"
                     variant="text"
                     @click="showDeleteDialog(tag)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Eliminar
+                    </VTooltip>         
                     <VIcon
                       size="22"
                       icon="tabler-trash" />
@@ -381,6 +391,7 @@ const downloadCSV = async () => {
 
       <!-- Dialog Content -->
       <VCard title="Eliminar Tag">
+        <VDivider class="mt-4"/>
         <VCardText>
           Está seguro de eliminar el Tag de <strong>{{ selectedTag.name }}</strong>?.
         </VCardText>

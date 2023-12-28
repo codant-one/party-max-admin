@@ -6,6 +6,7 @@ import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
 import { avatarText } from '@/@core/utils/formatters'
 import AddNewClientDrawer from './AddNewClientDrawer.vue' 
+import router from '@/router'
 
 const clientsStores = useClientsStores()
 const countriesStores = useCountriesStores()
@@ -88,6 +89,10 @@ const editClient = clientData => {
 const showDeleteDialog = clientData => {
   isConfirmDeleteDialogVisible.value = true
   selectedClient.value = { ...clientData }
+}
+
+const seeClient = clientData => {
+  router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
 }
 
 const removeClient = async () => {
@@ -348,7 +353,7 @@ const getFlagCountry = country => {
                         <span v-else>{{ avatarText(client.user.name) }}</span>
                     </VAvatar>
                     <div class="d-flex flex-column">
-                      <span class="font-weight-medium" >
+                      <span class="font-weight-medium cursor-pointer text-primary" @click="seeClient(client)">
                         {{ client.user.name }} {{ client.user.last_name }} 
                       </span>
                       <span class="text-sm text-disabled">{{ client.user.email }}</span>
@@ -375,13 +380,37 @@ const getFlagCountry = country => {
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">      
                   <VBtn
+                    v-if="$can('ver', 'clientes')"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small"
+                    @click="seeClient(client)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Ver
+                    </VTooltip>
+                    <VIcon
+                      size="28"
+                      icon="tabler-eye"
+                      class="me-1"
+                    />
+                  </VBtn> 
+                  <VBtn
                     v-if="$can('editar', 'clientes')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
                     @click="editClient(client)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Editar
+                    </VTooltip>
                     <VIcon
                         size="22"
                         icon="tabler-edit" />
@@ -394,7 +423,12 @@ const getFlagCountry = country => {
                     color="default"
                     variant="text"
                     @click="showDeleteDialog(client)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Eliminar
+                    </VTooltip>   
                     <VIcon
                       size="22"
                       icon="tabler-trash" />
@@ -449,6 +483,7 @@ const getFlagCountry = country => {
 
       <!-- Dialog Content -->
       <VCard title="Eliminar Cliente">
+        <VDivider class="mt-4"/>
         <VCardText>
           Está seguro de eliminar el Cliente <strong>{{ selectedClient.user.name }}</strong>?.
         </VCardText>

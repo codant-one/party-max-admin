@@ -133,6 +133,7 @@ const onSubmitCreate = () =>{
 
         <!-- Dialog Content -->
         <VCard title="Crear Rol">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <VForm
                     ref="refFormCreate"

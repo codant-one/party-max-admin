@@ -225,6 +225,7 @@ const getFlagCountry = country => {
 
         <!-- Dialog Content -->
         <VCard title="Editar usuario">
+          <VDivider class="mt-4"/>
             <VForm
                 ref="refFormEdit"
                 @submit.prevent="onSubmitEdit">

@@ -437,7 +437,7 @@ const onSubmit = () => {
                                             v-for="icon in iconsList" 
                                             class="button-icon"
                                             @click="selectIcon(icon)">
-                                            <VIcon size="40" :icon="icon"/>
+                                            <VIcon size="30" :icon="icon"/>
                                         </VBtn>
                                     </VBtnToggle>
                                     <!-- more icons -->

@@ -91,7 +91,7 @@ async function fetchData() {
     email.value = data.email
     username.value = data.username
     name.value = data.name
-    last_name.value = data.last_name
+    last_name.value = data.last_name ?? ''
     phone.value = data.user_details?.phone
     address.value = data.user_details?.address
     document.value = data.user_details?.document
@@ -261,7 +261,7 @@ const getFlagCountry = country => {
   <VRow>
     <VCol cols="12">
       <VCard>
-        <VCardText class="text-center pt-15">
+        <VCardText class="text-center pt-6">
           <VAvatar
             rounded
             :size="120"
@@ -281,7 +281,7 @@ const getFlagCountry = country => {
             </span>
           </VAvatar>
           <h6 class="text-h6 mt-4">
-            {{ name.toUpperCase() }}
+            {{ name.toUpperCase() }} {{ last_name.toUpperCase() }}
           </h6>
 
           <!-- 👉 Role chip -->
@@ -410,7 +410,8 @@ const getFlagCountry = country => {
       <DialogCloseBtn @click="closeUserEditDialog" />
 
       <!-- Dialog Content -->
-      <VCard title="Editar Información Personal">        
+      <VCard title="Editar Información Personal">    
+        <VDivider class="mt-4"/>    
         <VCol 
           v-if="alert.show" 
           cols="12" 

@@ -31,6 +31,7 @@ const closeTreeDialog  = function(){
 
         <!-- Dialog Content -->
         <VCard title="Mapa de Permisos">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <ol id="permisos-lista">
                     <li class="n1">

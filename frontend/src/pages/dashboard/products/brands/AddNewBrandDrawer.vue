@@ -109,7 +109,7 @@ const handleDrawerModelValueUpdate = val => {
         />
       </VBTn>
     </div>
-
+    <VDivider class="mt-4"/>
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>

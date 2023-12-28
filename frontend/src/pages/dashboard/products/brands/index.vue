@@ -309,7 +309,12 @@ const downloadCSV = async () => {
                     color="default"
                     variant="text"
                     @click="editBrand(brand)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Editar
+                    </VTooltip>       
                     <VIcon
                         size="22"
                         icon="tabler-edit" />
@@ -322,7 +327,12 @@ const downloadCSV = async () => {
                     color="default"
                     variant="text"
                     @click="showDeleteDialog(brand)">
-                              
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Eliminar
+                    </VTooltip>         
                     <VIcon
                       size="22"
                       icon="tabler-trash" />
@@ -377,6 +387,7 @@ const downloadCSV = async () => {
 
       <!-- Dialog Content -->
       <VCard title="Eliminar Marca">
+        <VDivider class="mt-4"/>
         <VCardText>
           Está seguro de eliminar la marca de <strong>{{ selectedBrand.name }}</strong>?.
         </VCardText>
