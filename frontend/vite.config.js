@@ -8,11 +8,13 @@ import { defineConfig } from 'vite'
 import Pages from 'vite-plugin-pages'
 import Layouts from 'vite-plugin-vue-layouts'
 import vuetify from 'vite-plugin-vuetify'
+import pluginSvgVue from '@vuetter/vite-plugin-vue-svg';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    pluginSvgVue(),
     vueJsx(),
 
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin

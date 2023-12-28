@@ -42,8 +42,9 @@ const onSubmit = () => {
         load.value = true
         
         let data = {
-            token_2fa: otp.value,
-            token: localStorage.getItem('token')
+          panel: false,
+          token_2fa: otp.value,
+          token: localStorage.getItem('token')
         }
 
         authStores.validate(data)

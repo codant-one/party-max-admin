@@ -7,7 +7,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
+
+use App\Http\Requests\RegisterClientRequest;
+
+use App\Models\Client;
+use App\Models\User;
+use App\Models\UserDetails;
+use App\Models\UserRegisterToken;
 
 class AuthController extends Controller
 {
@@ -18,7 +27,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt', ['except' => ['login']]);
+        $this->middleware('jwt', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -104,7 +113,7 @@ class AuthController extends Controller
         $user->online = Carbon::now();
         $user->save();
 
-        if (env('APP_DEBUG')) {
+        if (env('APP_DEBUG') || ($user->is_2fa === 0)) {
             return response()->json([
                 'success' => true,
                 'message' => 'login_success',
@@ -158,11 +167,54 @@ class AuthController extends Controller
         if ($google2fa->verifyKey($user->token_2fa, $request->token_2fa)) {
             session()->put('2fa', '1');
 
+            if($request->panel) {
+                $user->is_2fa =  ($user->is_2fa === 0) ? 1 : 0;
+                $user->update();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'login_success'
             ], 200);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'invalid_code',
+            'errors' => 'Código de verificación incorrecto'
+        ], 400);
+    }
+
+    public function generateQR()
+    {
+        $user = Auth::user();
+        $google2fa = app('pragmarx.google2fa');
+        $token2FA = '';
+
+        if (empty($user->token_2fa)) {
+            $token2FA = $google2fa->generateSecretKey();
+
+            $user->token_2fa = $token2FA;
+            $user->update();
+        }
+
+        $qr = $google2fa->getQRCodeUrl(
+            config('app.name'),
+            $user->email,
+            empty($user->token_2fa) ? $token2FA : $user->token_2fa
+        );
+
+        $data = [
+            'qr' => $qr,
+            'is_2fa' => ($user->is_2fa === 0) ? false : true,
+            'token' => empty($user->token_2fa) ? $token2FA : $user->token_2fa
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'generate-qr',
+            'data' => $data
+        ], 200);
 
         return response()->json([
             'success' => false,
@@ -287,6 +339,100 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function register(RegisterClientRequest $request)
+    {
+
+        try {
+
+            $password = $request->input('password');
+            $hashedPassword = Hash::make($password);
+
+            $user = new User();
+            $user->name = $request->name;
+            $user->username =  Str::slug($request->name);
+            $user->email = $request->email;
+            $user->password = $hashedPassword;
+            $user->save();
+
+            //Crear o Actualizar token.
+            $registerConfirm = UserRegisterToken::updateOrCreate(
+                ['user_id' => $user->id],
+                ['token' => Str::random(60)]
+            );
+
+            $userDetails = new UserDetails();
+            $userDetails->province_id = 292;
+            $userDetails->user_id = $user->id;
+            $userDetails->phone = $request->phone;
+            $userDetails->save();
+
+            if($request->rolname === 'cliente') {
+
+                $user->assignRole('Cliente');
+            
+                $client = new Client();
+                $client->user_id = $user->id;
+                $client->gender_id = 1;
+                $client->save();
+
+                $client = Client::with(['user'])->find($client->id);
+
+                $username = $client->user->username;
+                $email = $client->user->email;
+                
+                $info = [
+                    'title' => 'Verificar Correo Electrónico',
+                    'text' => 'Tu cuenta no está verificada. Confirma tu cuenta con los pasos a seguir para verificarla.',
+                    'buttonLink' =>  env('APP_DOMAIN').'/register-confirm?&token=' . $registerConfirm['token'],
+                    'buttonText' => 'Confirmar',
+                    'subject' => 'Bienvenido a PARTYMAX',
+                    'email' => 'emails.auth.notifications'
+                ];
+                
+                $responseMail = $this->sendMail($user->id, $info); 
+            }
+
+            return response()->json([
+                'success' => true,
+                'email_response' => $responseMail,
+                'data' => [ 
+                    'client' => Client::with(['user.userDetail.province.country', 'gender'])->find($client->id)
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
+
+    }
+
+    public function find($token)
+    {
+        $locale = session()->get('locale') ?? 'es';
+        $emailConfirm = UserRegisterToken::where('token', $token)->first();
+
+        if (!$emailConfirm)
+            return response()->json([
+                "ERROR" => true,'ERROR_MENSAGGE' => trans('auth.verify_token', [], $locale),"CODE" =>404], 404);
+
+        if (Carbon::parse($emailConfirm->updated_at)->addMinutes(720)->isPast()) {
+            $emailConfirm->delete();
+            return response()->json([
+                "ERROR" => true,'ERROR_MENSAGGE' => trans('auth.verify_token', [], $locale),"CODE" =>404], 404);
+        }
+
+        $response["message_return"] = array("ERROR" => false,"ERROR_MENSAGGE" => trans('auth.success', [], $locale),"CODE" =>200);
+        $response["result"] = $emailConfirm;
+
+        return response()->json($response,200);
+    }
+
+
     /**
      * Get the token array structure.
      *
@@ -306,4 +452,34 @@ class AuthController extends Controller
             'userAbilities' => $permissions
         ];
     }
+
+    private function sendMail($id, $info ){
+
+        $user = User::find($id);
+        
+        $data = [
+            'title' => $info['title'],
+            'user' => $user->name . ' ' . $user->last_name,
+            'text' => $info['text'],
+            'buttonLink' =>  $info['buttonLink'] ?? null,
+            'buttonText' =>  $info['buttonText'] ?? null
+        ];
+
+        $clientEmail = $user->email;
+        $subject = $info['subject'];
+        
+        try {
+            \Mail::send($info['email'], $data, function ($message) use ($clientEmail, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($clientEmail)->subject($subject);
+            });
+
+            return "Tu solicitud se ha procesado satisfactoriamente. Correo electrónico verificado. Le invitamos a que inicie sesion.";
+        } catch (\Exception $e){
+            return "Error al enviar el correo electrónico.".$e;
+        }        
+
+        return "";
+
+    } 
 }
