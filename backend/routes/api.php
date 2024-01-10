@@ -26,7 +26,9 @@ use App\Http\Controllers\{
     GenderController,
     MiscellaneousController,
     BrandController,
-    TagController
+    TagController,
+    OrderController
+
 };
 
 /*
@@ -74,6 +76,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('blog-categories', BlogCategoryController::class);
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('tags', TagController::class);
+    Route::apiResource('orders', OrderController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {

@@ -81,7 +81,7 @@ const recentDevices = [
   <VRow>
     <VCol cols="12">
       <!-- 👉 Change password -->
-      <VCard title="Change Password">
+      <VCard title="Cambiar contraseña">
         <VCardText>
           <VAlert
             variant="tonal"
@@ -89,9 +89,9 @@ const recentDevices = [
             class="mb-4 px-4 py-3"
           >
             <VAlertTitle class="mb-3">
-              Ensure that these requirements are met
+              Asegúrese de que se cumplan estos requisitos
             </VAlertTitle>
-            <span>Minimum 8 characters long, uppercase & symbol</span>
+            <span>Mínimo 8 caracteres, mayúsculas, minúsculas y números</span>
           </VAlert>
 
           <VForm @submit.prevent="() => {}">
@@ -101,7 +101,7 @@ const recentDevices = [
                 md="6"
               >
                 <AppTextField
-                  label="New Password"
+                  label="Nueva contraseña"
                   placeholder="············"
                   :type="isNewPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isNewPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
@@ -113,7 +113,7 @@ const recentDevices = [
                 md="6"
               >
                 <AppTextField
-                  label="Confirm Password"
+                  label="Confirmar Contraseña"
                   placeholder="············"
                   :type="isConfirmPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
@@ -123,7 +123,7 @@ const recentDevices = [
 
               <VCol cols="12">
                 <VBtn type="submit">
-                  Change Password
+                  Cambiar contraseña
                 </VBtn>
               </VCol>
             </VRow>

@@ -38,7 +38,9 @@ class DatabaseSeeder extends Seeder
             MoreStateSeeder::class,
             MorePermissionSeeder::class,
 
-            AddressSeeder::class
+            AddressSeeder::class,
+
+            OrderSeeder::class
         ]);
 
     }
