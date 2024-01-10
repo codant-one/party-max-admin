@@ -145,6 +145,9 @@ Route::get('miscellaneous/products', [MiscellaneousController::class, 'products'
 Route::get('miscellaneous/products/{slug}', [MiscellaneousController::class, 'productDetail']);
 Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
 Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
+Route::get('miscellaneous/blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+Route::get('miscellaneous/blogs/categories/{slug}', [MiscellaneousController::class, 'blogsByCategory']);
+
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
