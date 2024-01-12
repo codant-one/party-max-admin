@@ -99,13 +99,12 @@ class ClientController extends Controller
                 'user' => $client->user->name . ' ' . $client->user->last_name,
                 'user_name' =>$username,
                 'password'=>$password,
-                'Link' =>  $url ?? null, 
             ];
             
             try {
                 \Mail::send(
                     'emails.auth.client_created'
-                    , $data
+                    , ['data' => $data]
                     , function ($message) use ($email, $subject) {
                         $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                         $message->to($email)->subject($subject);
@@ -115,8 +114,9 @@ class ClientController extends Controller
                 $responseMail = 'Correo electrónico enviado al cliente satisfactoriamente.';
             } catch (\Exception $e){
                 $message = 'error';
-                $responseMail = 'Error al enviar Correo electrónico o dirección de correo no existe';//.$e->getMessage();
-            }      
+                $responseMail = $e->getMessage();
+            } 
+
 
 
 
