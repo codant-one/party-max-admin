@@ -12,6 +12,13 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalOrders = ref(0)
 
+const paginationData = computed(() => {
+  const firstIndex = orders.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = orders.value.length + (currentPage.value - 1) * rowPerPage.value
+
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
+})
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -151,7 +158,94 @@ async function fetchData() {
     </VCol>
 
     <VCol>
-      <!-- {{ orders }} -->
+      
+      <v-card title="Pedidos realizados">
+          <v-card-text class="d-flex flex-wrap py-4 gap-4">
+            <div
+              class="me-3"
+              style="width: 80px;">
+              
+              <VSelect
+                v-model="rowPerPage"
+                density="compact"
+                variant="outlined"
+                :items="[10, 20, 30, 50]"/>
+            </div>
+
+            <v-spacer />
+
+            <div class="d-flex align-center flex-wrap gap-4">
+              <!-- 👉 Search  -->
+              <div style="width: 10rem;">
+                <v-text-field
+                  v-model="searchQuery"
+                  placeholder="Buscar"
+                  density="compact"/>
+              </div>
+            </div>
+          </v-card-text>
+
+          <v-divider />
+
+          <v-table class="text-no-wrap">
+            <!-- 👉 table head -->
+            <thead>
+              <tr>
+                <th scope="col"> #ID </th>
+                <th scope="col"> NOMBRE </th>
+                <th scope="col"> DESCRIPCIÓN </th>
+                <th scope="col"> ICONO </th>
+                <th scope="col" v-if="$can('editar', 'categorías-faqs') || $can('eliminar', 'categorías-faqs')">
+                  ACCIONES
+                </th>
+              </tr>
+            </thead>
+            <!-- 👉 table body -->
+            <tbody>
+              <tr 
+                v-for="category in orders"
+                :key="category.id"
+                style="height: 3.75rem;">
+
+                <td> {{ category.id }} </td>
+                <td> {{ category.id }} </td>
+                <td> {{ category.id }} </td>
+                <td> 
+                  {{ category.id }} 
+                </td>
+                <!-- 👉 Acciones -->
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías-faqs') || $can('eliminar', 'categorías-faqs')">      
+                 
+                </td>
+              </tr>
+            </tbody>
+            <!-- 👉 table footer  -->
+            <tfoot v-show="!orders.length">
+              <tr>
+                <td
+                  colspan="7"
+                  class="text-center">
+                  Datos no disponibles
+                </td>
+              </tr>
+            </tfoot>
+          </v-table>
+        
+          <v-divider />
+
+          <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
+            <span class="text-sm text-disabled">
+              {{ paginationData }}
+            </span>
+
+            <VPagination
+              v-model="currentPage"
+              size="small"
+              :total-visible="5"
+              :length="totalPages"/>
+          
+          </VCardText>
+        </v-card>
       <!-- <CustomerOrderTable /> -->
     </VCol>
   </VRow>

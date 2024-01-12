@@ -205,8 +205,8 @@ const getFlagCountry = country => {
     </VCol> -->
     <!-- !SECTION -->
   </VRow>
-  <UserInfoEditDialog v-model:isDialogVisible="isUserInfoEditDialogVisible" />
-  <UserUpgradePlanDialog v-model:isDialogVisible="isUpgradePlanDialogVisible" />
+  <!-- <UserInfoEditDialog v-model:isDialogVisible="isUserInfoEditDialogVisible" /> -->
+  <!-- <UserUpgradePlanDialog v-model:isDialogVisible="isUpgradePlanDialogVisible" /> -->
 </template>
 
 <style lang="scss" scoped>

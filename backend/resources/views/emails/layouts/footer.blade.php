@@ -2,14 +2,14 @@
     <tr>
         <td class="es-m-p20b" align="left" style="padding:0;Margin:0;width:246px">
             <table cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                <tr>
+                <tr class="centerFestin">
                     <td align="left" style="padding:0;Margin:0">
                         <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:24px;color:#0a1b33;font-size:16px">
                             <strong>Síguenos en</strong>
                         </p>
                     </td>
                 </tr>
-                <tr>
+                <tr class="centerFestin">
                     <td align="left" style="padding:0;Margin:0;padding-top:15px;font-size:0">
                         <table cellpadding="0" cellspacing="0" class="es-table-not-adapt es-social" dir="ltr" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                             <tr>
@@ -38,8 +38,8 @@
         <td align="left" style="padding:0;Margin:0;width:254px">
             <table cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                 <tr>
-                    <td align="right" style="padding:0;Margin:0;font-size:0px">
-                        <img class="adapt-img" src="{{ asset('/images/festin.png') }}" width="150">
+                    <td align="right" class="centerFestin" style="padding:0;Margin:0;font-size:0px">
+                        <img src="{{ asset('/images/festin.png') }}" width="150">
                     </td>
                 </tr>
             </table>
