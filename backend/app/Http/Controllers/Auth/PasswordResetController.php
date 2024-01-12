@@ -40,16 +40,11 @@ class PasswordResetController extends Controller
         
         $email = $user->email;
         $subject = 'Solicitud de Renovación de Contraseña';
-        $url = env('APP_DOMAIN').'/reset-password?token='.$passwordReset['token'].'&user='.$email;
+        $domain = ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN');
+        $url = $domain.'/reset-password?token='.$passwordReset['token'].'&user='.$email;
         
         $data = [
-            'title' => 'Hemos recibido una solicitud para renovar Contraseña',
-            'user' => $user->name . ' ' . $user->last_name,
-            'text' => 'PARTYMAX te informa, que hemos recibido tu solicitud para renovar tu Contraseña.
-            <br><br>
-            Por favor confirma dicha solicitud haciendo clic en el enlace a continuación: ',
             'buttonLink' =>  $url ?? null,
-            'buttonText' => 'Confirmar Renovación de Contraseña' 
         ];
         
         try {
@@ -71,7 +66,7 @@ class PasswordResetController extends Controller
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => ["register_success" => $responseMail]
+            'data' => [ "register_success" => $responseMail ]
         ], 200);
     }
 
