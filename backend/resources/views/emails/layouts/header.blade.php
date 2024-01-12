@@ -5,7 +5,7 @@
                 <tr>
                     <td align="center" style="padding:0;Margin:0;font-size:0px">
                         <a  target="_blank" href="{{ env('APP_DOMAIN') }}" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#2CB543;font-size:14px">
-                            <img class="adapt-img" src="{{ asset('/logos/slogan.png') }}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="300">
+                            <img src="{{ asset('/logos/slogan.png') }}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="300">
                         </a>
                     </td>
                 </tr>
