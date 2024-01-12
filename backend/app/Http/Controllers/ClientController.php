@@ -92,20 +92,14 @@ class ClientController extends Controller
 
             $email = $client->user->email;
             $subject = 'Bienvenido a PARTYMAX';
-            $url = 'https://partymax.codant.one/';
+            $url = 'https://staging.partymax.co/';
             
             $data = [
                 'title' => 'Cuenta creada satisfactoriamente!!!',
                 'user' => $client->user->name . ' ' . $client->user->last_name,
-                'text' => "PARTYMAX te da la bienvenida, hemos creado satisfactoriamente tu cuenta de usuario para que puedas disfrutar de todos nuestros productos y servicios.
-                <br><br>
-                Usuario: <b>$username</b>
-                <br>
-                Clave de Acceso: <b>$password</b>
-                <br><br>
-                Visítanos en : ",
-                'buttonLink' =>  $url ?? null,
-                'buttonText' => 'PARTYMAX' 
+                'user_name' =>$username,
+                'password'=>$password,
+                'Link' =>  $url ?? null, 
             ];
             
             try {
