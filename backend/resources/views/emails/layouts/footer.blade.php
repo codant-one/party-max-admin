@@ -39,7 +39,7 @@
             <table cellpadding="0" cellspacing="0" width="100%" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                 <tr>
                     <td align="right" class="centerFestin" style="padding:0;Margin:0;font-size:0px">
-                        <img src="{{ asset('/images/festin.png') }}" width="150">
+                        <img class="adapt-img" src="{{ asset('/images/festin.png') }}" width="150">
                     </td>
                 </tr>
             </table>
