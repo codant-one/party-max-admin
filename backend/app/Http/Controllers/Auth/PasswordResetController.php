@@ -39,32 +39,19 @@ class PasswordResetController extends Controller
         );
         
         $email = $user->email;
-        $subject = 'Solicitud de Renovación de Contraseña';
+        $subject = 'Cambio de contraseña';
         $domain = ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN');
         $url = $domain.'/reset-password?token='.$passwordReset['token'].'&user='.$email;
         
-        $data = [
+        $info = [
             'buttonLink' =>  $url ?? null,
-        ];
+            'email' => 'emails.auth.forgot_pass_confirmation'
+        ];     
         
-        try {
-            \Mail::send(
-                'emails.auth.forgot_pass_confirmation'
-                , $data
-                , function ($message) use ($email, $subject) {
-                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                    $message->to($email)->subject($subject);
-            });
-
-            $message = 'send_email';
-            $responseMail = 'Tu solicitud se ha procesado satisfactoriamente.';
-        } catch (\Exception $e){
-            $message = 'error';
-            $responseMail = 'Correo electrónico y usuario no registrados';//.$e->getMessage();
-        }        
+        $responseMail = $this->sendMail($user->id, $info); 
 
         return response()->json([
-            'success' => true,
+            'success' => $success,
             'message' => $message,
             'data' => [ "register_success" => $responseMail ]
         ], 200);
@@ -78,7 +65,7 @@ class PasswordResetController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'not_found',
-                'errors' => 'El token de reestablecimiento de contraseña es invalido'
+                'errors' => 'El token de restablecimiento de contraseña no es válido'
             ], 404);
             
         if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
@@ -86,7 +73,7 @@ class PasswordResetController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'not_found',
-                'errors' => 'El token de reestablecimiento de contraseña es invalido'
+                'errors' => 'El token de restablecimiento de contraseña no es válido'
             ], 404);
         }
 
@@ -98,8 +85,7 @@ class PasswordResetController extends Controller
         ], 200);
     }
 
-    public function change(Request $request)
-    {
+    public function change(Request $request) {
         if ($this->find($request->token)->status() != 200)
             return response()->json([
                 'success' => false,
@@ -122,6 +108,13 @@ class PasswordResetController extends Controller
         $user->token_2fa = null;
         $user->update();
 
+        $info = [
+            'buttonLink' => ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN'),
+            'email' => 'emails.auth.reset_password'
+        ];     
+        
+        $responseMail = $this->sendMail($user->id, $info); 
+
         return response()->json([
             'success' => false,
             'message' => 'reset-password',
@@ -129,4 +122,34 @@ class PasswordResetController extends Controller
         ], 200);
 
     }
+
+    private function sendMail($id, $info ){
+
+        $user = User::find($id);
+        
+        $data = [
+            'title' => $info['title'],
+            'user' => $user->name . ' ' . $user->last_name,
+            'text' => $info['text'],
+            'buttonLink' =>  $info['buttonLink'] ?? null,
+            'buttonText' =>  $info['buttonText'] ?? null
+        ];
+
+        $clientEmail = $user->email;
+        $subject = $info['subject'];
+        
+        try {
+            \Mail::send($info['email'], $data, function ($message) use ($clientEmail, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($clientEmail)->subject($subject);
+            });
+
+            return "Tu solicitud se ha procesado satisfactoriamente.";
+        } catch (\Exception $e){
+            return "Ocurrió un error, no se pudo enviar el correo electrónico. ".$e;
+        }        
+
+        return "";
+
+    } 
 }

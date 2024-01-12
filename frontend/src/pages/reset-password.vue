@@ -9,6 +9,7 @@ import authV1TopShape from '@images/svg/auth-v1-top-shape.svg'
 import festin from '@images/pages/auth-v2-login-illustration-light.png'
 
 const route = useRoute()
+const router = useRouter()
 const authStores = useAuthStores()
 
 const user = route.query.user
@@ -65,7 +66,7 @@ const onSubmit = () => {
                 .then(response => {
 
                     advisor.value.show = true
-                    advisor.value.type = 'success'
+                    advisor.value.type = response.success ? 'success' : 'error'
                     advisor.value.message = response.data
 
 
@@ -76,6 +77,8 @@ const onSubmit = () => {
                     }, 5000)
 
                     load.value = false
+                    router.push({ name: 'login' })
+                    
                 }).catch(err => {
 
                     load.value = false
