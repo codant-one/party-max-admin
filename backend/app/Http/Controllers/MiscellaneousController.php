@@ -30,26 +30,12 @@ class MiscellaneousController extends Controller
                                ->orderBy('created_at', 'desc')
                                ->limit(5)
                                ->get();
-            
-            $latestProductColors = $category->productColors()
-                                   ->with(['product', 'color'])
-                                   ->limit(5)
-                                   ->get();
-
-            $latestProductsCategory = $latestProductColors->map(function ($productColor) {
-                return [
-                    'product' => $productColor->product,
-                    'color' => $productColor->color,
-                ];
-            });
 
             return response()->json([
                 'success' => true,
                 'data' => [            
                     'category' => $category,
-                    'products' => $products,
-                    'latestProductsCategory' => $latestProductsCategory
-
+                    'products' => $products
                 ]
             ], 200);
 
@@ -97,7 +83,9 @@ class MiscellaneousController extends Controller
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'category',
+                            'subcategory'
                         ])
                     );
 

@@ -86,6 +86,18 @@ class Product extends Model
             $q->where('category_id', $search);
         });
     }
+
+    public function scopeWhereCategorySlug($query, $search) {
+        $query->whereHas('colors.categories.category', function ($q) use ($search) {
+            $q->where('slug', $search);
+        });
+    }
+
+    public function scopeWhereSubCategory($query, $search) {
+        $query->whereHas('colors.categories.category', function ($q) use ($search) {
+            $q->where('slug', 'LIKE', '%' . $search);
+        });
+    }
  
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
         $query->orderByRaw('(IFNULL('. $orderByField .', id)) '. $orderBy);
@@ -120,6 +132,14 @@ class Product extends Model
 
         if ($filters->get('category_id') !== null) {
             $query->whereCategory($filters->get('category_id'));
+        }
+
+        if ($filters->get('category') !== null) {
+            $query->whereCategorySlug($filters->get('category'));
+        }
+
+        if ($filters->get('subcategory') !== null) {
+            $query->whereSubCategory($filters->get('subcategory'));
         }
  
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
