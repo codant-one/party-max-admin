@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\FaqCategory;
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Models\Tag;
 
 class MiscellaneousController extends Controller
 {
@@ -29,12 +30,26 @@ class MiscellaneousController extends Controller
                                ->orderBy('products.created_at', 'desc')
                                ->limit(5)
                                ->get();
+            
+            $latestProductColors = $category->productColors()
+                                   ->with(['product', 'color'])
+                                   ->limit(5)
+                                   ->get();
+
+            $latestProductsCategory = $latestProductColors->map(function ($productColor) {
+                return [
+                    'product' => $productColor->product,
+                    'color' => $productColor->color,
+                ];
+            });
 
             return response()->json([
                 'success' => true,
-                'data' => [
+                'data' => [            
                     'category' => $category,
-                    'products' => $products
+                    'products' => $products,
+                    'latestProductsCategory' => $latestProductsCategory
+
                 ]
             ], 200);
 
@@ -175,17 +190,27 @@ class MiscellaneousController extends Controller
 
             $blogs = 
                 Blog::with(['category', 'user'])
+                           ->where('is_popular_blog', 1)
                            ->get();
 
             $blogCategory = BlogCategory::with(['blogs'])
                            ->get();
+
+            $blogsLatest = Blog::with(['category', 'user'])
+                           ->latest('created_at') 
+                           ->limit(5)           
+                           ->get();
+
+            $tagsCount = Tag::withCount('blogTags')->get();
 
         
             return response()->json([
                 'success' => true,
                 'data' => [ 
                     'blogs' => $blogs,
-                    'categories' => $blogCategory
+                    'categories' => $blogCategory,
+                    'blogsLatest' => $blogsLatest,
+                    'tagsCount' => $tagsCount
                 ]
             ]);
 
