@@ -74,6 +74,7 @@ class Client extends Model
     /**** Public methods ****/
     public static function createClient($request) {
         $user = User::createUser($request);
+        $user->assignRole('Cliente');
         $client = self::create([
             'user_id' => $user->id,
             'gender_id' => $request->gender_id,
