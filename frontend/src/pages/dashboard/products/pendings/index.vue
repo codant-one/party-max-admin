@@ -531,6 +531,7 @@ const downloadCSV = async () => {
 
             <!-- Dialog Content -->
             <VCard title="Eliminar Producto">
+                <VDivider class="mt-4"/>
                 <VCardText>
                     Está seguro de eliminar el producto <strong>{{ selectedProduct.name }}</strong>?.
                 </VCardText>
@@ -560,6 +561,7 @@ const downloadCSV = async () => {
 
             <!-- Dialog Content -->
             <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Producto'">
+                <VDivider class="mt-4"/>
                 <VCardText>
                     Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el producto <strong>{{ selectedProduct.name }}</strong>?.
                 </VCardText>

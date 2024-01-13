@@ -19,8 +19,12 @@ class HomeController extends Controller
 
             $data = [];
     
-            $data['parentCategories'] = Category::select(['id', 'name', 'slug'])->whereNull('category_id')->get();
-     
+            $data['parentCategories'] = Category::select(['id', 'name', 'slug'])->whereNull('category_id')->get()->toArray();
+
+            foreach($data['parentCategories'] as $key => $parentCategory) {
+                $data['parentCategories'][$key]['children'] = Category::select(['id', 'name', 'slug'])->where('category_id', $parentCategory['id'])->get();
+            }
+
             $recommendations = Product::with(['user'])
                                       ->where('favourite', true)
                                       ->orderBy('created_at', 'desc')

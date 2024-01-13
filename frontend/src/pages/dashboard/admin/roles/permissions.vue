@@ -44,6 +44,7 @@ const closeModal = function(){
         <DialogCloseBtn @click="closeModal" />
 
         <VCard title="Permisos">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <VCardTitle>
                     Administrador General  

@@ -181,7 +181,7 @@ const onSubmitEdit = () =>{
                   else if(error.message.hasOwnProperty('username'))
                     advisor.value.message = error.message.username[0]
                 } else {
-                  advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+                  advisor.value.message = 'Se ha producido un error...! (Server Error)'
                 }
 
                 emit('alert', advisor)
@@ -225,6 +225,7 @@ const getFlagCountry = country => {
 
         <!-- Dialog Content -->
         <VCard title="Editar usuario">
+          <VDivider class="mt-4"/>
             <VForm
                 ref="refFormEdit"
                 @submit.prevent="onSubmitEdit">

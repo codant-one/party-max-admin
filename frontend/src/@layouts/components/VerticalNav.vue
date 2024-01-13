@@ -99,7 +99,7 @@ const closeAll = () =>{
       <slot name="nav-header">
         <RouterLink
           to="/info"
-          class="app-logo d-flex align-center gap-x-3 app-title-wrapper"
+          class="app-logo d-flex align-center gap-x-1 app-title-wrapper"
         >
         <VNodeRenderer :nodes="(hideTitleAndIcon) ? config.app.logoWhite : config.app.logoFull" />
 
@@ -108,6 +108,7 @@ const closeAll = () =>{
               v-show="!hideTitleAndIcon"
               class="app-title font-weight-bold leading-normal"
             >
+            {{ config.app.title }}
             </h4>
           </Transition>
         </RouterLink>

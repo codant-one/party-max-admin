@@ -104,6 +104,7 @@ const getFlagCountry = country => {
 
         <!-- Dialog Content -->
         <VCard title="Detalle usuario">
+            <VDivider class="mt-4"/>
             <VCardText>
                 <VRow>
                     <VCol md="6" cols="12">
@@ -150,9 +151,8 @@ const getFlagCountry = country => {
                     </VCol>
                     <VCol md="1" cols="1">
                         <VAvatar
-                            class="mt-2"
                             start
-                            size="25"
+                            size="36"
                             :image="getFlagCountry(country)"
                          />
                     </VCol>

@@ -10,6 +10,10 @@ class Clients {
         return axios.post('/clients', data)
     }
 
+    show(id) {
+        return axios.get(`/clients/${id}`)
+    }
+
     update(data) {
         return axios.post(`/clients/${data.id}`, data.data)
     }

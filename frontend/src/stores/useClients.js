@@ -46,6 +46,20 @@ export const useClientsStores = defineStore('clients', {
                 })
             
         },
+        showClient(id) {
+            this.setLoading(true)
+
+            return Clients.show(id)
+                .then((response) => {
+                    if(response.data.success)
+                        return Promise.resolve(response.data.data.client)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         updateClient(data) {
             this.setLoading(true)
             

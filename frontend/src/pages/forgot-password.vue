@@ -9,6 +9,7 @@ import authV1TopShape from '@images/svg/auth-v1-top-shape.svg'
 import festin from '@images/pages/auth-v2-login-illustration-light.png'
 
 const authStores = useAuthStores()
+const router = useRouter()
 
 const email = ref('')
 const load = ref(false)
@@ -36,7 +37,7 @@ const onSubmit = () => {
                 .then(response => {
 
                     advisor.value.show = true
-                    advisor.value.type = 'success'
+                    advisor.value.type = response.success ? 'success' : 'error'
                     advisor.value.message = response.data.register_success
     
 
@@ -44,17 +45,27 @@ const onSubmit = () => {
                         advisor.value.show = false
                         advisor.value.type = ''
                         advisor.value.message = ''
+                        router.push({ name: 'login' })
                     }, 5000)
 
                     load.value = false
+
                 }).catch(err => {
 
                     load.value = false
 
-                    if(err.message === 'error'){
+                    if(err.message === 'error') {
                         advisor.value.show = true
                         advisor.value.type = 'error'
                         advisor.value.message = err.data.register_success
+                    } else if(err.message === 'not_found'){
+                        advisor.value.show = true
+                        advisor.value.type = 'error'
+                        advisor.value.message = err.errors
+                    } else {
+                        advisor.value.show = true
+                        advisor.value.type = 'error'
+                        advisor.value.message = 'Se ha producido un error...! (Server Error)'
                     }
 
                     setTimeout(() => {

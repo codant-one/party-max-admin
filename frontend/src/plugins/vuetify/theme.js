@@ -33,14 +33,29 @@ const theme = {
         'perfect-scrollbar-thumb': '#DBDADE',
       },
       variables: {
-        'border-color': '#4B465C',
+        'code-color': '#d400ff',
+        'overlay-scrim-background': '#4C4E64',
+        'tooltip-background': '#4A5072',
+        'overlay-scrim-opacity': 0.5,
+        'hover-opacity': 0.04,
+        'focus-opacity': 0.12,
+        'selected-opacity': 0.06,
+        'activated-opacity': 0.16,
+        'pressed-opacity': 0.14,
+        'dragged-opacity': 0.1,
+        'disabled-opacity': 0.42,
+        'border-color': '#2F2B3D',
+        'border-opacity': 0.16,
+        'high-emphasis-opacity': 0.78,
         'medium-emphasis-opacity': 0.68,
-
+        'switch-opacity': 0.2,
+        'switch-disabled-track-opacity': 0.3,
+        'switch-disabled-thumb-opacity': 0.4,
+        'switch-checked-disabled-opacity': 0.3,
+  
         // Shadows
-        'shadow-key-umbra-opacity': 'rgba(var(--v-theme-on-surface), 0.03)',
-        'shadow-key-penumbra-opacity': 'rgba(var(--v-theme-on-surface), 0.02)',
-        'shadow-key-ambient-opacity': 'rgba(var(--v-theme-on-surface), 0.01)',
-      },
+        'shadow-key-umbra-color': '#2F2B3D',
+      }
     },
     dark: {
       dark: true,
@@ -73,14 +88,29 @@ const theme = {
         'perfect-scrollbar-thumb': '#4A5072',
       },
       variables: {
-        'border-color': '#CFD3EC',
+        'code-color': '#d400ff',
+        'overlay-scrim-background': '#101121',
+        'tooltip-background': '#5E6692',
+        'overlay-scrim-opacity': 0.6,
+        'hover-opacity': 0.04,
+        'focus-opacity': 0.12,
+        'selected-opacity': 0.06,
+        'activated-opacity': 0.16,
+        'pressed-opacity': 0.14,
+        'dragged-opacity': 0.1,
+        'disabled-opacity': 0.42,
+        'border-color': '#D0D4F1',
+        'border-opacity': 0.16,
+        'high-emphasis-opacity': 0.78,
         'medium-emphasis-opacity': 0.68,
-
+        'switch-opacity': 0.4,
+        'switch-disabled-track-opacity': 0.4,
+        'switch-disabled-thumb-opacity': 0.8,
+        'switch-checked-disabled-opacity': 0.3,
+  
         // Shadows
-        'shadow-key-umbra-opacity': 'rgba(12, 16, 27, 0.15)',
-        'shadow-key-penumbra-opacity': 'rgba(12, 16, 27, 0.01)',
-        'shadow-key-ambient-opacity': 'rgba(12, 16, 27, 0.08)',
-      },
+        'shadow-key-umbra-color': '#0F1422',
+      }
     },
   },
 }

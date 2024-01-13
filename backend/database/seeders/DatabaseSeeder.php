@@ -36,7 +36,11 @@ class DatabaseSeeder extends Seeder
 
             MoreColorSeeder::class,
             MoreStateSeeder::class,
-            MorePermissionSeeder::class
+            MorePermissionSeeder::class,
+
+            AddressSeeder::class,
+
+            OrderSeeder::class
         ]);
 
     }

@@ -1,7 +1,7 @@
 <script setup>
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import { requiredValidator } from '@/@core/utils/validators'
+import { emailValidator, requiredValidator } from '@/@core/utils/validators'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
 import { useGendersStores } from '@/stores/useGenders'
@@ -255,6 +255,8 @@ const getFlagCountry = country => {
         />
       </VBTn>
     </div>
+    
+    <VDivider class="mt-4"/>
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -305,7 +307,7 @@ const getFlagCountry = country => {
               <!-- 👉 Email -->
               <VCol cols="6">
                 <VTextField
-
+                  :rules="[emailValidator, requiredValidator]"
                   v-model="email"
                   label="Email"
                   :disabled="isEdit"

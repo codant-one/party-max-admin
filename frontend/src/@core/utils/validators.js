@@ -3,9 +3,9 @@ import { isEmpty, isEmptyArray, isNullOrUndefined } from './index'
 // 👉 Required Validator
 export const requiredValidator = value => {
   if (isNullOrUndefined(value) || isEmptyArray(value) || value === false)
-    return 'Este campo es obligatorio'
+    return 'requerido *'
   
-  return !!String(value).trim().length || 'Este campo es obligatorio'
+  return !!String(value).trim().length || 'requerido *'
 }
 
 // 👉 Email Validator
@@ -14,25 +14,26 @@ export const emailValidator = value => {
     return true
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   if (Array.isArray(value))
-    return value.every(val => re.test(String(val))) || 'El campo de correo electrónico debe ser un correo electrónico válido'
+    return value.every(val => re.test(String(val))) || 'E-mail debe ser un correo electrónico válido'
   
-  return re.test(String(value)) || 'El campo de correo electrónico debe ser un correo electrónico válido'
+  return re.test(String(value)) || 'E-mail debe ser un correo electrónico válido'
 }
 
 // 👉 Password Validator
 export const passwordValidator = password => {
   // const regExp = /(?=.*\d){0,1}(?=.*[a-z|A-Z]){8,}/
-  const regExp = /^([a-z|A-Z])*(\d)([a-z|A-Z])*$/
+  const regExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&.,#^(_\-+=)`~{}/;'"|:<>\\\[\\\]])[A-Za-z\d$@$!%*?&.,#^(_\-+=)`~{}/;'"|:<>\\\[\\\]]{8,}$/
+
   const validPassword = regExp.test(password) && (password.length>=8)
   
   return (
     // eslint-disable-next-line operator-linebreak
     validPassword ||
-        'El campo debe contener mayúsculas, minúsculas y un dígito con un mínimo de 8 caracteres')
+        'El campo debe contener mayúsculas, minúsculas y dígitos; con un mínimo de 8 caracteres')
 }
 
 // 👉 Confirm Password Validator
-export const confirmedValidator = (value, target) => value === target || 'La confirmación del campo Confirmar contraseña no coincide'
+export const confirmedValidator = (value, target) => value === target || 'Las contraseñas no coinciden.'
 
 // 👉 Between Validator
 export const betweenValidator = (value, min, max) => {

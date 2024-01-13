@@ -173,7 +173,7 @@ const onSubmitCreate = () => {
             else if(error.message.hasOwnProperty('username'))
               advisor.value.message = error.message.username[0]
           } else {
-            advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+            advisor.value.message = 'Se ha producido un error...! (Server Error)'
           }
 
           emit('alert', advisor)
@@ -223,6 +223,7 @@ const getFlagCountry = country => {
     <DialogCloseBtn @click="closeUserCreateDialog " />
 
     <VCard title="Crear usuario">
+      <VDivider class="mt-4"/>
       <VCardText>
         <VForm
           ref="refFormCreate"

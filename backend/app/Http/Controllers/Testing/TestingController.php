@@ -41,7 +41,7 @@ class TestingController extends Controller
             'buttonText' =>  $info['buttonText'] ?? null
         ];
 
-        return view('emails.auth.register', compact('data'));
+        return view('emails.auth.testing', compact('data'));
     }
 
 }

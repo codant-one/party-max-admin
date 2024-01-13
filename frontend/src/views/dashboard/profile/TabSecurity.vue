@@ -120,7 +120,7 @@ const onSubmit = () => {
                 window.scrollTo(0, 0)
 
                 alert.value.show = true
-                alert.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+                alert.value.message = 'Se ha producido un error...! (Server Error)'
                 alert.value.type = 'error'
                 
                 password.value = undefined

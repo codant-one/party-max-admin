@@ -223,5 +223,83 @@ class MiscellaneousController extends Controller
         }
     }
 
+    public function blogDetail($slug): JsonResponse
+    {
+        try {
+
+            $blog = 
+                Blog::with(['category', 'user', 'tags.tag'])
+                            ->where('slug',$slug)
+                            ->get();
+
+            $blogs = 
+                Blog::with(['category', 'user'])
+                           ->get();
+
+            $blogCategory = BlogCategory::with(['blogs'])
+                           ->get();
+
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'blog' => $blog,
+                    'blogs' => $blogs,
+                    'categories' => $blogCategory
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function blogsByCategory($slug): JsonResponse
+    {
+        try {
+
+            $blogs = array();
+            $blogsC = 
+                Blog::with(['category'=> function($q) use ($slug){
+                                $q->where('slug', '=', $slug);
+                            }
+                            , 'user'])
+                           ->get();
+
+            foreach ($blogsC as $key => $value) {
+                if( !empty($value->category) )
+                    $blogs[] = $value;
+            }
+
+            $blogsAll = 
+                Blog::with(['category', 'user'])
+                           ->get();
+
+            $blogCategory = BlogCategory::with(['blogs'])
+                           ->get();
+
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'blogs' => $blogs,
+                    'blogsAll' => $blogsAll,
+                    'categories' => $blogCategory
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
     
 }

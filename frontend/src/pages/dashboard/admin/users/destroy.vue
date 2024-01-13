@@ -83,6 +83,7 @@ const deleteUser = function() {
 
     <!-- Dialog Content -->
     <VCard title="Eliminar usuario">
+      <VDivider class="mt-4"/>
       <VCardText>
         Esta seguro que desea eliminar el usuario <strong>{{ user.email }}</strong>?
       </VCardText>

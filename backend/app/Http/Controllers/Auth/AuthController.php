@@ -476,7 +476,7 @@ class AuthController extends Controller
 
             return "Tu solicitud se ha procesado satisfactoriamente. Correo electrónico verificado. Le invitamos a que inicie sesion.";
         } catch (\Exception $e){
-            return "Error al enviar el correo electrónico.".$e;
+            return "Error al enviar el correo electrónico. ".$e;
         }        
 
         return "";

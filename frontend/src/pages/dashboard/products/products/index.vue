@@ -256,7 +256,7 @@ const updateLink = (data) => {
           if (error.feedback === 'params_validation_failed') {
               advisor.value.message = error.message
           } else {
-              advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+              advisor.value.message = 'Se ha producido un error...! (Server Error)'
           }
 
           closeAdvisor()  
@@ -864,6 +864,7 @@ const removeProduct = async () => {
 
       <!-- Dialog Content -->
       <VCard title="Eliminar Producto">
+        <VDivider class="mt-4"/>
         <VCardText>
           Está seguro de eliminar el producto de <strong>{{ selectedProduct.name }}</strong>?.
         </VCardText>
@@ -892,6 +893,7 @@ const removeProduct = async () => {
 
       <!-- Dialog Content -->
       <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Producto'">
+        <VDivider class="mt-4"/>
         <VCardText>
           Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el producto <strong>{{ selectedProduct.name }}</strong>?.
         </VCardText>

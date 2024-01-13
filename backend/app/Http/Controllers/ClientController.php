@@ -92,26 +92,21 @@ class ClientController extends Controller
 
             $email = $client->user->email;
             $subject = 'Bienvenido a PARTYMAX';
-            $url = 'https://partymax.codant.one/';
+            $url = 'https://staging.partymax.co/';
             
             $data = [
                 'title' => 'Cuenta creada satisfactoriamente!!!',
                 'user' => $client->user->name . ' ' . $client->user->last_name,
-                'text' => "PARTYMAX te da la bienvenida, hemos creado satisfactoriamente tu cuenta de usuario para que puedas disfrutar de todos nuestros productos y servicios.
-                <br><br>
-                Usuario: <b>$username</b>
-                <br>
-                Clave de Acceso: <b>$password</b>
-                <br><br>
-                Visítanos en : ",
-                'buttonLink' =>  $url ?? null,
-                'buttonText' => 'PARTYMAX' 
+                'email'=> $email,
+                'user_name' =>$username,
+                'password'=>$password,
+
             ];
             
             try {
                 \Mail::send(
                     'emails.auth.client_created'
-                    , $data
+                    , ['data' => $data]
                     , function ($message) use ($email, $subject) {
                         $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                         $message->to($email)->subject($subject);
@@ -121,8 +116,9 @@ class ClientController extends Controller
                 $responseMail = 'Correo electrónico enviado al cliente satisfactoriamente.';
             } catch (\Exception $e){
                 $message = 'error';
-                $responseMail = 'Error al enviar Correo electrónico o dirección de correo no existe';//.$e->getMessage();
-            }      
+                $responseMail = $e->getMessage();
+            } 
+
 
 
 
@@ -146,9 +142,33 @@ class ClientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Client $client)
+    public function show($id)
     {
-        //
+        try {
+
+            $client = Client::with(['user.userDetail.province.country', 'gender'])->find($id);
+
+            if (!$client)
+                return response()->json([
+                    'sucess' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Cliente no encontrado'
+                ], 404);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'client' => $client
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**

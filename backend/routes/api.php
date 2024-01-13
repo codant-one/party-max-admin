@@ -26,7 +26,9 @@ use App\Http\Controllers\{
     GenderController,
     MiscellaneousController,
     BrandController,
-    TagController
+    TagController,
+    OrderController
+
 };
 
 /*
@@ -74,6 +76,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('blog-categories', BlogCategoryController::class);
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('tags', TagController::class);
+    Route::apiResource('orders', OrderController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -145,6 +148,9 @@ Route::get('miscellaneous/products', [MiscellaneousController::class, 'products'
 Route::get('miscellaneous/products/{slug}', [MiscellaneousController::class, 'productDetail']);
 Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
 Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
+Route::get('miscellaneous/blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+Route::get('miscellaneous/blogs/categories/{slug}', [MiscellaneousController::class, 'blogsByCategory']);
+
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
