@@ -69,15 +69,14 @@ const onSubmit = () => {
                     advisor.value.type = response.success ? 'success' : 'error'
                     advisor.value.message = response.data
 
-
                     setTimeout(() => {
                         advisor.value.show = false
                         advisor.value.type = ''
                         advisor.value.message = ''
+                        router.push({ name: 'login' })
                     }, 5000)
 
-                    load.value = false
-                    router.push({ name: 'login' })
+                    load.value = false                    
                     
                 }).catch(err => {
 
@@ -87,6 +86,10 @@ const onSubmit = () => {
                         advisor.value.show = true
                         advisor.value.type = 'error'
                         advisor.value.message = err.errors
+                    } else {
+                        advisor.value.show = true
+                        advisor.value.type = 'error'
+                        advisor.value.message = 'Se ha producido un error...! (Server Error)'
                     }
 
                     setTimeout(() => {

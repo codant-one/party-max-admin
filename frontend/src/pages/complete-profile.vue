@@ -162,7 +162,7 @@ const onSubmit = () =>{
         }).catch(error => {
           alert.value.type = 'error'
           alert.value.show = true
-          alert.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+          alert.value.message = 'Se ha producido un error...! (Server Error)'
           
           setTimeout(() => {
             alert.value.show = false,

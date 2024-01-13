@@ -33,7 +33,7 @@ export const passwordValidator = password => {
 }
 
 // 👉 Confirm Password Validator
-export const confirmedValidator = (value, target) => value === target || 'La confirmación del campo Confirmar contraseña no coincide'
+export const confirmedValidator = (value, target) => value === target || 'Las contraseñas no coinciden.'
 
 // 👉 Between Validator
 export const betweenValidator = (value, min, max) => {

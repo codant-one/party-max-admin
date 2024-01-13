@@ -39,11 +39,11 @@ class PasswordResetController extends Controller
         );
         
         $email = $user->email;
-        $subject = 'Cambio de contraseña';
         $domain = ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN');
         $url = $domain.'/reset-password?token='.$passwordReset['token'].'&user='.$email;
         
         $info = [
+            'subject' => 'Solicitud de cambio de contraseña',
             'buttonLink' =>  $url ?? null,
             'email' => 'emails.auth.forgot_pass_confirmation'
         ];     
@@ -51,9 +51,9 @@ class PasswordResetController extends Controller
         $responseMail = $this->sendMail($user->id, $info); 
 
         return response()->json([
-            'success' => $success,
-            'message' => $message,
-            'data' => [ "register_success" => $responseMail ]
+            'success' => $responseMail['success'],
+            'message' => 'forgot_password',
+            'data' => [ "register_success" => $responseMail['message'] ]
         ], 200);
     }
 
@@ -109,15 +109,16 @@ class PasswordResetController extends Controller
         $user->update();
 
         $info = [
-            'buttonLink' => ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN'),
+            'subject' => 'Hola '.$user->name.'!. Tu contraseña ha sido actualizada.',
+            'buttonLink' => env('APP_DOMAIN'),
             'email' => 'emails.auth.reset_password'
         ];     
         
         $responseMail = $this->sendMail($user->id, $info); 
 
         return response()->json([
-            'success' => false,
-            'message' => 'reset-password',
+            'success' => $responseMail['success'],
+            'message' => 'reset_password',
             'data' => 'La Contraseña ha sido actualizada'
         ], 200);
 
@@ -126,11 +127,12 @@ class PasswordResetController extends Controller
     private function sendMail($id, $info ){
 
         $user = User::find($id);
-        
+        $response = [];
+
         $data = [
-            'title' => $info['title'],
+            'title' => $info['title']?? null,
             'user' => $user->name . ' ' . $user->last_name,
-            'text' => $info['text'],
+            'text' => $info['text'] ?? null,
             'buttonLink' =>  $info['buttonLink'] ?? null,
             'buttonText' =>  $info['buttonText'] ?? null
         ];
@@ -144,12 +146,14 @@ class PasswordResetController extends Controller
                     $message->to($clientEmail)->subject($subject);
             });
 
-            return "Tu solicitud se ha procesado satisfactoriamente.";
+            $response['success'] = true;
+            $response['message'] = "Tu solicitud se ha procesado satisfactoriamente.";
         } catch (\Exception $e){
-            return "Ocurrió un error, no se pudo enviar el correo electrónico. ".$e;
+            $response['success'] = false;
+            $response['message'] = "Ocurrió un error, no se pudo enviar el correo electrónico. ".$e;
         }        
 
-        return "";
+        return $response;
 
     } 
 }

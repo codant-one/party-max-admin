@@ -45,19 +45,27 @@ const onSubmit = () => {
                         advisor.value.show = false
                         advisor.value.type = ''
                         advisor.value.message = ''
+                        router.push({ name: 'login' })
                     }, 5000)
 
                     load.value = false
-                    router.push({ name: 'login' })
-                    
+
                 }).catch(err => {
 
                     load.value = false
 
-                    if(err.message === 'error'){
+                    if(err.message === 'error') {
                         advisor.value.show = true
                         advisor.value.type = 'error'
                         advisor.value.message = err.data.register_success
+                    } else if(err.message === 'not_found'){
+                        advisor.value.show = true
+                        advisor.value.type = 'error'
+                        advisor.value.message = err.errors
+                    } else {
+                        advisor.value.show = true
+                        advisor.value.type = 'error'
+                        advisor.value.message = 'Se ha producido un error...! (Server Error)'
                     }
 
                     setTimeout(() => {

@@ -256,7 +256,7 @@ const updateLink = (data) => {
           if (error.feedback === 'params_validation_failed') {
               advisor.value.message = error.message
           } else {
-              advisor.value.message = 'Ocurrió un error, intente nuevamente o contacte con el administrador...!'
+              advisor.value.message = 'Se ha producido un error...! (Server Error)'
           }
 
           closeAdvisor()  
