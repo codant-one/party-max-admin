@@ -39,7 +39,7 @@
                             <td align="center" style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px;border-bottom: 1px solid #D9EEF2;">
                                 <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:36px;color:#0a1b33;font-size:24px">
                                     Usuario:&nbsp;<br>
-                                    <strong>{{$data['user_name']}}</strong>
+                                    <strong>{{$data['email']}}</strong>
                                 </p>
                                 <p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:36px;color:#0a1b33;font-size:24px">
                                     <br>

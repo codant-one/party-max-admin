@@ -97,8 +97,10 @@ class ClientController extends Controller
             $data = [
                 'title' => 'Cuenta creada satisfactoriamente!!!',
                 'user' => $client->user->name . ' ' . $client->user->last_name,
+                'email'=> $email,
                 'user_name' =>$username,
                 'password'=>$password,
+
             ];
             
             try {
