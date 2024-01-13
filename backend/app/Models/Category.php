@@ -56,6 +56,13 @@ class Category extends Model
         return self::with('recursiveItems')->where('category_id', $category_id)->get();
     }
 
+    public function productColors()
+    {
+        //return $this->belongsToMany(ProductColor::class, 'product_categories', 'category_id', 'product_color_id');
+        return $this->belongsToMany(ProductColor::class, 'product_categories', 'category_id', 'product_color_id')
+        ->orderBy('product_colors.created_at', 'desc');
+    }
+
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
