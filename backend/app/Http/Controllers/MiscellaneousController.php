@@ -23,33 +23,19 @@ class MiscellaneousController extends Controller
                                 ->where('slug', $slug)
                                 ->first();
     
-            $products = Product::with(['user'])
-                               ->join('product_colors', 'products.id', '=', 'product_colors.product_id')
-                               ->join('product_categories', 'product_colors.id', '=', 'product_categories.product_color_id')
-                               ->where('product_categories.category_id', $category->id)
-                               ->orderBy('products.created_at', 'desc')
+            $products = Product::with(['user', 'colors.categories'])
+                                ->whereHas('colors.categories', function($query) use ($category) {
+                                    $query->where('category_id', $category->id);
+                                })
+                               ->orderBy('created_at', 'desc')
                                ->limit(5)
                                ->get();
-            
-            $latestProductColors = $category->productColors()
-                                   ->with(['product', 'color'])
-                                   ->limit(5)
-                                   ->get();
-
-            $latestProductsCategory = $latestProductColors->map(function ($productColor) {
-                return [
-                    'product' => $productColor->product,
-                    'color' => $productColor->color,
-                ];
-            });
 
             return response()->json([
                 'success' => true,
                 'data' => [            
                     'category' => $category,
-                    'products' => $products,
-                    'latestProductsCategory' => $latestProductsCategory
-
+                    'products' => $products
                 ]
             ], 200);
 
@@ -97,7 +83,9 @@ class MiscellaneousController extends Controller
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'category',
+                            'subcategory'
                         ])
                     );
 
