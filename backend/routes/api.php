@@ -129,9 +129,19 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     });
 
      //Blog-categories
-     Route::group(['prefix' => 'blog-categories'], function () {
+    Route::group(['prefix' => 'blog-categories'], function () {
         Route::post('delete', [BlogCategoryController::class, 'delete']);
         Route::get('blogs/all', [BlogCategoryController::class, 'all']);
+    });
+
+    //Profile
+    Route::group(['prefix' => 'profile'], function () {
+       Route::post('/', [ClientController::class, 'profile']);
+       Route::post('/changeAvatar', [ClientController::class, 'changeAvatar']);
+       Route::post('/changePassword', [ClientController::class, 'changePassword']);
+       Route::post('/changePhone', [ClientController::class, 'changePhone']);
+
+       
     });
 });
 

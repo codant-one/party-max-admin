@@ -42,4 +42,28 @@ class UserDetails extends Model
 
         return $userD;
     }
+
+    public static function updateOrCreateClient($request, $user) {
+        $userD = UserDetails::updateOrCreate(
+            [    'user_id' => $user->id ],
+            [
+                'province_id' => $request->province_id,
+                'address' => $request->address,
+                'document' => $request->document
+            ]
+        );
+
+        return $userD;
+    }
+
+    public static function updateOrCreatePhone($request, $user) {
+        $userD = UserDetails::updateOrCreate(
+            [    'user_id' => $user->id ],
+            [
+                'phone' => $request->phone
+            ]
+        );
+
+        return $userD;
+    }
 }

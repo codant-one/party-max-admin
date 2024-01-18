@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\UserDetails;
 use App\Models\UserMenu;
+use App\Models\Client;
 
 use Illuminate\Support\Facades\Hash;
 
@@ -97,6 +98,40 @@ trait UserHelper
 
         return $users;
     }
+
+    public static function updateProfileClient($request, $user) {
+        $user->update([
+            'name' => $request->name,
+            'last_name' => $request->last_name,
+            'username' => $request->username
+        ]);
+
+        UserDetails::updateOrCreateClient($request, $user);
+        
+        return $user;
+    }
+
+    public static function updateAvatar($request, $user) {
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+
+            $path = 'avatars/';
+
+            $file_data = uploadFile($image, $path);
+
+            $user->update([
+                'avatar' => $file_data['filePath']
+    
+            ]);          
+
+        }
+        
+        return $user;
+    }
+
+    
+
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {

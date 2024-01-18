@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
+use App\Http\Requests\ClientProfileRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
-use App\Models\Client;
+
 use App\Models\User;
 use App\Models\UserRegisterToken;
+use App\Models\Client;
+use App\Models\UserDetails;
 
 class ClientController extends Controller
 {
@@ -235,6 +239,143 @@ class ClientController extends Controller
                 'success' => false,
                 'message' => 'database_error',
                 'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function profile(ClientProfileRequest $request): JsonResponse
+    {
+
+        try {
+
+            $user = Auth::user()->load(['userDetail.province.country', 'client']);
+            $user->updateProfileClient($request, $user);
+            $client=Client::updateOrCreateClientProfile($request,$user);
+
+            $userData = getUserData($user->load(['userDetail.province.country', 'client']));
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => $userData
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function changeAvatar(Request $request): JsonResponse
+    {
+        $validate = Validator::make($request->all(), [
+            'image' => 'required'
+        ]);
+    
+        if ($validate->fails()) {
+            return response()->json([
+                'success' => false,
+                'feedback' => 'params_validation_failed',
+                'message' => $validate->errors()
+            ], 400);
+        }
+
+        try {
+
+            $user = Auth::user();
+            $user->updateAvatar($request, $user);
+            
+            $userData = getUserData($user->load(['userDetail.province.country', 'client']));
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => $userData
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $validate = Validator::make($request->all(), [
+            'password' => 'required',
+            'confirmPassword' => 'required|same:password'
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                'success' => false,
+                'feedback' => 'params_validation_failed',
+                'message' => $validate->errors()
+            ], 400);
+        }
+
+        try {
+                $user = Auth::user();
+                $user->password = bcrypt($request->password);
+                $user->save();
+                //$user->update(['password' =>  bcrypt($request->password)]);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => getUserData($user)
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function changePhone(Request $request): JsonResponse
+    {
+        $validate = Validator::make($request->all(), [
+            'phone' => 'required'
+        ]);
+
+        if ($validate->fails()) {
+            return response()->json([
+                'success' => false,
+                'feedback' => 'params_validation_failed',
+                'message' => $validate->errors()
+            ], 400);
+        }
+
+        try {
+            $user = Auth::user()->load(['userDetail']);
+            UserDetails::updateOrCreatePhone($request, $user);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => getUserData($user)
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
             ], 500);
         }
     }
