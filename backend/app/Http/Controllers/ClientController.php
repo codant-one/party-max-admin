@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest;
 use App\Http\Requests\ClientProfileRequest;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -250,7 +251,7 @@ class ClientController extends Controller
 
             $user = Auth::user()->load(['userDetail.province.country', 'client']);
             $user->updateProfileClient($request, $user);
-            $client=Client::updateOrCreateClientProfile($request,$user);
+            $client = Client::updateOrCreateClientProfile($request,$user);
 
             $userData = getUserData($user->load(['userDetail.province.country', 'client']));
 
@@ -326,9 +327,8 @@ class ClientController extends Controller
 
         try {
                 $user = Auth::user();
-                $user->password = bcrypt($request->password);
+                $user->password = Hash::make($request->password);
                 $user->save();
-                //$user->update(['password' =>  bcrypt($request->password)]);
 
             return response()->json([
                 'success' => true,

@@ -8,6 +8,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Models\Client;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -567,7 +568,7 @@ class UsersController extends Controller
 
                 $path = 'avatars/';
 
-                $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($image, $path, $user->avatar);
 
                 $user->avatar = $file_data['filePath'];
                 $user->update();
@@ -654,7 +655,7 @@ class UsersController extends Controller
         try {
 
             $user = Auth::user()->load(['userDetail.province.country']);
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password);
             $user->save();
 
             return response()->json([
@@ -754,7 +755,7 @@ class UsersController extends Controller
                     'message' => 'Usuario no encontrado'
                 ], 404);
 
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password);
             $user->save();
 
             return response()->json([

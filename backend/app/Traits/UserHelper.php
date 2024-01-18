@@ -118,13 +118,11 @@ trait UserHelper
 
             $path = 'avatars/';
 
-            $file_data = uploadFile($image, $path);
+            $file_data = uploadFile($image, $path, $user->avatar);
 
             $user->update([
                 'avatar' => $file_data['filePath']
-    
-            ]);          
-
+            ]);
         }
         
         return $user;
