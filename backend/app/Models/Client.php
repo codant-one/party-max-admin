@@ -111,4 +111,17 @@ class Client extends Model
             User::deleteUser($user->id);
         }
     }
+
+    public static function updateOrCreateClientProfile($request, $user) {
+
+        $clientD = Client::updateOrCreate(
+            [    'user_id' => $user->id ],
+            [
+                'gender_id' => $request->gender_id,
+                'birthday' => date('Y-m-d', strtotime($request->birthday) )
+            ]
+        );
+
+        return $clientD;
+    }
 }
