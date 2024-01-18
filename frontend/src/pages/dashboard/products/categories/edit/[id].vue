@@ -269,7 +269,9 @@ const onSubmit = () => {
                                                 v-bind="props"
                                                 :title="item?.raw?.name"
                                                 :style="{ 
-                                                    paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                    paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                                                    paddingTop: `0 !important`,
+                                                    height: `10px !important`
                                                 }"
                                             >
                                                 <template v-slot:prepend="{ isActive }">
@@ -331,7 +333,9 @@ const onSubmit = () => {
                                                     v-bind="props"
                                                     :title="item?.raw?.name"
                                                     :style="{ 
-                                                        paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                        paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                                                        paddingTop: `0 !important`,
+                                                        height: `10px !important`
                                                     }"
                                                 >
                                                     <template v-slot:prepend="{ isActive }">
@@ -392,7 +396,9 @@ const onSubmit = () => {
                                                     v-bind="props"
                                                     :title="item?.raw?.name"
                                                     :style="{ 
-                                                        paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                        paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                                                        paddingTop: `0 !important`,
+                                                        height: `10px !important`
                                                     }"
                                                 >
                                                     <template v-slot:prepend="{ isActive }">
@@ -452,7 +458,9 @@ const onSubmit = () => {
                                                     v-bind="props"
                                                     :title="item?.raw?.name"
                                                     :style="{ 
-                                                        paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                        paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                                                        paddingTop: `0 !important`,
+                                                        height: `10px !important`
                                                     }"
                                                 >
                                                     <template v-slot:prepend="{ isActive }">
@@ -512,7 +520,9 @@ const onSubmit = () => {
                                                     v-bind="props"
                                                     :title="item?.raw?.name"
                                                     :style="{ 
-                                                        paddingLeft: `${(item?.raw?.level) * 20}px`
+                                                        paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                                                        paddingTop: `0 !important`,
+                                                        height: `10px !important`
                                                     }"
                                                 >
                                                     <template v-slot:prepend="{ isActive }">
