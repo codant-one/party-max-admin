@@ -27,6 +27,7 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         $client = Client::find($this->client);
+
         $rules = [
             'gender_id' => [
                 'required',
@@ -37,7 +38,6 @@ class ClientRequest extends FormRequest
                 'required',
                 'date_format:Y-m-d'
             ],
-
             'name' => [
                 'required'
             ],
@@ -48,9 +48,6 @@ class ClientRequest extends FormRequest
                 'required_if:user_id,<>'.($client->user_id ?? -1),
                 Rule::unique('users', 'email')->ignore($client->user_id ?? -1)
             ],
-            // 'password' => [
-            //     ($this->user) ? 'nullable' : 'required'
-            // ],
             'province_id' => [
                 'integer',
                 'required',
@@ -67,10 +64,6 @@ class ClientRequest extends FormRequest
                 'required'
             ]  
         ];
-
-        if (request('is_client')) {
-            $rules['client_id'] = 'required|integer|exists:App\Models\Client,id';
-        }
 
         return $rules;
     }

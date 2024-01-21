@@ -1,10 +1,31 @@
 <script setup>
 // import { VDataTable } from 'vuetify/labs/VDataTable'
+import { confirmedValidator, passwordValidator, requiredValidator } from '@/@core/utils/validators'
+import { useUsersStores } from '@/stores/useUsers'
 
+const props = defineProps({
+  user_id: {
+    type: Number,
+    required: true
+  }
+})
+const usersStores = useUsersStores()
+
+const refForm  = ref()
+const password = ref()
+const passwordConfirmation = ref()
 const isNewPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
 const smsVerificationNumber = ref('+1(968) 819-2547')
 const isTwoFactorDialogOpen = ref(false)
+
+const advisor = ref({
+  type: '',
+  message: '',
+  show: false
+})
+
+const emit = defineEmits(['alert'])
 
 const recentDeviceHeader = [
   {
@@ -75,6 +96,42 @@ const recentDevices = [
     activity: '4, July 2021 15:15',
   },
 ]
+
+const onSubmit = () => {
+  refForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) {
+      let data = {
+        password: password.value
+      }
+
+      usersStores.updatePasswordUser(data, props.user_id)
+        .then(response => {
+          window.scrollTo(0, 0)
+
+          advisor.value.show = true
+          advisor.value.type = 'success'
+          advisor.value.message = 'Contraseña cambiada'
+                    
+          emit('alert', advisor)
+
+          nextTick(() => {
+            refForm.value?.reset()
+            refForm.value?.resetValidation()
+            password.value = null
+            passwordConfirmation.value = null
+          })
+
+          setTimeout(() => {
+            advisor.value.show = false
+            advisor.value.type = ''
+            advisor.value.message = ''
+            emit('alert', advisor)
+          }, 5000)
+
+      })
+    }
+  })
+}
 </script>
 
 <template>
@@ -94,31 +151,35 @@ const recentDevices = [
             <span>Mínimo 8 caracteres, mayúsculas, minúsculas y números</span>
           </VAlert>
 
-          <VForm @submit.prevent="() => {}">
+          <VForm
+            ref="refForm"
+            @submit.prevent="onSubmit">
             <VRow>
               <VCol
                 cols="12"
                 md="6"
               >
-                <AppTextField
+                <VTextField
+                  v-model="password"
                   label="Nueva contraseña"
-                  placeholder="············"
                   :type="isNewPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isNewPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  :rules="[requiredValidator, passwordValidator]"
                   @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
-                />
+                  />
               </VCol>
               <VCol
                 cols="12"
                 md="6"
               >
-                <AppTextField
+                <VTextField
+                  v-model="passwordConfirmation"
                   label="Confirmar Contraseña"
-                  placeholder="············"
                   :type="isConfirmPasswordVisible ? 'text' : 'password'"
                   :append-inner-icon="isConfirmPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  :rules="[requiredValidator, confirmedValidator(passwordConfirmation, password)]"
                   @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
-                />
+                  />
               </VCol>
 
               <VCol cols="12">
@@ -132,7 +193,7 @@ const recentDevices = [
       </VCard>
     </VCol>
 
-    <VCol cols="12">
+    <VCol cols="12" v-if="false">
       <!-- 👉 Two step verification -->
       <VCard>
         <VCardItem>
@@ -154,21 +215,21 @@ const recentDevices = [
               :model-value="smsVerificationNumber"
             >
               <template #append-inner>
-                <IconBtn
-                  size="small"
+                <VBtn
+                  icon
                   variant="text"
-                >
+                  color="default">
                   <VIcon
                     icon="tabler-edit"
                     @click="isTwoFactorDialogOpen = true"
                   />
-                </IconBtn>
-                <IconBtn
-                  size="small"
+                </VBtn>
+                <VBtn
+                  icon
                   variant="text"
-                >
+                  color="default">
                   <VIcon icon="tabler-trash" />
-                </IconBtn>
+                </VBtn>
               </template>
             </VTextField>
           </div>
@@ -183,7 +244,7 @@ const recentDevices = [
       </VCard>
     </VCol>
 
-    <VCol cols="12">
+    <VCol cols="12" v-if="false">
       <!-- 👉 Recent devices -->
       <VCard title="Recent devices">
         <VDivider />
@@ -211,8 +272,8 @@ const recentDevices = [
   </VRow>
 
   <!-- 👉 Enable One Time Password Dialog -->
-  <TwoFactorAuthDialog
+  <!-- <TwoFactorAuthDialog
     v-model:isDialogVisible="isTwoFactorDialogOpen"
     :sms-code="smsVerificationNumber"
-  />
+  /> -->
 </template>

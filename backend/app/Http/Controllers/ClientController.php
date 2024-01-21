@@ -81,31 +81,27 @@ class ClientController extends Controller
     public function store(ClientRequest $request)
     {
         try {
+
             $password = Str::random(8);
-            $request->merge([ 'password' => $password ]);
+            $request->merge(['password' => $password]);
 
             $client = Client::createClient($request);
-            $client = Client::with(['user'])->find($client->id);
 
-            //Crear o Actualizar token.
-            $registerConfirm = UserRegisterToken::updateOrCreate(
-                ['user_id' => $client->user->id],
+            UserRegisterToken::updateOrCreate(
+                ['user_id' => $client->user_id],
                 ['token' => Str::random(60)]
             );
 
-            $username = $client->user->username;
-
             $email = $client->user->email;
             $subject = 'Bienvenido a PARTYMAX';
-            $url = 'https://staging.partymax.co/';
+            $url = env('APP_DOMAIN');
             
             $data = [
                 'title' => 'Cuenta creada satisfactoriamente!!!',
                 'user' => $client->user->name . ' ' . $client->user->last_name,
                 'email'=> $email,
-                'user_name' =>$username,
-                'password'=>$password,
-
+                'user_name' => $client->user->username,
+                'password' => $password 
             ];
             
             try {
@@ -123,9 +119,6 @@ class ClientController extends Controller
                 $message = 'error';
                 $responseMail = $e->getMessage();
             } 
-
-
-
 
             return response()->json([
                 'success' => true,
@@ -151,7 +144,7 @@ class ClientController extends Controller
     {
         try {
 
-            $client = Client::with(['user.userDetail.province.country', 'gender'])->find($id);
+            $client = Client::with(['user.userDetail.province.country', 'gender', 'addresses.type'])->find($id);
 
             if (!$client)
                 return response()->json([

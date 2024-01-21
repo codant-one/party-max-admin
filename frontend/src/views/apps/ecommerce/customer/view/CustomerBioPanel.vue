@@ -115,47 +115,85 @@ const getFlagCountry = country => {
 
           <VList class="card-list mt-2">
             <VListItem>
-              <div class="text-body-1">
-                <span class="font-weight-medium me-2">Nombre:</span>
-                <span>
-                  {{ props.customerData.user.name }} {{ props.customerData.user.last_name ?? '' }}
-                </span>
-              </div>
-            </VListItem>
-
-            <VListItem>
-              <div class="text-body-1">
-                <span class="font-weight-medium me-2">E-mail:</span>
-                <span>
-                  {{ props.customerData.user.email }}
-                </span>
-              </div>
-            </VListItem>
-
-
-            <VListItem>
-              <div class="text-body-1">
-                <span class="font-weight-medium me-2">Teléfono:</span>
-                <span>
-                  {{ props.customerData.user.user_detail.phone }}
-                </span>
-              </div>
-            </VListItem>
-
-            <VListItem>
-              <div class="text-body-1">
-                <span class="font-weight-medium me-2">País:</span>
-                  <VAvatar
-                      start
-                      size="25"
-                      :image="getFlagCountry(props.customerData.user.user_detail.province.country.name)"
-                    />
-
-                  <span class="ms-2">
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Nombre:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.name }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Apellido:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.last_name ?? '' }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Email:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.email }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Username:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.username }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                    Teléfono:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.user_detail.phone }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Dirección:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.user_detail.address }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Estado:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.user_detail.province.name }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  País:
+                  <span class="text-body-2 me-2">
                     {{ props.customerData.user.user_detail.province.country.name }}
                   </span>
-              </div>
+                  <VAvatar
+                    start
+                    size="25"
+                    :image="getFlagCountry(props.customerData.user.user_detail.province.country.name)"
+                  />
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
+                  Documento:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.user_detail.document }}
+                  </span>
+                </h6>
+              </VListItemTitle>
             </VListItem>
+            
           </VList>
         </VCardText>
 

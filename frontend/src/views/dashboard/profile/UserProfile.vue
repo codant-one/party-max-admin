@@ -316,7 +316,7 @@ const getFlagCountry = country => {
               </VListItemTitle>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
-                  Apellidos:
+                  Apellido:
                   <span class="text-body-2">
                     {{ last_name }}
                   </span>

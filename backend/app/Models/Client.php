@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
+use App\Models\Address;
 
 class Client extends Model
 {
@@ -25,23 +26,32 @@ class Client extends Model
     ];
 
     /**** Relationship ****/
-    public function state(){
+    public function state() {
         return $this->belongsTo(State::class, 'state_id', 'id');
     }
 
-    public function gender(){
+    public function gender() {
         return $this->belongsTo(Gender::class, 'gender_id', 'id');
     }
 
-    public function user(){
+    public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function addresses() {
+        return $this->hasMany(Address::class, 'client_id');
+    }
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
-       $query->where('title', 'LIKE', '%' . $search . '%')
-             ->orWhere('description', 'LIKE', '%' . $search . '%');
+        $query->whereHas('user', function ($q) use ($search) {
+            $q->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('last_name', 'LIKE', '%' . $search . '%')
+                      ->orWhere('username', 'LIKE', '%' . $search . '%')
+                      ->orWhere('email', 'LIKE', '%' . $search . '%');
+            });
+        });
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
@@ -75,6 +85,7 @@ class Client extends Model
     public static function createClient($request) {
         $user = User::createUser($request);
         $user->assignRole('Cliente');
+
         $client = self::create([
             'user_id' => $user->id,
             'gender_id' => $request->gender_id,
@@ -86,7 +97,6 @@ class Client extends Model
 
     public static function updateClient($request, $client) {
         $client->update([
-            // 'user_id' => $request->user_id,
             'gender_id' => $request->gender_id,
             'birthday' => date('Y-m-d', strtotime($request->birthday) )
         ]);

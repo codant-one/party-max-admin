@@ -6,7 +6,6 @@ import { es } from 'date-fns/locale';
 
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
 import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/CustomerTabAddressAndBilling.vue'
-import CustomerTabNotification from '@/views/apps/ecommerce/customer/view/CustomerTabNotification.vue'
 import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
 import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
 
@@ -23,9 +22,20 @@ const isRequestOngoing = ref(true)
 const tabs = [
   { title: 'Descripción general' },
   { title: 'Seguridad' },
-  { title: 'Facturación & Envíos' },
-  { title: 'Notificaciones' },
+  { title: 'Envíos' }
 ]
+
+const advisor = ref({
+  type: '',
+  message: '',
+  show: false
+})
+
+const showAlert = function(alert) {
+  advisor.value.show = alert.value.show
+  advisor.value.type = alert.value.type
+  advisor.value.message = alert.value.message
+}
 
 const isAddCustomerDrawerOpen = ref(false)
 
@@ -37,7 +47,7 @@ async function fetchData() {
 
   if(Number(route.params.id)) {
     client.value = await clientsStores.showClient(Number(route.params.id))
-    console.log('cluente', client.value)
+    console.log('cliente', client.value)
     online.value = client.value.user.online
 
   }
@@ -67,6 +77,15 @@ async function fetchData() {
             </VCardText>
         </VCard>
     </VDialog>
+
+    <v-col cols="12">
+        <v-alert
+          v-if="advisor.show"
+          :type="advisor.type"
+          class="mb-6">
+            {{ advisor.message }}
+        </v-alert>
+    </v-col>
 
     <!-- 👉 Header  -->
     <div v-if="client" class="d-flex justify-space-between align-center flex-wrap gap-y-4 mb-6">
@@ -127,13 +146,12 @@ async function fetchData() {
                     <CustomerTabOverview />
                 </VWindowItem>
                 <VWindowItem>
-                    <CustomerTabSecurity />
+                    <CustomerTabSecurity 
+                        :user_id="client.user_id"
+                        @alert="showAlert" />
                 </VWindowItem>
                 <VWindowItem>
-                    <CustomerTabAddressAndBilling />
-                </VWindowItem>
-                <VWindowItem>
-                    <CustomerTabNotification />
+                    <CustomerTabAddressAndBilling :addresses="client.addresses"/>
                 </VWindowItem>
             </VWindow>
         </VCol>

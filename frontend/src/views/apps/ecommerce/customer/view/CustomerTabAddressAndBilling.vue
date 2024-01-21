@@ -1,7 +1,15 @@
 <script setup>
+
 import americanExpress from '@images/icons/payments/img/american-express.png'
 import mastercard from '@images/icons/payments/img/mastercard.png'
 import visa from '@images/icons/payments/img/visa-light.png'
+
+const props = defineProps({
+  addresses: {
+    type: Object,
+    required: true
+  }
+})
 
 const show = ref([
   true,
@@ -18,43 +26,6 @@ const paymentShow = ref([
 const isEditAddressDialogVisible = ref(false)
 const isCardAddDialogVisible = ref(false)
 
-const addressData = [
-  {
-    title: 'Home',
-    subtitle: '23 Shatinon Mekalan',
-    owner: 'Violet Mendoza',
-    defaultAdderss: true,
-    address: ` 23 Shatinon Mekalan,
-    <br>
-    Melbourne, VIC 3000,
-    <br>
-    LondonUK`,
-  },
-  {
-    title: 'Office',
-    subtitle: '45 Rocker Terrace',
-    owner: 'Violet Mendoza',
-    defaultAdderss: false,
-    address: ` 45 Rocker Terrace,
-    <br>
-    Latheronwheel,
-    <br>
-    KW5 8NW, London,
-    <br>
-    UK`,
-  },
-  {
-    title: 'Family',
-    subtitle: '512 Water Plant',
-    owner: 'Violet Mendoza',
-    defaultAdderss: false,
-    address: ` 512 Water Plant,
-    <br>
-    Melbourne, VIC 3000,
-    <br>
-    LondonUK`,
-  },
-]
 
 const paymentData = [
   {
@@ -86,67 +57,80 @@ const paymentData = [
     <VCardText>
       <div class="d-flex justify-space-between mb-6 flex-wrap align-center gap-y-4 gap-x-6">
         <h5 class="text-h5">
-          Address Book
+          Direcciones
         </h5>
         <VBtn
+          v-if="false"
           variant="tonal"
           @click="isEditAddressDialogVisible = !isEditAddressDialogVisible"
         >
-          Add new Address
+          Agregar
         </VBtn>
       </div>
       <template
-        v-for="(address, index) in addressData"
+        v-for="(address, index) in props.addresses"
         :key="index"
       >
         <div class="d-flex justify-space-between mb-4 gap-y-2 flex-wrap align-center">
           <div class="d-flex align-center gap-x-1">
-            <IconBtn
-              density="comfortable"
+            <VBtn
+              icon
+              variant="text"
+              color="default"
+              size="x-small"
               @click="show[index] = !show[index]"
             >
               <VIcon
                 :icon="show[index] ? 'tabler-chevron-down' : 'tabler-chevron-right'"
                 class="flip-in-rtl"
               />
-            </IconBtn>
+            </VBtn>
 
             <div>
               <div class="d-flex">
                 <h6 class="text-h6 me-2">
-                  {{ address.title }}
+                  {{ address.type.name }}
                 </h6>
                 <VChip
-                  v-if="address.defaultAdderss"
+                  v-if="address.default"
                   color="success"
                   label
                 >
-                  Default Address
+                  Dirección por defecto
                 </VChip>
               </div>
-              <span class="text-body-2 text-disabled">{{ address.subtitle }}</span>
+              <span class="text-body-2 text-disabled">{{ address.title }}</span>
             </div>
           </div>
 
-          <div class="ms-5">
-            <IconBtn>
+          <div class="ms-5 iconsAddress" v-if="false">
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-pencil"
                 class="flip-in-rtl"
               />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-trash"
                 class="flip-in-rtl"
               />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-dots-vertical"
                 class="flip-in-rtl"
               />
-            </IconBtn>
+            </VBtn>
           </div>
         </div>
         <VExpandTransition>
@@ -155,16 +139,28 @@ const paymentData = [
             class="px-10"
           >
             <h6 class="mb-1 text-h6">
-              {{ address.owner }}
+              {{ address.address }}
             </h6>
             <div
               class="text-body-1"
-              v-html="address.address"
+              v-html="address.street"
+            />
+            <div
+              class="text-body-1"
+              v-html="address.city"
+            />
+            <div
+              class="text-body-1"
+              v-html="address.postal_code"
+            />
+            <div
+              class="text-body-1"
+              v-html="address.phone"
             />
           </div>
         </VExpandTransition>
         <VDivider
-          v-if="index !== addressData.length - 1"
+          v-if="index !== addresses.length - 1"
           class="my-4"
         />
       </template>
@@ -172,7 +168,7 @@ const paymentData = [
   </VCard>
 
   <!-- 👉 Payment Methods -->
-  <VCard>
+  <VCard v-if="false">
     <VCardText>
       <div class="d-flex justify-space-between mb-6 flex-wrap align-center gap-y-4 gap-x-6">
         <h5 class="text-h5">
@@ -191,15 +187,18 @@ const paymentData = [
       >
         <div class="d-flex justify-space-between mb-4 gap-y-2 flex-wrap align-center">
           <div class="d-flex align-center">
-            <IconBtn
-              density="comfortable"
+            <VBtn
+              icon
+              variant="text"
+              color="default"
+              size="x-small"
               @click="paymentShow[index] = !paymentShow[index]"
             >
               <VIcon
                 :icon="paymentShow[index] ? 'tabler-chevron-down' : 'tabler-chevron-right'"
                 class="flip-in-rtl"
               />
-            </IconBtn>
+            </VBtn>
 
             <VImg
               :src="payment.image"
@@ -226,24 +225,33 @@ const paymentData = [
           </div>
 
           <div class="ms-5">
-            <IconBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-pencil"
                 class="flip-in-rtl"
               />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-trash"
                 class="flip-in-rtl"
               />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon
                 icon="tabler-dots-vertical"
                 class="flip-in-rtl"
               />
-            </IconBtn>
+            </VBtn>
           </div>
         </div>
         <VExpandTransition>
@@ -353,6 +361,13 @@ const paymentData = [
       </template>
     </VCardText>
   </VCard>
-  <AddEditAddressDialog v-model:isDialogVisible="isEditAddressDialogVisible" />
-  <CardAddEditDialog v-model:isDialogVisible="isCardAddDialogVisible" />
+  <!-- <AddEditAddressDialog v-model:isDialogVisible="isEditAddressDialogVisible" /> -->
+  <!-- <CardAddEditDialog v-model:isDialogVisible="isCardAddDialogVisible" /> -->
 </template>
+
+<style>
+  .iconsAddress .v-btn--icon.v-btn--density-default {
+    width: calc(var(--v-btn-height) + 0px) !important;
+    height: calc(var(--v-btn-height) + 0px) !important;
+  }
+</style>

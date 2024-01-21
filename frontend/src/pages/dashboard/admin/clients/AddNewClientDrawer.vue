@@ -1,21 +1,29 @@
 <script setup>
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import { emailValidator, requiredValidator } from '@/@core/utils/validators'
-import { useCountriesStores } from '@/stores/useCountries'
-import { useProvincesStores } from '@/stores/useProvinces'
-import { useGendersStores } from '@/stores/useGenders'
+import { emailValidator, requiredValidator, phoneValidator } from '@/@core/utils/validators'
 
 const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
-    required: true,
+    required: true
   },
   client: {
     type: Object,
-    required: false,
+    required: false
+  },
+  countries: {
+    type: Object,
+    required: true
+  },
+  provinces: {
+    type: Object,
+    required: true
+  },
+  genders: {
+    type: Object,
+    required: true
   }
-
 })
 
 const emit = defineEmits([
@@ -23,24 +31,13 @@ const emit = defineEmits([
   'clientData',
 ])
 
-const countriesStores = useCountriesStores()
-const provincesStores = useProvincesStores()
-const gendersStores = useGendersStores()
-
 const isFormValid = ref(false)
 const refForm = ref()
 
-const countries = ref([])
-const provinces = ref([])
-const genders = ref([])
 const listProvincesByCountry = ref([])
-const searchQuery = ref('')
-const rowPerPage = ref(10)
-const currentPage = ref(1)
-
 const id = ref(0)
-const client_country_id = ref('')
-const countryOld_id = ref('')
+const client_country_id = ref('Colombia')
+const countryOld_id = ref('Colombia')
 const province_id = ref('')
 const name = ref('')
 const last_name = ref('')
@@ -62,6 +59,14 @@ const startDateTimePickerConfig = computed(() => {
     dateFormat: 'Y-m-d'
   }
 
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
+
+  config.maxDate = formattedDate
+
   return config
 })
 
@@ -69,8 +74,24 @@ const getTitle = computed(() => {
   return isEdit.value ? 'Actualizar Cliente': 'Agregar Cliente'
 })
 
+const selectCountry = country => {
+  if (country) {
+    let _country = props.countries.find(item => item.name === country)
+    client_country_id.value = _country.name
+ 
+    province_id.value = null
+    
+    listProvincesByCountry.value = props.provinces.filter(item => item.country_id === _country.id)
+  }
+}
+
 watchEffect(async() => {
-  fetchData()
+  selectCountry(countryOld_id.value)
+
+  if (!(Object.entries(props.client).length === 0) && props.client.constructor === Object){
+    province_id.value = props.client.user.user_detail.province.id ?? ''
+    gender_id.value = props.client.gender_id
+  }
 
     if (props.isDrawerOpen) {
         let data = { limit: -1 }
@@ -97,33 +118,6 @@ watchEffect(async() => {
     }
 })
 
-async function fetchData() {
-
-  let data = {
-    search: searchQuery.value,
-    orderByField: 'id',
-    orderBy: 'desc',
-    limit: rowPerPage.value,
-    page: currentPage.value
-  }
-
-  await countriesStores.fetchCountries(data)
-  countries.value = countriesStores.getCountries
-
-  await provincesStores.fetchProvinces(data)
-  provinces.value = provincesStores.getProvinces
-
-  await gendersStores.fetchGenders(data)
-  genders.value = gendersStores.getGenders
-
-  await selectCountry(countryOld_id.value)
-  if (!(Object.entries(props.client).length === 0) && props.client.constructor === Object){
-    province_id.value = props.client.user.user_detail.province.id ?? ''
-    gender_id.value = props.client.gender_id
-  }
-}
-
-
 const getProvinces = computed(() => {
   return listProvincesByCountry.value.map((province) => {
     return {
@@ -134,24 +128,13 @@ const getProvinces = computed(() => {
 })
 
 const getGenders = computed(() => {
-  return genders.value.map((gender) => {
+  return props.genders.map((gender) => {
     return {
       title: gender.name,
       value: gender.id,
     }
   })
 })
-
-const selectCountry = country => {
-  if (country) {
-    let _country = countries.value.find(item => item.name === country)
-    client_country_id.value = _country.name
- 
-    province_id.value = ''
-    
-    listProvincesByCountry.value = provinces.value.filter(item => item.country_id === _country.id)
-  }
-}
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -160,25 +143,25 @@ const closeNavigationDrawer = () => {
     refForm.value?.reset()
     refForm.value?.resetValidation()
 
-    name.value = '' 
-    last_name.value = ''
-    username.value = ''
-    document.value = ''
-    email.value = ''
-    phone.value = ''
-    address.value = ''
-    birthday.value = ''
-    gender_id.value = ''
-    client_country_id.value = ''
-    province_id.value = ''
-    password.value = ''
-    passwordConfirmation.value = ''
+    name.value = null
+    last_name.value = null
+    username.value = null
+    document.value = null
+    email.value = null
+    phone.value = null
+    address.value = null
+    birthday.value = null
+    gender_id.value = null
+    client_country_id.value = null
+    province_id.value = null
+    password.value = null
+    passwordConfirmation.value = null
     isNewPasswordVisible.value = false
     isConfirmPasswordVisible.value = false
     
+    isEdit.value = false 
     id.value = 0
   })
-  isEdit.value = false  
 }
 
 const onSubmit = () => {
@@ -186,20 +169,21 @@ const onSubmit = () => {
     if (valid) {
       let formData = new FormData()
 
+      if (!isEdit.value)
+        formData.append('email', email.value)
+
       formData.append('name', name.value)
       formData.append('last_name', last_name.value)
       formData.append('username', username.value)
-      if (!isEdit.value)
-        formData.append('email', email.value)
       formData.append('document', document.value)
       formData.append('phone', phone.value)
       formData.append('address', address.value)
       formData.append('birthday', birthday.value)
       formData.append('gender_id', gender_id.value)
       formData.append('province_id', province_id.value)
+      formData.append('is_client', true)
 
       emit('clientData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
-      emit('update:isDrawerOpen', false)
 
       closeNavigationDrawer()
     }
@@ -211,7 +195,7 @@ const handleDrawerModelValueUpdate = val => {
 }
 
 const getFlagCountry = country => {
-  let val = countries.value.find(item => {
+  let val = props.countries.find(item => {
     return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   })
 
@@ -299,7 +283,7 @@ const getFlagCountry = country => {
               <VCol cols="6">
                 <VTextField
                   v-model="document"
-                  :rules="[requiredValidator]"
+                  :rules="[requiredValidator, phoneValidator]"
                   label="Documento de Identidad"
                 />
               </VCol>
@@ -318,7 +302,7 @@ const getFlagCountry = country => {
               <VCol cols="6">
                 <VTextField
                   v-model="phone"
-                  :rules="[requiredValidator]"
+                  :rules="[requiredValidator, phoneValidator]"
                   label="Teléfono"
                 />
               </VCol>
@@ -329,7 +313,7 @@ const getFlagCountry = country => {
                   v-model="client_country_id"
                   label="País"
                   :rules="[requiredValidator]"
-                  :items="countries"
+                  :items="props.countries"
                   item-title="name"
                   item-value="name"
                   :menu-props="{ maxHeight: '200px' }"

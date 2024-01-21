@@ -66,6 +66,11 @@ const onlineList = () => {
 
 const searchRoles =() => {
   rolesStores.allRoles().then(response => {
+    const index = response.roles.indexOf('Cliente')
+    
+    if (index !== -1)
+      response.roles.splice(index, 1);
+
     rolesList.value = response.roles
   }).catch(error => { })
 }

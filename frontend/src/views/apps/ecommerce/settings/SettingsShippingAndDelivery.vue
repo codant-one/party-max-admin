@@ -70,12 +70,18 @@ const InternationalTableData = [
           <VSpacer />
 
           <div class="text-disabled">
-            <IconBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon icon="tabler-edit" />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon icon="tabler-trash" />
-            </IconBtn>
+            </VBtn>
           </div>
         </div>
 
@@ -97,9 +103,12 @@ const InternationalTableData = [
               <td>{{ data.condition }}</td>
               <td>{{ data.price }}</td>
               <td>
-                <IconBtn>
+                <VBtn
+                  icon
+                  variant="text"
+                  color="default">
                   <VIcon icon="tabler-dots-vertical" />
-                </IconBtn>
+                </VBtn>
               </td>
             </tr>
           </tbody>
@@ -127,12 +136,18 @@ const InternationalTableData = [
 
           <VSpacer />
           <div class="text-disabled">
-            <IconBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon icon="tabler-edit" />
-            </IconBtn>
-            <IconBtn>
+            </VBtn>
+            <VBtn
+              icon
+              variant="text"
+              color="default">
               <VIcon icon="tabler-trash" />
-            </IconBtn>
+            </VBtn>
           </div>
         </div>
 
@@ -154,9 +169,12 @@ const InternationalTableData = [
               <td>{{ data.condition }}</td>
               <td>{{ data.price }}</td>
               <td>
-                <IconBtn>
+                <VBtn
+                  icon
+                  variant="text"
+                  color="default">
                   <VIcon icon="tabler-dots-vertical" />
-                </IconBtn>
+                </VBtn>
               </td>
             </tr>
           </tbody>

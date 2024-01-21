@@ -2,6 +2,8 @@
 
 import { useClientsStores } from '@/stores/useClients'
 import { useCountriesStores } from '@/stores/useCountries'
+import { useProvincesStores } from '@/stores/useProvinces'
+import { useGendersStores } from '@/stores/useGenders'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
 import { avatarText } from '@/@core/utils/formatters'
@@ -10,6 +12,8 @@ import router from '@/router'
 
 const clientsStores = useClientsStores()
 const countriesStores = useCountriesStores()
+const provincesStores = useProvincesStores()
+const gendersStores = useGendersStores()
 
 const clients = ref([])
 const searchQuery = ref('')
@@ -22,6 +26,8 @@ const isAddNewClientDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedClient = ref({})
 const listCountries = ref([])
+const listProvinces = ref([])
+const listGenders = ref([])
 
 const advisor = ref({
   type: '',
@@ -39,6 +45,14 @@ const paginationData = computed(() => {
 
 const loadCountries = () => {
   listCountries.value = countriesStores.getCountries
+}
+
+const loadProvinces = () => {
+  listProvinces.value = provincesStores.getProvinces
+}
+
+const loadGenders = () => {
+  listGenders.value = gendersStores.getGenders
 }
 
 // 👉 watching current page
@@ -76,6 +90,12 @@ async function fetchData() {
   clients.value = clientsStores.getClients
   totalPages.value = clientsStores.last_page
   totalClients.value = clientsStores.clientsTotalCount
+
+  await provincesStores.fetchProvinces()
+  loadProvinces()
+  
+  await gendersStores.fetchGenders()
+  loadGenders()
 
   isRequestOngoing.value = false
 }
@@ -465,11 +485,14 @@ const getFlagCountry = country => {
         </v-card>
       </v-col>
     </v-row>
-
     <!-- 👉 Add New Client -->
     <AddNewClientDrawer
+      v-if="listProvinces.length > 0"
       v-model:isDrawerOpen="isAddNewClientDrawerVisible"
       :client="selectedClient"
+      :countries="listCountries"
+      :provinces="listProvinces"
+      :genders="listGenders"
       @client-data="submitForm"/>
 
     <!-- 👉 Confirm Delete -->

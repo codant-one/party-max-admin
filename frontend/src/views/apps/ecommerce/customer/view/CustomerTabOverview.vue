@@ -157,7 +157,7 @@ async function fetchData() {
       </VCard>
     </VCol>
 
-    <VCol>
+    <VCol v-if="false">
       
       <v-card title="Pedidos realizados">
           <v-card-text class="d-flex flex-wrap py-4 gap-4">

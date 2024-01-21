@@ -36,33 +36,26 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'banner4_category_id', 'id');
     }
 
-    public function product()
-    {
+    public function product() {
         return $this->hasMany(ProductCategory::class, 'category_id', 'id');
     }
 
-    public function children()
-    {
+    public function children() {
         return $this->hasMany(Category::class, 'category_id');
     }
 
-    public function recursiveItems()
-    {
+    public function recursiveItems() {
         return $this->children()->with('recursiveItems');
     }
 
-    public static function getRecursiveItems($category_id = null)
-    {
+    public static function getRecursiveItems($category_id = null) {
         return self::with('recursiveItems')->where('category_id', $category_id)->get();
     }
 
-    public function productColors()
-    {
-        //return $this->belongsToMany(ProductColor::class, 'product_categories', 'category_id', 'product_color_id');
+    public function productColors() {
         return $this->belongsToMany(ProductColor::class, 'product_categories', 'category_id', 'product_color_id')
-        ->orderBy('product_colors.created_at', 'desc');
+                    ->orderBy('product_colors.created_at', 'desc');
     }
-
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {

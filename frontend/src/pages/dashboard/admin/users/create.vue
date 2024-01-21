@@ -36,7 +36,7 @@ const address = ref('')
 const username = ref('')
 const document = ref('')
 const province_id = ref('')
-const country_id = ref('')
+const country_id = ref('Colombia')
 const assignedRoles = ref([])
 
 const advisor = ref({
@@ -58,6 +58,16 @@ const getProvinces = computed(() => {
   })
 })
 
+const selectCountry = country => {
+  if (country) {
+    let _country = listCountries.value.find(item => item.name === country)
+    country_id.value = _country.name
+ 
+    province_id.value = ''
+    listProvincesByCountry.value = listProvinces.value.filter(item => item.country_id === _country.id)
+  }
+}
+
 onMounted(async () => {
 
     await countriesStores.fetchCountries();
@@ -65,6 +75,8 @@ onMounted(async () => {
 
     loadCountries()
     loadProvinces()
+
+    selectCountry('Colombia')
 
 })
 
@@ -74,16 +86,6 @@ const loadCountries = () => {
 
 const loadProvinces = () => {
   listProvinces.value = provincesStores.getProvinces
-}
-
-const selectCountry = country => {
-  if (country) {
-    let _country = listCountries.value.find(item => item.name === country)
-    country_id.value = _country.name
- 
-    province_id.value = ''
-    listProvincesByCountry.value = listProvinces.value.filter(item => item.country_id === _country.id)
-  }
 }
 
 const closeUserCreateDialog  = function(){

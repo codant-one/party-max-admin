@@ -106,11 +106,12 @@ class UsersController extends Controller
     {
         try {
             
-            $limit = $request->has('limit') ? $request->limit : 10;
-            $clients = Client::all()->pluck('user_id');
+            $limit = $request->has('limit') ? $request->limit : 10;;
 
             $query = User::with(['roles','userDetail.province.country'])
-                        ->whereNotIn('id', $clients)
+                         ->whereDoesntHave('roles', function ($query) {
+                            $query->where('name', 'Cliente');
+                         })
                          ->applyFilters(
                             $request->only([
                                 'search',
@@ -119,14 +120,16 @@ class UsersController extends Controller
                             ])
                         );
 
-            $count = $query->whereNotIn('id', $clients)
-                        ->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy'
-                        ])
-                    )->count();
+            $count = $query->whereDoesntHave('roles', function ($query) {
+                                $query->where('name', 'Cliente');
+                            })
+                           ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                            )->count();
 
             $users = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
