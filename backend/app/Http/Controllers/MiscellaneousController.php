@@ -172,33 +172,43 @@ class MiscellaneousController extends Controller
         }
     }
 
-    public function popularsBlogs(): JsonResponse
+    public function popularsBlogs(Request $request): JsonResponse
     {
         try {
 
-            $blogs = 
-                Blog::with(['category', 'user'])
-                           ->where('is_popular_blog', 1)
-                           ->get();
+            $tag = $request->has('tag') ? $request->tag : false;
+            $search = $request->has('search') ? $request->search : false;
+            $query = Blog::with(['user']);
 
-            $blogCategory = BlogCategory::with(['blogs'])
-                           ->get();
+            if($tag) {
+                $query = $query->whereHas('tags', function ($q) use ($tag) {
+                            $q->whereHas('tag', function ($q) use ($tag) {
+                                $q->where(function ($query) use ($tag) {
+                                    $query->where('slug', $tag );
+                                });
+                            });
+                        });
+            } else 
+                $query = $query->where('is_popular_blog', 1);
 
-            $blogsLatest = Blog::with(['category', 'user'])
-                           ->latest('created_at') 
-                           ->limit(5)           
-                           ->get();
+            if($search)
+                $query = $query->where('title', 'LIKE', '%' . $search . '%')
+                               ->orWhere('description', 'LIKE', '%' . $search . '%');
 
-            $tagsCount = Tag::withCount('blogTags')->get();
+            $blogs = $query->get();
+                
+            $tags = Tag::withCount('blogTags')->where('tag_type_id', 2)->get();
 
+            $latestBlogs = Blog::orderBy('created_at', 'desc')
+                               ->limit(5)          
+                               ->get();
         
             return response()->json([
                 'success' => true,
                 'data' => [ 
                     'blogs' => $blogs,
-                    'categories' => $blogCategory,
-                    'blogsLatest' => $blogsLatest,
-                    'tagsCount' => $tagsCount
+                    'tags' => $tags,
+                    'latestBlogs' => $latestBlogs
                 ]
             ]);
 
@@ -215,25 +225,22 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $blog = 
-                Blog::with(['category', 'user', 'tags.tag'])
-                            ->where('slug',$slug)
-                            ->get();
+            $blog = Blog::with(['category', 'user', 'tags.tag'])
+                        ->where('slug',$slug)
+                        ->first();
 
-            $blogs = 
-                Blog::with(['category', 'user'])
-                           ->get();
+            $tags = Tag::withCount('blogTags')->where('tag_type_id', 2)->get();
 
-            $blogCategory = BlogCategory::with(['blogs'])
-                           ->get();
-
+            $latestBlogs = Blog::orderBy('created_at', 'desc')
+                               ->limit(5)          
+                               ->get();
         
             return response()->json([
                 'success' => true,
                 'data' => [ 
                     'blog' => $blog,
-                    'blogs' => $blogs,
-                    'categories' => $blogCategory
+                    'tags' => $tags,
+                    'latestBlogs' => $latestBlogs
                 ]
             ]);
 
@@ -245,49 +252,5 @@ class MiscellaneousController extends Controller
             ], 500);
         }
     }
-
-    public function blogsByCategory($slug): JsonResponse
-    {
-        try {
-
-            $blogs = array();
-            $blogsC = 
-                Blog::with(['category'=> function($q) use ($slug){
-                                $q->where('slug', '=', $slug);
-                            }
-                            , 'user'])
-                           ->get();
-
-            foreach ($blogsC as $key => $value) {
-                if( !empty($value->category) )
-                    $blogs[] = $value;
-            }
-
-            $blogsAll = 
-                Blog::with(['category', 'user'])
-                           ->get();
-
-            $blogCategory = BlogCategory::with(['blogs'])
-                           ->get();
-
-        
-            return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'blogs' => $blogs,
-                    'blogsAll' => $blogsAll,
-                    'categories' => $blogCategory
-                ]
-            ]);
-
-        } catch(\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'database_error',
-                'exception' => $ex->getMessage()
-            ], 500);
-        }
-    }
-
     
 }
