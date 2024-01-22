@@ -61,7 +61,8 @@ class Tag extends Model
     public static function createTag($request) {
         $tag = self::create([
             'tag_type_id' => $request->tag_type_id,
-            'name' => $request->name
+            'name' => $request->name,
+            'slug' => Str::slug($request->name)
         ]);
 
         return $tag;
@@ -70,7 +71,8 @@ class Tag extends Model
     public static function updateTag($request, $tag) {
         $tag->update([
             'tag_type_id' => $request->tag_type_id,
-            'name' => $request->name
+            'name' => $request->name,
+            'slug' => Str::slug($request->name)
         ]);
 
         return $tag;

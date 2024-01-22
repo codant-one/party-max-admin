@@ -152,14 +152,16 @@ Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
 
 Route::get('home', [HomeController::class, 'home']);
-Route::get('miscellaneous/categories/{slug}', [MiscellaneousController::class, 'categories']);
-Route::get('miscellaneous/categories', [MiscellaneousController::class, 'categoriesAll']);
-Route::get('miscellaneous/products', [MiscellaneousController::class, 'products']);
-Route::get('miscellaneous/products/{slug}', [MiscellaneousController::class, 'productDetail']);
-Route::get('miscellaneous/faqs/all', [MiscellaneousController::class, 'faqs']);
-Route::get('miscellaneous/blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
-Route::get('miscellaneous/blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
-Route::get('miscellaneous/blogs/categories/{slug}', [MiscellaneousController::class, 'blogsByCategory']);
+
+Route::group(['prefix' => 'miscellaneous'], function () {
+    Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
+    Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
+    Route::get('products', [MiscellaneousController::class, 'products']);
+    Route::get('products/{slug}', [MiscellaneousController::class, 'productDetail']);
+    Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
+    Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
+    Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+});
 
 
 //Testing Endpoints
