@@ -109,9 +109,9 @@ class UsersController extends Controller
             $limit = $request->has('limit') ? $request->limit : 10;;
 
             $query = User::with(['roles','userDetail.province.country'])
-                         ->whereDoesntHave('roles', function ($query) {
-                            $query->where('name', 'Cliente')
-                                  ->orWhere('name', 'Proveedor');
+                         ->whereHas('roles', function ($query) {
+                            $query->where('name', 'SuperAdmin')
+                                  ->orWhere('name', 'Administrador');
                          })
                          ->applyFilters(
                             $request->only([
@@ -121,9 +121,9 @@ class UsersController extends Controller
                             ])
                         );
 
-            $count = $query->whereDoesntHave('roles', function ($query) {
-                                $query->where('name', 'Cliente')
-                                      ->orWhere('name', 'Proveedor');
+            $count = $query->whereHas('roles', function ($query) {
+                                $query->where('name', 'SuperAdmin')
+                                      ->orWhere('name', 'Administrador');
                             })
                            ->applyFilters(
                                 $request->only([
