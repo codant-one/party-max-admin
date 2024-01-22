@@ -1,0 +1,62 @@
+[
+    {
+        "id": 157,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Eventos y Fiestas"
+    },
+    {
+        "id": 158,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Catering"
+    },
+    {
+        "id": 159,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Animadores de Fiestas"
+    },
+    {
+        "id": 160,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Mobiliarios"
+    },
+    {
+        "id": 161,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Belleza"
+    },
+    {
+        "id": 162,
+        "category_type_id": 2,
+        "category_id": null,
+        "name": "Fotografía y video para eventos"
+    },
+    {
+        "id": 163,
+        "category_type_id": 2,
+        "category_id": 157,
+        "name": "Empresariales"
+    },
+    {
+        "id": 164,
+        "category_type_id": 2,
+        "category_id": 157,
+        "name": "Celebraciones Especiales"
+    },
+    {
+        "id": 165,
+        "category_type_id": 2,
+        "category_id": 157,
+        "name": "Fiestas Temáticas"
+    },
+    {
+        "id": 166,
+        "category_type_id": 2,
+        "category_id": 157,
+        "name": "Fiestas de Temporada"
+    }
+]

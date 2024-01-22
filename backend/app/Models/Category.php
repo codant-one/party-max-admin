@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Product;
+use App\Models\CategoryType;
 
 class Category extends Model
 {
@@ -16,6 +17,10 @@ class Category extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
+    public function category_type() {
+        return $this->belongsTo(CategoryType::class, 'category_type_id', 'id');
+    }
+
     public function category() {
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
@@ -76,6 +81,10 @@ class Category extends Model
 
         if ($filters->get('fathers') === '1') {
             $query->whereNull('category_id');
+        }
+
+        if ($filters->get('category_type_id')) {
+            $query->where('category_type_id', $filters->get('type'));
         }
         
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
@@ -152,6 +161,7 @@ class Category extends Model
         $slug = self::getSlug($request);
 
         $category = self::create([
+            'category_type_id' => $request->category_type_id,
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
             'slug' => $slug
@@ -164,6 +174,7 @@ class Category extends Model
         $slug = self::getSlug($request);
 
         $category->update([
+            'category_type_id' => $request->category_type_id,
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
             'slug' => $slug

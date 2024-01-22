@@ -17,6 +17,12 @@ const totalCategories = ref(0)
 const isRequestOngoing = ref(true)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedCategory = ref({})
+const category_type_id = ref()
+const categoryTypes = ref([
+  {id: 1, name: 'Productos'},
+  {id: 2, name: 'Servicios'},
+])
+
 
 const advisor = ref({
   type: '',
@@ -45,6 +51,7 @@ async function fetchData() {
   let data = {
     search: searchQuery.value,
     fathers: searchFathers.value === true ? 1 : 0,
+    category_type_id: category_type_id.value ?? null,
     orderByField: 'id',
     orderBy: 'desc',
     limit: rowPerPage.value,
@@ -147,6 +154,22 @@ const removeCategory = async () => {
                 :items="[10, 20, 30, 50]"/>
             </div>
 
+            <div
+              class="me-3"
+              style="width: 200px;">
+              
+              <VSelect
+                label="Tipo de categoría"
+                v-model="category_type_id"
+                :items="categoryTypes"
+                item-value="id"
+                item-title="name"
+                clearable
+                clear-icon="tabler-x"
+                no-data-text="No disponible"
+                density="compact"
+                variant="outlined"/>
+            </div>
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
@@ -181,6 +204,7 @@ const removeCategory = async () => {
                 <th> #ID </th>
                 <th> NOMBRE </th>
                 <th> SUBCATEGORÍA </th>
+                <th> TIPO </th>
                 <th class="text-end pe-4"> TOTAL PRODUCTOS </th>
                 <th class="text-end pe-4"> GANANCIA TOTAL </th>
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
@@ -222,6 +246,7 @@ const removeCategory = async () => {
                   </div>
                 </td>
                 <td> {{ category.category?.name }} </td>
+                <td> {{ category.category_type?.name }} </td>
                 <td> 
                   <div class="text-end">
                     {{ (category.product_count).toLocaleString() }}

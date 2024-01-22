@@ -51,13 +51,14 @@ class CategoryController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Category::with(['category.category'])
+            $query = Category::with(['category.category', 'category_type'])
                             ->withCount(['product'])
                             ->categoryTotalPrice()
                             ->applyFilters(
                                     $request->only([
                                         'search',
                                         'fathers',
+                                        'category_type_id',
                                         'orderByField',
                                         'orderBy'
                                     ])
@@ -206,7 +207,7 @@ class CategoryController extends Controller
     {
         try {
             
-            $category = Category::with(['category.category'])->find($id);
+            $category = Category::with(['category.category', 'category_type'])->find($id);
 
             if (!$category)
                 return response()->json([

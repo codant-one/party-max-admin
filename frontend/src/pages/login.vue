@@ -66,6 +66,7 @@ const login = () => {
 
       const { qr, token, accessToken, user_data, userAbilities } = response.data     
       const two_factor = { generate_qr: (response.message === '2fa-generate') ? true : false }       
+      const is_2fa = { status: (user_data.is_2fa === 0) ? false : true } 
 
       ability.update(userAbilities)
 
@@ -76,6 +77,7 @@ const login = () => {
       localStorage.setItem('token', token)
       localStorage.setItem('two_factor', JSON.stringify(two_factor))      
       localStorage.setItem('remember_me', remember_me.value);
+      localStorage.setItem('is_2fa', JSON.stringify(is_2fa));
 
       if(remember_me.value){
         localStorage.setItem('email', email.value);

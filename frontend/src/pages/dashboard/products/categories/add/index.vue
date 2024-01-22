@@ -19,7 +19,11 @@ const emitter = inject("emitter")
 const name = ref('')
 const category_id = ref()
 const banners = ref([])
-const avatars = ref([])
+const category_type_id = ref()
+const categoryTypes = ref([
+  {id: 1, name: 'Productos'},
+  {id: 2, name: 'Servicios'},
+])
 
 const isValid =  ref(null)
 
@@ -56,6 +60,7 @@ const onSubmit = () => {
             formData.append('banner_3', banners.value[2] ?? null)
             formData.append('banner_4', banners.value[3] ?? null)
             formData.append('name', name.value)
+            formData.append('category_type_id', category_type_id.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
             formData.append('category_id', category_id.value)
 
@@ -128,14 +133,28 @@ const onSubmit = () => {
                     <VCard class="mb-8">
                         <VCardText>
                             <VRow>
-                                <VCol cols="12" md="6">
+                                <VCol cols="12" md="8">
                                     <VTextField
-                                    v-model="name"
-                                    :rules="[requiredValidator]"
-                                    label="Nombre"
+                                        v-model="name"
+                                        :rules="[requiredValidator]"
+                                        label="Nombre"
                                     />
                                 </VCol>
-                                <VCol cols="12"  md="6">
+                                <VCol cols="12" md="4">
+                                    <VSelect
+                                        label="Tipo de categoría"
+                                        v-model="category_type_id"
+                                        :items="categoryTypes"
+                                        item-value="id"
+                                        item-title="name"
+                                        clearable
+                                        clear-icon="tabler-x"
+                                        no-data-text="No disponible"
+                                        density="compact"
+                                        variant="outlined"
+                                        :rules="[requiredValidator]"/>
+                                </VCol>
+                                <VCol cols="12"  md="12">
                                     <VAutocomplete
                                         id="selectCategory"
                                         v-model="category_id"

@@ -12,6 +12,7 @@
                 'id' => $user->id,
                 'email' => $user->email,
                 'name' => $user->name,
+                'is_2fa' => $user->is_2fa,
                 'last_name' => $user->last_name,
                 'username' => $user->username,
                 'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : $user->avatar,

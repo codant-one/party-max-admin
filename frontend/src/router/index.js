@@ -10,9 +10,10 @@ const router = createRouter({
     {
       path: '/',
       redirect: to => {
+        const is_2fa = JSON.parse(localStorage.getItem('is_2fa') || 'null')
         const two_factor = JSON.parse(localStorage.getItem('two_factor') || 'null')
-        
-        if(two_factor){
+
+        if(two_factor && is_2fa.status){
           if(two_factor.generate_qr) { 
             return { name: '2fa-generate' }
           } else {            
