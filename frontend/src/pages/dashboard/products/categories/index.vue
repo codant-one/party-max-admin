@@ -154,10 +154,7 @@ const removeCategory = async () => {
                 :items="[10, 20, 30, 50]"/>
             </div>
 
-            <div
-              class="me-3"
-              style="width: 200px;">
-              
+            <div style="width: 200px;">
               <VSelect
                 label="Tipo de categoría"
                 v-model="category_type_id"
