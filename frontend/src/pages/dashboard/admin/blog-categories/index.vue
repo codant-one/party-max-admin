@@ -277,7 +277,7 @@ const downloadCSV = async () => {
             <tfoot v-show="!categories.length">
               <tr>
                 <td
-                  colspan="7"
+                  colspan="5"
                   class="text-center">
                   Datos no disponibles
                 </td>

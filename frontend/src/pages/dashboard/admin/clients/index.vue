@@ -460,7 +460,7 @@ const getFlagCountry = country => {
             <tfoot v-show="!clients.length">
               <tr>
                 <td
-                  colspan="4"
+                  colspan="7"
                   class="text-center">
                   Datos no disponibles
                 </td>

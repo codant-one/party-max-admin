@@ -223,7 +223,7 @@ async function fetchData() {
             <tfoot v-show="!orders.length">
               <tr>
                 <td
-                  colspan="7"
+                  colspan="5"
                   class="text-center">
                   Datos no disponibles
                 </td>
