@@ -56,8 +56,8 @@ const handleKeyDown = (event, index) => {
       class="d-flex align-center gap-2"
     >
       <VTextField
-        text="tel"
         v-for="i in props.totalInput"
+        type="tel"
         class="digits"
         :key="i"
         :model-value="digits[i - 1]"
