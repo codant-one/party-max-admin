@@ -110,7 +110,8 @@ class UsersController extends Controller
 
             $query = User::with(['roles','userDetail.province.country'])
                          ->whereDoesntHave('roles', function ($query) {
-                            $query->where('name', 'Cliente');
+                            $query->where('name', 'Cliente')
+                                  ->orWhere('name', 'Proveedor');
                          })
                          ->applyFilters(
                             $request->only([
@@ -121,7 +122,8 @@ class UsersController extends Controller
                         );
 
             $count = $query->whereDoesntHave('roles', function ($query) {
-                                $query->where('name', 'Cliente');
+                                $query->where('name', 'Cliente')
+                                      ->orWhere('name', 'Proveedor');
                             })
                            ->applyFilters(
                                 $request->only([
