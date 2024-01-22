@@ -1,62 +1,62 @@
 [
     {
-        "id": 157,
+        "id": 162,
         "category_type_id": 2,
         "category_id": null,
         "name": "Eventos y Fiestas"
     },
     {
-        "id": 158,
+        "id": 163,
         "category_type_id": 2,
         "category_id": null,
         "name": "Catering"
     },
     {
-        "id": 159,
+        "id": 164,
         "category_type_id": 2,
         "category_id": null,
         "name": "Animadores de Fiestas"
     },
     {
-        "id": 160,
+        "id": 165,
         "category_type_id": 2,
         "category_id": null,
         "name": "Mobiliarios"
     },
     {
-        "id": 161,
+        "id": 166,
         "category_type_id": 2,
         "category_id": null,
         "name": "Belleza"
     },
     {
-        "id": 162,
+        "id": 167,
         "category_type_id": 2,
         "category_id": null,
         "name": "Fotografía y video para eventos"
     },
     {
-        "id": 163,
+        "id": 168,
         "category_type_id": 2,
-        "category_id": 157,
+        "category_id": 162,
         "name": "Empresariales"
     },
     {
-        "id": 164,
+        "id": 169,
         "category_type_id": 2,
-        "category_id": 157,
+        "category_id": 162,
         "name": "Celebraciones Especiales"
     },
     {
-        "id": 165,
+        "id": 170,
         "category_type_id": 2,
-        "category_id": 157,
+        "category_id": 162,
         "name": "Fiestas Temáticas"
     },
     {
-        "id": 166,
+        "id": 171,
         "category_type_id": 2,
-        "category_id": 157,
+        "category_id": 162,
         "name": "Fiestas de Temporada"
     }
 ]
