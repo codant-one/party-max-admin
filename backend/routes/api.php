@@ -28,9 +28,11 @@ use App\Http\Controllers\{
     BrandController,
     TagController,
     OrderController,
-    SupplierController
+    SupplierController,
+    AddressController
 
 };
+use App\Models\Address;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +81,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('tags', TagController::class);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('addresses', AddressController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
