@@ -40,7 +40,8 @@ class DatabaseSeeder extends Seeder
 
             AddressSeeder::class,
 
-            OrderSeeder::class
+            OrderSeeder::class,
+            SupplierSeeder::class
         ]);
 
     }

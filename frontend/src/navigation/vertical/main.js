@@ -3,7 +3,7 @@ export default [
     {
         title: 'Proveedores', 
         icon: { icon: 'mdi-account-tie' },
-        to: 'dashboard-admin-providers', 
+        to: 'dashboard-admin-suppliers', 
         action: 'ver' , 
         subject: 'proveedores'
     },

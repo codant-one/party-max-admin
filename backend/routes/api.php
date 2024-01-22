@@ -27,7 +27,8 @@ use App\Http\Controllers\{
     MiscellaneousController,
     BrandController,
     TagController,
-    OrderController
+    OrderController,
+    SupplierController
 
 };
 
@@ -77,6 +78,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('tags', TagController::class);
     Route::apiResource('orders', OrderController::class);
+    Route::apiResource('suppliers', SupplierController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
