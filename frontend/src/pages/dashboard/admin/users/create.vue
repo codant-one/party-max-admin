@@ -358,3 +358,8 @@ const getFlagCountry = country => {
     </VCard>
   </VDialog>
 </template>
+<route lang="yaml">
+  meta:
+    action: crear
+    subject: usuarios
+</route>

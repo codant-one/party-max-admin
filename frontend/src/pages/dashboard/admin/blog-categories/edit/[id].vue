@@ -511,3 +511,8 @@ const onSubmit = () => {
         padding: 5px !important;
     } 
 </style>
+<route lang="yaml">
+    meta:
+      action: editar
+      subject: categorías-blogs
+</route>

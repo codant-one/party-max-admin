@@ -181,3 +181,8 @@ const onSubmitCreate = () =>{
     />
    
 </template>
+<route lang="yaml">
+    meta:
+      action: crear
+      subject: roles
+  </route>

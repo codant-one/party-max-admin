@@ -206,3 +206,8 @@ const onSubmitEdit = () =>{
         @permissions="getPermissions"
     />
 </template>
+<route lang="yaml">
+    meta:
+      action: editar
+      subject: roles
+  </route>

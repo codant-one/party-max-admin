@@ -645,3 +645,8 @@ const onSubmit = () => {
         border: 1.8px solid rgb(var(--v-theme-error));
     }
 </style>
+<route lang="yaml">
+    meta:
+      action: editar
+      subject: categorías
+</route>

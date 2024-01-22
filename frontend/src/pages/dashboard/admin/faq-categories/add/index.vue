@@ -462,3 +462,8 @@ const onSubmit = () => {
         padding: 5px !important;
     } 
 </style>
+<route lang="yaml">
+    meta:
+      action: crear
+      subject: categorías-faqs
+</route>

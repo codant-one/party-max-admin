@@ -769,3 +769,8 @@ const onSubmit = () => {
         padding: 10px;
     }
 </style>
+<route lang="yaml">
+  meta:
+    action: editar
+    subject: productos
+</route>

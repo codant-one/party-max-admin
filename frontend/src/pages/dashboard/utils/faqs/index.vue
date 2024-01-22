@@ -225,17 +225,15 @@ const contactUs = [
     </div>
     </section>
 </template>
-
+<style lang="scss">
+  .faq-v-window {
+    .v-window__container {
+      z-index: 0;
+    }
+  }
+</style>
 <route lang="yaml">
     meta:
       action: ver
       subject: página-faqs
 </route>
-
-<style lang="scss">
-.faq-v-window {
-  .v-window__container {
-    z-index: 0;
-  }
-}
-</style>

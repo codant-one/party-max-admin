@@ -445,3 +445,8 @@ const capitalizedLabel = label => {
         padding: 10px;
     }
 </style>
+<route lang="yaml">
+  meta:
+    action: editar
+    subject: blogs
+</route>

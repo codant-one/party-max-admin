@@ -163,4 +163,4 @@ async function fetchData() {
     meta:
       action: ver
       subject: proveedores
-  </route>
+</route>
