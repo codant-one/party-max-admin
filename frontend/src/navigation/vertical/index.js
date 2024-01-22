@@ -6,4 +6,4 @@ import products from './products'
 import payments from './payments'
 import reports from './reports'
 
-export default [...dashboard, ...main, ...admin, ...utils, ...products, ...payments,  ...reports]
+export default [...dashboard, ...main, ...admin, ...utils, ...products]
