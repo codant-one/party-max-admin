@@ -84,7 +84,7 @@ class Category extends Model
         }
 
         if ($filters->get('category_type_id')) {
-            $query->where('category_type_id', $filters->get('type'));
+            $query->where('category_type_id', $filters->get('category_type_id'));
         }
         
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
