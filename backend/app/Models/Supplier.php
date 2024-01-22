@@ -4,19 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
 use App\Models\Address;
 
-class Client extends Model
+use Illuminate\Support\Str;
+
+class Supplier extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
     protected $guarded = [];
 
-    /**** Relationship ****/
     public function state() {
         return $this->belongsTo(State::class, 'state_id', 'id');
     }
@@ -29,11 +31,8 @@ class Client extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function addresses() {
-        return $this->hasMany(Address::class, 'client_id');
-    }
-
     /**** Scopes ****/
+
     public function scopeWhereSearch($query, $search) {
         $query->whereHas('user', function ($q) use ($search) {
             $q->where(function ($query) use ($search) {
@@ -73,56 +72,48 @@ class Client extends Model
 
 
     /**** Public methods ****/
-    public static function createClient($request) {
-        $user = User::createUser($request);
-        $user->assignRole('Cliente');
 
-        $client = self::create([
+    public static function createSupplier($request) {
+        $user = User::createUser($request);
+        $user->assignRole('Proveedor');
+
+        $supplier = self::create([
             'user_id' => $user->id,
             'gender_id' => $request->gender_id,
-            'birthday' => date('Y-m-d', strtotime($request->birthday) )
+            'birthday' => date('Y-m-d', strtotime($request->birthday) ),
+            'slug'=> Str::slug($user->name),
+            'about_us'=>$request->about_us
         ]);
         
-        return $client;
+        return $supplier;
     }
 
-    public static function updateClient($request, $client) {
-        $client->update([
+    public static function updateSupplier($request, $supplier) {
+        $supplier->update([
             'gender_id' => $request->gender_id,
-            'birthday' => date('Y-m-d', strtotime($request->birthday) )
+            'birthday' => date('Y-m-d', strtotime($request->birthday) ),
+            'about_us'=>$request->about_us
         ]);
 
-        $user = User::find($client->user_id);
+        $user = User::find($supplier->user_id);
         $request->merge([ 'email' => $user->email ]);
         User::updateUser($request, $user);
 
-        return $client;
+        return $supplier;
     }
 
-    public static function deleteClient($id) {
-        self::deleteClients(array($id));
+    public static function deleteSupplier($id) {
+        self::deleteSuppliers(array($id));
     }
 
-    public static function deleteClients($ids) {
+    public static function deleteSuppliers($ids) {
         foreach ($ids as $id) {
-            $client = self::find($id);
-            $user = User::find($client->user_id);
+            $supplier = self::find($id);
+            $user = User::find($supplier->user_id);
 
-            $client->delete();
+            $supplier->delete();
             User::deleteUser($user->id);
         }
     }
 
-    public static function updateOrCreateClientProfile($request, $user) {
-
-        $clientD = Client::updateOrCreate(
-            [    'user_id' => $user->id ],
-            [
-                'gender_id' => $request->gender_id,
-                'birthday' => date('Y-m-d', strtotime($request->birthday) )
-            ]
-        );
-
-        return $clientD;
-    }
 }
