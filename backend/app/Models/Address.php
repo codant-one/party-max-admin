@@ -40,6 +40,12 @@ class Address extends Model
             'default' => $request->default
         ]);
 
+        if ($address->default == 1) {
+            Address::where('client_id', $request->client_id)
+                ->where('id', '!=', $address->id) 
+                ->update(['default' => 0]);
+        }
+
         return $address;
     }
 
@@ -57,6 +63,13 @@ class Address extends Model
             'postal_code' => $request->postal_code,
             'default' => $request->default
         ]);
+
+        
+        if ($address->default == 1) {
+            Address::where('client_id', $request->client_id)
+                ->where('id', '!=', $address->id) 
+                ->update(['default' => 0]);
+        }
 
         return $address;
     }
