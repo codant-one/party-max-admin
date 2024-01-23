@@ -54,7 +54,7 @@ const logout = () => {
   >
     <VAvatar
       class="cursor-pointer"
-      color="primary"
+      :color="userData('avatar') ? 'default' : 'primary'"
       variant="tonal"
     >
       <VImg
@@ -89,7 +89,7 @@ const logout = () => {
                   color="success"
                 >
                   <VAvatar
-                    color="primary"
+                    :color="userData('avatar') ? 'default' : 'primary'" 
                     variant="tonal"
                   >
                     <VImg

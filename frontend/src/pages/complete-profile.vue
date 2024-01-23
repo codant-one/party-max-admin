@@ -293,7 +293,7 @@ const getFlagCountry = country => {
               rounded
               size="100"
               class="me-6"
-              color="primary"
+              :color="avatar ? 'default' : 'primary'"
               variant="tonal"
             >
               <VImg
