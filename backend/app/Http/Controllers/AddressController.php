@@ -12,10 +12,7 @@ class AddressController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(PermissionMiddleware::class . ':ver addresses|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear addresses|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar addresses|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar addresses|administrador')->only(['delete']);
+        //
     }
     /**
      * Display a listing of the resource.
