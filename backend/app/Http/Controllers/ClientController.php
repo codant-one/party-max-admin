@@ -144,7 +144,7 @@ class ClientController extends Controller
     {
         try {
 
-            $client = Client::with(['user.userDetail.province.country', 'gender', 'addresses.type'])->find($id);
+            $client = Client::with(['user.userDetail.province.country', 'gender', 'addresses.type', 'addresses.province.country'])->find($id);
 
             if (!$client)
                 return response()->json([

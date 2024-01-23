@@ -14,7 +14,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:selectedRadio'])
+const emit = defineEmits(['update:selectedRadio', 'change'])
 
 const updateSelectedOption = value => {
   emit('update:selectedRadio', value)

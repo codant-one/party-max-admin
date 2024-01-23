@@ -3,7 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { avatarText } from '@/@core/utils/formatters'
 import { useCountriesStores } from '@/stores/useCountries'
-import rocketImg from '@images/eCommerce/rocket.png'
+// import rocketImg from '@images/eCommerce/rocket.png'
 
 const countriesStores = useCountriesStores()
 

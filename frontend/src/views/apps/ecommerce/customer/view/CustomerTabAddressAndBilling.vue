@@ -1,5 +1,6 @@
 <script setup>
 
+import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
 import americanExpress from '@images/icons/payments/img/american-express.png'
 import mastercard from '@images/icons/payments/img/mastercard.png'
 import visa from '@images/icons/payments/img/visa-light.png'
@@ -10,6 +11,11 @@ const props = defineProps({
     required: true
   }
 })
+
+const emit = defineEmits([
+  'submit',
+  'delete'
+])
 
 const show = ref([
   true,
@@ -25,7 +31,8 @@ const paymentShow = ref([
 
 const isEditAddressDialogVisible = ref(false)
 const isCardAddDialogVisible = ref(false)
-
+const selectedAddress = ref({})
+const addresses_ = ref(props.addresses)
 
 const paymentData = [
   {
@@ -47,6 +54,36 @@ const paymentData = [
     image: visa,
   },
 ]
+
+watch(() =>  
+  props.addresses, (addreses_) => {
+    addresses_.value = addreses_
+  });
+
+watchEffect(() => {
+    if (!isEditAddressDialogVisible.value)
+      selectedAddress.value = {}
+})
+
+const editAddress = addressData => {
+
+  addressData.addresses_type_id = addressData.addresses_type_id.toString()
+  addressData.default = (addressData.default) === 1 ? true : false
+  addressData.country_id = addressData.province.country.name
+  addressData.provinceOld_id = addressData.province.id
+  addressData.province_id = addressData.province.name
+
+  isEditAddressDialogVisible.value = true
+  selectedAddress.value = { ...addressData }
+}
+
+const showDeleteDialog = addressData => {
+  emit('delete', addressData)
+}
+
+const onSubmit = (address, method) => {
+  emit('submit', address, method)
+}
 </script>
 
 <template>
@@ -60,7 +97,6 @@ const paymentData = [
           Direcciones
         </h5>
         <VBtn
-          v-if="false"
           variant="tonal"
           @click="isEditAddressDialogVisible = !isEditAddressDialogVisible"
         >
@@ -68,7 +104,7 @@ const paymentData = [
         </VBtn>
       </div>
       <template
-        v-for="(address, index) in props.addresses"
+        v-for="(address, index) in addresses_"
         :key="index"
       >
         <div class="d-flex justify-space-between mb-4 gap-y-2 flex-wrap align-center">
@@ -103,11 +139,12 @@ const paymentData = [
             </div>
           </div>
 
-          <div class="ms-5 iconsAddress" v-if="false">
+          <div class="ms-5 iconsAddress">
             <VBtn
               icon
               variant="text"
-              color="default">
+              color="default"
+              @click="editAddress(address)">
               <VIcon
                 icon="tabler-pencil"
                 class="flip-in-rtl"
@@ -116,18 +153,10 @@ const paymentData = [
             <VBtn
               icon
               variant="text"
-              color="default">
+              color="default"
+              @click="showDeleteDialog(address)">
               <VIcon
                 icon="tabler-trash"
-                class="flip-in-rtl"
-              />
-            </VBtn>
-            <VBtn
-              icon
-              variant="text"
-              color="default">
-              <VIcon
-                icon="tabler-dots-vertical"
                 class="flip-in-rtl"
               />
             </VBtn>
@@ -160,7 +189,7 @@ const paymentData = [
           </div>
         </VExpandTransition>
         <VDivider
-          v-if="index !== addresses.length - 1"
+          v-if="index !== addresses_.length - 1"
           class="my-4"
         />
       </template>
@@ -361,7 +390,10 @@ const paymentData = [
       </template>
     </VCardText>
   </VCard>
-  <!-- <AddEditAddressDialog v-model:isDialogVisible="isEditAddressDialogVisible" /> -->
+  <AddEditAddressDialog 
+    v-model:isDialogVisible="isEditAddressDialogVisible"
+    :billing-address="selectedAddress"
+    @submit="onSubmit"/>
   <!-- <CardAddEditDialog v-model:isDialogVisible="isCardAddDialogVisible" /> -->
 </template>
 

@@ -1,5 +1,6 @@
 <script setup>
 
+import { useAddressesStores } from '@/stores/useAddresses'
 import { useClientsStores } from '@/stores/useClients'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -11,6 +12,7 @@ import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTa
 
 const route = useRoute()
 const clientsStores = useClientsStores()
+const addressesStores = useAddressesStores()
 
 const userTab = ref(null)
 
@@ -37,6 +39,8 @@ const showAlert = function(alert) {
   advisor.value.message = alert.value.message
 }
 
+const isConfirmDeleteDialogVisible = ref(false)
+const selectedAddress = ref({})
 const isAddCustomerDrawerOpen = ref(false)
 
 watchEffect(fetchData)
@@ -47,13 +51,123 @@ async function fetchData() {
 
   if(Number(route.params.id)) {
     client.value = await clientsStores.showClient(Number(route.params.id))
-    console.log('cliente', client.value)
     online.value = client.value.user.online
-
   }
 
   isRequestOngoing.value = false
 }
+
+const showDeleteDialog = addressData => {
+  isConfirmDeleteDialogVisible.value = true
+  selectedAddress.value = { ...addressData }
+}
+
+const onSubmit = (address, method) => {
+    if (method === 'update') {
+        submitUpdate(address.data)
+        return
+    }
+
+  submitCreate(address.data)
+}
+
+const submitCreate = addressData => {
+
+    addressData.addresses_type_id = Number(addressData.addresses_type_id)
+    addressData.client_id = Number(route.params.id)
+    addressData.default = (addressData.default) === true ? 1 : 0
+
+    addressesStores.addAddress(addressData)
+        .then((res) => {
+            if (res.data.success) {
+                advisor.value = {
+                    type: 'success',
+                    message: 'Dirección creada ! ',
+                    show: true
+                }
+                fetchData()
+            }
+            isRequestOngoing.value = false
+        })
+        .catch((err) => {
+            advisor.value = {
+                type: 'error',
+                message: err.message,
+                show: true
+            }
+            isRequestOngoing.value = false
+        })
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
+}
+
+const submitUpdate = addressData => {
+
+    addressData.addresses_type_id = Number(addressData.addresses_type_id)
+    addressData.client_id = Number(route.params.id)
+    addressData.default = (addressData.default) === true ? 1 : 0
+
+    addressesStores.updateAddress(addressData)
+        .then((res) => {
+            if (res.data.success) {
+                    advisor.value = {
+                    type: 'success',
+                    message: 'Dirección actualizada!',
+                    show: true
+                }
+                fetchData()
+            }
+            isRequestOngoing.value = false
+        })
+        .catch((err) => {
+            advisor.value = {
+                type: 'error',
+                message: err.message,
+                show: true
+            }
+            isRequestOngoing.value = false
+        })
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
+}
+
+const removeAddress = async () => {
+  isConfirmDeleteDialogVisible.value = false
+  let res = await addressesStores.deleteAddress(selectedAddress.value.id)
+  selectedAddress.value = {}
+
+  advisor.value = {
+    type: res.data.success ? 'success' : 'error',
+    message: res.data.success ? 'Dirección eliminada!' : res.data.message,
+    show: true
+  }
+
+  await fetchData()
+
+  setTimeout(() => {
+    advisor.value = {
+      type: '',
+      message: '',
+      show: false
+    }
+  }, 3000)
+
+  return true
+}
+
+
 </script>
 
 <template>
@@ -151,11 +265,43 @@ async function fetchData() {
                         @alert="showAlert" />
                 </VWindowItem>
                 <VWindowItem>
-                    <CustomerTabAddressAndBilling :addresses="client.addresses"/>
+                    <CustomerTabAddressAndBilling 
+                        :addresses="client.addresses"
+                        @submit="onSubmit"
+                        @delete="showDeleteDialog"/>
                 </VWindowItem>
             </VWindow>
         </VCol>
     </VRow>
+    <!-- 👉 Confirm Delete -->
+    <VDialog
+      v-model="isConfirmDeleteDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Eliminar Dirección">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de eliminar la dirección <strong>{{ selectedAddress.title }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmDeleteDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="removeAddress">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 

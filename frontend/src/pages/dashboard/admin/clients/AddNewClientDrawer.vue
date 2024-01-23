@@ -39,6 +39,7 @@ const id = ref(0)
 const client_country_id = ref('Colombia')
 const countryOld_id = ref('Colombia')
 const province_id = ref('')
+const provinceOld_id = ref('')
 const name = ref('')
 const last_name = ref('')
 const username = ref('')
@@ -111,10 +112,14 @@ watchEffect(async() => {
             password.value = props.client.password
             passwordConfirmation.value = props.client.password
             countryOld_id.value = props.client.user.user_detail.province.country.name
-            
+            client_country_id.value = props.client.user.user_detail?.province.country.name
+
             isNewPasswordVisible.value = false 
             isConfirmPasswordVisible.value = false 
-        }
+
+            province_id.value = props.client.user.user_detail?.province.name
+            provinceOld_id.value = props.client.user.user_detail?.province_id
+      }
     }
 })
 
@@ -152,7 +157,8 @@ const closeNavigationDrawer = () => {
     address.value = null
     birthday.value = null
     gender_id.value = null
-    client_country_id.value = null
+    client_country_id.value = 'Colombia'
+    countryOld_id.value = 'Colombia'
     province_id.value = null
     password.value = null
     passwordConfirmation.value = null
@@ -180,7 +186,7 @@ const onSubmit = () => {
       formData.append('address', address.value)
       formData.append('birthday', birthday.value)
       formData.append('gender_id', gender_id.value)
-      formData.append('province_id', province_id.value)
+      formData.append('province_id', (Number.isInteger(province_id.value)) ? province_id.value : provinceOld_id.value)
       formData.append('is_client', true)
 
       emit('clientData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')

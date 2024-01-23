@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\AddressesType;
+use App\Models\Province;
 
 class Address extends Model
 {
@@ -17,6 +18,10 @@ class Address extends Model
     /**** Relationship ****/
     public function type() {
         return $this->belongsTo(AddressesType::class, 'addresses_type_id', 'id');
+    }
+
+    public function province() {
+        return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
     /**** Public methods ****/
