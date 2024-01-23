@@ -281,7 +281,7 @@ class AuthController extends Controller
         if($user->password === $hash){
 
             $permissions = getPermissionsByRole(Auth::user());
-            $userData = getUserData(Auth::user()->load(['userDetail.province.country']));
+            $userData = getUserData(Auth::user()->load(['userDetail.province.country', 'client.gender']));
 
             return response()->json([
                 'success' => true,
@@ -443,7 +443,7 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         $permissions = getPermissionsByRole(Auth::user());
-        $userData = getUserData(Auth::user()->load(['userDetail.province.country']));
+        $userData = getUserData(Auth::user()->load(['userDetail.province.country', 'client.gender']));
 
         return [
             'accessToken' => $token,
