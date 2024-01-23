@@ -57,6 +57,7 @@ const handleKeyDown = (event, index) => {
     >
       <VTextField
         v-for="i in props.totalInput"
+        type="tel"
         class="digits"
         :key="i"
         :model-value="digits[i - 1]"
