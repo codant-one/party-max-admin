@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Testing\TestingController;
+use App\Http\Controllers\Shopping\CartController;
+
 
 use App\Http\Controllers\{
     CountryController,
@@ -145,6 +147,15 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
        Route::post('/changeAvatar', [ClientController::class, 'changeAvatar']);
        Route::post('/changePassword', [ClientController::class, 'changePassword']);
        Route::post('/changePhone', [ClientController::class, 'changePhone']);       
+    });
+
+    //ShoppingCart
+    Route::group(['prefix' => 'shopping-cart'], function () {
+
+        Route::get('show/{id}', [CartController::class, 'show']);
+        Route::post('add', [CartController::class, 'add_cart']);
+        Route::delete('delete',[CartController::class, 'delete_cart']);
+
     });
 });
 
