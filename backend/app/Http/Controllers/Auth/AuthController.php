@@ -27,7 +27,9 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt', ['except' => ['login', 'register']]);
+        $this->middleware('jwt', ['except' => 
+            ['login', 'register', 'find', 'completed']
+        ]);
     }
 
     /**
@@ -383,7 +385,7 @@ class AuthController extends Controller
                 $info = [
                     'title' => 'Verificar Correo Electrónico',
                     'text' => 'Tu cuenta no está verificada. Confirma tu cuenta con los pasos a seguir para verificarla.',
-                    'buttonLink' =>  env('APP_DOMAIN').'/register-confirm?&token=' . $registerConfirm['token'],
+                    'buttonLink' =>  env('APP_DOMAIN').'/register-confirm?token=' . $registerConfirm['token'],
                     'buttonText' => 'Confirmar',
                     'subject' => 'Bienvenido a PARTYMAX',
                     'email' => 'emails.auth.notifications'
@@ -413,25 +415,79 @@ class AuthController extends Controller
 
     public function find($token)
     {
-        $locale = session()->get('locale') ?? 'es';
-        $emailConfirm = UserRegisterToken::where('token', $token)->first();
+        
+        try {
 
-        if (!$emailConfirm)
-            return response()->json([
-                "ERROR" => true,'ERROR_MENSAGGE' => trans('auth.verify_token', [], $locale),"CODE" =>404], 404);
+            $emailConfirm = UserRegisterToken::where('token', $token)->first();
 
-        if (Carbon::parse($emailConfirm->updated_at)->addMinutes(720)->isPast()) {
-            $emailConfirm->delete();
+            if (!$emailConfirm)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Token inválido'
+                ], 404);
+
+            if (Carbon::parse($emailConfirm->updated_at)->addMinutes(720)->isPast()) {
+                $emailConfirm->delete();
+
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'error_token',
+                    'message' => 'Token vencido'
+                ], 404);
+                
+            }
+
             return response()->json([
-                "ERROR" => true,'ERROR_MENSAGGE' => trans('auth.verify_token', [], $locale),"CODE" =>404], 404);
+                'success' => true,
+                'message' => 'Confirmación de correo electrónico exitosa',
+                'data' => [ 
+                    'token' => $token
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
         }
 
-        $response["message_return"] = array("ERROR" => false,"ERROR_MENSAGGE" => trans('auth.success', [], $locale),"CODE" =>200);
-        $response["result"] = $emailConfirm;
-
-        return response()->json($response,200);
     }
 
+    public function completed(Request $request)
+    {
+        try {
+        
+            $emailConfirm = UserRegisterToken::where('token', $request->token)->first();
+            $user = User::where('id', $emailConfirm->user_id)->first();
+
+            if (!$user)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Cliente no registrado'
+                ], 404);
+
+            if ($user->email_verified_at == null) {
+                $user->email_verified_at = now();
+                $user->update();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Tu solicitud se ha procesado satisfactoriamente. Correo electrónico verificado. Le invitamos a que inicie sesion',
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    } 
 
     /**
      * Get the token array structure.
