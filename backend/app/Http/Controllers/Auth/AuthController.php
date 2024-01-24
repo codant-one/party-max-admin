@@ -111,7 +111,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if (empty($user->email_verified_at)) {
+        if (empty(Auth::user()->email_verified_at)) {
             Auth::logout();
 
             return response()->json([
