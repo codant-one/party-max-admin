@@ -116,7 +116,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'other',
+                'message' => 'not_confirm',
                 'errors' => 'Correo electrónico no verificado. Revise su correo electrónico donde se le indica los pasos a seguir para verificar el mismo.'
             ], 400);
         }
