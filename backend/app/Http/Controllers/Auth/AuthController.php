@@ -111,6 +111,16 @@ class AuthController extends Controller
             ], 400);
         }
 
+        if (empty($user->email_verified_at)) {
+            Auth::logout();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'other',
+                'errors' => 'Correo electrónico no verificado. Revise su correo electrónico donde se le indica los pasos a seguir para verificar el mismo.'
+            ], 400);
+        }
+
         $user = Auth::user();
         $user->online = Carbon::now();
         $user->save();
