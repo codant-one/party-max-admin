@@ -159,6 +159,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::delete('delete',[CartController::class, 'delete_cart']);
 
     });
+
+    //Orders
+    Route::group(['prefix' => 'orders'], function () {
+        Route::put('/updatePaymentState/{id}', [OrderController::class, 'updatePaymentState']);
+    });
 });
 
 //Public Endpoints

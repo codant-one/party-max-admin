@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
+use Illuminate\Support\Facades\Validator;
+
 use App\Models\Order;
 
 class OrderController extends Controller
@@ -130,33 +132,7 @@ class OrderController extends Controller
      */
     public function update(OrderRequest $request, $id): JsonResponse
     {
-        try {
-
-            $order = Order::find($id);
-        
-            if (!$order)
-                return response()->json([
-                    'success' => false,
-                    'feedback' => 'not_found',
-                    'message' => 'Orden no encontrada'
-                ], 404);
-
-            $order = $order->updateOrder($request, $order);
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'order' => Order::with(['details', 'billing'])->find($order->id)
-                ]
-            ]);
-
-        } catch(\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'database_error',
-                'exception' => $ex->getMessage()
-            ], 500);
-        }
+ 
     }
 
 
@@ -194,4 +170,53 @@ class OrderController extends Controller
         }
     
     }
+
+    public function updatePaymentState(Request $request, $id): JsonResponse
+    {
+            $validate = Validator::make($request->all(), [
+                'payment_state_id' => [
+                    'required',
+                    'integer',
+                    'exists:App\Models\PaymentState,id'
+                ]
+            ]);
+        
+            if ($validate->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'params_validation_failed',
+                    'message' => $validate->errors()
+                ], 400);
+            }
+    
+            try {
+                $order = Order::find($id);
+
+                if (!$order)
+                    return response()->json([
+                        'success' => false,
+                        'feedback' => 'not_found',
+                        'message' => 'Orden no encontrada'
+                    ], 404);
+                
+                $order->updatePaymentState($request, $order);
+                $order=$order->load(['details', 'billing']);
+    
+                return response()->json([
+                    'success' => true,
+                    'data' => [ 
+                        'order' => $order
+                    ]
+                ], 200);
+    
+    
+            } catch(\Illuminate\Database\QueryException $ex) {
+                return response()->json([
+                  'success' => false,
+                  'message' => 'database_error',
+                  'exception' => $ex->getMessage()
+                ], 500);
+            }
+    }
+
 }
