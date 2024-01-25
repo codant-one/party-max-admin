@@ -23,7 +23,7 @@ class AddressController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Address::with(['type'])
+            $query = Address::with(['type', 'province'])
                          ->applyFilters(
                             $request->only([
                                     'search',
@@ -100,7 +100,7 @@ class AddressController extends Controller
     {
         try {
 
-            $address = Address::with(['type'])->find($id);
+            $address = Address::with(['type', 'province'])->find($id);
         
             if (!$address)
                 return response()->json([
