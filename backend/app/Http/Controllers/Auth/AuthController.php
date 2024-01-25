@@ -111,13 +111,23 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if (empty(Auth::user()->email_verified_at)) {
+        if (empty(Auth::user()->email_verified_at) && (Auth::user()->getRoleNames()[0] === 'Cliente')) {
             Auth::logout();
 
             return response()->json([
                 'success' => false,
                 'message' => 'not_confirm',
                 'errors' => 'Correo electrónico no verificado. Revise su correo electrónico donde se le indica los pasos a seguir para verificar el mismo.'
+            ], 400);
+        }
+
+        if(Auth::user()->getRoleNames()[0] !== 'Cliente') {
+            Auth::logout();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'not_role',
+                'errors' => 'Usuario no registrado'
             ], 400);
         }
 
