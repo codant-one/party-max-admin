@@ -28,7 +28,8 @@ class AddressController extends Controller
                             $request->only([
                                     'search',
                                     'orderByField',
-                                    'orderBy'
+                                    'orderBy',
+                                    'client_id'
                                 ])
                           );            
 
