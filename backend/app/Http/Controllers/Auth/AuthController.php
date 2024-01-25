@@ -111,7 +111,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if (empty(Auth::user()->email_verified_at) && (Auth::user()->getRoleNames()[0] === 'Cliente')) {
+        if (empty(Auth::user()->email_verified_at) && (Auth::user()->getRoleNames()[0] === 'Cliente') && ($request->panel === 'client')) {
             Auth::logout();
 
             return response()->json([
@@ -121,7 +121,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if(Auth::user()->getRoleNames()[0] !== 'Cliente') {
+        if(Auth::user()->getRoleNames()[0] !== 'Cliente' && ($request->panel === 'client')) {
             Auth::logout();
 
             return response()->json([
