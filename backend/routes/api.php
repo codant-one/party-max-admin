@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Testing\TestingController;
 use App\Http\Controllers\Shopping\CartController;
+use App\Http\Controllers\Shopping\FavoritesController;
 
 
 use App\Http\Controllers\{
@@ -157,6 +158,17 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('show/{id}', [CartController::class, 'show']);
         Route::post('add', [CartController::class, 'add_cart']);
         Route::delete('delete',[CartController::class, 'delete_cart']);
+
+    });
+
+    //Favorites
+    Route::group(['prefix' => 'favorites'], function () {
+
+        Route::post('add', [FavoritesController::class, 'add_favorite']);
+        Route::get('show/{id}',[FavoritesController::class, 'show_favorites']);
+        Route::delete('delete',[FavoritesController::class, 'delete_favorite']);
+
+
 
     });
 });
