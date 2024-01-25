@@ -53,6 +53,8 @@ Route::group([
 ], function () {
     Route::post('login', [AuthController::class , 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
+    Route::get('find/{token}', [AuthController::class, 'find'])->name('find');
+    Route::post('completed', [AuthController::class, 'completed'])->name('completed');
     Route::post('forgot-password', [PasswordResetController::class, 'forgot_password'])->name('forgot.password');
     Route::get('password/find/{token}', [PasswordResetController::class, 'find'])->name("find");
     Route::post('change', [PasswordResetController::class, 'change'])->name("change");

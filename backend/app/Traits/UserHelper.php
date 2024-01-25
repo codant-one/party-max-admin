@@ -103,7 +103,8 @@ trait UserHelper
         $user->update([
             'name' => $request->name,
             'last_name' => $request->last_name,
-            'username' => $request->username
+            'username' => $request->username,
+            'full_profile' => 1
         ]);
 
         UserDetails::updateOrCreateClient($request, $user);
