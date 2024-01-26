@@ -165,9 +165,10 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //Favorites
     Route::group(['prefix' => 'favorites'], function () {
+        Route::get('/', [FavoriteController::class, 'index']);
         Route::post('add', [FavoriteController::class, 'add']);
-        Route::get('show/{id}', [FavoriteController::class, 'show']);
         Route::post('delete', [FavoriteController::class, 'delete']);
+        Route::post('show', [FavoriteController::class, 'show']);
     });
 });
 

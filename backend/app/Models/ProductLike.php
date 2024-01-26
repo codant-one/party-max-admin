@@ -26,11 +26,17 @@ class ProductLike extends Model
     /**** Public methods ****/
     public static function addFavorite($request) {
         
-        $favorite = self::create([
-            'user_id' => $request->user_id,
-            'product_id' => $request->product_id,
-            'date' => now()
-        ]);
+        $favorite = ProductLike::updateOrInsert(
+            [
+                'user_id' => $request->user_id,
+                'product_id' => $request->product_id
+            ],
+            [   
+                'date' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        );
 
         return $favorite;
     }

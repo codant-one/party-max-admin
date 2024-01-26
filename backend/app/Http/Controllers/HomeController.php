@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductColor;
 use App\Models\ProductLike;
 
 class HomeController extends Controller
@@ -48,37 +49,39 @@ class HomeController extends Controller
                                       ->get();
 
             // Validate if the user is authenticated
-            /*if (auth()->check()) {
+            if (auth()->check()) {
 
                 $lastLike = ProductLike::where('user_id', auth()->user()->id)
-                            ->orderBy('date', 'desc')
+                            ->orderBy('created_at', 'desc')
                             ->first();
 
-            
                 //Validate if the last Like exists
                 if ($lastLike) {
-                    $productCategory = ProductCategory::where('product_id', $lastLike->product_id)->first();
-    
+                    $productColor = ProductColor::where('product_id', $lastLike->product_id)->first();
+                    $productCategory = ProductCategory::where('product_color_id', $productColor->color_id)->first();
+
                     if ($productCategory) {
                         $category_id = $productCategory->category_id;
 
                         $recommendations = 
-                            Product::with(['user'])
-                                   ->join('product_categories', 'products.id', '=', 'product_categories.product_id')
-                                   ->where('product_categories.category_id', $category_id)
-                                   ->orderBy('products.created_at', 'desc')
-                                   ->limit(5)
-                                   ->get();
+                                Product::with(['user', 'colors.categories'])
+                                        ->whereHas('colors.categories', function($query) use ($category_id) {
+                                            $query->where('category_id', $category_id);
+                                        })
+                                    ->orderBy('created_at', 'desc')
+                                    ->limit(5)
+                                    ->get();
 
+                        $data['recommendations'] = $recommendations;
+                    } else {
                         $data['recommendations'] = $recommendations;
                     }
                 } else 
                     $data['recommendations'] = $recommendations;
 
             } else {
-               */
                 $data['recommendations'] = $recommendations;
-            //}
+            }
             
             $data['mostSold'] = [];
         
