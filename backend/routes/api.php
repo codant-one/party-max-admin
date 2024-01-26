@@ -3,12 +3,17 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Testing\TestingController;
-use App\Http\Controllers\Shopping\CartController;
-use App\Http\Controllers\Shopping\FavoritesController;
 
+use App\Http\Controllers\Auth\{
+    AuthController,
+    PasswordResetController
+};
+
+use App\Http\Controllers\Shopping\{
+    CartController,
+    FavoriteController
+};
 
 use App\Http\Controllers\{
     CountryController,
@@ -35,7 +40,6 @@ use App\Http\Controllers\{
     AddressController
 
 };
-use App\Models\Address;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,9 +112,9 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //Menu
     Route::group(['prefix' => 'menu'], function () {
-        Route::get('/',[UserMenuController::class, 'index']);
-        Route::post('/add',[UserMenuController::class, 'store']);
-        Route::post('/update',[UserMenuController::class, 'update']);
+        Route::get('/', [UserMenuController::class, 'index']);
+        Route::post('/add', [UserMenuController::class, 'store']);
+        Route::post('/update', [UserMenuController::class, 'update']);
     });
 
     //Categories
@@ -154,22 +158,16 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //ShoppingCart
     Route::group(['prefix' => 'shopping-cart'], function () {
-
         Route::get('show/{id}', [CartController::class, 'show']);
         Route::post('add', [CartController::class, 'add_cart']);
-        Route::post('delete',[CartController::class, 'delete_cart']);
-
+        Route::post('delete', [CartController::class, 'delete_cart']);
     });
 
     //Favorites
     Route::group(['prefix' => 'favorites'], function () {
-
-        Route::post('add', [FavoritesController::class, 'add_favorite']);
-        Route::get('show/{id}',[FavoritesController::class, 'show_favorites']);
-        Route::post('delete',[FavoritesController::class, 'delete_favorite']);
-
-
-
+        Route::post('add', [FavoriteController::class, 'add']);
+        Route::get('show/{id}', [FavoriteController::class, 'show']);
+        Route::post('delete', [FavoriteController::class, 'delete']);
     });
 });
 

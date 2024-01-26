@@ -14,6 +14,7 @@ class ProductLike extends Model
 
     protected $guarded = [];
 
+    /**** Relationship ****/
     public function product() {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
@@ -23,7 +24,6 @@ class ProductLike extends Model
     }
 
     /**** Public methods ****/
-
     public static function addFavorite($request) {
         
         $favorite = self::create([
@@ -35,14 +35,12 @@ class ProductLike extends Model
         return $favorite;
     }
 
+    public static function deleteFavorite($request) {
 
-    public static function deleteFavorite($request) 
-    {
-        $favorite = ProductLike::where('user_id', $request->user_id)
-                            ->where('product_id', $request->product_id)
-                            ->first();
-          
-        $favorite->delete(); 
+        ProductLike::where([
+            ['user_id', $request->user_id],
+            ['product_id', $request->product_id]]
+        )->delete(); 
     }
    
 }

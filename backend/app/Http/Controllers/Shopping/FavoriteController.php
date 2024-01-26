@@ -10,39 +10,34 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductLike;
 
-class FavoritesController extends Controller
+class FavoriteController extends Controller
 {
 
-
-    public function show_favorites($id)
+    public function show($id): JsonResponse
     {
-        try 
-        {
-            $favorites = ProductLike::with(['user','product'])
-                                      ->where('user_id',$id)
-                                      ->get()
-                                      ->groupBy('user_id') // Agrupa por user
-                                      ->map(function ($group) {
-                                        // La función de mapeo para agregar detalles del producto y cantidad a cada elemento del grupo
-                                        return 
-                                            
-                                             $group->map(function ($item) {
+        try {
 
-                                                $producto = $item->product;
-                                                return $producto;
-                                            })->all();
-                                       
+            $favorites = ProductLike::with(['user', 'product'])
+                                    ->where('user_id', $id)
+                                    ->get()
+                                    ->groupBy('user_id') //Agrupa por user
+                                    ->map(function ($group) {
+                                        // La función de mapeo para agregar detalles del producto y cantidad a cada elemento del grupo
+                                        return $group->map(function ($item) {
+                                            $product = $item->product;
+                                            return $product;
+                                        })->all();
                                     })
                                     ->values()
                                     ->all();
- 
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'favorites' => $favorites[0]
+                    'favorites' => (count($favorites) === 0) ? [] : $favorites[0]
                 ]
             ], 200);
+
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -52,11 +47,11 @@ class FavoritesController extends Controller
         }
     }
 
-    public function add_favorite(Request $request)
+    public function add(Request $request): JsonResponse
     {
 
-        try 
-        {
+        try {
+
             $favorite = ProductLike::addFavorite($request);
 
             return response()->json([
@@ -65,6 +60,7 @@ class FavoritesController extends Controller
                     'favorite' => $favorite
                 ]
             ], 200);
+
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -75,11 +71,10 @@ class FavoritesController extends Controller
 
     }
 
-
-    public function delete_favorite(Request $request)
+    public function delete(Request $request): JsonResponse
     {
-        try 
-        {
+        try {
+
             $favorite = ProductLike::deleteFavorite($request);
 
             return response()->json([
@@ -88,6 +83,7 @@ class FavoritesController extends Controller
                     'favorite' => $favorite
                 ]
             ], 200);
+            
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
