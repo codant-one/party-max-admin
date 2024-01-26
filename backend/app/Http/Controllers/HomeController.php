@@ -48,7 +48,7 @@ class HomeController extends Controller
                                       ->get();
 
             // Validate if the user is authenticated
-            if (auth()->check()) {
+            /*if (auth()->check()) {
 
                 $lastLike = ProductLike::where('user_id', auth()->user()->id)
                             ->orderBy('date', 'desc')
@@ -76,9 +76,9 @@ class HomeController extends Controller
                     $data['recommendations'] = $recommendations;
 
             } else {
-               
+               */
                 $data['recommendations'] = $recommendations;
-            }
+            //}
             
             $data['mostSold'] = [];
         

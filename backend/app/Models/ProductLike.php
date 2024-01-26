@@ -42,6 +42,7 @@ class ProductLike extends Model
                             ->where('product_id', $request->product_id)
                             ->first();
           
-        $favorite->delete();
+        $favorite->delete(); 
     }
+   
 }

@@ -20,12 +20,27 @@ class FavoritesController extends Controller
         {
             $favorites = ProductLike::with(['user','product'])
                                       ->where('user_id',$id)
-                                      ->get();  
+                                      ->get()
+                                      ->groupBy('user_id') // Agrupa por user
+                                      ->map(function ($group) {
+                                        // La función de mapeo para agregar detalles del producto y cantidad a cada elemento del grupo
+                                        return 
+                                            
+                                             $group->map(function ($item) {
+
+                                                $producto = $item->product;
+                                                return $producto;
+                                            })->all();
+                                       
+                                    })
+                                    ->values()
+                                    ->all();
+ 
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'Favorites' => $favorites
+                    'favorites' => $favorites[0]
                 ]
             ], 200);
         } catch (\Illuminate\Database\QueryException $ex) {

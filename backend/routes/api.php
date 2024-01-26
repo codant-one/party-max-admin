@@ -157,7 +157,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
         Route::get('show/{id}', [CartController::class, 'show']);
         Route::post('add', [CartController::class, 'add_cart']);
-        Route::delete('delete',[CartController::class, 'delete_cart']);
+        Route::post('delete',[CartController::class, 'delete_cart']);
 
     });
 
@@ -166,7 +166,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
         Route::post('add', [FavoritesController::class, 'add_favorite']);
         Route::get('show/{id}',[FavoritesController::class, 'show_favorites']);
-        Route::delete('delete',[FavoritesController::class, 'delete_favorite']);
+        Route::post('delete',[FavoritesController::class, 'delete_favorite']);
 
 
 
