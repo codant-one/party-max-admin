@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\ProductColor;
+use App\Models\ProductTag;
 use App\Models\ProductLike;
 
 class HomeController extends Controller
@@ -57,16 +57,15 @@ class HomeController extends Controller
 
                 //Validate if the last Like exists
                 if ($lastLike) {
-                    $productColor = ProductColor::where('product_id', $lastLike->product_id)->first();
-                    $productCategory = ProductCategory::where('product_color_id', $productColor->color_id)->first();
-
-                    if ($productCategory) {
-                        $category_id = $productCategory->category_id;
+                    $productTag = ProductTag::where('product_id', $lastLike->product_id)->first();
+                    
+                    if ($productTag) {
+                        $tag_id = $productTag->tag_id;
 
                         $recommendations = 
-                                Product::with(['user', 'colors.categories'])
-                                        ->whereHas('colors.categories', function($query) use ($category_id) {
-                                            $query->where('category_id', $category_id);
+                                Product::with(['user', 'tags'])
+                                        ->whereHas('tags', function($query) use ($tag_id) {
+                                            $query->where('tag_id', $tag_id);
                                         })
                                     ->orderBy('created_at', 'desc')
                                     ->limit(5)
