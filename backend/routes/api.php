@@ -170,6 +170,14 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [FavoriteController::class, 'delete']);
         Route::post('show', [FavoriteController::class, 'show']);
     });
+
+    //Orders
+    Route::group(['prefix' => 'orders'], function () {
+
+        Route::get('show/{id}', [OrderController::class, 'ordersbyclient']);
+        Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
+    });
+
 });
 
 //Public Endpoints
