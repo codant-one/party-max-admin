@@ -10,40 +10,38 @@ use App\Models\ShoppingCart;
 use App\Models\Client;
 use App\Models\Product;
 
-
 class CartController extends Controller
 {
 
-    public function show($id)
+    public function index(Request $request): JsonResponse
     {
        
-        try 
-        {
-            $cart = ShoppingCart::with(['client','product.user'])
-                                        ->where('client_id',$id)
-                                        ->get()
-                                        ->groupBy('client_id') // Agrupa por client_id
-                                        ->map(function ($group) {
-                                            // La función de mapeo para agregar detalles del producto y cantidad a cada elemento del grupo
-                                            return [
-                                                'cliente' => $group->first()->client,
-                                                'detalles' => $group->map(function ($item) {
+        try {
 
-                                                    $producto = $item->product;
-                                                    $producto->quantity = $item->quantity;
-                                                    return $producto;
-                                                })->all(),
-                                            ];
-                                        })
-                                        ->values()
-                                        ->all();
+            $cart = 
+                ShoppingCart::with(['color.product.user', 'color.images'])
+                            ->where('client_id', $request->client_id)
+                            ->get()
+                            ->groupBy('client_id')
+                            ->map(function ($group) {
+                                return $group->map(function ($item) {
+                                    $product = $item->color->product;
+                                    $product->images = $item->color->images;
+                                    $product->product_color_id = $item->product_color_id;
+                                    $product->quantity = $item->quantity;
+                                    return $product;
+                                })->all();
+                            })
+                            ->values()
+                            ->all();
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => $cart[0]
+                    'cart' => (count($cart) === 0) ? [] : $cart[0]
                 ]
             ], 200);
+
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -54,7 +52,7 @@ class CartController extends Controller
 
     }
 
-    public function add_cart(Request $request)
+    public function add(Request $request)
     {
         try 
         {
@@ -75,7 +73,7 @@ class CartController extends Controller
         }
     }
 
-    public function delete_cart(Request $request)
+    public function delete(Request $request)
     {
         try 
         {

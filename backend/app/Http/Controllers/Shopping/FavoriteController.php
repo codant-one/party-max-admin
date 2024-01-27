@@ -21,9 +21,8 @@ class FavoriteController extends Controller
                 ProductLike::with(['user', 'product'])
                            ->where('user_id', $request->user_id)
                            ->get()
-                           ->groupBy('user_id') //Agrupa por user
+                           ->groupBy('user_id')
                            ->map(function ($group) {
-                                // La función de mapeo para agregar detalles del producto y cantidad a cada elemento del grupo
                                 return $group->map(function ($item) {
                                     $product = $item->product;
                                     return $product;

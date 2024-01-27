@@ -158,9 +158,9 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //ShoppingCart
     Route::group(['prefix' => 'shopping-cart'], function () {
-        Route::get('show/{id}', [CartController::class, 'show']);
-        Route::post('add', [CartController::class, 'add_cart']);
-        Route::post('delete', [CartController::class, 'delete_cart']);
+        Route::get('/', [CartController::class, 'index']);
+        Route::post('add', [CartController::class, 'add']);
+        Route::post('delete', [CartController::class, 'delete']);
     });
 
     //Favorites
