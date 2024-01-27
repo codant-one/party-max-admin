@@ -32,7 +32,7 @@ class Product extends Model
 
     public function colors()
     {
-        return $this->hasMany(ProductColor::class, 'product_id');
+        return $this->hasMany(ProductColor::class, 'product_id','id');
     }
 
     public function tags()
