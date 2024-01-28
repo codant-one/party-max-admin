@@ -6,39 +6,35 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-use App\Models\ShoppingCart;
-use App\Models\Client;
+use App\Models\User;
 use App\Models\Product;
+use App\Models\ProductLike;
 
-class CartController extends Controller
+class FavoriteController extends Controller
 {
 
     public function index(Request $request): JsonResponse
     {
-       
         try {
 
-            $cart = 
-                ShoppingCart::with(['color.product.user', 'color.images'])
-                            ->where('client_id', $request->client_id)
-                            ->get()
-                            ->groupBy('client_id')
-                            ->map(function ($group) {
+            $favorites = 
+                ProductLike::with(['user', 'product'])
+                           ->where('user_id', $request->user_id)
+                           ->get()
+                           ->groupBy('user_id')
+                           ->map(function ($group) {
                                 return $group->map(function ($item) {
-                                    $product = $item->color->product;
-                                    $product->images = $item->color->images;
-                                    $product->product_color_id = $item->product_color_id;
-                                    $product->quantity = $item->quantity;
+                                    $product = $item->product;
                                     return $product;
                                 })->all();
                             })
-                            ->values()
-                            ->all();
+                           ->values()
+                           ->all();
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => (count($cart) === 0) ? [] : $cart[0]
+                    'favorites' => (count($favorites) === 0) ? [] : $favorites[0]
                 ]
             ], 200);
 
@@ -49,21 +45,22 @@ class CartController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
-
     }
 
-    public function add(Request $request)
+    public function add(Request $request): JsonResponse
     {
-        try 
-        {
-            $cart = ShoppingCart::addCart($request);
+
+        try {
+
+            $favorite = ProductLike::addFavorite($request);
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => $cart
+                    'favorite' => $favorite
                 ]
             ], 200);
+
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -71,20 +68,22 @@ class CartController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
-        try 
-        {
-            $cart = ShoppingCart::deleteCart($request);
+        try {
+
+            $favorite = ProductLike::deleteFavorite($request);
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => $cart
+                    'favorite' => $favorite
                 ]
             ], 200);
+            
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -94,5 +93,30 @@ class CartController extends Controller
         }
     }
 
-    
+    public function show(Request $request): JsonResponse
+    {
+
+        try {
+
+            $favorite = ProductLike::where([
+                ['user_id', $request->user_id],
+                ['product_id', $request->product_id]]
+            )->first();
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'favorite' => $favorite ? true : false
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
+    }
 }

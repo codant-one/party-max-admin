@@ -3,11 +3,18 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Testing\TestingController;
-use App\Http\Controllers\Shopping\CartController;
 
+use App\Http\Controllers\Auth\{
+    AuthController,
+    PasswordResetController
+};
+
+use App\Http\Controllers\Shopping\{
+    CartController,
+    FavoriteController,
+    PaymentController
+};
 
 use App\Http\Controllers\{
     CountryController,
@@ -34,7 +41,6 @@ use App\Http\Controllers\{
     AddressController
 
 };
-use App\Models\Address;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,9 +113,9 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //Menu
     Route::group(['prefix' => 'menu'], function () {
-        Route::get('/',[UserMenuController::class, 'index']);
-        Route::post('/add',[UserMenuController::class, 'store']);
-        Route::post('/update',[UserMenuController::class, 'update']);
+        Route::get('/', [UserMenuController::class, 'index']);
+        Route::post('/add', [UserMenuController::class, 'store']);
+        Route::post('/update', [UserMenuController::class, 'update']);
     });
 
     //Categories
@@ -153,17 +159,26 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //ShoppingCart
     Route::group(['prefix' => 'shopping-cart'], function () {
+        Route::get('/', [CartController::class, 'index']);
+        Route::post('add', [CartController::class, 'add']);
+        Route::post('delete', [CartController::class, 'delete']);
+    });
 
-        Route::get('show/{id}', [CartController::class, 'show']);
-        Route::post('add', [CartController::class, 'add_cart']);
-        Route::delete('delete',[CartController::class, 'delete_cart']);
-
+    //Favorites
+    Route::group(['prefix' => 'favorites'], function () {
+        Route::get('/', [FavoriteController::class, 'index']);
+        Route::post('add', [FavoriteController::class, 'add']);
+        Route::post('delete', [FavoriteController::class, 'delete']);
+        Route::post('show', [FavoriteController::class, 'show']);
     });
 
     //Orders
     Route::group(['prefix' => 'orders'], function () {
         Route::put('/updatePaymentState/{id}', [OrderController::class, 'updatePaymentState']);
+        Route::get('show/{id}', [OrderController::class, 'ordersbyclient']);
+        Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
     });
+
 });
 
 //Public Endpoints
@@ -182,6 +197,13 @@ Route::group(['prefix' => 'miscellaneous'], function () {
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+});
+
+//PAYU
+Route::group(['prefix' => 'payment'], function () {
+    Route::get('/', [PaymentController::class, 'redirectToPayU']);
+    Route::get('response', [PaymentController::class, 'response']);
+    Route::get('confirmation', [PaymentController::class, 'confirmation']);
 });
 
 

@@ -281,7 +281,6 @@ const getFlagCountry = country => {
                 v-model="billingAddress.street"
                 label="Calle"
                 placeholder="Calle"
-                :rules="[requiredValidator]"
               />
             </VCol>
 

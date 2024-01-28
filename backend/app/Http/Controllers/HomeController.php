@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductTag;
 use App\Models\ProductLike;
 
 class HomeController extends Controller
@@ -51,32 +52,33 @@ class HomeController extends Controller
             if (auth()->check()) {
 
                 $lastLike = ProductLike::where('user_id', auth()->user()->id)
-                            ->orderBy('date', 'desc')
+                            ->orderBy('created_at', 'desc')
                             ->first();
 
-            
                 //Validate if the last Like exists
                 if ($lastLike) {
-                    $productCategory = ProductCategory::where('product_id', $lastLike->product_id)->first();
-    
-                    if ($productCategory) {
-                        $category_id = $productCategory->category_id;
+                    $productTag = ProductTag::where('product_id', $lastLike->product_id)->first();
+                    
+                    if ($productTag) {
+                        $tag_id = $productTag->tag_id;
 
                         $recommendations = 
-                            Product::with(['user'])
-                                   ->join('product_categories', 'products.id', '=', 'product_categories.product_id')
-                                   ->where('product_categories.category_id', $category_id)
-                                   ->orderBy('products.created_at', 'desc')
-                                   ->limit(5)
-                                   ->get();
+                                Product::with(['user', 'tags'])
+                                        ->whereHas('tags', function($query) use ($tag_id) {
+                                            $query->where('tag_id', $tag_id);
+                                        })
+                                    ->orderBy('created_at', 'desc')
+                                    ->limit(5)
+                                    ->get();
 
+                        $data['recommendations'] = $recommendations;
+                    } else {
                         $data['recommendations'] = $recommendations;
                     }
                 } else 
                     $data['recommendations'] = $recommendations;
 
             } else {
-               
                 $data['recommendations'] = $recommendations;
             }
             

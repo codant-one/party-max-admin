@@ -100,6 +100,10 @@ class Address extends Model
             $query->whereSearch($filters->get('search'));
         }
 
+        if ($filters->get('client_id')) {
+            $query->where('client_id', $filters->get('client_id'));
+        }
+
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'created_at';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';

@@ -12,6 +12,9 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\ProductColor;
+use App\Models\Product;
 
 class OrderController extends Controller
 {
@@ -217,6 +220,110 @@ class OrderController extends Controller
                   'exception' => $ex->getMessage()
                 ], 500);
             }
+    }
+
+    public function ordersbyclient($id)
+    {
+
+        try {
+
+            $orders = Order::with(['details.product_color.product'])->where('client_id',$id)->get();
+            
+            $orderData = [];
+
+            foreach ($orders as $order) {
+
+                $orderInfo = [
+                    'order_id' => $order->id,
+                    'order_date' => $order->date,
+                    'products' => []
+                ];
+            
+                foreach ($order->details as $detail) {
+                    $productInfo = [
+                        'product_id' => $detail->product_color->product->id,
+                        'product_name' => $detail->product_color->product->name,
+                        'product_image' => $detail->product_color->product->image,
+                        'slug'=> $detail->product_color->product->slug,
+                        'quantity' => $detail->quantity
+                    ];
+            
+                    $orderInfo['products'][] = $productInfo;
+                }
+            
+                $orderData[] = $orderInfo;
+    
+    
+                }
+
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'orders' => $orderData
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function orderbyID($id)
+    {
+        try {
+
+            $orders = Order::with(['details.product_color.product'])->where('id',$id)->get();
+            
+            $orderData = [];
+
+            foreach ($orders as $order) {
+
+                $orderInfo = [
+                    'order_id' => $order->id,
+                    'order_date' => $order->date,
+                    'subtotal' => $order->sub_total,
+                    'costo_envio'=> $order->shipping_total,
+                    'total'=> $order->total,
+                    'products' => []
+                ];
+            
+                foreach ($order->details as $detail) {
+                    $productInfo = [
+                        'product_id' => $detail->product_color->product->id,
+                        'product_name' => $detail->product_color->product->name,
+                        'product_image' => $detail->product_color->product->image,
+                        'slug'=> $detail->product_color->product->slug,
+                        'quantity' => $detail->quantity
+                    ];
+            
+                    $orderInfo['products'][] = $productInfo;
+                }
+            
+                $orderData[] = $orderInfo;
+    
+    
+                }
+
+        
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'orders' => $orderData
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
 }

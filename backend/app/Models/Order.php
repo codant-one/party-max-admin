@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Models\OrderDetail;
+
 class Order extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -116,9 +117,11 @@ class Order extends Model
     }
 
     public static function updatePaymentState($request, $order) {
+ 
         $order->update([
             'payment_state_id' => $request->payment_state_id,
         ]);      
+    
         return $order;
     }
 }

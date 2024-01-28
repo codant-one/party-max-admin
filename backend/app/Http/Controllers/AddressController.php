@@ -23,12 +23,13 @@ class AddressController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Address::with(['type'])
+            $query = Address::with(['type', 'province.country'])
                          ->applyFilters(
                             $request->only([
                                     'search',
                                     'orderByField',
-                                    'orderBy'
+                                    'orderBy',
+                                    'client_id'
                                 ])
                           );            
 
@@ -79,7 +80,7 @@ class AddressController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'address' => $address
+                    'address' => Address::with(['type', 'province.country'])->find($address->id)
                 ]
             ], 200);
         
@@ -99,7 +100,7 @@ class AddressController extends Controller
     {
         try {
 
-            $address = Address::with(['type'])->find($id);
+            $address = Address::with(['type', 'province.country'])->find($id);
         
             if (!$address)
                 return response()->json([
@@ -153,7 +154,7 @@ class AddressController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'address' => $address
+                    'address' => Address::with(['type', 'province.country'])->find($address->id)
                 ]
             ], 200);
 
