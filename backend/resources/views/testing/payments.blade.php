@@ -13,8 +13,8 @@
         <input name="signature"       type="hidden"  value="0017e293bae8ffc4bb163c65768f1f00"  >
         <input name="test"            type="hidden"  value="true" >
         <input name="buyerEmail"      type="hidden"  value="test@test.com" >
-        <input name="responseUrl"     type="hidden"  value="http://backend.partymax/api/payment/response" >
-        <input name="confirmationUrl" type="hidden"  value="http://backend.partymax/api/payment/confirmation" >
+        <input name="responseUrl"     type="hidden"  value="{{env('APP_URL')}}/api/payment/response" >
+        <input name="confirmationUrl" type="hidden"  value="{{env('APP_URL')}}/api/payment/confirmation" >
         <input name="shippingAddress"    type="hidden"  value="calle 93 n 47 - 65"   >
         <input name="shippingCity"       type="hidden"  value="Bogotá" >
         <input name="shippingCountry"    type="hidden"  value="CO"  >
