@@ -12,7 +12,8 @@ use App\Http\Controllers\Auth\{
 
 use App\Http\Controllers\Shopping\{
     CartController,
-    FavoriteController
+    FavoriteController,
+    PaymentController
 };
 
 use App\Http\Controllers\{
@@ -173,7 +174,6 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //Orders
     Route::group(['prefix' => 'orders'], function () {
-
         Route::get('show/{id}', [OrderController::class, 'ordersbyclient']);
         Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
     });
@@ -196,6 +196,12 @@ Route::group(['prefix' => 'miscellaneous'], function () {
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+});
+
+//PAYU
+Route::group(['prefix' => 'payment'], function () {
+    Route::get('/', [PaymentController::class, 'redirectToPayU']);
+    Route::get('response', [PaymentController::class, 'response']);
 });
 
 
