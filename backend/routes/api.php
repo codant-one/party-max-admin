@@ -202,6 +202,7 @@ Route::group(['prefix' => 'miscellaneous'], function () {
 Route::group(['prefix' => 'payment'], function () {
     Route::get('/', [PaymentController::class, 'redirectToPayU']);
     Route::get('response', [PaymentController::class, 'response']);
+    Route::get('confirmation', [PaymentController::class, 'confirmation']);
 });
 
 

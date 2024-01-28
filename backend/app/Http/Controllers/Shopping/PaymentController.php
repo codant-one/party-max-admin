@@ -16,4 +16,9 @@ class PaymentController extends Controller
     {
         return view('testing.response');
     }
+
+    public function confirmation(Request $request)
+    {
+        return view('testing.confirmation');
+    }
 }
