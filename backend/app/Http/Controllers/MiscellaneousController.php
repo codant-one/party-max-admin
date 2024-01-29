@@ -85,7 +85,10 @@ class MiscellaneousController extends Controller
                             'orderByField',
                             'orderBy',
                             'category',
-                            'subcategory'
+                            'subcategory',
+                            'colorId',
+                            'min',
+                            'max'
                         ])
                     );
 
@@ -93,9 +96,26 @@ class MiscellaneousController extends Controller
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'category',
+                            'subcategory',
+                            'colorId',
+                            'min',
+                            'max'
                         ])
                     )->count();
+                           
+                    /*$highest_price =Product::with(['user'])
+                    ->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy',
+                            'category',
+                            'subcategory',
+                            'colorId'
+                        ])
+                    )->selectRaw('MAX(CAST(wholesale_price AS DECIMAL(10, 2))) as highest_price')->value('wholesale_price');*/
 
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
@@ -103,7 +123,7 @@ class MiscellaneousController extends Controller
                 'success' => true,
                 'data' => [
                     'products' => $products,
-                    'productsTotalCount' => $count
+                    'productsTotalCount' => $count                    
                 ]
             ], 200);
 
