@@ -174,6 +174,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     //Orders
     Route::group(['prefix' => 'orders'], function () {
+        Route::put('/updatePaymentState/{id}', [OrderController::class, 'updatePaymentState']);
         Route::get('show/{id}', [OrderController::class, 'ordersbyclient']);
         Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
     });
@@ -202,6 +203,7 @@ Route::group(['prefix' => 'miscellaneous'], function () {
 Route::group(['prefix' => 'payment'], function () {
     Route::get('/', [PaymentController::class, 'redirectToPayU']);
     Route::get('response', [PaymentController::class, 'response']);
+    Route::get('confirmation', [PaymentController::class, 'confirmation']);
 });
 
 
