@@ -12,6 +12,8 @@ use App\Models\FaqCategory;
 use App\Models\Blog;
 use App\Models\BlogCategory;
 use App\Models\Tag;
+use App\Models\ProductLike;
+use App\Models\ProductTag;
 
 class MiscellaneousController extends Controller
 {
@@ -152,10 +154,38 @@ class MiscellaneousController extends Controller
                               ->where('slug', $slug)
                               ->first();
 
+            $recommendations = 
+                Product::with(['user'])
+                       ->where('favourite', true)
+                       ->orderBy('created_at', 'desc')
+                       ->limit(5)
+                       ->get();
+
+            // Validate if the user is authenticated
+            if (auth()->check()) {
+
+                $productTag = ProductTag::where('product_id', $product->id)->first();
+                    
+                if ($productTag) {
+                    $tag_id = $productTag->tag_id;
+
+                    $recommendations = 
+                            Product::with(['user', 'tags'])
+                                   ->whereHas('tags', function($query) use ($tag_id) {
+                                        $query->where('tag_id', $tag_id);
+                                   })
+                                   ->orderBy('created_at', 'desc')
+                                   ->limit(5)
+                                   ->get();
+                }
+
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'product' => $product
+                    'product' => $product,
+                    'recommendations' => $recommendations,
                 ]
             ], 200);
 
