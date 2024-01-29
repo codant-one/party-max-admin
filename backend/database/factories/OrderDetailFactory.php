@@ -26,7 +26,7 @@ class OrderDetailFactory extends Factory
     {
 
         $price = $this->faker->randomFloat(2, 10, 100);
-        $quantity = $this->faker->numberBetween(0, 10);
+        $quantity = $this->faker->numberBetween(1, 10);
 
         return [
             'product_color_id' => ProductColor::InRandomOrder()->first()->id,

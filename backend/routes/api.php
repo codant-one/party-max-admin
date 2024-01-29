@@ -162,6 +162,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('/', [CartController::class, 'index']);
         Route::post('add', [CartController::class, 'add']);
         Route::post('delete', [CartController::class, 'delete']);
+        Route::post('deleteAll', [CartController::class, 'deleteAll']);
     });
 
     //Favorites
@@ -200,7 +201,8 @@ Route::group(['prefix' => 'miscellaneous'], function () {
 });
 
 //PAYU
-Route::group(['prefix' => 'payment'], function () {
+Route::group(['prefix' => 'payments'], function () {
+    Route::get('/signature', [PaymentController::class, 'signature']);
     Route::get('/', [PaymentController::class, 'redirectToPayU']);
     Route::get('response', [PaymentController::class, 'response']);
     Route::get('confirmation', [PaymentController::class, 'confirmation']);

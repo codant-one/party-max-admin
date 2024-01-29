@@ -60,17 +60,14 @@ class Order extends Model
     /**** Public methods ****/
     public static function createOrder($request) {
 
-        $total = $request->sub_total + $request->shipping_total + $request->tax;
         $order = self::create([
             'client_id' => $request->client_id,
-            'shipping_state_id' => $request->shipping_state_id,
-            'payment_state_id' => $request->payment_state_id,
             'address_id' => $request->address_id,
-            'date' => $request->date,
+            'date' => now(),
             'sub_total' => $request->sub_total,
             'shipping_total' => $request->shipping_total,
             'tax' => $request->tax,
-            'total' => $total, 
+            'total' => $request->total, 
         ]);
 
         //Order_details
@@ -88,17 +85,16 @@ class Order extends Model
         $billing = Billing::create([
             'order_id' => $order->id,
             'province_id' => $request->province_id,
-            'default' => $request->default,
-            'pse' => $request->pse,
-            'card_number' => $request->card_number,
             'name' => $request->name,
-            'expired_date' => $request->expired_date,
-            'cvv_code' => $request->cvv_code,
+            'last_name' => $request->last_name,
+            'company' => $request->company,
+            'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
             'street' => $request->street,
             'city' => $request->city,
             'postal_code' => $request->postal_code,
+            'note' => $request->note
         ]);
 
         return $order;

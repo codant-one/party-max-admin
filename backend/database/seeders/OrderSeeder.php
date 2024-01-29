@@ -23,7 +23,9 @@ class OrderSeeder extends Seeder
             for($i = 0; $i < rand(1,5); $i++) {
                 $order = Order::factory(['client_id' => $client->id])->create();
 
-                OrderDetail::factory(['order_id' => $order->id])->create();
+                for($j = 0; $j < rand(1,5); $j++) 
+                    OrderDetail::factory(['order_id' => $order->id])->create();
+                
                 Billing::factory(['order_id' => $order->id])->create();
             }
         }

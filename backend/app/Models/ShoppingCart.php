@@ -50,5 +50,10 @@ class ShoppingCart extends Model
         )->delete(); 
     }
 
+    public static function deleteAll($request) 
+    {
+        ShoppingCart::where('client_id', $request->client_id)->delete(); 
+    }
+
 
 }

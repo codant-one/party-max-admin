@@ -20,11 +20,7 @@ class OrderController extends Controller
 {
     public function __construct()
     {
-
-        $this->middleware(PermissionMiddleware::class . ':ver ordenes|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear ordenes|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar ordenes|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar ordenes|administrador')->only(['destroy']);
+        //
     }
 
     /**
@@ -138,7 +134,6 @@ class OrderController extends Controller
  
     }
 
-
     /*
      * Remove the specified resource from storage.
      */
@@ -203,7 +198,7 @@ class OrderController extends Controller
                     ], 404);
                 
                 $order->updatePaymentState($request, $order);
-                $order=$order->load(['details', 'billing']);
+                $order = $order->load(['details', 'billing']);
     
                 return response()->json([
                     'success' => true,

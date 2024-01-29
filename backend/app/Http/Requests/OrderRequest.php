@@ -30,24 +30,10 @@ class OrderRequest extends FormRequest
 				'integer',
                 'exists:App\Models\Client,id'
             ],
-            'shipping_state_id' => [
-                'required',
-				'integer',
-                'exists:App\Models\ShippingState,id'
-            ],
-            'payment_state_id' => [
-                'required',
-				'integer',
-                'exists:App\Models\PaymentState,id'
-            ],
             'address_id' => [
                 'required',
 				'integer',
                 'exists:App\Models\Address,id'
-            ],
-            'date' => [
-                'date',
-                'required'
             ],
             'sub_total' => [
                 'numeric',
@@ -91,14 +77,6 @@ class OrderRequest extends FormRequest
                 'integer',
                 'exists:App\Models\Province,id'
             ],
-            'default' => [
-                'boolean',
-                'required'
-            ],
-            'pse' => [
-                'boolean',
-                'required'
-            ],
             'card_number' => [
                 'numeric'
             ],
@@ -121,20 +99,9 @@ class OrderRequest extends FormRequest
             'client_id.integer' => 'El formato del Id del cliente debe ser entero.',
             'client_id.exists' => 'El cliente ingresado no existe.',
          
-            'shipping_state_id.required' => 'El Id de Estado de envío es requerido.',
-            'shipping_state_id.integer' => 'El formato de Id de Estado de envío debe ser entero.',
-            'shipping_state_id.exists' => 'El Id de Estado de envío ingresado no existe.',
-            
-            'payment_state_id.required' => 'El Id de Estado de Pago es requerido.',
-            'payment_state_id.integer' => 'El formato de Id de Estado de Pago debe ser entero.',
-            'payment_state_id.exists' => 'El Id de Estado de Pago ingresado no existe.',
-            
             'address_id.required' => 'La dirección es requerida.',
             'address_id.integer' => 'El Id de dirección debe ser entero.',
             'address_id.exists' => 'La dirección ingresada no existe.',
-
-            'date.required' => 'La fecha de la orden es requerida.',
-            'date.date' => 'La fecha de la orden debe estar en formato fecha.',
 
             'subtotal.required' => 'El subtotal es requerido.',
             'subtotal.numeric' => 'El subtotal debe ser numérico.',
@@ -168,11 +135,6 @@ class OrderRequest extends FormRequest
             'province_id.integer' => 'El formato de provincia debe ser entero.',
             'province_id.exists' => 'La provincia ingresada no existe.',
 
-            
-            'default.required' => 'El campo default es requerido.',
-            'default.boolean' => 'El formato del campo default debe ser boolean.',
-            'pse.required' => 'El campo Pse es requerido.',
-            'pse.boolean' => 'El formato del campo Pse debe ser boolean.',
             'card_number.numeric' => 'El número de la tarjeta debe ser numérico.',
             'expired_date.numeric' => 'La fecha de la expriracion de la tarjeta debe estar en formato fecha.',
             'cvv_code.numeric' => 'El código cvv debe ser numérico.',
