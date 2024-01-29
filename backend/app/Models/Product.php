@@ -98,7 +98,13 @@ class Product extends Model
             $q->where('slug', 'LIKE', '%' . $search);
         });
     }
- 
+
+    public function scopeWhereColor($query, $search) {
+        $query->whereHas('colors', function ($q) use ($search) {
+            $q->where('color_id', $search);
+        });
+    }
+
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
         $query->orderByRaw('(IFNULL('. $orderByField .', id)) '. $orderBy);
     }
@@ -141,6 +147,19 @@ class Product extends Model
         if ($filters->get('subcategory') !== null) {
             $query->whereSubCategory($filters->get('subcategory'));
         }
+
+        if($filters->get('colorId')!=null){
+            $query->whereColor($filters->get('colorId'));
+
+        }
+
+        if($filters->get('min')!=null && $filters->get('max')!=null)
+        {
+            $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
+            
+        }
+
+        
  
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
