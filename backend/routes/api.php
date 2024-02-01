@@ -203,7 +203,8 @@ Route::group(['prefix' => 'miscellaneous'], function () {
 //PAYU
 Route::group(['prefix' => 'payments'], function () {
     Route::get('/signature', [PaymentController::class, 'signature']);
-    Route::get('/', [PaymentController::class, 'redirectToPayU']);
+    Route::get('/', [PaymentController::class, 'redirectToPayUTesting']);
+    Route::post('/', [PaymentController::class, 'redirectToPayU']);
     Route::get('response', [PaymentController::class, 'response']);
     Route::get('confirmation', [PaymentController::class, 'confirmation']);
 });
