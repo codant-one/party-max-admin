@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Shopping;
 
 use App\Http\Controllers\Controller;
 
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,15 +44,6 @@ class PaymentController extends Controller
         }
     }
 
-    protected function extractUrlFromLocationHeader($headers) {
-        foreach ($headers as $key => $value) {
-          if (strtolower($key) === 'location') {
-            return $value;
-          }
-        }
-        return null;
-      }
-
     public function redirectToPayU(Request $request): JsonResponse
     {
 
@@ -81,7 +72,7 @@ class PaymentController extends Controller
                 ]
             ]);
 
-        } catch (RequestException $e) {
+        } catch (GuzzleException $e) {
             if ($e->hasResponse()) {
                 $errorResponse = json_decode($e->getResponse()->getBody(), true);
                 
