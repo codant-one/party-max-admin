@@ -70,6 +70,7 @@ Route::group([
         Route::post('logout', [AuthController::class , 'logout'])->name('logout');
         Route::post('me', [AuthController::class , 'me'])->name('me');
         Route::get('generateQR', [AuthController::class , 'generateQR'])->name('generateQR');
+        Route::get('store', [AuthController::class , 'storeDetail'])->name('storeDetail');
     });
 });
 
@@ -99,6 +100,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('update/password/{id}', [UsersController::class, 'updatePasswordUser']);
         Route::post('update/password', [UsersController::class, 'updatePassword']);
         Route::post('update/profile',  [UsersController::class, 'updateProfile']);
+        Route::post('update/store', [UsersController::class, 'updateStore']);
     });
 
     //Roles

@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
@@ -111,6 +112,10 @@ class Product extends Model
  
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
+
+        if(Auth::user()->getRoleNames()[0] === 'Proveedor') {
+            $query->where('user_id', Auth::user()->id);
+        }
  
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
@@ -148,19 +153,14 @@ class Product extends Model
             $query->whereSubCategory($filters->get('subcategory'));
         }
 
-        if($filters->get('colorId')!=null){
+        if($filters->get('colorId') !== null){
             $query->whereColor($filters->get('colorId'));
-
         }
 
-        if($filters->get('min')!=null && $filters->get('max')!=null)
-        {
+        if($filters->get('min')!=null && $filters->get('max')!=null) {
             $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
-            
         }
 
-        
- 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
@@ -291,8 +291,9 @@ class Product extends Model
     public static function createProduct($request) {
  
         $product = self::create([
+            'user_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1,
             'brand_id' => $request->brand_id,
-            'state_id' => 3,
+            'state_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? 4 : 3,
             'name' => $request->name,
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,

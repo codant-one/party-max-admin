@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Models\UserDetails;
 use App\Models\UserMenu;
 use App\Models\Client;
+use App\Models\Supplier;
 
 use Illuminate\Support\Facades\Hash;
 
@@ -26,6 +27,9 @@ trait UserHelper
         return $this->hasOne(Client::class, 'user_id', 'id');
     }
 
+    public function supplier() {
+        return $this->hasOne(Supplier::class, 'user_id', 'id');
+    }
 
     /**** Public methods ****/
     public function getOnlineAttribute($value) {

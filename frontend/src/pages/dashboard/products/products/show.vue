@@ -80,7 +80,7 @@ watchEffect(() => {
                 radioContent.value.push(aux)
             });
 
-            store.value = props.product.user.name + ' ' + (props.product.user.last_name ?? '')
+            store.value = props.product.user.user_detail.store_name ?? (props.product.user.name + ' ' + (props.product.user.last_name ?? ''))
             title.value = props.product.name
             description.value = props.product.single_description
             sku.value = props.product.colors[0]?.sku ?? null
@@ -204,7 +204,7 @@ const chanceRadio = (value) => {
                     <VCol md="8" cols="12">
                         <VCardTitle class="text-h6 title-truncate py-0"> {{ title }} </VCardTitle>
                         <VCardSubtitle v-if="store" class="subtitle-truncate mb-3"> 
-                            <span><strong class="me-2">Store:</strong> {{ store }}</span>
+                            <span><strong class="me-2">Tienda:</strong> {{ store }}</span>
                         </VCardSubtitle>
                         <VDivider />
                         <VCardText class="py-4">

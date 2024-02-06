@@ -16,7 +16,8 @@ class UserDetails extends Model
         'province_id',
         'phone',
         'address',
-        'document'
+        'document',
+        'store_name'
     ];
 
     /**** Relationship ****/
@@ -36,7 +37,19 @@ class UserDetails extends Model
                 'province_id' => $request->province_id,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'document' => $request->document
+                'document' => $request->document,
+                'store_name' => $request->store_name
+            ]
+        );
+
+        return $userD;
+    }
+
+    public static function updateOrCreateStore($request, $user) {
+        $userD = UserDetails::updateOrCreate(
+            [    'user_id' => $user->id ],
+            [
+                'store_name' => $request->store_name
             ]
         );
 
