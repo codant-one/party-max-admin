@@ -113,7 +113,7 @@ class Product extends Model
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
 
-        if(Auth::user()->getRoleNames()[0] === 'Proveedor') {
+        if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
             $query->where('user_id', Auth::user()->id);
         }
  
