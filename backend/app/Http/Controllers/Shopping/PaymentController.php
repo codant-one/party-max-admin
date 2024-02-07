@@ -10,6 +10,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+use App\Models\Order;
+use App\Models\Billing;
+
 class PaymentController extends Controller
 {
     public function signature(Request $request): JsonResponse
@@ -110,8 +113,26 @@ class PaymentController extends Controller
         Log::info('Solicitud de confirmación de PayU recibida: ');
         Log::info($request->all());
 
+        $order = Order::where('transaction_id', $request->transaction_id)->first();
+
+        if (!$order)
+            return response()->json([
+                'sucess' => false,
+                'feedback' => 'not_found',
+                'message' => 'Orden no encontrada'
+            ], 404);
+
+        $pse = is_null($request->pse_bank) ? 0 : 1;
+
+        Billing::where('order_id', $order_id->id)
+               ->update([
+                    'pse' => $pse,
+                    'card_number' => ($pse === 0) ? $request->cc_number : null,
+                    'card_name' => ($pse === 0) ? $request->cc_holder : null
+                ]);
+
         return response()->json([
             'success' => true
-        ], 500);
+        ], 200);
     }
 }

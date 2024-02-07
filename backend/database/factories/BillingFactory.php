@@ -32,8 +32,6 @@ class BillingFactory extends Factory
             'pse' => $pse,
             'card_number' => ($pse === 0) ? $this->faker->creditCardNumber :  null,
             'card_name' => ($pse === 0) ? $this->faker->name :  null,
-            'expired_date' => ($pse === 0) ? $this->faker->creditCardExpirationDate :  null,
-            'cvv_code' => ($pse === 0) ? '123' :  null,
             'name' => $this->faker->name,
             'last_name' => $this->faker->lastName                                  ,
             'company' => $this->faker->company ,

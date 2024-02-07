@@ -80,12 +80,6 @@ class OrderRequest extends FormRequest
             'card_number' => [
                 'numeric'
             ],
-            'expired_date' => [
-                'date'
-            ],
-            'cvv_code' => [
-                'numeric'
-            ],
             'phone' => [
                 'regex:/^[0-9\-\+\(\) ]+$/'
             ]
@@ -136,8 +130,6 @@ class OrderRequest extends FormRequest
             'province_id.exists' => 'La provincia ingresada no existe.',
 
             'card_number.numeric' => 'El número de la tarjeta debe ser numérico.',
-            'expired_date.numeric' => 'La fecha de la expriracion de la tarjeta debe estar en formato fecha.',
-            'cvv_code.numeric' => 'El código cvv debe ser numérico.',
             'phone.regex' => 'El teléfono debe contener solo números, espacios y los caracteres - + ( )'
         ];
     }

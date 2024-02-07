@@ -116,6 +116,7 @@ class Order extends Model
  
         $order->update([
             'payment_state_id' => $request->payment_state_id,
+            'transaction_id' => $request->transaction_id
         ]);      
     
         return $order;
