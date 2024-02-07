@@ -49,7 +49,7 @@ watchEffect(() => {
         discarded.value = props.product.discarded ?? null
         title.value = props.product.title ?? null
         image.value = props.product.image === null ? '' : themeConfig.settings.urlStorage + props.product.image
-        store.value = props.product.user.name + ' ' + (props.product.user.last_name ?? '')
+        store.value = props.product.user.user_detail.store_name ?? (props.product.user.name + ' ' + (props.product.user.last_name ?? ''))
         state.value = props.product.state
         in_stock.value = props.product.in_stock
         stock.value = props.product.stock

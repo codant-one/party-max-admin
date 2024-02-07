@@ -81,18 +81,19 @@ class MiscellaneousController extends Controller
             $products = Product::with(['user'])->get();
 
             $query = Product::with(['user'])
-                    ->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy',
-                            'category',
-                            'subcategory',
-                            'colorId',
-                            'min',
-                            'max'
-                        ])
-                    );
+                            ->where('state_id', 3)
+                            ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy',
+                                    'category',
+                                    'subcategory',
+                                    'colorId',
+                                    'min',
+                                    'max'
+                                ])
+                            );
 
             $count = $query->applyFilters(
                         $request->only([

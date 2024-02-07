@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
-import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/CustomerTabAddressAndBilling.vue'
 import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
 import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
 
@@ -21,8 +20,7 @@ const isRequestOngoing = ref(true)
 
 const tabs = [
   { title: 'Descripción general' },
-  { title: 'Seguridad' },
-  { title: 'Envíos' }
+  { title: 'Seguridad' }
 ]
 
 const advisor = ref({
@@ -149,9 +147,6 @@ async function fetchData() {
                     <CustomerTabSecurity 
                         :user_id="supplier.user_id"
                         @alert="showAlert" />
-                </VWindowItem>
-                <VWindowItem>
-                    <CustomerTabAddressAndBilling :addresses="supplier.addresses"/>
                 </VWindowItem>
             </VWindow>
         </VCol>

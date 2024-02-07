@@ -23,6 +23,15 @@ export const useProfileStores = defineStore('profile', {
                     }).catch(error => {
                         console.error(error.response.data)
                     }) 
-        }
+        },
+        updateStore(data) {
+
+            return Profile.updateStore(data)
+                    .then((response) => {
+                        return Promise.resolve(response.data.data)
+                    }).catch(error => {
+                        console.error(error.response.data)
+                    })         
+        },
   },
 })

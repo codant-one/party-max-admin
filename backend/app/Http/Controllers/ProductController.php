@@ -36,7 +36,7 @@ class ProductController extends Controller
                             'colors.images', 
                             'colors.color', 
                             'detail', 
-                            'user', 
+                            'user.userDetail', 
                             'state',
                             'tags'
                         ])->favorites()

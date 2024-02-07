@@ -72,7 +72,6 @@ class Supplier extends Model
 
 
     /**** Public methods ****/
-
     public static function createSupplier($request) {
         $user = User::createUser($request);
         $user->assignRole('Proveedor');
@@ -81,8 +80,8 @@ class Supplier extends Model
             'user_id' => $user->id,
             'gender_id' => $request->gender_id,
             'birthday' => date('Y-m-d', strtotime($request->birthday) ),
-            'slug'=> Str::slug($user->name),
-            'about_us'=>$request->about_us
+            'slug' => Str::slug($user->name),
+            'about_us' => $request->about_us
         ]);
         
         return $supplier;
@@ -92,12 +91,25 @@ class Supplier extends Model
         $supplier->update([
             'gender_id' => $request->gender_id,
             'birthday' => date('Y-m-d', strtotime($request->birthday) ),
-            'about_us'=>$request->about_us
+            'about_us' => $request->about_us
         ]);
 
         $user = User::find($supplier->user_id);
         $request->merge([ 'email' => $user->email ]);
         User::updateUser($request, $user);
+
+        return $supplier;
+    }
+
+    public static function updateOrCreateStore($request, $user) {
+        $supplier = Supplier::updateOrCreate(
+            [    'user_id' => $user->id ],
+            [
+                'slug' => Str::slug($request->store_name),
+                'about_us' => $request->about_us,
+                'address' => $request->address
+            ]
+        );
 
         return $supplier;
     }

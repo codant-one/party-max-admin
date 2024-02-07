@@ -7,6 +7,8 @@ use App\Http\Requests\UserRequest;
 
 use App\Models\User;
 use App\Models\Client;
+use App\Models\UserDetails;
+use App\Models\Supplier;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
@@ -840,4 +842,60 @@ class UsersController extends Controller
             ], 500);
         }
     }
+
+    public function updateStore(Request $request): JsonResponse
+    {
+
+        try {
+
+            $user = Auth::user()->load(['userDetail.province.country']);
+            $userDetails = UserDetails::where('user_id', $user->id)->first();
+            $userDetails->updateOrCreateStore($request, $user);
+
+            if(Auth::user()->getRoleNames()[0] === 'Proveedor') {
+                $supplier = Supplier::where('user_id', $user->id)->first();
+                $supplier->updateOrCreateStore($request, $user);
+
+                if ($request->hasFile('banner')) {
+                    $image = $request->file('banner');
+
+                    $path = 'suppliers/';
+
+                    $file_data = uploadFile($image, $path, $supplier->banner);
+
+                    $supplier->banner = $file_data['filePath'];
+                    $supplier->update();
+                } 
+
+                if ($request->hasFile('logo')) {
+                    $image = $request->file('logo');
+
+                    $path = 'suppliers/';
+
+                    $file_data = uploadFile($image, $path, $supplier->logo);
+
+                    $supplier->logo = $file_data['filePath'];
+                    $supplier->update();
+                } 
+            }
+
+            $userData = getUserData($user->load(['userDetail.province.country']));
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => $userData
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
 }

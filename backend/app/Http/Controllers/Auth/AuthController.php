@@ -17,6 +17,7 @@ use App\Models\Client;
 use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\UserRegisterToken;
+use App\Models\Supplier;
 
 class AuthController extends Controller
 {
@@ -205,6 +206,31 @@ class AuthController extends Controller
             'message' => 'invalid_code',
             'errors' => 'Código de verificación incorrecto'
         ], 400);
+    }
+
+    public function storeDetail()
+    {
+        try {
+            
+            $supplier = 
+                Supplier::where('user_id', Auth::user()->id)
+                        ->first();
+        
+            return response()->json([
+                'success' => true,
+                'message' => 'store',
+                'data' => [
+                    'supplier' => $supplier
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     public function generateQR()

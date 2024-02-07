@@ -3,6 +3,7 @@
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
 import TabSecurity from '@/views/dashboard/profile/TabSecurity.vue'
+import TabStore from '@/views/dashboard/profile/TabStore.vue'
 import TabStatistics from '@/views/dashboard/profile/TabStatistics.vue'
 import UserProfile from '@/views/dashboard/profile/UserProfile.vue'
 
@@ -20,6 +21,10 @@ const tabs = [
   {
     icon: 'tabler-lock',
     title: 'Seguridad',
+  },
+  {
+    icon: 'tabler-shopping-cart-cog',
+    title: 'Tienda',
   },
   {
     icon: 'tabler-chart-pie-filled',
@@ -166,7 +171,9 @@ const onImageSelected = event => {
           <VWindowItem>
             <TabSecurity />
           </VWindowItem>
-
+          <VWindowItem>
+            <TabStore />
+          </VWindowItem>
           <VWindowItem>
             <TabStatistics />
           </VWindowItem>
