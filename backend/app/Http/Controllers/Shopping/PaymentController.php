@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -31,6 +32,7 @@ class PaymentController extends Controller
                     'merchantId' => env('PAYU_MERCHANT_ID'),
                     'accountId' => env('PAYU_ACCOUNT_ID'),
                     'responseUrl' => env('APP_DOMAIN').'/cart',
+                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation',
                     'test' => env('PAYU_DEBUG')
                 ]
             ]);
@@ -103,8 +105,13 @@ class PaymentController extends Controller
         return view('testing.response');
     }
 
-    public function confirmation(Request $request)
+    public function confirmation(Request $request): JsonResponse
     {
-        return view('testing.confirmation');
+        Log::info('Solicitud de confirmación de PayU recibida: ');
+        Log::info($request->all());
+
+        return response()->json([
+            'success' => true
+        ], 500);
     }
 }
