@@ -208,7 +208,7 @@ Route::group(['prefix' => 'payments'], function () {
     Route::get('/', [PaymentController::class, 'redirectToPayUTesting']);
     Route::post('/', [PaymentController::class, 'redirectToPayU']);
     Route::get('response', [PaymentController::class, 'response']);
-    Route::get('confirmation', [PaymentController::class, 'confirmation']);
+    Route::post('confirmation', [PaymentController::class, 'confirmation']);
 });
 
 

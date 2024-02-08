@@ -8,6 +8,10 @@ use GuzzleHttp\Exception\GuzzleException;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+use App\Models\Order;
+use App\Models\Billing;
 
 class PaymentController extends Controller
 {
@@ -31,6 +35,7 @@ class PaymentController extends Controller
                     'merchantId' => env('PAYU_MERCHANT_ID'),
                     'accountId' => env('PAYU_ACCOUNT_ID'),
                     'responseUrl' => env('APP_DOMAIN').'/cart',
+                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation',
                     'test' => env('PAYU_DEBUG')
                 ]
             ]);
@@ -103,8 +108,31 @@ class PaymentController extends Controller
         return view('testing.response');
     }
 
-    public function confirmation(Request $request)
+    public function confirmation(Request $request): JsonResponse
     {
-        return view('testing.confirmation');
+        Log::info('Solicitud de confirmación de PayU recibida: ');
+        Log::info($request->all());
+
+        $order = Order::where('transaction_id', $request->transaction_id)->first();
+
+        if (!$order)
+            return response()->json([
+                'sucess' => false,
+                'feedback' => 'not_found',
+                'message' => 'Orden no encontrada'
+            ], 404);
+
+        $pse = is_null($request->pse_bank) ? 0 : 1;
+
+        Billing::where('order_id', $order_id->id)
+               ->update([
+                    'pse' => $pse,
+                    'card_number' => ($pse === 0) ? $request->cc_number : null,
+                    'card_name' => ($pse === 0) ? $request->cc_holder : null
+                ]);
+
+        return response()->json([
+            'success' => true
+        ], 200);
     }
 }
