@@ -250,6 +250,17 @@ class CategoryController extends Controller
 
             $category = $category->updateCategory($request, $category);
 
+            if ($request->hasFile('icon_subcategory')) {
+                $icon_subcategory = $request->file('icon_subcategory');
+
+                $path = 'categories/';
+
+                $file_data = uploadFile($icon_subcategory, $path, $category->icon_subcategory);
+
+                $category->icon_subcategory = $file_data['filePath'];
+                $category->save();
+            }
+
             if ($request->hasFile('banner')) {
                 $banner = $request->file('banner');
 
