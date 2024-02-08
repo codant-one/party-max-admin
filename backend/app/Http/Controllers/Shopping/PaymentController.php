@@ -124,7 +124,7 @@ class PaymentController extends Controller
 
         $pse = is_null($request->pse_bank) ? 0 : 1;
 
-        Billing::where('order_id', $order_id->id)
+        Billing::where('order_id', $order->id)
                ->update([
                     'pse' => $pse,
                     'card_number' => ($pse === 0) ? $request->cc_number : null,
