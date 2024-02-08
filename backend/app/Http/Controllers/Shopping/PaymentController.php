@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\GuzzleException;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 use App\Models\Order;
 use App\Models\Billing;
@@ -111,15 +110,8 @@ class PaymentController extends Controller
     public function confirmation(Request $request): JsonResponse
     {
 
-        $orders = Order::all();
-        Log::info('orders: ');
-        Log::info($orders);
-
         $order = Order::where('reference_code', $request->reference_sale)->first();
-        Log::info('reference_sale: ');
-        Log::info("(".$request->reference_sale.")");
-        Log::info('order: ');
-        Log::info($order);
+
         if (!$order)
             return response()->json([
                 'sucess' => false,
