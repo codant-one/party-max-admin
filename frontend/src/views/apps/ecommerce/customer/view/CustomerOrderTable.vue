@@ -41,15 +41,26 @@ async function fetchData() {
 
 }
 
-const resolveStatus = shipping_state_id => {
+const resolveStatusShipping = shipping_state_id => {
   if (shipping_state_id === 1)
-    return { color: 'success' }
+    return { color: 'error' }
   if (shipping_state_id === 2)
-    return { color: 'primary' }
+    return { color: 'warning' }
   if (shipping_state_id === 3)
     return { color: 'info' }
   if (shipping_state_id === 4)
+    return { color: 'success' }
+}
+
+const resolveStatusPayment = shipping_state_id => {
+  if (shipping_state_id === 1)
+    return { color: 'error' }
+  if (shipping_state_id === 2)
+    return { color: 'default' }
+  if (shipping_state_id === 3)
     return { color: 'warning' }
+  if (shipping_state_id === 4)
+    return { color: 'info' }
 }
 
 </script>
@@ -109,7 +120,7 @@ const resolveStatus = shipping_state_id => {
           <td> 
             <VChip
               label
-              :color="resolveStatus(order.shipping.id)?.color"
+              :color="resolveStatusShipping(order.shipping.id)?.color"
             >
               {{ order.shipping.name }}
             </VChip>
@@ -117,7 +128,8 @@ const resolveStatus = shipping_state_id => {
           <td> 
             <VChip
               label
-              :color="resolveStatus(order.payment.id)?.color"
+              variant="outlined"
+              :color="resolveStatusPayment(order.payment.id)?.color"
             >
               {{ order.payment.name }}
             </VChip>
