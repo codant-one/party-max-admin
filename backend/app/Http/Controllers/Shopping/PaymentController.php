@@ -113,7 +113,7 @@ class PaymentController extends Controller
 
         $orders = Order::all();
         Log::info('orders: ');
-        Log::info($order);
+        Log::info($orders);
 
         $order = Order::where('reference_code', $request->reference_sale)->first();
         Log::info('reference_sale: ');
