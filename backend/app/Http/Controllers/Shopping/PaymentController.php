@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Order;
 use App\Models\Billing;
+use App\Models\ShoppingCart;
 
 class PaymentController extends Controller
 {
@@ -136,7 +137,11 @@ class PaymentController extends Controller
         $order->update([
             'payment_state_id' => $payment_state_id
         ]);
-            
+        
+        $request->request->add(['client_id' => $order->client_id ]);
+
+        ShoppingCart::deleteAll($request);
+
         $pse = is_null($request->pse_bank) ? 0 : 1;
 
         Billing::where('order_id', $order->id)
