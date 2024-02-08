@@ -114,7 +114,10 @@ class PaymentController extends Controller
         Log::info($request->all());
 
         $order = Order::where('reference_code', $request->reference_sale)->first();
-
+        Log::info('reference_sale: ');
+        Log::info($request->reference_sale);
+        Log::info('order: ');
+        Log::info($order);
         if (!$order)
             return response()->json([
                 'sucess' => false,
