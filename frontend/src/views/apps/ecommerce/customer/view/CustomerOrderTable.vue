@@ -90,7 +90,8 @@ const resolveStatus = shipping_state_id => {
         <tr>
           <th scope="col"> #ID </th>
           <th scope="col"> FECHA </th>
-          <th scope="col"> STATUS </th>
+          <th scope="col"> ESTADO DEL ENVÍO</th>
+          <th scope="col"> ESTADO DEL PAGO</th>
           <th scope="col"> VENTA </th>
           <th scope="col" v-if="$can('editar', 'ordenes') || $can('eliminar', 'ordenes')">
             ACCIONES
@@ -111,6 +112,14 @@ const resolveStatus = shipping_state_id => {
               :color="resolveStatus(order.shipping.id)?.color"
             >
               {{ order.shipping.name }}
+            </VChip>
+          </td>
+          <td> 
+            <VChip
+              label
+              :color="resolveStatus(order.payment.id)?.color"
+            >
+              {{ order.payment.name }}
             </VChip>
           </td>
           <td> 

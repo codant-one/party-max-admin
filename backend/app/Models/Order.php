@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\OrderDetail;
 use App\Models\ShippingState; 
+use App\Models\PaymentState;
 
 class Order extends Model
 {
@@ -27,6 +28,10 @@ class Order extends Model
 
     public function shipping() {
         return $this->belongsTo(ShippingState::class, 'shipping_state_id', 'id');
+    }
+
+    public function payment() {
+        return $this->belongsTo(PaymentState::class, 'payment_state_id', 'id');
     }
 
     /**** Scopes ****/
