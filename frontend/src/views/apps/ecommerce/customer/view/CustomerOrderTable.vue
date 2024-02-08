@@ -1,194 +1,203 @@
 <script setup>
-// import { VDataTableServer } from 'vuetify/labs/VDataTable'
-// import { paginationMeta } from '@api-utils/paginationMeta'
 
+import { useOrdersStores } from '@/stores/useOrders'
+import { formatNumber } from '@/@core/utils/formatters'
+
+const route = useRoute()
+const ordersStores = useOrdersStores()
+
+const orders = ref([])
 const searchQuery = ref('')
+const rowPerPage = ref(10)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const totalOrders = ref(0)
 
-// Data table options
-const itemsPerPage = ref(10)
-const page = ref(1)
-const sortBy = ref()
-const orderBy = ref()
+const paginationData = computed(() => {
+  const firstIndex = orders.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = orders.value.length + (currentPage.value - 1) * rowPerPage.value
 
-const updateOptions = options => {
-  page.value = options.page
-  sortBy.value = options.sortBy[0]?.key
-  orderBy.value = options.sortBy[0]?.order
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
+})
+
+watchEffect(fetchData)
+
+async function fetchData() {
+
+  let data = {
+    search: searchQuery.value,
+    orderByField: 'id',
+    orderBy: 'desc',
+    limit: rowPerPage.value,
+    page: currentPage.value,
+    clientId: Number(route.params.id)
+  }
+
+  await ordersStores.fetchOrders(data)
+
+  orders.value = ordersStores.getOrders
+  totalPages.value = ordersStores.last_page
+  totalOrders.value = ordersStores.ordersTotalCount
+
 }
 
-const headers = [
-  {
-    title: 'Order',
-    key: 'order',
-  },
-  {
-    title: 'Date',
-    key: 'date',
-  },
-  {
-    title: 'Status',
-    key: 'status',
-  },
-  {
-    title: 'Spent',
-    key: 'spent',
-  },
-  {
-    title: 'Actions',
-    key: 'actions',
-    sortable: false,
-  },
-]
-
-const resolveStatus = status => {
-  if (status === 'Delivered')
+const resolveStatus = shipping_state_id => {
+  if (shipping_state_id === 1)
     return { color: 'success' }
-  if (status === 'Out for Delivery')
+  if (shipping_state_id === 2)
     return { color: 'primary' }
-  if (status === 'Ready to Pickup')
+  if (shipping_state_id === 3)
     return { color: 'info' }
-  if (status === 'Dispatched')
+  if (shipping_state_id === 4)
     return { color: 'warning' }
 }
 
-const {
-  data: ordersData,
-  execute: fetchOrders,
-} = await useApi(createUrl('/apps/ecommerce/orders', {
-  query: {
-    q: searchQuery,
-    page,
-    itemsPerPage,
-    sortBy,
-    orderBy,
-  },
-}))
-
-const orders = computed(() => ordersData.value?.orders)
-const totalOrder = computed(() => ordersData.value?.total ?? 0)
-
-const deleteOrder = async id => {
-  await $api(`/apps/ecommerce/orders/${ id }`, { method: 'DELETE' })
-  fetchOrders()
-}
 </script>
 
 <template>
-  <VCard>
-    <VCardText>
-      <div class="d-flex justify-sm-space-between justify-start flex-wrap gap-4 align-center">
-        <h5 class="text-h5">
-          Orders placed
-        </h5>
-        <VTextField
-          v-model="searchQuery"
+
+  <VCard title="Pedidos realizados">
+    <VCardText class="d-flex flex-wrap py-4 gap-4">
+      <div
+        class="me-3"
+        style="width: 80px;">
+              
+        <VSelect
+          v-model="rowPerPage"
           density="compact"
-          placeholder="Serach Order"
-          style=" max-inline-size: 200px; min-inline-size: 200px;"
-        />
+          variant="outlined"
+          :items="[10, 20, 30, 50]"/>
+      </div>
+
+      <VSpacer />
+
+      <div class="d-flex align-center flex-wrap gap-4">
+        <!-- 👉 Search  -->
+        <div style="width: 10rem;">
+          <v-text-field
+            v-model="searchQuery"
+            placeholder="Buscar"
+            density="compact"/>
+        </div>
       </div>
     </VCardText>
-    
-    <!-- <VDataTableServer
-      v-model:items-per-page="itemsPerPage"
-      v-model:page="page"
-      :headers="headers"
-      show-select
-      :items="orders"
-      :items-length="totalOrder"
-      class="text-no-wrap"
-      @update:options="updateOptions"
-    >
 
-      <template #item.order="{ item }">
-        <RouterLink :to="{ name: 'apps-ecommerce-order-details-id', params: { id: item.order } }">
-          #{{ item.order }}
-        </RouterLink>
-      </template>
+    <VDivider />
 
+    <VTable class="text-no-wrap">
+      <!-- 👉 table head -->
+      <thead>
+        <tr>
+          <th scope="col"> #ID </th>
+          <th scope="col"> FECHA </th>
+          <th scope="col"> STATUS </th>
+          <th scope="col"> VENTA </th>
+          <th scope="col" v-if="$can('editar', 'ordenes') || $can('eliminar', 'ordenes')">
+            ACCIONES
+          </th>
+        </tr>
+      </thead>
+      <!-- 👉 table body -->
+      <tbody>
+        <tr 
+          v-for="order in orders"
+          :key="order.id"
+          style="height: 3.75rem;">
+          <td> #{{ order.id }} </td>
+          <td> {{ order.date }} </td>
+          <td> 
+            <VChip
+              label
+              :color="resolveStatus(order.shipping.id)?.color"
+            >
+              {{ order.shipping.name }}
+            </VChip>
+          </td>
+          <td> 
+            COP {{ formatNumber(order.total) }} 
+          </td>
+          <!-- 👉 Acciones -->
+          <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'ordenes') || $can('eliminar', 'ordenes')">      
+            <VBtn
+              v-if="$can('ver', 'ordenes')"
+              icon
+              variant="text"
+              color="default"
+              size="x-small">
+              <VTooltip
+                open-on-focus
+                location="top"
+                activator="parent">
+                Ver
+              </VTooltip>
+              <VIcon
+                size="28"
+                icon="tabler-eye"
+                class="me-1"
+              />
+            </VBtn> 
+            <VBtn
+              v-if="$can('editar', 'ordenes')"
+              icon
+              size="x-small"
+              color="default"
+              variant="text"
+              @click="editClient(client)">
+              <VTooltip
+                open-on-focus
+                location="top"
+                activator="parent">
+                Editar
+              </VTooltip>
+              <VIcon
+                size="22"
+                icon="tabler-edit" />
+            </VBtn>
+            <VBtn
+              v-if="$can('eliminar','ordenes')"
+              icon
+              size="x-small"
+              color="default"
+              variant="text"
+              @click="showDeleteDialog(client)">
+              <VTooltip
+                open-on-focus
+                location="top"
+                activator="parent">
+                Eliminar
+              </VTooltip>   
+              <VIcon
+                size="22"
+                icon="tabler-trash" />
+            </VBtn>
+          </td>
+        </tr>
+      </tbody>
+      <!-- 👉 table footer  -->
+      <tfoot v-show="!orders.length">
+        <tr>
+          <td
+            colspan="5"
+            class="text-center">
+            Datos no disponibles
+          </td>
+        </tr>
+      </tfoot>
+    </VTable>
+        
+    <VDivider />
 
-      <template #item.date="{ item }">
-        {{ new Date(item.date).toDateString() }}
-      </template>
+    <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
+      <span class="text-sm text-disabled">
+        {{ paginationData }}
+      </span>
 
-
-      <template #item.status="{ item }">
-        <VChip
-          label
-          :color="resolveStatus(item.status)?.color"
-        >
-          {{ item.status }}
-        </VChip>
-      </template>
-
-
-      <template #item.spent="{ item }">
-        ${{ item.spent }}
-      </template>
-
-      <template #item.actions="{ item }">
-        <VBtn
-          icon
-          variant="text"
-          color="default">
-          <VIcon icon="tabler-dots-vertical" />
-          <VMenu activator="parent">
-            <VList>
-              <VListItem
-                value="view"
-                :to="{ name: 'apps-ecommerce-order-details-id', params: { id: item.order } }"
-              >
-                View
-              </VListItem>
-              <VListItem
-                value="delete"
-                @click="deleteOrder(item.id)"
-              >
-                Delete
-              </VListItem>
-            </VList>
-          </VMenu>
-        </VBtn>
-      </template>
-
-
-      <template #bottom>
-        <VDivider />
-
-        <div class="d-flex align-center justify-sm-space-between justify-center flex-wrap gap-3 pa-6">
-          <p class="text-sm text-disabled mb-0">
-            {{ paginationMeta({ page, itemsPerPage }, totalOrder) }}
-          </p>
-
-          <VPagination
-            v-model="page"
-            :length="Math.ceil(totalOrder / itemsPerPage)"
-            :total-visible="$vuetify.display.xs ? 1 : Math.min(Math.ceil(totalOrder / itemsPerPage), 5)"
-          >
-            <template #prev="slotProps">
-              <VBtn
-                variant="tonal"
-                color="default"
-                v-bind="slotProps"
-                :icon="false"
-              >
-                Previous
-              </VBtn>
-            </template>
-
-            <template #next="slotProps">
-              <VBtn
-                variant="tonal"
-                color="default"
-                v-bind="slotProps"
-                :icon="false"
-              >
-                Next
-              </VBtn>
-            </template>
-          </VPagination>
-        </div>
-      </template>
-    </VDataTableServer> -->
+      <VPagination
+        v-model="currentPage"
+        size="small"
+        :total-visible="5"
+        :length="totalPages"/>
+          
+    </VCardText>
   </VCard>
 </template>

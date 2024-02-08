@@ -45,9 +45,7 @@ async function fetchData() {
 
   if(Number(route.params.id)) {
     supplier.value = await suppliersStores.showSupplier(Number(route.params.id))
-    console.log('proveedor', supplier.value)
     online.value = supplier.value.user.online
-
   }
 
   isRequestOngoing.value = false
@@ -141,7 +139,9 @@ async function fetchData() {
                 :touch="false"
             >
                 <VWindowItem>
-                    <CustomerTabOverview />
+                    <CustomerTabOverview
+                        :customer-data="supplier"
+                        :is-supplier="true"/>
                 </VWindowItem>
                 <VWindowItem>
                     <CustomerTabSecurity 

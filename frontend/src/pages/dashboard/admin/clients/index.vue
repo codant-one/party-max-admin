@@ -6,7 +6,7 @@ import { useProvincesStores } from '@/stores/useProvinces'
 import { useGendersStores } from '@/stores/useGenders'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
-import { avatarText } from '@/@core/utils/formatters'
+import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import AddNewClientDrawer from './AddNewClientDrawer.vue' 
 import router from '@/router'
 
@@ -392,10 +392,10 @@ const getFlagCountry = country => {
                   </span>
                 </td>
                 <td>
-                  324
+                  {{ client.orders_count }}
                 </td>
                 <td>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">$100</span>
+                  <span class="text-body-1 font-weight-medium text-high-emphasis">$ {{ formatNumber(client.sales) ?? '0.00' }}</span>
                 </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">      

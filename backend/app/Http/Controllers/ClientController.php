@@ -39,14 +39,16 @@ class ClientController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Client::with(['user.userDetail.province.country', 'gender'])
-                        ->applyFilters(
-                            $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy'
-                            ])
-                        );
+            $query = Client::with(['user.userDetail.province.country', 'gender', 'orders'])
+                           ->withCount(['orders'])
+                           ->sales()
+                           ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy'
+                                ])
+                            );
 
             $count = $query->applyFilters(
                         $request->only([
@@ -144,7 +146,17 @@ class ClientController extends Controller
     {
         try {
 
-            $client = Client::with(['user.userDetail.province.country', 'gender', 'addresses.type', 'addresses.province.country'])->find($id);
+            $client = Client::with([
+                                'user.userDetail.province.country',
+                                'user.favorites', 
+                                'gender', 
+                                'addresses.type', 
+                                'addresses.province.country',
+                                'orders'
+                            ])
+                            ->withCount(['orders'])
+                            ->sales()
+                            ->find($id);
 
             if (!$client)
                 return response()->json([

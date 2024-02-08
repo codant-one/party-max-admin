@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
 use App\Models\Address;
+use App\Models\Order;
 
 class Client extends Model
 {
@@ -33,7 +34,22 @@ class Client extends Model
         return $this->hasMany(Address::class, 'client_id');
     }
 
+    public function orders() {
+        return $this->hasMany(Order::class, 'client_id');
+    }
+
     /**** Scopes ****/
+    public function scopeSales($query)
+    {
+        return  $query->addSelect(['sales' => function ($q){
+                    $q->selectRaw('SUM(CAST(o.total AS DECIMAL(10, 2)))')
+                        ->from('clients as c')
+                        ->leftJoin('orders as o', 'o.client_id', '=', 'c.id')
+                        ->whereColumn('c.id', 'clients.id')
+                        ->groupBy('c.id');
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->whereHas('user', function ($q) use ($search) {
             $q->where(function ($query) use ($search) {

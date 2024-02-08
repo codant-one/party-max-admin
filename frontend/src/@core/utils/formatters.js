@@ -45,3 +45,13 @@ export const formatDateToMonthShort = (value, toTimeForCurrentDay = true) => {
 }
 
 export const prefixWithPlus = value => value > 0 ? `+${value}` : value
+
+export const formatNumber = (value) => {
+  if (!value) return value;
+
+  const numberString = value.toString();
+  const [integer, decimal] = numberString.split('.');
+  const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  return `${formattedInteger}${decimal ? `.${decimal}` : ''}`;
+}

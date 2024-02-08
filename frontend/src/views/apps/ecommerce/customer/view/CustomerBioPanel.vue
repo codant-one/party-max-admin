@@ -1,20 +1,19 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { avatarText } from '@/@core/utils/formatters'
+import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import { useCountriesStores } from '@/stores/useCountries'
 // import rocketImg from '@images/eCommerce/rocket.png'
 
-const countriesStores = useCountriesStores()
-
 const props = defineProps({
   customerData: {
-    type: null,
+    type: Object,
     required: true,
-  },
+  }
 })
 
-const isUserInfoEditDialogVisible = ref(false)
+const countriesStores = useCountriesStores()
+
 const isUpgradePlanDialogVisible = ref(false)
 
 const listCountries = ref([])
@@ -85,7 +84,7 @@ const getFlagCountry = country => {
                 <VIcon icon="tabler-shopping-cart" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium">181</span>
+                <span class="text-body-1 font-weight-medium"> {{ props.customerData.orders_count }} </span>
                 <span class="text-body-2">Ordenes</span>
               </div>
             </div>
@@ -99,7 +98,7 @@ const getFlagCountry = country => {
                 <VIcon icon="tabler-currency-dollar" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium">COP 2.000.000</span>
+                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(props.customerData.sales) }}</span>
                 <span class="text-body-2">Ventas</span>
               </div>
             </div>
@@ -197,11 +196,6 @@ const getFlagCountry = country => {
           </VList>
         </VCardText>
 
-        <!-- <VCardText class="text-center">
-          <VBtn @click="isUserInfoEditDialogVisible = !isUserInfoEditDialogVisible">
-            Edit Details
-          </VBtn>
-        </VCardText> -->
       </VCard>
     </VCol>
     <!-- !SECTION -->
@@ -243,7 +237,6 @@ const getFlagCountry = country => {
     </VCol> -->
     <!-- !SECTION -->
   </VRow>
-  <!-- <UserInfoEditDialog v-model:isDialogVisible="isUserInfoEditDialogVisible" /> -->
   <!-- <UserUpgradePlanDialog v-model:isDialogVisible="isUpgradePlanDialogVisible" /> -->
 </template>
 

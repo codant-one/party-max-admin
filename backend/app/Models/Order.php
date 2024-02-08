@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\OrderDetail;
+use App\Models\ShippingState; 
 
 class Order extends Model
 {
@@ -22,6 +23,10 @@ class Order extends Model
 
     public function billing() {
         return $this->hasMany(Billing::class, 'order_id', 'id');
+    }
+
+    public function shipping() {
+        return $this->belongsTo(ShippingState::class, 'shipping_state_id', 'id');
     }
 
     /**** Scopes ****/
@@ -39,6 +44,10 @@ class Order extends Model
 
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
+        }
+        
+        if ($filters->get('clientId')) {
+            $query->where('client_id', $filters->get('clientId'));
         }
 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {

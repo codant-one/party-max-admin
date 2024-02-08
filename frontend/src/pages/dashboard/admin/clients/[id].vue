@@ -41,7 +41,6 @@ const showAlert = function(alert) {
 
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedAddress = ref({})
-const isAddCustomerDrawerOpen = ref(false)
 
 watchEffect(fetchData)
 
@@ -257,7 +256,9 @@ const removeAddress = async () => {
                 :touch="false"
             >
                 <VWindowItem>
-                    <CustomerTabOverview />
+                    <CustomerTabOverview
+                        :customer-data="client"
+                        :is-supplier="false"/>
                 </VWindowItem>
                 <VWindowItem>
                     <CustomerTabSecurity 

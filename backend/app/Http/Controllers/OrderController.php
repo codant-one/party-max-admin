@@ -32,12 +32,13 @@ class OrderController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Order::with(['details', 'billing'])
+            $query = Order::with(['details', 'billing', 'shipping'])
                         ->applyFilters(
                             $request->only([
                                 'search',
                                 'orderByField',
-                                'orderBy'
+                                'orderBy',
+                                'clientId'
                             ])
                         );
 
@@ -45,7 +46,8 @@ class OrderController extends Controller
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'clientId'
                         ])
                     )->count();
 
@@ -80,7 +82,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'order' => Order::with(['details', 'billing'])->find($order->id)
+                    'order' => Order::with(['details', 'billing', 'shipping'])->find($order->id)
                 ]
             ]);
 
@@ -100,7 +102,7 @@ class OrderController extends Controller
     {
         try {
 
-            $order = Order::with(['details', 'billing'])->find($id);
+            $order = Order::with(['details', 'billing', 'shipping'])->find($id);
 
             if (!$order)
                 return response()->json([
@@ -198,7 +200,7 @@ class OrderController extends Controller
                     ], 404);
                 
                 $order->updatePaymentState($request, $order);
-                $order = $order->load(['details', 'billing']);
+                $order = $order->load(['details', 'billing', 'shipping']);
     
                 return response()->json([
                     'success' => true,
