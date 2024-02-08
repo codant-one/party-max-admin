@@ -119,6 +119,24 @@ class PaymentController extends Controller
                 'message' => 'Orden no encontrada'
             ], 404);
 
+        switch ($resquest->response_code_pol) {
+            case '1':
+                $payment_state_id = 4;
+                break;
+            case '4':
+                $payment_state_id = 3;
+                break;
+            case '20':
+                $payment_state_id = 2;
+                break;
+            default:
+                $payment_state_id = 3;  
+            }
+
+        $order->update([
+            'payment_state_id' => $payment_state_id
+        ]);
+            
         $pse = is_null($request->pse_bank) ? 0 : 1;
 
         Billing::where('order_id', $order->id)
