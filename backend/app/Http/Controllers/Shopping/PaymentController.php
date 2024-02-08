@@ -148,7 +148,8 @@ class PaymentController extends Controller
                ->update([
                     'pse' => $pse,
                     'card_number' => ($pse === 0) ? $request->cc_number : null,
-                    'card_name' => ($pse === 0) ? $request->cc_holder : null
+                    'card_name' => ($pse === 0) ? $request->cc_holder : null,
+                    'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null
                 ]);
 
         return response()->json([

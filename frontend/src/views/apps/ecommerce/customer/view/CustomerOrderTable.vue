@@ -99,12 +99,12 @@ const resolveStatusPayment = shipping_state_id => {
       <!-- 👉 table head -->
       <thead>
         <tr>
-          <th scope="col"> #ID </th>
+          <th scope="col"> REFERENCIA </th>
           <th scope="col"> FECHA </th>
           <th scope="col"> ESTADO DEL ENVÍO</th>
           <th scope="col"> ESTADO DEL PAGO</th>
           <th scope="col"> VENTA </th>
-          <th scope="col" v-if="$can('editar', 'ordenes') || $can('eliminar', 'ordenes')">
+          <th scope="col" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
             ACCIONES
           </th>
         </tr>
@@ -115,7 +115,7 @@ const resolveStatusPayment = shipping_state_id => {
           v-for="order in orders"
           :key="order.id"
           style="height: 3.75rem;">
-          <td> #{{ order.id }} </td>
+          <td> {{ order.reference_code }} </td>
           <td> {{ order.date }} </td>
           <td> 
             <VChip
@@ -138,7 +138,7 @@ const resolveStatusPayment = shipping_state_id => {
             COP {{ formatNumber(order.total) }} 
           </td>
           <!-- 👉 Acciones -->
-          <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'ordenes') || $can('eliminar', 'ordenes')">      
+          <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">      
             <VBtn
               v-if="$can('ver', 'ordenes')"
               icon
@@ -156,23 +156,6 @@ const resolveStatusPayment = shipping_state_id => {
                 icon="tabler-eye"
                 class="me-1"
               />
-            </VBtn> 
-            <VBtn
-              v-if="$can('editar', 'ordenes')"
-              icon
-              size="x-small"
-              color="default"
-              variant="text"
-              @click="editClient(client)">
-              <VTooltip
-                open-on-focus
-                location="top"
-                activator="parent">
-                Editar
-              </VTooltip>
-              <VIcon
-                size="22"
-                icon="tabler-edit" />
             </VBtn>
             <VBtn
               v-if="$can('eliminar','ordenes')"

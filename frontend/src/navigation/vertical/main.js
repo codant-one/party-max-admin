@@ -13,6 +13,13 @@ export default [
         to: 'dashboard-admin-clients', 
         action: 'ver' , 
         subject: 'clientes', 
+    },
+    {
+        title: 'Órdenes', 
+        icon: { icon: 'tabler-clipboard-list' },
+        to: 'dashboard-admin-orders', 
+        action: 'ver' , 
+        subject: 'ordenes', 
     }
 ]
   
