@@ -113,7 +113,7 @@ class PaymentController extends Controller
         Log::info('Solicitud de confirmación de PayU recibida: ');
         Log::info($request->all());
 
-        $order = Order::where('transaction_id', $request->transaction_id)->first();
+        $order = Order::where('reference_code', $request->reference_sale)->first();
 
         if (!$order)
             return response()->json([
