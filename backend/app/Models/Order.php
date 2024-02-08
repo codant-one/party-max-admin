@@ -70,6 +70,10 @@ class Order extends Model
             'total' => $request->total, 
         ]);
 
+        $order->update([
+            'reference_code' => 'PARTYMAX-'.$request->client_id.'-'.$order->id
+        ]);
+
         //Order_details
         foreach ($request->product_color_id as $index => $productColorId) {
             $detail = OrderDetail::create([
@@ -115,8 +119,7 @@ class Order extends Model
     public static function updatePaymentState($request, $order) {
  
         $order->update([
-            'payment_state_id' => $request->payment_state_id,
-            'reference_code' => $request->reference_code
+            'payment_state_id' => $request->payment_state_id
         ]);      
     
         return $order;

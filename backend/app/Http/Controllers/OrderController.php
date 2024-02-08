@@ -176,9 +176,6 @@ class OrderController extends Controller
                     'required',
                     'integer',
                     'exists:App\Models\PaymentState,id'
-                ],
-                'reference_code' => [
-                    'required'
                 ]
             ]);
         
