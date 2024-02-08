@@ -33,6 +33,7 @@ const filename = ref([])
 const filename2 = ref([])
 const filename3 = ref([])
 const filename4 = ref([])
+const fileicon = ref([])
 
 const category_type_id = ref()
 const categoryTypes = ref([
@@ -78,6 +79,9 @@ async function fetchData() {
 
         avatars.value[3] = category.value.banner_4 === null ? '' : themeConfig.settings.urlStorage + category.value.banner_4
         avatarsOld.value[3] = category.value.banner_4 === null ? '' : themeConfig.settings.urlStorage + category.value.banner_4
+
+        avatars.value[4] = category.value.icon_subcategory === null ? '' : themeConfig.settings.urlStorage + category.value.icon_subcategory
+        avatarsOld.value[4] = category.value.icon_subcategory === null ? '' : themeConfig.settings.urlStorage + category.value.icon_subcategory
 
     }
 
@@ -172,6 +176,7 @@ const onSubmit = () => {
             formData.append('banner_2', banners.value[1] ?? null)
             formData.append('banner_3', banners.value[2] ?? null)
             formData.append('banner_4', banners.value[3] ?? null)
+            formData.append('icon_subcategory', banners.value[4] ?? null)
             formData.append('name', name.value)
             formData.append('category_type_id', category_type_id.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
@@ -320,6 +325,17 @@ const onSubmit = () => {
                                         </template>
                                     </VAutocomplete>
                                 </VCol>
+                                <VCol cols="12" md="6">
+                                    <VFileInput
+                                            v-model="filename"
+                                            label="Icono Categoria"
+                                            class="mb-2 me-2"
+                                            accept="image/png, image/jpeg, image/bmp"
+                                            prepend-icon="tabler-camera"
+                                            @change="onImageSelected($event, 4)"
+                                            @click:clear="avatars[4] = avatarsOld[4]"
+                                    />
+                                </VCol>
                             </VRow>
                         </VCardText>
                         <div v-if="category_id === null">
@@ -329,7 +345,7 @@ const onSubmit = () => {
                                     <VCol cols="12"  md="6"></VCol>
                                     <VCol cols="12"  md="3">
                                         <VFileInput
-                                            v-model="filename"
+                                            v-model="fileicon"
                                             label="Banner Principal"
                                             class="mb-2 me-2"
                                             accept="image/png, image/jpeg, image/bmp"
