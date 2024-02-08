@@ -119,7 +119,7 @@ class PaymentController extends Controller
                 'message' => 'Orden no encontrada'
             ], 404);
 
-        switch ($resquest->response_code_pol) {
+        switch ($request->response_code_pol) {
             case '1':
                 $payment_state_id = 4;
                 break;
