@@ -110,8 +110,6 @@ class PaymentController extends Controller
 
     public function confirmation(Request $request): JsonResponse
     {
-
-        $request->request->add(['client_id' => $order->client_id ]);
         $order = Order::where('reference_code', $request->reference_sale)->first();
 
         if (!$order)
@@ -124,6 +122,7 @@ class PaymentController extends Controller
         switch ($request->response_code_pol) {
             case '1':
                 $payment_state_id = 4;
+                $request->request->add(['client_id' => $order->client_id ]);
                 ShoppingCart::deleteAll($request);
                 break;
             case '4':
