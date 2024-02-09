@@ -4,6 +4,7 @@ import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import router from '@/router'
 
 const route = useRoute()
 const ordersStores = useOrdersStores()
@@ -41,6 +42,10 @@ async function fetchData() {
   totalPages.value = ordersStores.last_page
   totalOrders.value = ordersStores.ordersTotalCount
 
+}
+
+const seeOrder = orderData => {
+  router.push({ name : 'dashboard-admin-orders-id', params: { id: orderData.id } })
 }
 
 const resolveStatusShipping = shipping_state_id => {
@@ -117,7 +122,11 @@ const resolveStatusPayment = shipping_state_id => {
           v-for="order in orders"
           :key="order.id"
           style="height: 3.75rem;">
-          <td> {{ order.reference_code }} </td>
+          <td>
+            <span class="font-weight-medium cursor-pointer text-primary" @click="seeOrder(order)">
+              {{ order.reference_code }} 
+            </span>
+          </td>
           <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
           <td> 
             <VChip
@@ -146,7 +155,8 @@ const resolveStatusPayment = shipping_state_id => {
               icon
               variant="text"
               color="default"
-              size="x-small">
+              size="x-small"
+              @click="seeOrder(order)">
               <VTooltip
                 open-on-focus
                 location="top"

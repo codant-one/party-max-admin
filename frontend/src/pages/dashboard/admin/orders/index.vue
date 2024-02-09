@@ -9,6 +9,7 @@ import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
 import mastercard from '@images/cards/mastercard.png'
 import visa from '@images/cards/visa.png'
+import pse from '@images/cards/pse.png'
 
 const ordersStores = useOrdersStores()
 
@@ -93,6 +94,10 @@ async function fetchData() {
 const showDeleteDialog = orderData => {
   isConfirmDeleteDialogVisible.value = true
   selectedOrder.value = { ...orderData }
+}
+
+const seeClient = clientData => {
+  router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
 }
 
 const seeOrder = orderData => {
@@ -312,7 +317,11 @@ const downloadCSV = async () => {
                         :key="order.id"
                         style="height: 3.75rem;">
                         <td> #{{ order.id }} </td>
-                        <td> {{ order.reference_code }} </td>
+                        <td>
+                            <span class="font-weight-medium cursor-pointer text-primary" @click="seeOrder(order)">
+                                {{ order.reference_code }} 
+                            </span>
+                        </td>
                         <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
                         <td class="text-wrap">
                             <div class="d-flex align-center gap-x-3">
@@ -328,7 +337,7 @@ const downloadCSV = async () => {
                                         <span v-else>{{ avatarText(order.client.user.name) }}</span>
                                 </VAvatar>
                                 <div class="d-flex flex-column">
-                                    <span class="font-weight-medium cursor-pointer text-primary">
+                                    <span class="font-weight-medium cursor-pointer text-primary" @click="seeClient(order.client)">
                                         {{ order.client.user.name }} {{ order.client.user.last_name }} 
                                     </span>
                                     <span class="text-sm text-disabled">{{ order.client.user.email }}</span>
@@ -351,43 +360,51 @@ const downloadCSV = async () => {
                             {{ order.payment.name }}
                             </VChip>
                         </td>
-                        <td>
+                        <td :class="order.billing?.pse ? 'px-0' : ''">
                             <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
                                 <VImg
                                     :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
-                                    height="22"
-                                    max-width="22"
-                                    min-width="22"
+                                    height="40"
+                                    max-width="40"
+                                    min-width="40"
                                 />
-                                <div>
+                                <div class="mt-2">
                                     <VIcon
                                         icon="tabler-dots"
-                                        class="me-2"
+                                        class="mt-1"
                                     />
-                                    <span >
-                                        {{ order.billing.card_number }}
+                                    <span class="mt-2">
+                                        {{ order.billing.card_number.replaceAll('*', '').trim() }}
                                     </span>
                                 </div>
                             </div>
+                            <div class="d-flex align-start px-0" v-if="order.billing?.pse === 1">
+                                <VImg
+                                    :src="pse"
+                                    height="65"
+                                    max-width="65"
+                                    min-width="65"
+                                />
+                            </div>
+                            
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">      
-                
+                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
                             <VBtn
                                 v-if="$can('ver', 'ordenes')"
                                 icon
                                 size="x-small"
                                 color="default"
                                 variant="text"
-                                @click="showStateDialog(order, 3)">
+                                @click="seeOrder(order)">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
                                     activator="parent">
-                                    Aprobar
+                                    Ver
                                 </VTooltip>      
                                 <VIcon
                                     size="22"
-                                    icon="mdi-cart-check" />
+                                    icon="tabler-eye" />
                             </VBtn>
 
                             <VBtn
