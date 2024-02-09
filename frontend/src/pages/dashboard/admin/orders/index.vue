@@ -352,9 +352,9 @@ const downloadCSV = async () => {
                             </VChip>
                         </td>
                         <td>
-                            <div class="d-flex align-start gap-x-2" v-if="order.billing.pse === 0">
+                            <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
                                 <VImg
-                                    :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : paypal"
+                                    :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
                                     height="22"
                                     max-width="22"
                                     min-width="22"

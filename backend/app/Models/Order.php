@@ -24,7 +24,7 @@ class Order extends Model
     }
 
     public function billing() {
-        return $this->hasMany(Billing::class, 'order_id', 'id');
+        return $this->hasOne(Billing::class, 'order_id', 'id');
     }
 
     public function client() {
