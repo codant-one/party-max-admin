@@ -298,7 +298,6 @@ const downloadCSV = async () => {
             <v-table class="text-no-wrap">
                 <thead>
                     <tr class="text-no-wrap">
-                        <th> #ID </th>
                         <th> REFERENCIA </th>
                         <th> FECHA </th>
                         <th class="pe-4"> CLIENTE </th>
@@ -316,7 +315,6 @@ const downloadCSV = async () => {
                         v-for="order in orders"
                         :key="order.id"
                         style="height: 3.75rem;">
-                        <td> #{{ order.id }} </td>
                         <td>
                             <span class="font-weight-medium cursor-pointer text-primary" @click="seeOrder(order)">
                                 {{ order.reference_code }} 
@@ -354,8 +352,8 @@ const downloadCSV = async () => {
                         </td>
                         <td> 
                             <VChip
-                            label
-                            :color="resolveStatusPayment(order.payment.id)?.color"
+                                label
+                                :color="resolveStatusPayment(order.payment.id)?.color"
                             >
                             {{ order.payment.name }}
                             </VChip>
