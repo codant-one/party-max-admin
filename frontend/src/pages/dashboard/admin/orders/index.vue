@@ -1,33 +1,26 @@
 <script setup>
 
-import { useClientsStores } from '@/stores/useClients'
-import { useCountriesStores } from '@/stores/useCountries'
-import { useProvincesStores } from '@/stores/useProvinces'
-import { useGendersStores } from '@/stores/useGenders'
+import { useOrdersStores } from '@/stores/useOrders'
 import { excelParser } from '@/plugins/csv/excelParser'
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
-// import AddNewClientDrawer from './AddNewClientDrawer.vue' 
 import router from '@/router'
+import mastercard from '@images/cards/mastercard.png'
+import visa from '@images/cards/visa.png'
 
-const clientsStores = useClientsStores()
-const countriesStores = useCountriesStores()
-const provincesStores = useProvincesStores()
-const gendersStores = useGendersStores()
+const ordersStores = useOrdersStores()
 
-const clients = ref([])
+const orders = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalClients = ref(0)
+const totalOrders = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewClientDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
-const selectedClient = ref({})
-const listCountries = ref([])
-const listProvinces = ref([])
-const listGenders = ref([])
+const selectedOrder = ref({})
 
 const advisor = ref({
   type: '',
@@ -35,40 +28,42 @@ const advisor = ref({
   show: false
 })
 
+const widgetData = ref([
+  {
+    title: 'Pending Payment',
+    value: 56,
+    icon: 'tabler-calendar-stats',
+  },
+  {
+    title: 'Unfulfilled',
+    value: 25,
+    icon: 'tabler-circle-x',
+  },
+  {
+    title: 'Completed',
+    value: 12689,
+    icon: 'tabler-checks',
+  },
+  {
+    title: 'Refunded',
+    value: 124,
+    icon: 'tabler-wallet',
+  },
+])
+
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = clients.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = clients.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = orders.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = orders.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalClients.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
 })
 
-const loadCountries = () => {
-  listCountries.value = countriesStores.getCountries
-}
-
-const loadProvinces = () => {
-  listProvinces.value = provincesStores.getProvinces
-}
-
-const loadGenders = () => {
-  listGenders.value = gendersStores.getGenders
-}
 
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
-
-    if (!isAddNewClientDrawerVisible.value)
-        selectedClient.value = {}
-})
-
-onMounted(async () => {
-
-  await countriesStores.fetchCountries()
-
-  loadCountries()
 })
 
 watchEffect(fetchData)
@@ -85,44 +80,33 @@ async function fetchData() {
 
   isRequestOngoing.value = true
 
-  await clientsStores.fetchClients(data)
+  await ordersStores.fetchOrders(data)
 
-  clients.value = clientsStores.getClients
-  totalPages.value = clientsStores.last_page
-  totalClients.value = clientsStores.clientsTotalCount
-
-  await provincesStores.fetchProvinces()
-  loadProvinces()
-  
-  await gendersStores.fetchGenders()
-  loadGenders()
+  orders.value = ordersStores.getOrders
+  totalPages.value = ordersStores.last_page
+  totalOrders.value = ordersStores.ordersTotalCount
 
   isRequestOngoing.value = false
 }
 
-const editClient = clientData => {
-    isAddNewClientDrawerVisible.value = true
-    selectedClient.value = { ...clientData }
-}
 
-
-const showDeleteDialog = clientData => {
+const showDeleteDialog = orderData => {
   isConfirmDeleteDialogVisible.value = true
-  selectedClient.value = { ...clientData }
+  selectedOrder.value = { ...orderData }
 }
 
-const seeClient = clientData => {
-  router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
+const seeOrder = orderData => {
+  router.push({ name : 'dashboard-admin-orders-id', params: { id: orderData.id } })
 }
 
-const removeClient = async () => {
+const removeOrder = async () => {
   isConfirmDeleteDialogVisible.value = false
-  let res = await clientsStores.deleteClient(selectedClient.value.id)
-  selectedClient.value = {}
+  let res = await ordersStores.deleteOrder(selectedOrder.value.id)
+  selectedOrder.value = {}
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Cliente eliminado!' : res.data.message,
+    message: res.data.success ? 'Órden eliminada!' : res.data.message,
     show: true
   }
 
@@ -139,81 +123,26 @@ const removeClient = async () => {
   return true
 }
 
-const submitForm = async (client, method) => {
-  isRequestOngoing.value = true
-
-  if (method === 'update') {
-    client.data.append('_method', 'PUT')
-    submitUpdate(client)
-    return
-  }
-
-  submitCreate(client.data)
+const resolveStatusShipping = shipping_state_id => {
+  if (shipping_state_id === 1)
+    return { color: 'error' }
+  if (shipping_state_id === 2)
+    return { color: 'warning' }
+  if (shipping_state_id === 3)
+    return { color: 'info' }
+  if (shipping_state_id === 4)
+    return { color: 'success' }
 }
 
-
-const submitCreate = clientData => {
-
-    clientsStores.addClient(clientData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'Cliente creado! ' + res.data.email_response,
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
-}
-
-const submitUpdate = clientData => {
-
-    clientsStores.updateClient(clientData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'Cliente actualizado!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
+const resolveStatusPayment = shipping_state_id => {
+  if (shipping_state_id === 1)
+    return { color: 'error' }
+  if (shipping_state_id === 2)
+    return { color: 'default' }
+  if (shipping_state_id === 3)
+    return { color: 'warning' }
+  if (shipping_state_id === 4)
+    return { color: 'info' }
 }
 
 const downloadCSV = async () => {
@@ -222,308 +151,293 @@ const downloadCSV = async () => {
 
   let data = { limit: -1 }
 
-  await clientsStores.fetchClients(data)
+  await ordersStores.fetchOrders(data)
 
   let dataArray = [];
       
-  clientsStores.getClients.forEach(element => {
+  ordersStores.getOrders.forEach(element => {
 
     let data = {
       ID: element.id,
       NOMBRE: element.user.name,
       APELLIDO: element.user.last_name ?? '',
-      USUARIO: element.user.username,
-      PAÍS:  element.user.user_detail.province.country.name
+      USUARIO: element.user.username
     }
           
     dataArray.push(data)
   })
 
   excelParser()
-    .exportDataFromJSON(dataArray, "clients", "csv");
+    .exportDataFromJSON(dataArray, "orders", "csv");
 
   isRequestOngoing.value = false
 
-}
-
-const getFlagCountry = country => {
-  let val = listCountries.value.find(item => {
-    return item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === country.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-  })
-
-  if(val)
-    return 'https://hatscripts.github.io/circle-flags/flags/'+val.iso.toLowerCase()+'.svg'
-  else
-    return ''
 }
 </script>
 
 <template>
   <section>
-    <v-row>
-      <VDialog
-        v-model="isRequestOngoing"
-        width="300"
-        persistent>
-          
-        <VCard
-          color="primary"
-          width="300">
+    <div>
+        <VDialog
+            v-model="isRequestOngoing"
+            width="300"
+            persistent>
             
-          <VCardText class="pt-3">
-            Cargando
+            <VCard
+            color="primary"
+            width="300">
+                
+            <VCardText class="pt-3">
+                Cargando
 
-            <VProgressLinear
-              indeterminate
-              color="white"
-              class="mb-0"/>
-          </VCardText>
+                <VProgressLinear
+                indeterminate
+                color="white"
+                class="mb-0"/>
+            </VCardText>
+            </VCard>
+        </VDialog>
+
+        <VCard class="mb-6">
+            <!-- 👉 Widgets  -->
+            <VCardText>
+                <VRow>
+                    <template
+                        v-for="(data, id) in widgetData"
+                        :key="id"
+                    >
+                        <VCol cols="12" sm="6" md="3" class="px-6">
+                            <div
+                                class="d-flex justify-space-between"
+                                :class="$vuetify.display.xs
+                                ? 'product-widget'
+                                : $vuetify.display.sm
+                                    ? id < 2 ? 'product-widget' : ''
+                                    : ''"
+                            >
+                                <div class="d-flex flex-column gap-y-1">
+                                    <h4 class="text-h4">
+                                        {{ data.value }}
+                                    </h4>
+
+                                    <h6 class="text-h6">
+                                        {{ data.title }}
+                                    </h6>
+                                </div>
+
+                                <VAvatar
+                                    variant="tonal"
+                                    rounded
+                                    size="38"
+                                >
+                                    <VIcon
+                                        :icon="data.icon"
+                                        size="28"
+                                    />
+                                </VAvatar>
+                            </div>
+                        </VCol>
+                        <VDivider
+                            v-if="$vuetify.display.mdAndUp ? id !== widgetData.length - 1
+                                : $vuetify.display.smAndUp ? id % 2 === 0
+                                : false"
+                            vertical
+                            inset
+                            length="55"
+                        />
+                    </template>
+                </VRow>
+            </VCardText>
         </VCard>
-      </VDialog>
+      
+        <!-- 👉 orders -->
+        <VCard
+            title="Órdenes"
+            class="mb-6" >
 
-      <v-col cols="12">
-        <v-alert
-          v-if="advisor.show"
-          :type="advisor.type"
-          class="mb-6">
-            
-          {{ advisor.message }}
-        </v-alert>
-
-        <v-card title="">
-          <v-card-text class="d-flex flex-wrap py-4 gap-4">
-            <div
-              class="me-3"
-              style="width: 80px;">
-              
-              <VSelect
-                v-model="rowPerPage"
-                density="compact"
-                variant="outlined"
-                :items="[10, 20, 30, 50]"/>
-            </div>
-
-            <div class="d-flex align-center">
-              <VBtn
-                variant="tonal"
-                color="secondary"
-                prepend-icon="tabler-file-export"
-                @click="downloadCSV">
-                Exportar
-              </VBtn>
-            </div>
-
-            <v-spacer />
-
-            <div class="d-flex align-center flex-wrap gap-4">
-              <!-- 👉 Search  -->
-              <div class="search">
-                <v-text-field
-                  v-model="searchQuery"
-                  placeholder="Buscar"
-                  density="compact"/>
-              </div>
-
-              <!-- 👉 Add user button -->
-              <v-btn
-                v-if="$can('crear','clientes')"
-                prepend-icon="tabler-plus"
-                @click="isAddNewClientDrawerVisible = true">
-                  Agregar Cliente
-              </v-btn>
-            </div>
-          </v-card-text>
-
-          <v-divider />
-
-          <v-table class="text-no-wrap">
-            <!-- 👉 table head -->
-            <thead>
-              <tr>
-                <th scope="col"> #ID </th>
-                <th scope="col"> NOMBRE </th>
-                <th scope="col"> USUARIO </th>
-                <th scope="col"> PAÍS </th>
-                <th scope="col"> PEDIDOS </th>
-                <th scope="col"> TOTAL VENTAS </th>
-                <th scope="col" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">
-                  ACCIONES
-                </th>
-              </tr>
-            </thead>
-            <!-- 👉 table body -->
-            <tbody>
-              <tr 
-                v-for="client in clients"
-                :key="client.id"
-                style="height: 3.75rem;">
-
-                <td> {{ client.id }} </td>
-                <td class="text-wrap">
-                  <div class="d-flex align-center gap-x-3">
-                    <VAvatar
-                      variant="tonal"
-                      size="38"
-                      >
-                      <VImg
-                        v-if="client.user.avatar"
-                        style="border-radius: 50%;"
-                        :src="themeConfig.settings.urlStorage + client.user.avatar"
-                      />
-                        <span v-else>{{ avatarText(client.user.name) }}</span>
-                    </VAvatar>
-                    <div class="d-flex flex-column">
-                      <span class="font-weight-medium cursor-pointer text-primary" @click="seeClient(client)">
-                        {{ client.user.name }} {{ client.user.last_name }} 
-                      </span>
-                      <span class="text-sm text-disabled">{{ client.user.email }}</span>
-                    </div>
-                  </div>
-                </td>
-                <td class="text-wrap"> {{ client.user.username }} </td>
-                <td class="text-wrap"> 
-                  <VAvatar
-                    start
-                    size="25"
-                    :image="getFlagCountry(client.user.user_detail.province.country.name)"
-                  />
-                  <span class="text-body-2 ms-2">
-                    {{ client.user.user_detail.province.country.name }} 
-                  </span>
-                </td>
-                <td>
-                  {{ client.orders_count }}
-                </td>
-                <td>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">$ {{ formatNumber(client.sales) ?? '0.00' }}</span>
-                </td>
-                <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">      
-                  <VBtn
-                    v-if="$can('ver', 'clientes')"
-                    icon
-                    variant="text"
-                    color="default"
-                    size="x-small"
-                    @click="seeClient(client)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Ver
-                    </VTooltip>
-                    <VIcon
-                      size="28"
-                      icon="tabler-eye"
-                      class="me-1"
+            <div class="d-flex flex-wrap gap-4 mx-5">
+                <div class="d-flex align-center">
+                    <!-- 👉 Search  -->
+                    <AppTextField
+                        v-model="searchQuery"
+                        placeholder="Buscar"
+                        density="compact"
+                        style="inline-size: 700px;"
+                        class="me-3"
                     />
-                  </VBtn> 
-                  <VBtn
-                    v-if="$can('editar', 'clientes')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="editClient(client)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Editar
-                    </VTooltip>
-                    <VIcon
-                        size="22"
-                        icon="tabler-edit" />
-                  </VBtn>
+                </div>
 
-                  <VBtn
-                    v-if="$can('eliminar','clientes')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="showDeleteDialog(client)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Eliminar
-                    </VTooltip>   
-                    <VIcon
-                      size="22"
-                      icon="tabler-trash" />
-                  </VBtn>
-                </td>
-              </tr>
-            </tbody>
-            <!-- 👉 table footer  -->
-            <tfoot v-show="!clients.length">
-              <tr>
-                <td
-                  colspan="7"
-                  class="text-center">
-                  Datos no disponibles
-                </td>
-              </tr>
-            </tfoot>
-          </v-table>
+                <VSpacer />
+
+                <div class="d-flex gap-4 flex-wrap align-center">
+                    <AppSelect
+                        v-model="rowPerPage"
+                        :items="[5, 10, 20, 25, 50]"
+                    />
+                    <!-- 👉 Export button -->
+                    <VBtn
+                        variant="tonal"
+                        color="secondary"
+                        prepend-icon="tabler-file-export"
+                        @click="downloadCSV"
+                    >
+                        Exportar
+                    </VBtn>
+                </div>
+            </div>
+
+            <VDivider class="mt-4" />
+
+            <!-- 👉 Datatable  -->
+
+            <v-table class="text-no-wrap">
+                <thead>
+                    <tr class="text-no-wrap">
+                        <th> #ID </th>
+                        <th> REFERENCIA </th>
+                        <th> FECHA </th>
+                        <th class="pe-4"> CLIENTE </th>
+                        <th class="pe-4"> ESTADO DEL ENVÍO </th>
+                        <th class="pe-4"> ESTADO DEL PAGO </th>
+                        <th class="pe-4"> MÉTODO </th>
+                  
+                        <th scope="pe-4" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
+                            ACCIONES
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="order in orders"
+                        :key="order.id"
+                        style="height: 3.75rem;">
+                        <td> #{{ order.id }} </td>
+                        <td> {{ order.reference_code }} </td>
+                        <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
+                        <td class="text-wrap">
+                            <div class="d-flex align-center gap-x-3">
+                                <VAvatar
+                                    variant="tonal"
+                                    size="38"
+                                >
+                                    <VImg
+                                        v-if="order.client.user.avatar"
+                                        style="border-radius: 50%;"
+                                        :src="themeConfig.settings.urlStorage + order.client.user.avatar"
+                                    />
+                                        <span v-else>{{ avatarText(order.client.user.name) }}</span>
+                                </VAvatar>
+                                <div class="d-flex flex-column">
+                                    <span class="font-weight-medium cursor-pointer text-primary">
+                                        {{ order.client.user.name }} {{ order.client.user.last_name }} 
+                                    </span>
+                                    <span class="text-sm text-disabled">{{ order.client.user.email }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td> 
+                            <li
+                                :class="`text-${resolveStatusShipping(order.shipping.id)?.color}`"
+                                class="font-weight-medium"
+                            >
+                                {{ order.shipping.name }}
+                            </li>
+                        </td>
+                        <td> 
+                            <VChip
+                            label
+                            :color="resolveStatusPayment(order.payment.id)?.color"
+                            >
+                            {{ order.payment.name }}
+                            </VChip>
+                        </td>
+                        <td>
+                            <div class="d-flex align-start gap-x-2" v-if="order.billing.pse === 0">
+                                <VImg
+                                    :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : paypal"
+                                    height="22"
+                                    max-width="22"
+                                    min-width="22"
+                                />
+                                <div>
+                                    <VIcon
+                                        icon="tabler-dots"
+                                        class="me-2"
+                                    />
+                                    <span >
+                                        {{ order.billing.card_number }}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">      
+                
+                            <VBtn
+                                v-if="$can('ver', 'ordenes')"
+                                icon
+                                size="x-small"
+                                color="default"
+                                variant="text"
+                                @click="showStateDialog(order, 3)">
+                                <VTooltip
+                                    open-on-focus
+                                    location="top"
+                                    activator="parent">
+                                    Aprobar
+                                </VTooltip>      
+                                <VIcon
+                                    size="22"
+                                    icon="mdi-cart-check" />
+                            </VBtn>
+
+                            <VBtn
+                                v-if="$can('eliminar','ordenes')"
+                                icon
+                                size="x-small"
+                                color="default"
+                                variant="text"
+                                @click="showDeleteDialog(order)">
+                                <VTooltip
+                                    open-on-focus
+                                    location="top"
+                                    activator="parent">
+                                    Eliminar
+                                </VTooltip>  
+                                <VIcon
+                                    size="22"
+                                    icon="tabler-trash" />
+                            </VBtn>
+                        </td>
+                    </tr>
+                </tbody>
+                <!-- 👉 table footer  -->
+                <tfoot v-show="!orders.length">
+                    <tr>
+                        <td
+                        colspan="8"
+                        class="text-center">
+                        Datos no disponibles
+                        </td>
+                    </tr>
+                </tfoot>
+            </v-table>
         
-          <v-divider />
+            <v-divider />
 
-          <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-            <span class="text-sm text-disabled">
-              {{ paginationData }}
-            </span>
+            <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
+                <span class="text-sm text-disabled">
+                {{ paginationData }}
+                </span>
 
-            <VPagination
-              v-model="currentPage"
-              size="small"
-              :total-visible="5"
-              :length="totalPages"/>
-          
-          </VCardText>
-        </v-card>
-      </v-col>
-    </v-row>
-    <!-- 👉 Add New Client -->
-    <!-- <AddNewClientDrawer
-      v-if="listProvinces.length > 0"
-      v-model:isDrawerOpen="isAddNewClientDrawerVisible"
-      :client="selectedClient"
-      :countries="listCountries"
-      :provinces="listProvinces"
-      :genders="listGenders"
-      @client-data="submitForm"/> -->
-
-    <!-- 👉 Confirm Delete -->
-    <VDialog
-      v-model="isConfirmDeleteDialogVisible"
-      persistent
-      class="v-dialog-sm" >
-      <!-- Dialog close btn -->
-        
-      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
-
-      <!-- Dialog Content -->
-      <VCard title="Eliminar Cliente">
-        <VDivider class="mt-4"/>
-        <VCardText>
-          Está seguro de eliminar el Cliente <strong>{{ selectedClient.user.name }}</strong>?.
-        </VCardText>
-
-        <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn
-            color="secondary"
-            variant="tonal"
-            @click="isConfirmDeleteDialogVisible = false">
-              Cancelar
-          </VBtn>
-          <VBtn @click="removeClient">
-              Aceptar
-          </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
+                <VPagination
+                    v-model="currentPage"
+                    size="small"
+                    :total-visible="5"
+                    :length="totalPages"/>
+            
+            </VCardText>
+        </VCard>
+    </div>
   </section>
 </template>
 
@@ -541,5 +455,5 @@ const getFlagCountry = country => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: clientes
+    subject: ordenes
 </route>

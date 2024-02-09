@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\OrderDetail;
 use App\Models\ShippingState; 
 use App\Models\PaymentState;
+use App\Models\Client;
 
 class Order extends Model
 {
@@ -24,6 +25,10 @@ class Order extends Model
 
     public function billing() {
         return $this->hasMany(Billing::class, 'order_id', 'id');
+    }
+
+    public function client() {
+        return $this->belongsTo(Client::class, 'client_id', 'id');
     }
 
     public function shipping() {

@@ -2,6 +2,8 @@
 
 import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const route = useRoute()
 const ordersStores = useOrdersStores()
@@ -116,7 +118,7 @@ const resolveStatusPayment = shipping_state_id => {
           :key="order.id"
           style="height: 3.75rem;">
           <td> {{ order.reference_code }} </td>
-          <td> {{ order.date }} </td>
+          <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
           <td> 
             <VChip
               label

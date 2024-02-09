@@ -12,7 +12,7 @@ const isMobile = ref(false)
 
 const widgetData = ref([
   {
-    title: 'In-Store Sales',
+    title: 'Ventas',
     value: '$5,345.43',
     icon: 'tabler-home',
     desc: '5k orders',
@@ -32,7 +32,7 @@ const widgetData = ref([
     desc: '6k orders',
   },
   {
-    title: 'Afiliados',
+    title: 'Proveedores',
     value: '$8,345.23',
     icon: 'tabler-wallet',
     desc: '150 orders',
@@ -418,24 +418,7 @@ const downloadCSV = async () => {
                                 label
                             />
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">      
-                            <!-- <VBtn
-                                v-if="$can('editar', 'productos')"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="editProduct(product)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Editar
-                                </VTooltip>
-                                <VIcon
-                                    size="22"
-                                    icon="tabler-edit" />
-                            </VBtn> -->
+                        <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
                             <VBtn
                                 v-if="$can('aprobar', 'productos')"
                                 icon
