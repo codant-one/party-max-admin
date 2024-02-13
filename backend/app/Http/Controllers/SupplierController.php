@@ -124,7 +124,7 @@ class SupplierController extends Controller
                 'success' => true,
                 'email_response' => $responseMail,
                 'data' => [ 
-                    'supplier' => Supplier::with(['user.userDetail.province.country', 'gender'])->find($supplier->id)
+                    'supplier' => Supplier::with(['user.userDetail.province.country', 'gender','document'])->find($supplier->id)
                 ]
             ]);
 

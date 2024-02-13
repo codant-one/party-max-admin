@@ -49,6 +49,9 @@ const address = ref('')
 const birthday = ref('')
 const gender_id = ref('')
 const password = ref('')
+const nit = ref('')
+const rut = ref('')
+const bank_account = ref('')
 const passwordConfirmation = ref()
 const isNewPasswordVisible = ref(false) 
 const isConfirmPasswordVisible = ref(false)
@@ -152,6 +155,9 @@ const closeNavigationDrawer = () => {
     address.value = null
     birthday.value = null
     gender_id.value = null
+    nit.value = null
+    rut.value = null
+    bank_account.value = null
     supplier_country_id.value = null
     province_id.value = null
     password.value = null
@@ -181,6 +187,9 @@ const onSubmit = () => {
       formData.append('birthday', birthday.value)
       formData.append('gender_id', gender_id.value)
       formData.append('province_id', province_id.value)
+      formData.append('nit', nit.value)
+      formData.append('rut', rut.value)
+      formData.append('bank_account', bank_account.value)
       formData.append('is_supplier', true)
 
       emit('supplierData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
@@ -373,6 +382,30 @@ const getFlagCountry = country => {
                   :rules="[requiredValidator]"
                   :items="getGenders"
                   :menu-props="{ maxHeight: '200px' }"
+                />
+              </VCol>
+
+              <!-- 👉 NIT -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="nit"
+                  label="NIT"
+                />
+              </VCol>
+
+               <!-- 👉 RUT -->
+               <VCol cols="6">
+                <VTextField
+                  v-model="rut"
+                  label="RUT"
+                />
+              </VCol>
+
+              <!-- 👉 RUT -->
+              <VCol cols="6">
+                <VTextField
+                  v-model="bank_account"
+                  label="Nro Cuenta bancaria"
                 />
               </VCol>
 

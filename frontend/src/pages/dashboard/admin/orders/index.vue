@@ -320,7 +320,10 @@ const downloadCSV = async () => {
                                 {{ order.reference_code }} 
                             </span>
                         </td>
+                       
                         <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
+                       
+                        
                         <td class="text-wrap">
                             <div class="d-flex align-center gap-x-3">
                                 <VAvatar

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\User;
 use App\Models\Address;
+use App\Models\Document;
 
 use Illuminate\Support\Str;
 
@@ -29,6 +30,11 @@ class Supplier extends Model
 
     public function user() {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function document()
+    {
+        return $this->hasOne(Document::class, 'id', 'document_id');
     }
 
     /**** Scopes ****/
@@ -75,9 +81,11 @@ class Supplier extends Model
     public static function createSupplier($request) {
         $user = User::createUser($request);
         $user->assignRole('Proveedor');
+        $document = Document::createDocument($request);
 
         $supplier = self::create([
             'user_id' => $user->id,
+            'document_id'=> $document->id,
             'gender_id' => $request->gender_id,
             'birthday' => date('Y-m-d', strtotime($request->birthday) ),
             'slug' => Str::slug($user->name),
