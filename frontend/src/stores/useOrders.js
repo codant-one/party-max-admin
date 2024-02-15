@@ -46,6 +46,20 @@ export const useOrdersStores = defineStore('orders', {
                 })
             
         },
+        showOrder(id) {
+            this.setLoading(true)
+
+            return Orders.show(id)
+                .then((response) => {
+                    if(response.data.success)
+                        return Promise.resolve(response.data.data.order)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         updateOrder(data) {
             this.setLoading(true)
             

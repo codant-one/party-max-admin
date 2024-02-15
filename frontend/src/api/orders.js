@@ -9,6 +9,10 @@ class Orders {
     create(data) {
         return axios.post('/orders', data)
     }
+    
+    show(id) {
+        return axios.get(`/orders/${id}`)
+    }
 
     update(data) {
         return axios.post(`/orders/${data.id}`, data.data)
