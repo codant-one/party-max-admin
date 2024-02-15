@@ -37,7 +37,6 @@ export const useSuppliersStores = defineStore('suppliers', {
 
             return Suppliers.create(data)
                 .then((response) => {
-                    this.suppliers.push(response.data.data.supplier)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -65,8 +64,6 @@ export const useSuppliersStores = defineStore('suppliers', {
             
             return Suppliers.update(data)
                 .then((response) => {
-                    let pos = this.suppliers.findIndex((item) => item.id === response.data.data.supplier.id)
-                    this.suppliers[pos] = response.data.data.supplier
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))

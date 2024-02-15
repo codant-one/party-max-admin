@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('type_documents', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('documents', function (Blueprint $table) {
+            $table->dropColumn('file_account');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('type_documents');
+        Schema::table('documents', function (Blueprint $table) {
+            $table->string('file_account')->nullable();
+        });
     }
 };

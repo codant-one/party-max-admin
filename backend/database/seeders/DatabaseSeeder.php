@@ -42,7 +42,9 @@ class DatabaseSeeder extends Seeder
             AddressSeeder::class,
 
             OrderSeeder::class,
-            SupplierSeeder::class
+            SupplierSeeder::class,
+
+            DocumentTypeSeeder::class
         ]);
 
     }

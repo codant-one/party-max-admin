@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('suppliers', function (Blueprint $table) {
-
-            $table->string('company_name')->nullable()->after('id');
+            $table->string('company_name')->nullable()->after('gender_id');
             $table->string('phone_contact')->nullable()->after('birthday');
             $table->unsignedBigInteger('gender_id')->nullable()->change();
-
         });
     }
 
@@ -26,11 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('suppliers', function (Blueprint $table) {
-
             $table->dropColumn('company_name');
             $table->dropColumn('phone_contact');
             $table->dropColumn('gender_id');
-
         });
     }
 };

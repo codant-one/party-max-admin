@@ -9,7 +9,7 @@ use App\Models\Supplier;
 use App\Models\ProductLike;
 
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Str;
 /**
  * Trait for models with stores
  */
@@ -60,7 +60,7 @@ trait UserHelper
         $user = self::create([
             'name' => $request->name,
             'last_name' =>  $request->last_name,
-            'username' => $request->username,
+            'username' => Str::slug($request->name . ' ' . $request->last_name),
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
@@ -78,7 +78,7 @@ trait UserHelper
         $user->update([
             'name' => $request->name,
             'last_name' =>  $request->last_name,
-            'username' => $request->username,
+            'username' => Str::slug($request->name . ' ' . $request->last_name),
             'email' => $request->email
         ]);
 

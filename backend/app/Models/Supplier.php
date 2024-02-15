@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Document;
-
-use Illuminate\Support\Str;
+use App\Models\SupplierAccount;
 
 class Supplier extends Model
 {
@@ -81,25 +80,28 @@ class Supplier extends Model
     public static function createSupplier($request) {
         $user = User::createUser($request);
         $user->assignRole('Proveedor');
+
         $document = Document::createDocument($request);
 
         $supplier = self::create([
             'user_id' => $user->id,
             'document_id'=> $document->id,
-            'gender_id' => $request->gender_id,
-            'birthday' => date('Y-m-d', strtotime($request->birthday) ),
-            'slug' => Str::slug($user->name),
-            'about_us' => $request->about_us
+            'company_name' => $request->company_name,
+            'phone_contact' => $request->phone_contact,
+            'slug' => Str::slug($user->company_name)
         ]);
+
+        SupplierAccount::createSupplierAccount($request, $supplier->id);
         
         return $supplier;
     }
 
     public static function updateSupplier($request, $supplier) {
         $supplier->update([
-            'gender_id' => $request->gender_id,
-            'birthday' => date('Y-m-d', strtotime($request->birthday) ),
-            'about_us' => $request->about_us
+            'document_id'=> $document->id,
+            'company_name' => $request->company_name,
+            'phone_contact' => $request->phone_contact,
+            'slug' => Str::slug($user->company_name)
         ]);
 
         $user = User::find($supplier->user_id);

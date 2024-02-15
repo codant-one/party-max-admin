@@ -2,18 +2,14 @@
 
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { useCountriesStores } from '@/stores/useCountries'
-import { useProvincesStores } from '@/stores/useProvinces'
-import { useGendersStores } from '@/stores/useGenders'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
 import { avatarText } from '@/@core/utils/formatters'
-import AddNewSupplierDrawer from './AddNewSupplierDrawer.vue' 
+import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 
 const suppliersStores = useSuppliersStores()
 const countriesStores = useCountriesStores()
-const provincesStores = useProvincesStores()
-const gendersStores = useGendersStores()
 
 const suppliers = ref([])
 const searchQuery = ref('')
@@ -22,12 +18,9 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalSuppliers = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewSupplierDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedSupplier = ref({})
 const listCountries = ref([])
-const listProvinces = ref([])
-const listGenders = ref([])
 
 const advisor = ref({
   type: '',
@@ -47,21 +40,10 @@ const loadCountries = () => {
   listCountries.value = countriesStores.getCountries
 }
 
-const loadProvinces = () => {
-  listProvinces.value = provincesStores.getProvinces
-}
-
-const loadGenders = () => {
-  listGenders.value = gendersStores.getGenders
-}
-
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
-
-    if (!isAddNewSupplierDrawerVisible.value)
-        selectedSupplier.value = {}
 })
 
 onMounted(async () => {
@@ -91,17 +73,10 @@ async function fetchData() {
   totalPages.value = suppliersStores.last_page
   totalSuppliers.value = suppliersStores.suppliersTotalCount
 
-  await provincesStores.fetchProvinces()
-  loadProvinces()
-  
-  await gendersStores.fetchGenders()
-  loadGenders()
-
   isRequestOngoing.value = false
 }
 
 const editSupplier = supplierData => {
-    isAddNewSupplierDrawerVisible.value = true
     selectedSupplier.value = { ...supplierData }
 }
 
@@ -290,6 +265,8 @@ const getFlagCountry = country => {
           {{ advisor.message }}
         </v-alert>
 
+        <Toaster />
+
         <v-card title="">
           <v-card-text class="d-flex flex-wrap py-4 gap-4">
             <div
@@ -328,7 +305,7 @@ const getFlagCountry = country => {
               <v-btn
                 v-if="$can('crear','proveedores')"
                 prepend-icon="tabler-plus"
-                @click="isAddNewSupplierDrawerVisible = true">
+                :to="{ name: 'dashboard-admin-suppliers-add' }">
                   Agregar Proveedor
               </v-btn>
             </div>
@@ -423,8 +400,7 @@ const getFlagCountry = country => {
                     icon
                     size="x-small"
                     color="default"
-                    variant="text"
-                    @click="editSupplier(supplier)">
+                    variant="text">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -485,15 +461,6 @@ const getFlagCountry = country => {
         </v-card>
       </v-col>
     </v-row>
-    <!-- 👉 Add New Supplier -->
-    <AddNewSupplierDrawer
-      v-if="listProvinces.length > 0"
-      v-model:isDrawerOpen="isAddNewSupplierDrawerVisible"
-      :supplier="selectedSupplier"
-      :countries="listCountries"
-      :provinces="listProvinces"
-      :genders="listGenders"
-      @supplier-data="submitForm"/>
 
     <!-- 👉 Confirm Delete -->
     <VDialog

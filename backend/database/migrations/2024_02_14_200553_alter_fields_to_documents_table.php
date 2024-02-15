@@ -12,17 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('documents', function (Blueprint $table) {
-            
-            $table->unsignedBigInteger('type_document_id')->nullable()->after('id');
-            $table->string('main_document')->nullable()->after('type_document_id');
+            $table->unsignedBigInteger('document_type_id')->nullable()->after('id');
+            $table->string('main_document')->nullable()->after('document_type_id');
             $table->tinyInteger('type_account')->after('main_document')->default(0);
             $table->string('name_bank')->nullable()->after('type_account');
             $table->string('ncc')->nullable()->after('name_bank');
             $table->dropColumn('nit');
             $table->dropColumn('rut');
 
-            $table->foreign('type_document_id')->references('id')->on('type_documents')->onDelete('cascade');
-
+            $table->foreign('document_type_id')->references('id')->on('document_types')->onDelete('cascade');
         });
     }
 
@@ -32,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('documents', function (Blueprint $table) {
-            $table->dropColumn('type_document_id');
+            $table->dropColumn('document_type_id');
             $table->dropColumn('main_document');
             $table->dropColumn('type_account');
             $table->dropColumn('name_bank');

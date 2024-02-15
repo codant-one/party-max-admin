@@ -10,16 +10,40 @@ use Illuminate\Support\Facades\DB;
 class Document extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
 
     /**** Public methods ****/
-
     public static function createDocument($request) {
         $document = self::create([
-            'nit' => $request->nit,
-            'rut' => $request->rut,
-            'bank_account' => $request->bank_account
+            'document_type_id' => $request->document_type_id,
+            'main_document' => $request->main_document,
+            'ncc' => $request->ncc
         ]);
+
+        if ($request->hasFile('file_nit')) {
+            $file = $request->file('file_nit');
+
+            $path = 'documents/';
+
+            $file_data = uploadFile($file, $path);
+
+            $document->update([
+                'file_nit' => $file_data['filePath']
+            ]);
+        }
+
+        if ($request->hasFile('file_rut')) {
+            $file = $request->file('file_rut');
+
+            $path = 'documents/';
+
+            $file_data = uploadFile($file, $path);
+
+            $document->update([
+                'file_rut' => $file_data['filePath']
+            ]);
+        }
 
         return $document;
     }

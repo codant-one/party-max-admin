@@ -20,7 +20,7 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  genders: {
+  documentTypes: {
     type: Object,
     required: true
   }
@@ -33,6 +33,7 @@ const emit = defineEmits([
 
 const isFormValid = ref(false)
 const refForm = ref()
+const currentTab = ref('tab-1')
 
 const listProvincesByCountry = ref([])
 const id = ref(0)
@@ -41,37 +42,44 @@ const countryOld_id = ref('Colombia')
 const province_id = ref('')
 const name = ref('')
 const last_name = ref('')
-const username = ref('')
-const document = ref('')
+const main_document = ref('')
 const email = ref('')
 const phone = ref('')
 const address = ref('')
-const birthday = ref('')
-const gender_id = ref('')
 const password = ref('')
-const nit = ref('')
-const rut = ref('')
+const company_name = ref('')
+const document_type_id = ref('')
+const file_nit = ref([])
+const file_rut = ref([])
+const file_account = ref([])
+const ncc = ref([])
+const type_account = ref('1')
+const name_bank = ref('')
+const phone_contact = ref('')
 const bank_account = ref('')
 const passwordConfirmation = ref()
 const isNewPasswordVisible = ref(false) 
 const isConfirmPasswordVisible = ref(false)
 const isEdit = ref(false)
 
-const startDateTimePickerConfig = computed(() => {
-  const config = {
-    dateFormat: 'Y-m-d'
-  }
-
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-  const day = String(currentDate.getDate()).padStart(2, '0');
-  const formattedDate = `${year}-${month}-${day}`;
-
-  config.maxDate = formattedDate
-
-  return config
-})
+const accountTypes = [
+  {
+    icon: {
+      icon: 'mdi-cash-multiple',
+      size: '40',
+    },
+    title: 'Cuenta Corriente',
+    value: '1',
+  },
+  {
+    icon: {
+      icon: 'tabler-pig-money',
+      size: '40',
+    },
+    title: 'Cuenta de Ahorros',
+    value: '2',
+  },
+]
 
 const getTitle = computed(() => {
   return isEdit.value ? 'Actualizar Proveedor': 'Agregar Proveedor'
@@ -93,7 +101,6 @@ watchEffect(async() => {
 
   if (!(Object.entries(props.supplier).length === 0) && props.supplier.constructor === Object){
     province_id.value = props.supplier.user.user_detail.province.id ?? ''
-    gender_id.value = props.supplier.gender_id
   }
 
     if (props.isDrawerOpen) {
@@ -104,12 +111,10 @@ watchEffect(async() => {
             id.value = props.supplier.id
             name.value = props.supplier.user.name
             last_name.value = props.supplier.user.last_name
-            username.value = props.supplier.user.username
-            document.value = props.supplier.user.user_detail.document
+            main_document.value = props.supplier.document.main_document
             email.value = props.supplier.user.email
             phone.value = props.supplier.user.user_detail.phone
             address.value = props.supplier.user.user_detail.address
-            birthday.value = props.supplier.birthday
             
             password.value = props.supplier.password
             passwordConfirmation.value = props.supplier.password
@@ -121,20 +126,20 @@ watchEffect(async() => {
     }
 })
 
+const getDocumentTypes = computed(() => {
+  return props.documentTypes.map((documentType) => {
+    return {
+      title: '(' + documentType.code + ') - ' + documentType.name,
+      value: documentType.id,
+    }
+  })
+})
+
 const getProvinces = computed(() => {
   return listProvincesByCountry.value.map((province) => {
     return {
       title: province.name,
       value: province.id,
-    }
-  })
-})
-
-const getGenders = computed(() => {
-  return props.genders.map((gender) => {
-    return {
-      title: gender.name,
-      value: gender.id,
     }
   })
 })
@@ -148,15 +153,14 @@ const closeNavigationDrawer = () => {
 
     name.value = null
     last_name.value = null
-    username.value = null
-    document.value = null
+    main_document.value = null
+    file_nit.value = null
+    file_rut.value = null
+    file_account.value = []
+    type_account.value = '1'
     email.value = null
     phone.value = null
     address.value = null
-    birthday.value = null
-    gender_id.value = null
-    nit.value = null
-    rut.value = null
     bank_account.value = null
     supplier_country_id.value = null
     province_id.value = null
@@ -164,7 +168,7 @@ const closeNavigationDrawer = () => {
     passwordConfirmation.value = null
     isNewPasswordVisible.value = false
     isConfirmPasswordVisible.value = false
-    
+  
     isEdit.value = false 
     id.value = 0
   })
@@ -180,15 +184,10 @@ const onSubmit = () => {
 
       formData.append('name', name.value)
       formData.append('last_name', last_name.value)
-      formData.append('username', username.value)
-      formData.append('document', document.value)
+      formData.append('main_document', main_document.value)
       formData.append('phone', phone.value)
       formData.append('address', address.value)
-      formData.append('birthday', birthday.value)
-      formData.append('gender_id', gender_id.value)
       formData.append('province_id', province_id.value)
-      formData.append('nit', nit.value)
-      formData.append('rut', rut.value)
       formData.append('bank_account', bank_account.value)
       formData.append('is_supplier', true)
 
@@ -219,7 +218,7 @@ const getFlagCountry = country => {
 <template>
   <VNavigationDrawer
     temporary
-    :width="550"
+    :width="700"
     location="end"
     class="scrollable-content"
     :model-value="props.isDrawerOpen"
@@ -260,161 +259,279 @@ const getFlagCountry = country => {
             v-model="isFormValid"
             @submit.prevent="onSubmit"
           >
-            <VRow>
-              <!-- 👉 Name -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="name"
-                  :rules="[requiredValidator]"
-                  label="Nombre"
+            <VTabs
+              v-model="currentTab"
+              grow
+              stacked
+            >
+              <VTab>
+                <VIcon
+                  icon="mdi-domain"
+                  class="mb-2"
                 />
-              </VCol>
+                <span>Empresa</span>
+              </VTab>
 
-              <!-- 👉 Last Name -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="last_name"
-                  :rules="[requiredValidator]"
-                  label="Apellido"
+              <VTab>
+                <VIcon
+                  icon="mdi-bank"
+                  class="mb-2"
                 />
-              </VCol>
+                <span>Datos Bancarios</span>
+              </VTab>
 
-              <!-- 👉 User Name -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="username"
-                  :rules="[requiredValidator]"
-                  label="Usuario"
+              <VTab>
+                <VIcon
+                  icon="mdi-account-tie"
+                  class="mb-2"
                 />
-              </VCol>
+                <span>Contacto</span>
+              </VTab>
+            </VTabs>
 
-              <!-- 👉 Document -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="document"
-                  :rules="[requiredValidator, phoneValidator]"
-                  label="Documento de Identidad"
-                />
-              </VCol>
 
-              <!-- 👉 Email -->
-              <VCol cols="6">
-                <VTextField
-                  :rules="[emailValidator, requiredValidator]"
-                  v-model="email"
-                  label="Email"
-                  :disabled="isEdit"
-                />
-              </VCol>
-
-              <!-- 👉 Phone -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="phone"
-                  :rules="[requiredValidator, phoneValidator]"
-                  label="Teléfono"
-                />
-              </VCol>
-
-              <!-- 👉 Paises -->
-              <VCol cols="6">
-                <VAutocomplete
-                  v-model="supplier_country_id"
-                  label="País"
-                  :rules="[requiredValidator]"
-                  :items="props.countries"
-                  item-title="name"
-                  item-value="name"
-                  :menu-props="{ maxHeight: '200px' }"
-                  @update:model-value="selectCountry"
-                >
-                  <template
-                    v-if="supplier_country_id"
-                    #prepend
-                    >
-                    <VAvatar
-                      start
-                      style="margin-top: -8px;"
-                      size="36"
-                      :image="getFlagCountry(supplier_country_id)"
-                    />
-                  </template>
-                </VAutocomplete>
-              </VCol>
-
-              <!-- 👉 Provincias -->
-              <VCol cols="6">
-                <v-autocomplete
-                  v-model="province_id"
-                  label="Provincias"
-                  :rules="[requiredValidator]"
-                  :items="getProvinces"
-                  :menu-props="{ maxHeight: '200px' }"
-                />
-              </VCol>
-
-              <!-- 👉 Address -->
-              <VCol cols="12">
-                <VTextarea
-                  v-model="address"
-                  rows="4"
-                  label="Dirección"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <!-- 👉 Birthday -->
-               <VCol cols="6" >
-                    <AppDateTimePicker
-                        :key="JSON.stringify(startDateTimePickerConfig)"
-                        v-model="birthday"
+            <VCardText>
+              <VWindow v-model="currentTab">
+                <!-- company -->
+                <VWindowItem>
+                  <VRow>
+                    <!-- Company Name -->
+                    <VCol cols="12">
+                      <VTextField
+                        v-model="company_name"
                         :rules="[requiredValidator]"
-                        label="Fecha de Cumpleaños"
-                        :config="startDateTimePickerConfig"
-                        />
-                </VCol>
+                        label="Empresa"
+                      />
+                    </VCol>
 
-              <!-- 👉 Gender -->
-              <VCol cols="6">
-                <v-autocomplete
-                  v-model="gender_id"
-                  label="Genero"
-                  :rules="[requiredValidator]"
-                  :items="getGenders"
-                  :menu-props="{ maxHeight: '200px' }"
-                />
-              </VCol>
+                    <!-- 👉 Document Types -->
+                    <VCol cols="6">
+                      <VAutocomplete
+                        v-model="document_type_id"
+                        label="Tipo de Documento"
+                        :rules="[requiredValidator]"
+                        :items="getDocumentTypes"
+                        :menu-props="{ maxHeight: '200px' }"
+                      />
+                    </VCol>
 
-              <!-- 👉 NIT -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="nit"
-                  label="NIT"
-                />
-              </VCol>
+                    <!-- 👉 Document -->
+                    <VCol cols="6">
+                      <VTextField
+                        v-model="main_document"
+                        :rules="[requiredValidator, phoneValidator]"
+                        label="Documento"
+                      />
+                    </VCol>
 
-               <!-- 👉 RUT -->
-               <VCol cols="6">
-                <VTextField
-                  v-model="rut"
-                  label="RUT"
-                />
-              </VCol>
+                    <!-- NIT -->
+                    <VCol cols="6">
+                      <VFileInput
+                        label="NIT"
+                        prepend-icon="tabler-paperclip"
+                      >
+                        <template #selection="{ fileNames1 }">
+                          <template
+                            v-for="fileName in fileNames1"
+                            :key="fileName">
+                            <VChip
+                              label
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                              class="me-2">
+                              {{ fileName }}
+                            </VChip>
+                          </template>
+                        </template>
+                      </VFileInput>
+                    </VCol>
 
-              <!-- 👉 RUT -->
-              <VCol cols="6">
-                <VTextField
-                  v-model="bank_account"
-                  label="Nro Cuenta bancaria"
-                />
-              </VCol>
+                    <!-- RUT -->
+                    <VCol cols="6">
+                      <VFileInput
+                        label="RUT"
+                        prepend-icon="tabler-paperclip"
+                      >
+                        <template #selection="{ fileNames2 }">
+                          <template
+                            v-for="fileName in fileNames2"
+                            :key="fileName">
+                            <VChip
+                              label
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                              class="me-2">
+                              {{ fileName }}
+                            </VChip>
+                          </template>
+                        </template>
+                      </VFileInput>
+                    </VCol>
 
+                    <!-- 👉 NCC -->
+                    <VCol cols="12">
+                      <VTextField
+                        v-model="ncc"
+                        :rules="[requiredValidator]"
+                        label="Número de la Cámara de Comercio"
+                      />
+                    </VCol>
+                  </VRow>
+                </VWindowItem>
+                <!-- bank -->
+                <VWindowItem>
+                  <VRow>
+                    <!-- Type Account  -->
+                    <VCol cols="12" class="d-flex">
+                      <CustomRadiosWithIcon
+                        v-model:selected-radio="type_account"
+                        :radio-content="accountTypes"
+                        :grid-column="{ sm: '6', cols: '12' }"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Name Bank-->
+                    <VCol cols="12">
+                      <VTextField
+                        v-model="name_bank"
+                        :rules="[requiredValidator]"
+                        label="Nombre del Banco"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Name Bank-->
+                    <VCol cols="6">
+                      <VTextField
+                        v-model="bank_account"
+                        :rules="[requiredValidator]"
+                        label="Nro. de Cuenta"
+                      />
+                    </VCol>
+
+                    <!-- ACCOUNT -->
+                    <VCol cols="6">
+                      <VFileInput
+                        label="Certificación Bancaria"
+                        prepend-icon="tabler-paperclip"
+                      >
+                        <template #selection="{ fileNames3 }">
+                          <template
+                            v-for="fileName in fileNames3"
+                            :key="fileName">
+                            <VChip
+                              label
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                              class="me-2">
+                              {{ fileName }}
+                            </VChip>
+                          </template>
+                        </template>
+                      </VFileInput>
+                    </VCol>
+                  </VRow>
+                </VWindowItem>
+                <!-- contact -->
+                <VWindowItem>
+                  <VRow>
+                    <!-- 👉 Name -->
+                    <VCol cols="6">
+                      <VTextField
+                        v-model="name"
+                        :rules="[requiredValidator]"
+                        label="Nombre"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Last Name -->
+                    <VCol cols="6">
+                      <VTextField
+                        v-model="last_name"
+                        :rules="[requiredValidator]"
+                        label="Apellido"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Email -->
+                    <VCol cols="6">
+                      <VTextField
+                        :rules="[emailValidator, requiredValidator]"
+                        v-model="email"
+                        label="Email"
+                        :disabled="isEdit"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Phone -->
+                    <VCol cols="6">
+                      <VTextField
+                        v-model="phone"
+                        :rules="[requiredValidator, phoneValidator]"
+                        label="Teléfono"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Paises -->
+                    <VCol cols="6">
+                      <VAutocomplete
+                        v-model="supplier_country_id"
+                        label="País"
+                        :rules="[requiredValidator]"
+                        :items="props.countries"
+                        item-title="name"
+                        item-value="name"
+                        :menu-props="{ maxHeight: '200px' }"
+                        @update:model-value="selectCountry"
+                      >
+                        <template
+                          v-if="supplier_country_id"
+                          #prepend
+                          >
+                          <VAvatar
+                            start
+                            style="margin-top: -8px;"
+                            size="36"
+                            :image="getFlagCountry(supplier_country_id)"
+                          />
+                        </template>
+                      </VAutocomplete>
+                    </VCol>
+
+                    <!-- 👉 Provincias -->
+                    <VCol cols="6">
+                      <v-autocomplete
+                        v-model="province_id"
+                        label="Provincias"
+                        :rules="[requiredValidator]"
+                        :items="getProvinces"
+                        :menu-props="{ maxHeight: '200px' }"
+                      />
+                    </VCol>
+
+                    <!-- 👉 Address -->
+                    <VCol cols="12">
+                      <VTextarea
+                        v-model="address"
+                        rows="4"
+                        label="Dirección"
+                        :rules="[requiredValidator]"
+                      />
+                    </VCol>
+                  </VRow>
+                </VWindowItem>
+              </VWindow>
+            </VCardText>
+            
+            <VRow>
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">
                 <VBtn
                   type="submit"
                   class="me-3"
-                >
+                  >
                   {{ isEdit ? 'Actualizar': 'Agregar' }}
                 </VBtn>
                 <VBtn

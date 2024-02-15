@@ -38,7 +38,8 @@ use App\Http\Controllers\{
     TagController,
     OrderController,
     SupplierController,
-    AddressController
+    AddressController,
+    DocumentTypeController
 
 };
 
@@ -189,6 +190,7 @@ Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
 Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
+Route::apiResource('document-types', DocumentTypeController::class);
 
 Route::get('home', [HomeController::class, 'home']);
 
