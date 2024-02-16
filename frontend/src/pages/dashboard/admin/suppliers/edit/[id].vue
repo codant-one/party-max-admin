@@ -13,6 +13,7 @@ const documentTypesStores = useDocumentTypesStores()
 const suppliersStores = useSuppliersStores()
 
 const emitter = inject("emitter")
+const route = useRoute()
 
 const listCountries = ref([])
 const listProvinces = ref([])
@@ -25,8 +26,8 @@ const refForm = ref()
 const currentTab = ref('tab-1')
 const isMobile = ref(false)
 
+const supplier = ref(null)
 const supplier_country_id = ref('Colombia')
-const countryOld_id = ref('Colombia')
 const province_id = ref('')
 const name = ref('')
 const last_name = ref('')
@@ -101,13 +102,37 @@ watchEffect(async() => {
 
     isRequestOngoing.value = true
 
+    if(Number(route.params.id)) {
+        supplier.value = await suppliersStores.showSupplier(Number(route.params.id))
+       
+        //company
+        company_name.value = supplier.value.company_name
+        document_type_id.value = supplier.value.document.document_type_id
+        main_document.value = supplier.value.document.main_document
+        phone_contact.value = supplier.value.phone_contact
+        ncc.value = supplier.value.document.ncc
+
+        //bank
+        type_account.value = supplier.value.account.type_account.toString()
+        name_bank.value = supplier.value.account.name_bank
+        bank_account.value = supplier.value.account.bank_account
+
+        // contact
+        name.value  = supplier.value.user.name
+        last_name.value = supplier.value.user.last_name 
+        email.value = supplier.value.user.email
+        phone.value = supplier.value.user.user_detail.phone
+        address.value = supplier.value.user.user_detail.address
+        supplier_country_id.value = supplier.value.user.user_detail?.province.country.name
+        province_id.value =  supplier.value.user.user_detail?.province.name
+
+    }
+
     await provincesStores.fetchProvinces()
     loadProvinces()
 
     await documentTypesStores.fetchDocumentTypes()
     documentTypes.value = documentTypesStores.getDocumentTypes
-
-    selectCountry(countryOld_id.value)
 
     isRequestOngoing.value = false
 })
@@ -153,7 +178,11 @@ const onSubmit = () => {
         } else if (valid  && currentTab.value < 2 && refForm.value.items.length > 8) {
             currentTab.value++
         } else if (valid && currentTab.value === 2) {
+            
             let formData = new FormData()
+
+            formData.append('id', Number(route.params.id))
+            formData.append('_method', 'PUT')
 
             //company
             formData.append('company_name', company_name.value)
@@ -180,12 +209,12 @@ const onSubmit = () => {
 
             isRequestOngoing.value = true
 
-            suppliersStores.addSupplier(formData)
+            suppliersStores.updateSupplier(formData)
                 .then((res) => {
                     if (res.data.success) {
                         
                         let data = {
-                            message: 'Proveedor creado!',
+                            message: 'Proveedor actualizado!',
                             error: false
                         }
 
@@ -239,7 +268,7 @@ const onSubmit = () => {
                 <div class="d-flex mt-5 flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6">
                     <div class="d-flex flex-column justify-center">
                         <h6 class="text-md-h4 text-h6 font-weight-medium">
-                            Añadir un nuevo proveedor 😃🌟
+                            Editar un proveedor 😃🌟
                         </h6>
                         <span>Recarga tu fiesta de proveedores 🎉</span>
                     </div>
@@ -445,6 +474,7 @@ const onSubmit = () => {
                                                     :rules="[emailValidator, requiredValidator]"
                                                     v-model="email"
                                                     label="Email"
+                                                    readonly
                                                 />
                                             </VCol>
                                             <VCol cols="12" md="6">
@@ -527,6 +557,6 @@ const onSubmit = () => {
 
 <route lang="yaml">
     meta:
-      action: crear
+      action: editar
       subject: proveedores
 </route>

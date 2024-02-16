@@ -36,6 +36,11 @@ class Supplier extends Model
         return $this->hasOne(Document::class, 'id', 'document_id');
     }
 
+    public function account()
+    {
+        return $this->hasOne(SupplierAccount::class, 'supplier_id', 'id');
+    }
+
     /**** Scopes ****/
 
     public function scopeWhereSearch($query, $search) {

@@ -77,9 +77,8 @@ async function fetchData() {
 }
 
 const editSupplier = supplierData => {
-    selectedSupplier.value = { ...supplierData }
+  router.push({ name : 'dashboard-admin-suppliers-edit-id', params: { id: supplierData.id } })
 }
-
 
 const showDeleteDialog = supplierData => {
   isConfirmDeleteDialogVisible.value = true
@@ -122,41 +121,6 @@ const submitForm = async (supplier, method) => {
     submitUpdate(supplier)
     return
   }
-
-  submitCreate(supplier.data)
-}
-
-
-const submitCreate = supplierData => {
-
-    suppliersStores.addSupplier(supplierData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'Proveedor creado! ' + res.data.email_response,
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
 }
 
 const submitUpdate = supplierData => {
@@ -400,7 +364,8 @@ const getFlagCountry = country => {
                     icon
                     size="x-small"
                     color="default"
-                    variant="text">
+                    variant="text"
+                    >
                     <VTooltip
                       open-on-focus
                       location="top"
