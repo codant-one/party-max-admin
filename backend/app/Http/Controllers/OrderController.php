@@ -32,7 +32,7 @@ class OrderController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Order::with(['details', 'billing', 'shipping', 'payment', 'client.user'])
+            $query = Order::with(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail'])
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -82,7 +82,7 @@ class OrderController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'order' => Order::with(['details', 'billing', 'shipping', 'payment', 'client.user'])->find($order->id)
+                    'order' => Order::with(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail'])->find($order->id)
                 ]
             ]);
 
@@ -102,7 +102,7 @@ class OrderController extends Controller
     {
         try {
 
-            $order = Order::with(['details', 'billing', 'shipping', 'payment', 'client.user'])->find($id);
+            $order = Order::with(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail'])->find($id);
 
             if (!$order)
                 return response()->json([
@@ -200,7 +200,7 @@ class OrderController extends Controller
                     ], 404);
                 
                 $order->updatePaymentState($request, $order);
-                $order = $order->load(['details', 'billing', 'shipping', 'payment', 'client.user']);
+                $order = $order->load(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail']);
     
                 return response()->json([
                     'success' => true,

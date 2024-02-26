@@ -11,6 +11,7 @@ use App\Models\OrderDetail;
 use App\Models\ShippingState; 
 use App\Models\PaymentState;
 use App\Models\Client;
+use App\Models\Address;
 
 class Order extends Model
 {
@@ -37,6 +38,10 @@ class Order extends Model
 
     public function payment() {
         return $this->belongsTo(PaymentState::class, 'payment_state_id', 'id');
+    }
+
+    public function address() {
+        return $this->belongsTo(Address::class, 'address_id', 'id');
     }
 
     /**** Scopes ****/

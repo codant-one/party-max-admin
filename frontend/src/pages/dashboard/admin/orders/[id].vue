@@ -4,6 +4,8 @@ import { useAddressesStores } from '@/stores/useAddresses'
 import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
 import { format } from 'date-fns';
+import { avatarText } from '@/@core/utils/formatters'
+import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
 
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
@@ -224,7 +226,7 @@ const resolveStatusPayment = shipping_state_id => {
         </VCard>
 
         <!-- 👉 Shipping Activity -->
-        <VCard title="Shipping Activity">
+        <VCard title="Actividad de envío">
           <VCardText>
             <VTimeline
               truncate-line="both"
@@ -332,9 +334,17 @@ const resolveStatusPayment = shipping_state_id => {
 
             <div class="d-flex align-center">
               <VAvatar
-              
                 class="me-3"
-              />
+                variant="tonal"
+                size="38"
+                >
+                <VImg
+                  v-if="order.client.user.avatar"
+                  style="border-radius: 50%;"
+                  :src="themeConfig.settings.urlStorage + order.client.user.avatar"
+                  />
+                <span v-else>{{ avatarText(order.client.user.name) }}</span>
+              </VAvatar>
               <div>
                 <div class="text-body-1 font-weight-medium">
                   {{ order.client.user.name }} {{ order.client.user.last_name }}
@@ -355,8 +365,8 @@ const resolveStatusPayment = shipping_state_id => {
             </div>
 
             <div class="d-flex flex-column gap-y-1">
-              <span>Email: Sheldon88@yahoo.com</span>
-              <span>Mobile: +1 (609) 972-22-22</span>
+              <span>Email: {{ order.client.user.email }} </span>
+              <span>Teléfono: {{ order.client.user.user_detail.phone }}</span>
             </div>
           </VCardText>
         </VCard>
@@ -366,11 +376,17 @@ const resolveStatusPayment = shipping_state_id => {
           <VCardText>
             <div class="d-flex align-center justify-space-between">
               <div class="text-body-1 text-high-emphasis font-weight-medium">
-                Shipping Address
+                Dirección de envío
               </div>
             </div>
             <div>
-              45 Rocker Terrace <br> Latheronwheel <br> KW5 8NW, London <br> UK
+              <h6 class="text-h6 me-2 mt-4">
+                {{ order.address.type.name }}
+              </h6>
+              {{ order.address.address }} <br> 
+              {{ order.address.street }} <br> 
+              {{ order.address.city }} <br> 
+              {{ order.address.postal_code }}
             </div>
           </VCardText>
         </VCard>
@@ -380,19 +396,25 @@ const resolveStatusPayment = shipping_state_id => {
           <VCardText>
             <div class="d-flex align-center justify-space-between">
               <div class="text-body-1 text-high-emphasis font-weight-medium">
-                Billing Address
+                Dirección de Facturación
               </div>
             </div>
+            <h6 class="text-h6 me-2 mt-4" v-if="order.billing.company">
+              {{ order.billing.company }}
+            </h6>
             <div>
-              45 Rocker Terrace <br> Latheronwheel <br> KW5 8NW, London <br> UK
+              {{ order.billing.address }} <br> 
+              {{ order.billing.street }} <br> 
+              {{ order.billing.city }} <br> 
+              {{ order.billing.postal_code }}
             </div>
 
             <div class="mt-6">
               <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
-                Mastercard
+                {{ order.billing.payment_method_name }}
               </div>
               <div class="text-body-1">
-                Card Number: ******4291
+                Número de tarjeta: {{ order.billing.card_number }}
               </div>
             </div>
           </VCardText>
