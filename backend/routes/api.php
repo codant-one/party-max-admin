@@ -39,7 +39,8 @@ use App\Http\Controllers\{
     OrderController,
     SupplierController,
     AddressController,
-    DocumentTypeController
+    DocumentTypeController,
+    ProxyController
 
 };
 
@@ -213,6 +214,8 @@ Route::group(['prefix' => 'payments'], function () {
     Route::post('confirmation', [PaymentController::class, 'confirmation']);
 });
 
+//PROXY
+Route::get('/proxy-image',[ProxyController::class, 'getImage']);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');

@@ -311,7 +311,7 @@ const open = (url) => {
 const download = async (img) => {
 
     try {
-        const response = await fetch(img);
+        const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + img);
         const blob = await response.blob();
 
         const url = window.URL.createObjectURL(blob);

@@ -290,8 +290,13 @@ class Product extends Model
 
     public static function createProduct($request) {
  
+        $user_id = 
+            ($request->user_id === '0') ? 
+            (Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1) : 
+            $request->user_id;
+
         $product = self::create([
-            'user_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1,
+            'user_id' => $user_id,
             'brand_id' => $request->brand_id,
             'state_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? 4 : 3,
             'name' => $request->name,
@@ -313,7 +318,13 @@ class Product extends Model
  
     public static function updateProduct($request, $product) {
  
+        $user_id = 
+            ($request->user_id === '0') ? 
+            (Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1) : 
+            $request->user_id;
+
         $product->update([
+            'user_id' => $user_id,
             'brand_id' => $request->brand_id,
             'state_id' => 3,
             'name' => $request->name,

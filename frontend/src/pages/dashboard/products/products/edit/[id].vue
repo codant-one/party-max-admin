@@ -8,6 +8,7 @@ import { useColorsStores } from '@/stores/useColors'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { useBrandsStores } from '@/stores/useBrands'
 import { useTagsStores } from '@/stores/useTags'
+import { useSuppliersStores } from '@/stores/useSuppliers'
 import { QuillEditor } from '@vueup/vue-quill'
 import ImageUploader from 'quill-image-uploader'
 import FileInput from "@/components/common/FileInput.vue";
@@ -19,6 +20,7 @@ const colorsStores = useColorsStores()
 const categoriesStores = useCategoriesStores()
 const brandsStores = useBrandsStores() 
 const tagsStores = useTagsStores() 
+const suppliersStores = useSuppliersStores()
 const route = useRoute()
 
 const emitter = inject("emitter")
@@ -30,10 +32,13 @@ const categories = ref([])
 const listColors = ref([])
 const listBrands = ref([])
 const listTags = ref([])
+const listSuppliers = ref([])
 
 const isValid =  ref(null)
 const isFormValid = ref(false)
 const refForm = ref()
+const rol = ref(null)
+const userData = ref(null)
 
 const product = ref(null) 
 const tag_id = ref()
@@ -42,6 +47,7 @@ const category_id = ref([])
 const sku = ref([])
 const product_files = ref([])
 const brand_id = ref()
+const user_id = ref(null)
 const name = ref(null)
 const single_description = ref(' ')
 const description = ref(' ')
@@ -106,6 +112,14 @@ async function fetchData() {
     listBrands.value = brandsStores.getBrands
     listTags.value = tagsStores.getTags
 
+    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+    rol.value = userData.value.roles[0].name
+
+    if(rol.value !== 'Proveedor') {
+      await suppliersStores.fetchSuppliers(data)
+      listSuppliers.value = suppliersStores.getSuppliers
+    }
+
     product.value = await productsStores.showProduct(Number(route.params.id))
     tag_id.value = product.value.tags.map(color => color.tag_id)
     color_id.value = product.value.colors.map(color => color.color_id)
@@ -118,7 +132,7 @@ async function fetchData() {
         let files = []
         for(var i = 0; i < value.images.length; i++) {
 
-            const response = await fetch( themeConfig.settings.urlStorage + value.images[i].image);
+            const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + value.images[i].image);
             const blob = await response.blob();
             const file = new File([blob], value.images[i].image.replaceAll('products/gallery/',''), { type: blob.type });
           
@@ -138,6 +152,7 @@ async function fetchData() {
     });
 
     brand_id.value = product.value.brand_id
+    user_id.value = (product.value.user_id === userData.value.id) ? null : product.value.user_id 
     name.value = product.value.name
     single_description.value = product.value.single_description
     description.value = product.value.description
@@ -159,6 +174,16 @@ async function fetchData() {
 
     isRequestOngoing.value = false
 }
+
+const getSuppliers = computed(() => {
+  return listSuppliers.value.map((supplier) => {
+    return {
+      title: supplier.user.name + ' ' + (supplier.user.last_name ?? ''),
+      value: supplier.user.id,
+    }
+  })
+})
+
 
 const onImageSelected = event => {
   const file = event.target.files[0]
@@ -244,6 +269,7 @@ const onSubmit = () => {
             let formData = new FormData()
 
             //product
+            formData.append('user_id', user_id.value ?? 0)
             formData.append('brand_id', brand_id.value)
             formData.append('name', name.value)
             formData.append('single_description', single_description.value)
@@ -381,12 +407,21 @@ const onSubmit = () => {
           >
             <VCardText>
               <VRow>
-                <VCol cols="12">
+                <VCol :cols="rol === 'Proveedor' ? 12 : 8">
                   <AppTextField
                     v-model="name"
                     label="Nombre"
                     placeholder="Nombre"
                     :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol cols="4" v-if="rol !== 'Proveedor'">
+                  <VAutocomplete
+                    class="mt-6 mb-1"
+                    v-model="user_id"
+                    :items="getSuppliers"
+                    label="Proveedores"
+                    clearable
                   />
                 </VCol>
 

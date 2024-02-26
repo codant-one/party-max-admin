@@ -37,7 +37,6 @@ export const useProductsStores = defineStore('products', {
 
             return Products.create(data)
                 .then((response) => {
-                    this.products.push(response.data.data.product)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -65,8 +64,6 @@ export const useProductsStores = defineStore('products', {
             
             return Products.update(data)
                 .then((response) => {
-                    let pos = this.products.findIndex((item) => item.id === response.data.data.product.id)
-                    this.products[pos] = response.data.data.product
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
