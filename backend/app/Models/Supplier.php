@@ -117,7 +117,8 @@ class Supplier extends Model
             'user_id' => $user->id,
             'document_id'=> $document->id,
             'company_name' => $request->company_name,
-            'phone_contact' => $request->phone_contact
+            'phone_contact' => $request->phone_contact,
+            'slug' => Str::slug($user->company_name)
         ]);
 
         SupplierAccount::createSupplierAccount($request, $supplier->id);
