@@ -133,7 +133,7 @@ watchEffect(async() => {
         supplier_country_id.value = supplier.value.user.user_detail?.province.country.name
 
         selectCountry(supplier_country_id.value)
-        
+
         province_id.value =  supplier.value.user.user_detail?.province.name
         provinceOld_id.value = supplier.value.user.user_detail?.province_id
     }
@@ -563,6 +563,12 @@ const onSubmit = () => {
         </VRow>
     </section>
 </template>
+
+<style scoped>
+    .v-btn--disabled {
+        opacity: 1 !important;
+    }
+</style>
 
 <route lang="yaml">
     meta:

@@ -525,6 +525,12 @@ const onSubmit = () => {
     </section>
 </template>
 
+<style scoped>
+    .v-btn--disabled {
+        opacity: 1 !important;
+    }
+</style>
+
 <route lang="yaml">
     meta:
       action: crear
