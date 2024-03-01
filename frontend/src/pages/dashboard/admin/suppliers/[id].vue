@@ -35,8 +35,6 @@ const showAlert = function(alert) {
   advisor.value.message = alert.value.message
 }
 
-const isAddCustomerDrawerOpen = ref(false)
-
 watchEffect(fetchData)
 
 async function fetchData() {

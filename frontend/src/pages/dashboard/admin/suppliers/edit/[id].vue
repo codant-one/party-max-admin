@@ -29,6 +29,7 @@ const isMobile = ref(false)
 const supplier = ref(null)
 const supplier_country_id = ref('Colombia')
 const province_id = ref('')
+const provinceOld_id = ref('')
 const name = ref('')
 const last_name = ref('')
 const main_document = ref('')
@@ -102,6 +103,12 @@ watchEffect(async() => {
 
     isRequestOngoing.value = true
 
+    await provincesStores.fetchProvinces()
+    loadProvinces()
+
+    await documentTypesStores.fetchDocumentTypes()
+    documentTypes.value = documentTypesStores.getDocumentTypes
+
     if(Number(route.params.id)) {
         supplier.value = await suppliersStores.showSupplier(Number(route.params.id))
        
@@ -124,15 +131,12 @@ watchEffect(async() => {
         phone.value = supplier.value.user.user_detail.phone
         address.value = supplier.value.user.user_detail.address
         supplier_country_id.value = supplier.value.user.user_detail?.province.country.name
+
+        selectCountry(supplier_country_id.value)
+        
         province_id.value =  supplier.value.user.user_detail?.province.name
-
+        provinceOld_id.value = supplier.value.user.user_detail?.province_id
     }
-
-    await provincesStores.fetchProvinces()
-    loadProvinces()
-
-    await documentTypesStores.fetchDocumentTypes()
-    documentTypes.value = documentTypesStores.getDocumentTypes
 
     isRequestOngoing.value = false
 })
@@ -204,12 +208,17 @@ const onSubmit = () => {
             formData.append('last_name', last_name.value)
             formData.append('email', email.value)
             formData.append('phone', phone.value)
-            formData.append('province_id', province_id.value)
+            formData.append('province_id', Number.isInteger(province_id.value) ? province_id.value : provinceOld_id.value),
             formData.append('address', address.value)
 
             isRequestOngoing.value = true
 
-            suppliersStores.updateSupplier(formData)
+            let data = {
+                data: formData, 
+                id: Number(route.params.id)
+            }
+
+            suppliersStores.updateSupplier(data)
                 .then((res) => {
                     if (res.data.success) {
                         
@@ -544,7 +553,7 @@ const onSubmit = () => {
                                     Regresar
                                 </VBtn>
                                 <VBtn type="submit">
-                                    {{ (currentTab === 2) ? 'Enviar' : 'Siguiente' }}
+                                    {{ (currentTab === 2) ? 'Actualizar' : 'Siguiente' }}
                                 </VBtn>
                             </div>
                         </VCol>

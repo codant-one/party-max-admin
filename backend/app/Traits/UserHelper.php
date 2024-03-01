@@ -7,6 +7,7 @@ use App\Models\UserMenu;
 use App\Models\Client;
 use App\Models\Supplier;
 use App\Models\ProductLike;
+use App\Models\Product;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -34,6 +35,10 @@ trait UserHelper
 
     public function favorites() {
         return $this->hasMany(ProductLike::class, 'user_id', 'id');
+    }
+
+    public function products() {
+        return $this->hasMany(Product::class, 'user_id');
     }
 
     /**** Public methods ****/

@@ -39,7 +39,9 @@ class SupplierController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Supplier::with(['user.userDetail.province.country', 'gender'])
+            $query = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])
+                        ->productsCount()
+                        ->sales()
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -124,7 +126,7 @@ class SupplierController extends Controller
                 'success' => true,
                 'email_response' => $responseMail,
                 'data' => [ 
-                    'supplier' => Supplier::with(['user.userDetail.province.country', 'gender','document'])->find($supplier->id)
+                    'supplier' => Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])->find($supplier->id)
                 ]
             ]);
 
@@ -144,7 +146,7 @@ class SupplierController extends Controller
     {
         try {
 
-            $supplier = Supplier::with(['user.userDetail.province.country', 'gender', 'document', 'account'])->find($id);
+            $supplier = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])->find($id);
 
             if (!$supplier)
                 return response()->json([
@@ -176,7 +178,7 @@ class SupplierController extends Controller
     {
         try {
 
-            $supplier = Supplier::with(['user.userDetail.province.country', 'gender'])->find($id);
+            $supplier = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])->find($id);
         
             if (!$supplier)
                 return response()->json([

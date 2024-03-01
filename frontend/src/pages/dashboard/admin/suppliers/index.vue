@@ -4,7 +4,7 @@ import { useSuppliersStores } from '@/stores/useSuppliers'
 import { useCountriesStores } from '@/stores/useCountries'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
-import { avatarText } from '@/@core/utils/formatters'
+import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 
@@ -113,48 +113,6 @@ const removeSupplier = async () => {
   return true
 }
 
-const submitForm = async (supplier, method) => {
-  isRequestOngoing.value = true
-
-  if (method === 'update') {
-    supplier.data.append('_method', 'PUT')
-    submitUpdate(supplier)
-    return
-  }
-}
-
-const submitUpdate = supplierData => {
-
-    suppliersStores.updateSupplier(supplierData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'Proveedor actualizado!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
-
-    setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
-    }, 3000)
-}
-
 const downloadCSV = async () => {
 
   isRequestOngoing.value = true
@@ -169,12 +127,15 @@ const downloadCSV = async () => {
 
     let data = {
       ID: element.id,
-      NOMBRE: element.user.name,
-      APELLIDO: element.user.last_name ?? '',
-      USUARIO: element.user.username,
-      PAÍS:  element.user.user_detail.province.country.name
+      NOMBRE: element.user.name + ' ' + (element.user.last_name ?? ''),
+      EMAIL: element.user.email,
+      EMPRESA: element.company_name ?? '',
+      DOCUMENTO: (element.document === null) ? '' : (element.document?.type.code + ': ' + element.document?.main_document),
+      PAÍS:  element.user.user_detail.province.country.name,
+      PRODUCTOS_PUBLICADOS:  element.product_count,
+      TOTAL_VENTAS:  formatNumber(element.sales) ?? '0.00'
     }
-          
+
     dataArray.push(data)
   })
 
@@ -283,9 +244,9 @@ const getFlagCountry = country => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col"> USUARIO </th>
+                <th scope="col"> EMPRESA </th>
                 <th scope="col"> PAÍS </th>
-                <th scope="col"> PEDIDOS </th>
+                <th scope="col"> PRODUCTOS PUBLICADOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
                 <th scope="col" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">
                   ACCIONES
@@ -315,13 +276,22 @@ const getFlagCountry = country => {
                     </VAvatar>
                     <div class="d-flex flex-column">
                       <span class="font-weight-medium cursor-pointer text-primary" @click="seeSupplier(supplier)">
-                        {{ supplier.user.name }} {{ supplier.user.last_name }} 
+                        {{ supplier.user.name }} {{ supplier.user.last_name ?? '' }} 
                       </span>
                       <span class="text-sm text-disabled">{{ supplier.user.email }}</span>
                     </div>
                   </div>
                 </td>
-                <td class="text-wrap"> {{ supplier.user.username }} </td>
+                <td class="text-wrap">
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-medium text-secondary">
+                      {{ supplier.company_name }}
+                    </span>
+                    <span class="text-sm text-disabled" v-if="supplier.document">
+                      {{ supplier.document?.type.code }}: {{ supplier.document?.main_document }}
+                    </span>
+                  </div>
+                </td>
                 <td class="text-wrap"> 
                   <VAvatar
                     start
@@ -333,10 +303,12 @@ const getFlagCountry = country => {
                   </span>
                 </td>
                 <td>
-                  324
+                  {{ supplier.product_count }}
                 </td>
                 <td>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">$100</span>
+                  <span class="text-body-1 font-weight-medium text-high-emphasis">
+                    ${{ formatNumber(supplier.sales) ?? '0.00' }}
+                  </span>
                 </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">      
@@ -365,6 +337,7 @@ const getFlagCountry = country => {
                     size="x-small"
                     color="default"
                     variant="text"
+                    @click="editSupplier(supplier)"
                     >
                     <VTooltip
                       open-on-focus
@@ -440,7 +413,7 @@ const getFlagCountry = country => {
       <VCard title="Eliminar Proveedor">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar el Proveedor <strong>{{ selectedSupplier.user.name }}</strong>?.
+          Está seguro de eliminar el Proveedor <strong>{{ selectedSupplier.user.name }} {{ selectedSupplier.user.last_name ?? '' }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">

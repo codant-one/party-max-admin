@@ -38,4 +38,27 @@ class SupplierAccount extends Model
         return $supplierAccount;
     }
 
+    public static function updateSupplierAccount($request, $supplierAccount) {
+
+        $supplierAccount->update([
+            'type_account' => $request->type_account,
+            'name_bank' => $request->name_bank,
+            'bank_account' => $request->bank_account
+        ]);
+
+        if ($request->hasFile('file_account')) {
+            $file = $request->file('file_account');
+
+            $path = 'documents/';
+
+            $file_data = uploadFile($file, $path, $supplierAccount->file_account);
+
+            $supplierAccount->update([
+                'file_account' => $file_data['filePath']
+            ]);
+        }
+
+        return $supplierAccount;
+    }
+
 }

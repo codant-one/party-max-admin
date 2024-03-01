@@ -42,6 +42,31 @@ class Supplier extends Model
     }
 
     /**** Scopes ****/
+    public function scopeProductsCount($query)
+    {
+        return  $query->addSelect(['product_count' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->where('p.state_id', 3)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeSales($query)
+    {
+        return  $query->addSelect(['sales' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->where('p.state_id', 3)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
 
     public function scopeWhereSearch($query, $search) {
         $query->whereHas('user', function ($q) use ($search) {
@@ -92,8 +117,7 @@ class Supplier extends Model
             'user_id' => $user->id,
             'document_id'=> $document->id,
             'company_name' => $request->company_name,
-            'phone_contact' => $request->phone_contact,
-            'slug' => Str::slug($user->company_name)
+            'phone_contact' => $request->phone_contact
         ]);
 
         SupplierAccount::createSupplierAccount($request, $supplier->id);
@@ -102,17 +126,21 @@ class Supplier extends Model
     }
 
     public static function updateSupplier($request, $supplier) {
+
+        $user = User::find($supplier->user_id);
+        $document = Document::find($supplier->document_id);
+        $supplier_account = SupplierAccount::where('supplier_id', $supplier->id)->first();
+
         $supplier->update([
             'document_id'=> $document->id,
             'company_name' => $request->company_name,
-            'phone_contact' => $request->phone_contact,
-            'slug' => Str::slug($user->company_name)
+            'phone_contact' => $request->phone_contact
         ]);
 
-        $user = User::find($supplier->user_id);
-        $request->merge([ 'email' => $user->email ]);
-        User::updateUser($request, $user);
-
+        User::updateUser($request, $user);       
+        Document::updateDocument($request, $document);
+        SupplierAccount::updateSupplierAccount($request, $supplier_account);
+        
         return $supplier;
     }
 
