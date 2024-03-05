@@ -161,6 +161,11 @@ class Product extends Model
             $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
         }
 
+        if ($filters->get('wholesalers')) {
+            $query->whereNotNull('wholesale_price');
+        }
+                
+
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
