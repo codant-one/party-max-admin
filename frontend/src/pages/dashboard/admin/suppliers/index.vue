@@ -127,7 +127,7 @@ const downloadCSV = async () => {
 
     let data = {
       ID: element.id,
-      NOMBRE: element.user.name + ' ' + (element.user.last_name ?? ''),
+      CONTACTO: element.user.name + ' ' + (element.user.last_name ?? ''),
       EMAIL: element.user.email,
       EMPRESA: element.company_name ?? '',
       DOCUMENTO: (element.document === null) ? '' : (element.document?.type.code + ': ' + element.document?.main_document),
@@ -243,8 +243,8 @@ const getFlagCountry = country => {
             <thead>
               <tr>
                 <th scope="col"> #ID </th>
-                <th scope="col"> NOMBRE </th>
                 <th scope="col"> EMPRESA </th>
+                <th scope="col"> CONTACTO </th>
                 <th scope="col"> PAÍS </th>
                 <th scope="col"> PRODUCTOS PUBLICADOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
@@ -261,7 +261,17 @@ const getFlagCountry = country => {
                 style="height: 3.75rem;">
 
                 <td> {{ supplier.id }} </td>
-                <td class="text-wrap">
+                <td class="text-wrap w-25">
+                  <div class="d-flex flex-column">
+                    <span class="font-weight-medium text-secondary">
+                      {{ supplier.company_name }}
+                    </span>
+                    <span class="text-sm text-disabled" v-if="supplier.document">
+                      {{ supplier.document?.type.code }}: {{ supplier.document?.main_document }}
+                    </span>
+                  </div>
+                </td>
+                <td class="text-wrap w-25">
                   <div class="d-flex align-center gap-x-3">
                     <VAvatar
                       variant="tonal"
@@ -282,17 +292,7 @@ const getFlagCountry = country => {
                     </div>
                   </div>
                 </td>
-                <td class="text-wrap">
-                  <div class="d-flex flex-column">
-                    <span class="font-weight-medium text-secondary">
-                      {{ supplier.company_name }}
-                    </span>
-                    <span class="text-sm text-disabled" v-if="supplier.document">
-                      {{ supplier.document?.type.code }}: {{ supplier.document?.main_document }}
-                    </span>
-                  </div>
-                </td>
-                <td class="text-wrap"> 
+                <td class="text-wrap w-15"> 
                   <VAvatar
                     start
                     size="25"
@@ -302,11 +302,11 @@ const getFlagCountry = country => {
                     {{ supplier.user.user_detail.province.country.name }} 
                   </span>
                 </td>
-                <td>
+                <td class="text-wrap w-15">
                   {{ supplier.product_count }}
                 </td>
                 <td>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">
+                  <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
                     ${{ formatNumber(supplier.sales) ?? '0.00' }}
                   </span>
                 </td>
