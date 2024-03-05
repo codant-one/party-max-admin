@@ -131,7 +131,7 @@ async function fetchData() {
               v-for="{ title, value, icon, color } in [
                 { title: 'Horas vendidas', value: '34h', icon: 'mdi-laptop', color: 'primary' },
                 { title: 'Servicios prestados', value: '82%', icon: 'mdi-lightbulb', color: 'success' },
-                { title: 'Course Completed', value: '14', icon: 'mdi-check-decagram-outline', color: 'error' },
+                { title: 'Servicios completados', value: '14', icon: 'mdi-check-decagram-outline', color: 'error' },
               ]"
               :key="title"
             >
