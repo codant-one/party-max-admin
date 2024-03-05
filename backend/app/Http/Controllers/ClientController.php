@@ -103,7 +103,9 @@ class ClientController extends Controller
                 'user' => $client->user->name . ' ' . $client->user->last_name,
                 'email'=> $email,
                 'user_name' => $client->user->username,
-                'password' => $password 
+                'password' => $password,
+                'url'=> env("APP_DOMAIN"),
+                'text-url'=> env("URL_DOMAIN")
             ];
             
             try {

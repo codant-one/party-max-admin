@@ -257,7 +257,7 @@ const downloadCSV = async () => {
       
         <!-- 👉 orders -->
         <VCard
-            title="Órdenes"
+            title="Pedidos"
             class="mb-6" >
 
             <div class="d-flex flex-wrap gap-4 mx-5">

@@ -103,7 +103,9 @@ class SupplierController extends Controller
                 'user' => $supplier->user->name . ' ' . $supplier->user->last_name,
                 'email'=> $email,
                 'user_name' => $supplier->user->username,
-                'password' => $password
+                'password' => $password,
+                'url'=> env("APP_DOMAIN_ADMIN").'/login',
+                'text-url'=>'Panel administrativo'
             ];
             
             try {

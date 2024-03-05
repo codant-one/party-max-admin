@@ -15,7 +15,7 @@ export default [
         subject: 'clientes', 
     },
     {
-        title: 'Órdenes', 
+        title: 'Pedidos', 
         icon: { icon: 'tabler-clipboard-list' },
         to: 'dashboard-admin-orders', 
         action: 'ver' , 
