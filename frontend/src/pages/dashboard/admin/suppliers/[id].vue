@@ -20,7 +20,8 @@ const isRequestOngoing = ref(true)
 
 const tabs = [
   { title: 'Descripción general' },
-  { title: 'Seguridad' }
+  { title: 'Seguridad' },
+  { title: 'Facturación' }
 ]
 
 const advisor = ref({

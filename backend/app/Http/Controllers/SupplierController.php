@@ -148,7 +148,16 @@ class SupplierController extends Controller
     {
         try {
 
-            $supplier = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])->find($id);
+            $supplier = Supplier::with([
+                                    'user.userDetail.province.country', 
+                                    'user.products', 
+                                    'gender', 
+                                    'document.type', 
+                                    'account'
+                                ])
+                                ->productsCount()
+                                ->sales()
+                                ->find($id);
 
             if (!$supplier)
                 return response()->json([

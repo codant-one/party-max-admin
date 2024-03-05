@@ -1,4 +1,5 @@
 <script setup>
+
 import VueApexCharts from 'vue3-apexcharts'
 
 const props = defineProps({

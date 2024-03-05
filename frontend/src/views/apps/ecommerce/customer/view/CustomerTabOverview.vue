@@ -1,5 +1,7 @@
 <script setup>
+
 import CustomerOrderTable from './CustomerOrderTable.vue'
+import { formatNumber } from '@/@core/utils/formatters'
 
 const props = defineProps({
   customerData: {
@@ -11,6 +13,17 @@ const props = defineProps({
     required: true,
   }
 })
+
+const balance = ref(null)
+
+watchEffect(fetchData)
+
+async function fetchData() {
+
+  if(props.isSupplier)
+    balance.value = (props.customerData.account === null) ? '0.00' : props.customerData.account.balance
+
+}
 
 </script>
 
@@ -34,7 +47,7 @@ const props = defineProps({
               Saldo de la Cuenta
             </h4>
             <div>
-              <span class="text-primary text-h4 me-2">$2345</span>
+              <span class="text-primary text-h4 me-2">COP {{ formatNumber(balance) ?? '0.00' }}</span>
               <span class="text-body-1">Crédito restante</span>
               <p class="mb-0 text-base text-disabled">
                 Saldo de cuenta para la próxima compra

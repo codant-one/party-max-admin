@@ -12,16 +12,30 @@ const props = defineProps({
   }
 })
 
+const route = useRoute()
 const countriesStores = useCountriesStores()
 
 const isUpgradePlanDialogVisible = ref(false)
 
 const listCountries = ref([])
+const valueCount = ref(null)
+const valueText = ref(null)
+const icon = ref('tabler-shopping-cart')
 
 watchEffect(fetchData)
 
 async function fetchData() {
   await countriesStores.fetchCountries();
+
+  if (route.name.includes('clients')) {
+    valueCount.value = props.customerData.orders_count ?? 0
+    valueText.value = 'Pedidos'
+    icon.value = 'tabler-shopping-cart'
+  } else {
+    valueCount.value = props.customerData.product_count ?? 0
+    valueText.value = 'Publicados'
+    icon.value = 'tabler-building-store'
+  }
 
   loadCountries()
 }
@@ -81,11 +95,11 @@ const getFlagCountry = country => {
                 rounded
                 class="me-3"
               >
-                <VIcon icon="tabler-shopping-cart" />
+                <VIcon :icon="icon" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium"> {{ props.customerData.orders_count }} </span>
-                <span class="text-body-2">Ordenes</span>
+                <span class="text-body-1 font-weight-medium"> {{ valueCount }} </span>
+                <span class="text-body-2">{{ valueText }}</span>
               </div>
             </div>
             <div class="d-flex align-center">
@@ -98,7 +112,7 @@ const getFlagCountry = country => {
                 <VIcon icon="tabler-currency-dollar" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(props.customerData.sales) }}</span>
+                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(props.customerData.sales) ?? '0.00' }}</span>
                 <span class="text-body-2">Ventas</span>
               </div>
             </div>
