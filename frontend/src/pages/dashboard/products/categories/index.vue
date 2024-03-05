@@ -176,10 +176,12 @@ const removeCategory = async () => {
               />
               <!-- 👉 Search  -->
               <div class="search">
-                <v-text-field
+                <VTextField
                   v-model="searchQuery"
                   placeholder="Buscar"
-                  density="compact"/>
+                  density="compact"
+                  clearable
+                />
               </div>
 
               <!-- 👉 Add user button -->

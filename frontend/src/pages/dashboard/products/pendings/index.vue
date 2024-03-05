@@ -340,6 +340,7 @@ const downloadCSV = async () => {
                         density="compact"
                         style="inline-size: 700px;"
                         class="me-3"
+                        clearable
                     />
                 </div>
 

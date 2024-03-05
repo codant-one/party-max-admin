@@ -401,6 +401,7 @@ const removeProduct = async () => {
               label="Buscar"
               placeholder="Buscar"
               density="compact"
+              clearable
             />
           </VCol>
           <VCol cols="12" sm="2">

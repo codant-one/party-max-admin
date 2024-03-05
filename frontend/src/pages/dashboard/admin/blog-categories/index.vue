@@ -184,10 +184,12 @@ const downloadCSV = async () => {
             <div class="d-flex align-center flex-wrap gap-4">
               <!-- 👉 Search  -->
               <div style="width: 10rem;">
-                <v-text-field
+                <VTextField
                   v-model="searchQuery"
                   placeholder="Buscar"
-                  density="compact"/>
+                  density="compact"
+                  clearable
+                />
               </div>
 
               <!-- 👉 Add user button -->
