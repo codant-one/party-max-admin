@@ -73,10 +73,11 @@ class Supplier extends Model
             $q->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', '%' . $search . '%')
                       ->orWhere('last_name', 'LIKE', '%' . $search . '%')
-                      ->orWhere('username', 'LIKE', '%' . $search . '%')
                       ->orWhere('email', 'LIKE', '%' . $search . '%');
             });
-        });
+        })->orWhereHas('document', function ($q) use ($search) {
+            $q->where('main_document', 'LIKE', '%' . $search . '%');
+        })->orWhere('company_name', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
