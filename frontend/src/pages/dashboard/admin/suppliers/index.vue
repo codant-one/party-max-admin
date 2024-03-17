@@ -265,7 +265,7 @@ const getFlagCountry = country => {
                 <td> {{ supplier.id }} </td>
                 <td class="text-wrap w-25">
                   <div class="d-flex flex-column">
-                    <span class="font-weight-medium text-secondary">
+                    <span class="font-weight-medium text-primary">
                       {{ supplier.company_name }}
                     </span>
                     <span class="text-sm text-disabled" v-if="supplier.document">
@@ -287,7 +287,7 @@ const getFlagCountry = country => {
                         <span v-else>{{ avatarText(supplier.user.name) }}</span>
                     </VAvatar>
                     <div class="d-flex flex-column">
-                      <span class="font-weight-medium cursor-pointer text-primary" @click="seeSupplier(supplier)">
+                      <span class="font-weight-medium cursor-pointer text-secondary" @click="seeSupplier(supplier)">
                         {{ supplier.user.name }} {{ supplier.user.last_name ?? '' }} 
                       </span>
                       <span class="text-sm text-disabled">{{ supplier.user.email }}</span>
