@@ -76,12 +76,10 @@ watchEffect(fetchData)
 async function fetchData() {
 
   if(props.isSupplier && props.customerData.account !== null) {
-    console.log('customerData', props.customerData)
     type_account.value = props.customerData.account.type_account.toString()
 
     if(props.customerData.account.file_account) {
       document.value = props.customerData.account.file_account.split('documents/')[1]
-      console.log(' document.value',  document.value)
       switch (document.value.split('.')[1]) {
         case 'pdf':
           icon_type.value = 'tabler-file-type-pdf'
@@ -99,18 +97,20 @@ async function fetchData() {
           icon_type.value = 'tabler-file-type-png'
           break;
       }
-
-      console.log(' icon_type.value',  icon_type.value)
     }
   }
 }
 
-const download = (document) => {
-    emit('download', document)
+const download = (file) => {
+  let data = {
+    icon: document.value.split('.')[1],
+    document: file
+  }
+  emit('download', data)
 }
 
 const copy = (account) => {
-    emit('copy', account)
+  emit('copy', account)
 }
 
 const editAddress = addressData => {
