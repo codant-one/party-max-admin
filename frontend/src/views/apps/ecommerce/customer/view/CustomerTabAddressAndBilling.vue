@@ -25,6 +25,7 @@ const emit = defineEmits([
   'submit',
   'delete',
   'copy',
+  'download'
 ])
 
 const show = ref([
@@ -102,6 +103,10 @@ async function fetchData() {
       console.log(' icon_type.value',  icon_type.value)
     }
   }
+}
+
+const download = (document) => {
+    emit('download', document)
 }
 
 const copy = (account) => {
@@ -280,7 +285,7 @@ const onSubmit = (address, method) => {
                               variant="text"
                             >
                                           
-                              <VIcon size="22" icon="tabler-copy"  @click="copy(props.customerData.account?.bank_account)"/>
+                              <VIcon size="22" icon="tabler-copy" @click="copy(props.customerData.account?.bank_account)"/>
                               <VTooltip activator="parent" location="top">
                                 Copiar
                               </VTooltip>
@@ -308,7 +313,7 @@ const onSubmit = (address, method) => {
                               activator="parent"
                               text="Descargar">
                               <template v-slot:activator="{ props }">
-                                <VIcon color="primary" :icon="icon_type" size="x-large" />
+                                <VIcon color="primary" :icon="icon_type" size="x-large" @click="download(document)" />
                               </template>
                             </VTooltip>
                           </span>

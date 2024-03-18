@@ -1,5 +1,7 @@
 <script setup>
 
+import axios from '@axios'
+import { themeConfig } from '@themeConfig'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -53,7 +55,46 @@ async function fetchData() {
   isRequestOngoing.value = false
 }
 
-const handleCopy =(data) => {
+const handleDownload = async(file) => {
+    console.log('descargar', file)
+
+    try {
+        const response = await axios.get( 
+            themeConfig.settings.urlbase + 'proxy-document?file=documents/' + file, 
+            { responseType: 'blob'
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', file);
+        document.body.appendChild(link);
+        link.click();
+
+        link.parentNode.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        advisor.value.type = 'success'
+        advisor.value.show = true
+        advisor.value.message = 'Descarga Exitosa!'
+
+    } catch (error) {
+
+        advisor.value.type = 'error'
+        advisor.value.show = true
+        advisor.value.message = 'Error al descargar la imagen:' + error
+
+        console.log('EEOR', error)
+    }
+
+    setTimeout(() => {
+        advisor.value.show = false
+        advisor.value.type = ''
+        advisor.value.message = ''
+    }, 5000)
+}
+
+const handleCopy = (data) => {
   
     cp.copy(data)
 
@@ -169,7 +210,8 @@ const handleCopy =(data) => {
                     <CustomerTabAddressAndBilling 
                         :customer-data="supplier"
                         :is-supplier="true"
-                        @copy="handleCopy"/>
+                        @copy="handleCopy"
+                        @download="handleDownload"/>
                 </VWindowItem>
             </VWindow>
         </VCol>
