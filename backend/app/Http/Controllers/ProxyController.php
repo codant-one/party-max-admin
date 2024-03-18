@@ -24,26 +24,4 @@ class ProxyController extends Controller
         ]);        
     }
 
-    public function getDocument(Request $request) {
-
-        $client = new \GuzzleHttp\Client();
-        $url = env('APP_URL').'/storage/'.strtolower($request->file);
-
-        $response = $client->get($url, [
-            'verify' => false
-        ]);
-
-        if ($response->getStatusCode() == 200) {
-            $fileContents = $response->getBody()->getContents();
-            $fileSize = strlen($fileContents); 
-
-            $tempPath = 'temp/' . $request->file;
-            Storage::disk('local')->put($tempPath, $fileContents);
-
-            return response()->download(storage_path('app/' . $tempPath))->deleteFileAfterSend(true);
-        } else {
-            return response()->json(['error' => 'Unable to download the file'], 500);
-        }
-    }
-
 }

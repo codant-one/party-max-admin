@@ -59,20 +59,13 @@ const handleDownload = async(file) => {
     console.log('descargar', file)
 
     try {
-        const response = await axios.get( 
-            themeConfig.settings.urlbase + 'proxy-document?file=documents/' + file, 
-            { responseType: 'blob'
-        });
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file);
+        link.href = themeConfig.settings.urlStorage + 'documents/' + file
+        link.target = '_blank'
         document.body.appendChild(link);
         link.click();
 
         link.parentNode.removeChild(link);
-        window.URL.revokeObjectURL(url);
 
         advisor.value.type = 'success'
         advisor.value.show = true
