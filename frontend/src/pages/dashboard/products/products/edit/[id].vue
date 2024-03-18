@@ -178,7 +178,7 @@ async function fetchData() {
 const getSuppliers = computed(() => {
   return listSuppliers.value.map((supplier) => {
     return {
-      title: supplier.user.name + ' ' + (supplier.user.last_name ?? ''),
+      title: supplier.company_name,
       value: supplier.user.id,
     }
   })
