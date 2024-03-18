@@ -12,6 +12,7 @@ import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/C
 
 const route = useRoute()
 const suppliersStores = useSuppliersStores()
+const cp = useClipboard()
 
 const userTab = ref(null)
 
@@ -19,9 +20,6 @@ const supplier = ref(null)
 const online = ref(null)
 
 const isRequestOngoing = ref(true)
-
-const source = ref('Hello')
-const { copy, copied, text, isSupported } = useClipboard({ source });
 
 const tabs = [
   { title: 'Descripción general' },
@@ -57,11 +55,7 @@ async function fetchData() {
 
 const handleCopy =(data) => {
   
-    copy(data);
-    console.log('text', text.value)
-    console.log('isSupported', isSupported.value)
-    console.log('copied', copied.value)
-
+    cp.copy(data)
 
     advisor.value.type = 'success'
     advisor.value.show = true
@@ -124,12 +118,6 @@ const handleCopy =(data) => {
             </div>
         </div>
         <div class="d-flex gap-4">
-
-            <input type="text" v-model="source" />
-  <button v-if="isSupported" @click="copy(source)">
-    {{ copied ? 'Copied' : 'Copy' }}
-  </button>
-  {{ text }}
             <VBtn
                 variant="tonal"
                 color="secondary"

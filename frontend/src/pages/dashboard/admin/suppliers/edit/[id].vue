@@ -352,7 +352,7 @@ const onSubmit = () => {
                                                     v-model="file_nit"
                                                     value=""
                                                     placeholder="Upload your documents"
-                                                    label="NIT"
+                                                    label="Cámara de Comercio"
                                                     prepend-icon="tabler-paperclip"
                                                 >
                                                     <template #selection="{ fileNames }">
