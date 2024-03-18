@@ -28,11 +28,7 @@ class ProxyController extends Controller
         $client = new \GuzzleHttp\Client();
         $url = env('APP_URL').'/storage/'.strtolower($request->file);
     
-        $response = $client->get($url, [
-            'stream' => true, 
-            'verify' => false,
-            'debug' => true
-        ]);
+        $response = $client->get($url);
     
         if ($response->getStatusCode() == 200) {
             $headers = [
