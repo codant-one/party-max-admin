@@ -103,7 +103,7 @@ const earningReports = [
   {
     avatarIcon: 'tabler-credit-card',
     avatarColor: 'secondary',
-    title: 'Gastos totales',
+    title: 'Comisión PartyMax',
     subtitle: 'ADVT, Marketing',
     earnings: '$430',
     percentage: '52.8%',
