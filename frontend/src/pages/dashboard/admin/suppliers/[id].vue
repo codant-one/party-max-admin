@@ -3,10 +3,12 @@
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useClipboard } from '@vueuse/core';
 
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
 import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
 import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
+import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/CustomerTabAddressAndBilling.vue'
 
 const route = useRoute()
 const suppliersStores = useSuppliersStores()
@@ -17,6 +19,9 @@ const supplier = ref(null)
 const online = ref(null)
 
 const isRequestOngoing = ref(true)
+
+const source = ref('Hello')
+const { copy, copied, text, isSupported } = useClipboard({ source });
 
 const tabs = [
   { title: 'Descripción general' },
@@ -48,6 +53,25 @@ async function fetchData() {
   }
 
   isRequestOngoing.value = false
+}
+
+const handleCopy =(data) => {
+  
+    copy(data);
+    console.log('text', text.value)
+    console.log('isSupported', isSupported.value)
+    console.log('copied', copied.value)
+
+
+    advisor.value.type = 'success'
+    advisor.value.show = true
+    advisor.value.message = 'Cuenta Bancaria copiada!'
+
+    setTimeout(() => {
+        advisor.value.show = false
+        advisor.value.type = ''
+        advisor.value.message = ''
+    }, 5000)
 }
 </script>
 
@@ -100,6 +124,12 @@ async function fetchData() {
             </div>
         </div>
         <div class="d-flex gap-4">
+
+            <input type="text" v-model="source" />
+  <button v-if="isSupported" @click="copy(source)">
+    {{ copied ? 'Copied' : 'Copy' }}
+  </button>
+  {{ text }}
             <VBtn
                 variant="tonal"
                 color="secondary"
@@ -146,6 +176,12 @@ async function fetchData() {
                     <CustomerTabSecurity 
                         :user_id="supplier.user_id"
                         @alert="showAlert" />
+                </VWindowItem>
+                <VWindowItem>
+                    <CustomerTabAddressAndBilling 
+                        :customer-data="supplier"
+                        :is-supplier="true"
+                        @copy="handleCopy"/>
                 </VWindowItem>
             </VWindow>
         </VCol>

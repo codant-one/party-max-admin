@@ -8,41 +8,13 @@ import { avatarText } from '@/@core/utils/formatters'
 import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
 
-import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
-import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/CustomerTabAddressAndBilling.vue'
-import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
-import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
-
 const route = useRoute()
 const ordersStores = useOrdersStores()
-
-const userTab = ref(null)
 
 const order = ref(null)
 const date = ref(null)
 
 const isRequestOngoing = ref(true)
-
-const tabs = [
-  { title: 'Descripción general' },
-  { title: 'Seguridad' },
-  { title: 'Envíos' }
-]
-
-const advisor = ref({
-  type: '',
-  message: '',
-  show: false
-})
-
-const showAlert = function(alert) {
-  advisor.value.show = alert.value.show
-  advisor.value.type = alert.value.type
-  advisor.value.message = alert.value.message
-}
-
-const isConfirmDeleteDialogVisible = ref(false)
-const selectedAddress = ref({})
 
 watchEffect(fetchData)
 
@@ -106,21 +78,12 @@ const resolveStatusPayment = shipping_state_id => {
         </VCard>
     </VDialog>
 
-    <v-col cols="12">
-        <v-alert
-          v-if="advisor.show"
-          :type="advisor.type"
-          class="mb-6">
-            {{ advisor.message }}
-        </v-alert>
-    </v-col>
-
     <!-- 👉 Header  -->
     <div v-if="order" class="d-flex justify-space-between align-center flex-wrap gap-y-4 mb-6">
         <div>
             <div class="d-flex gap-2 align-center mb-2 flex-wrap">
                 <h4 class="text-h4 font-weight-medium">
-                    Órden ID #{{ route.params.id }}
+                    Pedido ID #{{ route.params.id }}
                 </h4>
                 <div class="d-flex gap-x-2">
                     <VChip
@@ -162,7 +125,7 @@ const resolveStatusPayment = shipping_state_id => {
                 variant="tonal"
                 color="error"
             >
-                Eliminar Órden
+                Eliminar Pedido
             </VBtn>
         </div>
     </div>
@@ -177,7 +140,7 @@ const resolveStatusPayment = shipping_state_id => {
           <VCardItem>
             <template #title>
               <h5 class="text-h5">
-                Detalles de la órden
+                Detalles del pedido
               </h5>
             </template>
           </VCardItem>
@@ -427,5 +390,5 @@ const resolveStatusPayment = shipping_state_id => {
 <route lang="yaml">
     meta:
       action: ver
-      subject: ordenes
+      subject: pedidos
 </route>

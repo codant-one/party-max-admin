@@ -108,7 +108,7 @@ class OrderController extends Controller
                 return response()->json([
                     'sucess' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Orden no encontrada'
+                    'message' => 'Pedido no encontrada'
                 ], 404);
 
             return response()->json([
@@ -149,7 +149,7 @@ class OrderController extends Controller
                 return response()->json([
                     'success' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Orden no encontrada'
+                    'message' => 'Pedido no encontrada'
                 ], 404);
 
             $order->deleteOrder($id);
@@ -196,7 +196,7 @@ class OrderController extends Controller
                     return response()->json([
                         'success' => false,
                         'feedback' => 'not_found',
-                        'message' => 'Orden no encontrada'
+                        'message' => 'Pedido no encontrada'
                     ], 404);
                 
                 $order->updatePaymentState($request, $order);

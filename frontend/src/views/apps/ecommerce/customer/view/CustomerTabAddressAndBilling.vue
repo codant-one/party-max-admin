@@ -1,5 +1,6 @@
 <script setup>
 
+import { formatNumber } from '@/@core/utils/formatters'
 import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
 import americanExpress from '@images/icons/payments/img/american-express.png'
 import mastercard from '@images/icons/payments/img/mastercard.png'
@@ -8,13 +9,22 @@ import visa from '@images/icons/payments/img/visa-light.png'
 const props = defineProps({
   addresses: {
     type: Object,
-    required: true
+    required: false
+  },
+  customerData: {
+    type: Object,
+    required: false,
+  },
+  isSupplier: {
+    type: Boolean,
+    required: true,
   }
 })
 
 const emit = defineEmits([
   'submit',
-  'delete'
+  'delete',
+  'copy',
 ])
 
 const show = ref([
@@ -23,37 +33,32 @@ const show = ref([
   false,
 ])
 
-const paymentShow = ref([
-  true,
-  false,
-  false,
-])
-
 const isEditAddressDialogVisible = ref(false)
-const isCardAddDialogVisible = ref(false)
 const selectedAddress = ref({})
 const addresses_ = ref(props.addresses)
 
-const paymentData = [
+const accountTypes = [
   {
-    title: 'Mastercard',
-    subtitle: 'Expries Apr 2028',
-    isDefaultMethod: false,
-    image: mastercard,
+    icon: {
+      icon: 'mdi-cash-multiple',
+      size: '40',
+    },
+    title: 'Cuenta Corriente',
+    value: '1',
   },
   {
-    title: 'American Express',
-    subtitle: 'Expries Apr 2028',
-    isDefaultMethod: false,
-    image: americanExpress,
-  },
-  {
-    title: 'Visa',
-    subtitle: '45 Roker Terrace',
-    isDefaultMethod: true,
-    image: visa,
-  },
+    icon: {
+      icon: 'tabler-pig-money',
+      size: '40',
+    },
+    title: 'Cuenta de Ahorros',
+    value: '2',
+  }
 ]
+
+const type_account = ref('1')
+const document = ref(null)
+const icon_type = ref(null)
 
 watch(() =>  
   props.addresses, (addreses_) => {
@@ -64,6 +69,44 @@ watchEffect(() => {
     if (!isEditAddressDialogVisible.value)
       selectedAddress.value = {}
 })
+
+watchEffect(fetchData)
+
+async function fetchData() {
+
+  if(props.isSupplier && props.customerData.account !== null) {
+    console.log('customerData', props.customerData)
+    type_account.value = props.customerData.account.type_account.toString()
+
+    if(props.customerData.account.file_account) {
+      document.value = props.customerData.account.file_account.split('documents/')[1]
+      console.log(' document.value',  document.value)
+      switch (document.value.split('.')[1]) {
+        case 'pdf':
+          icon_type.value = 'tabler-file-type-pdf'
+          break;
+        case 'docx':
+          icon_type.value = 'mdi-file-word'
+          break;
+        case 'doc':
+          icon_type.value = 'mdi-file-word'
+          break;
+        case 'jpg':
+          icon_type.value = 'tabler-file-type-jpg'
+          break;
+        default:
+          icon_type.value = 'tabler-file-type-png'
+          break;
+      }
+
+      console.log(' icon_type.value',  icon_type.value)
+    }
+  }
+}
+
+const copy = (account) => {
+    emit('copy', account)
+}
 
 const editAddress = addressData => {
 
@@ -90,7 +133,7 @@ const onSubmit = (address, method) => {
   <!-- eslint-disable vue/no-v-html -->
 
   <!-- 👉 Address Book -->
-  <VCard class="mb-6">
+  <VCard class="mb-6" v-if="!props.isSupplier">
     <VCardText>
       <div class="d-flex justify-space-between mb-6 flex-wrap align-center gap-y-4 gap-x-6">
         <h5 class="text-h5">
@@ -197,204 +240,95 @@ const onSubmit = (address, method) => {
   </VCard>
 
   <!-- 👉 Payment Methods -->
-  <VCard v-if="false">
-    <VCardText>
-      <div class="d-flex justify-space-between mb-6 flex-wrap align-center gap-y-4 gap-x-6">
-        <h5 class="text-h5">
-          Payment Methods
-        </h5>
-        <VBtn
-          variant="tonal"
-          @click="isCardAddDialogVisible = !isCardAddDialogVisible"
-        >
-          Add Payment Methods
-        </VBtn>
-      </div>
-      <template
-        v-for="(payment, index) in paymentData"
-        :key="index"
-      >
-        <div class="d-flex justify-space-between mb-4 gap-y-2 flex-wrap align-center">
-          <div class="d-flex align-center">
-            <VBtn
-              icon
-              variant="text"
-              color="default"
-              size="x-small"
-              @click="paymentShow[index] = !paymentShow[index]"
-            >
-              <VIcon
-                :icon="paymentShow[index] ? 'tabler-chevron-down' : 'tabler-chevron-right'"
-                class="flip-in-rtl"
-              />
-            </VBtn>
+  <VRow>
+    <VCol cols="12" v-if="props.isSupplier">
+      <VCard title="Método de pago">
+        <VCardText class="d-flex flex-column gap-y-4">
+          <VCard border flat>
+            <VCardText class="d-flex flex-sm-row flex-column pa-4">
+              <VRow>
+                <VCol cols="12" md="12" class="d-flex">
+                  <CustomRadiosWithIcon
+                    v-model:selected-radio="type_account"
+                    :radio-content="accountTypes"
+                    :grid-column="{ sm: '6', cols: '12' }"
+                    readonly
+                  />
+                </VCol>
+                <VCol cols="12" md="12">
+                  <VList class="card-list mt-2">
+                    <VListItem>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Nombre del Banco:
+                          <span class="text-body-2">
+                            {{ props.customerData.account?.name_bank }}
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Nro. de Cuenta:
+                          <span class="text-body-2">
+                            {{ props.customerData.account?.bank_account }}
+                            <VBtn
+                              v-if="props.customerData.account?.bank_account"
+                              class="ml-2"
+                              icon
+                              size="x-small"
+                              color="secondary"
+                              variant="text"
+                            >
+                                          
+                              <VIcon size="22" icon="tabler-copy"  @click="copy(props.customerData.account?.bank_account)"/>
+                              <VTooltip activator="parent" location="top">
+                                Copiar
+                              </VTooltip>
+                            </VBtn>
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Saldo:
+                          <span class="text-body-2">
+                            COP {{ formatNumber(props.customerData.account?.balance) ?? '0.00' }}
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Certificación Bancaria:
+                          <span class="text-body-2" v-if="document">
+                            {{ document }}
 
-            <VImg
-              :src="payment.image"
-              height="30"
-              width="50"
-              class="me-3"
-            />
-
-            <div>
-              <div class="d-flex gap-x-2">
-                <h6 class="text-h6">
-                  {{ payment.title }}
-                </h6>
-                <VChip
-                  v-if="payment.isDefaultMethod"
-                  color="success"
-                  label
-                >
-                  Default Method
-                </VChip>
-              </div>
-              <span class="text-body-2 text-disabled">{{ payment.subtitle }}</span>
-            </div>
-          </div>
-
-          <div class="ms-5">
-            <VBtn
-              icon
-              variant="text"
-              color="default">
-              <VIcon
-                icon="tabler-pencil"
-                class="flip-in-rtl"
-              />
-            </VBtn>
-            <VBtn
-              icon
-              variant="text"
-              color="default">
-              <VIcon
-                icon="tabler-trash"
-                class="flip-in-rtl"
-              />
-            </VBtn>
-            <VBtn
-              icon
-              variant="text"
-              color="default">
-              <VIcon
-                icon="tabler-dots-vertical"
-                class="flip-in-rtl"
-              />
-            </VBtn>
-          </div>
-        </div>
-        <VExpandTransition>
-          <div
-            v-show="paymentShow[index]"
-            class="px-8"
-          >
-            <VRow>
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTable>
-                  <tr>
-                    <td>Name </td>
-                    <td class="font-weight-medium">
-                      Violet Mendoza
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Number </td>
-                    <td class="font-weight-medium">
-                      **** 4487
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Expires </td>
-                    <td class="font-weight-medium">
-                      08/2028
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Type </td>
-                    <td class="font-weight-medium">
-                      Master Card
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Issuer </td>
-                    <td class="font-weight-medium">
-                      VICBANK
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>ID </td>
-                    <td class="font-weight-medium">
-                      DH73DJ8
-                    </td>
-                  </tr>
-                </VTable>
-              </VCol>
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTable>
-                  <tr>
-                    <td>Billing </td>
-                    <td class="font-weight-medium">
-                      United Kingdom
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Number</td>
-                    <td class="font-weight-medium">
-                      +7634 983 637
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Email</td>
-                    <td class="font-weight-medium">
-                      vafgot@vultukir.org
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Origin</td>
-                    <td class="font-weight-medium">
-                      United States
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>CVC Check</td>
-                    <td class="font-weight-medium">
-                      Passed
-                      <VAvatar
-                        class="ms-2"
-                        color="success"
-                        size="20"
-                        variant="tonal"
-                      >
-                        <VIcon
-                          icon="tabler-check"
-                          size="14"
-                        />
-                      </VAvatar>
-                    </td>
-                  </tr>
-                </VTable>
-              </VCol>
-            </VRow>
-          </div>
-        </VExpandTransition>
-        <VDivider
-          v-if="index !== paymentData.length - 1"
-          class="my-4"
-        />
-      </template>
-    </VCardText>
-  </VCard>
+                            <VTooltip
+                              open-on-focus
+                              location="top"
+                              activator="parent"
+                              text="Descargar">
+                              <template v-slot:activator="{ props }">
+                                <VIcon color="primary" :icon="icon_type" size="x-large" />
+                              </template>
+                            </VTooltip>
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                    </VListItem>
+                  </VList>
+                </VCol>
+              </VRow>
+            </VCardText>
+          </VCard>
+        </VCardText>
+      </VCard>
+    </VCol>
+  </VRow>
+  
   <AddEditAddressDialog 
     v-model:isDialogVisible="isEditAddressDialogVisible"
     :billing-address="selectedAddress"
     @submit="onSubmit"/>
-  <!-- <CardAddEditDialog v-model:isDialogVisible="isCardAddDialogVisible" /> -->
 </template>
 
 <style>

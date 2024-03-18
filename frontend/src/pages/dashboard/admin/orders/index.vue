@@ -111,7 +111,7 @@ const removeOrder = async () => {
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Órden eliminada!' : res.data.message,
+    message: res.data.success ? 'Pedido eliminado!' : res.data.message,
     show: true
   }
 
@@ -306,7 +306,7 @@ const downloadCSV = async () => {
                         <th class="pe-4"> ESTADO DEL PAGO </th>
                         <th class="pe-4"> MÉTODO </th>
                   
-                        <th scope="pe-4" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
+                        <th scope="pe-4" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             ACCIONES
                         </th>
                     </tr>
@@ -390,9 +390,9 @@ const downloadCSV = async () => {
                             </div>
                             
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
+                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             <VBtn
-                                v-if="$can('ver', 'ordenes')"
+                                v-if="$can('ver', 'pedidos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -410,7 +410,7 @@ const downloadCSV = async () => {
                             </VBtn>
 
                             <VBtn
-                                v-if="$can('eliminar','ordenes')"
+                                v-if="$can('eliminar','pedidos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -474,5 +474,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: ordenes
+    subject: pedidos
 </route>

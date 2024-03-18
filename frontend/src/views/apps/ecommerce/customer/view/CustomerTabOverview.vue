@@ -10,7 +10,7 @@ const props = defineProps({
   },
   isSupplier: {
     type: Boolean,
-    required: true,
+    required: true
   }
 })
 
@@ -50,7 +50,7 @@ async function fetchData() {
               <span class="text-primary text-h4 me-2">COP {{ formatNumber(balance) ?? '0.00' }}</span>
               <span class="text-body-1">Crédito restante</span>
               <p class="mb-0 text-base text-disabled">
-                Saldo de cuenta para la próxima compra
+                Saldo de cuenta para el proveedor
               </p>
             </div>
           </VCardText>

@@ -268,6 +268,7 @@ const removeAddress = async () => {
                 <VWindowItem>
                     <CustomerTabAddressAndBilling 
                         :addresses="client.addresses"
+                        :is-supplier="false"
                         @submit="onSubmit"
                         @delete="showDeleteDialog"/>
                 </VWindowItem>

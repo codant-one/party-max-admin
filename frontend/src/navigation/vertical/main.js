@@ -19,7 +19,7 @@ export default [
         icon: { icon: 'tabler-clipboard-list' },
         to: 'dashboard-admin-orders', 
         action: 'ver' , 
-        subject: 'ordenes', 
+        subject: 'pedidos', 
     }
 ]
   

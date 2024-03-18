@@ -113,7 +113,7 @@ const resolveStatusPayment = shipping_state_id => {
           <th scope="col"> ESTADO DEL ENVÍO</th>
           <th scope="col"> ESTADO DEL PAGO</th>
           <th scope="col"> VENTA </th>
-          <th scope="col" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">
+          <th scope="col" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
             ACCIONES
           </th>
         </tr>
@@ -151,9 +151,9 @@ const resolveStatusPayment = shipping_state_id => {
             COP {{ formatNumber(order.total) }} 
           </td>
           <!-- 👉 Acciones -->
-          <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'ordenes') || $can('eliminar', 'ordenes')">      
+          <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">      
             <VBtn
-              v-if="$can('ver', 'ordenes')"
+              v-if="$can('ver', 'pedidos')"
               icon
               variant="text"
               color="default"
@@ -172,7 +172,7 @@ const resolveStatusPayment = shipping_state_id => {
               />
             </VBtn>
             <VBtn
-              v-if="$can('eliminar','ordenes')"
+              v-if="$can('eliminar','pedidos')"
               icon
               size="x-small"
               color="default"

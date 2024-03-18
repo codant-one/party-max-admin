@@ -116,7 +116,7 @@ class PaymentController extends Controller
             return response()->json([
                 'sucess' => false,
                 'feedback' => 'not_found',
-                'message' => 'Orden no encontrada'
+                'message' => 'Pedido no encontrada'
             ], 404);
 
         switch ($request->response_code_pol) {
