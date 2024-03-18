@@ -311,10 +311,11 @@ const onSubmit = () => {
                                             </VCol>
                                             <VCol cols="12" md="6">
                                                 <VFileInput
+                                                    accept="image/*,application/pdf"
                                                     v-model="file_nit"
                                                     value=""
                                                     placeholder="Upload your documents"
-                                                    label="Cámara de Comercio"
+                                                    label="Cámara de Comercio (images/pdf)"
                                                     prepend-icon="tabler-paperclip"
                                                 >
                                                     <template #selection="{ fileNames }">
@@ -335,10 +336,11 @@ const onSubmit = () => {
                                             </VCol>
                                             <VCol cols="12" md="6">
                                                 <VFileInput
+                                                    accept="image/*,application/pdf"
                                                     v-model="file_rut"
                                                     value=""
                                                     placeholder="Upload your documents"
-                                                    label="RUT"
+                                                    label="RUT (images/pdf)"
                                                     prepend-icon="tabler-paperclip"
                                                 >
                                                     <template #selection="{ fileNames }">
@@ -399,10 +401,11 @@ const onSubmit = () => {
                                             </VCol>
                                             <VCol cols="12" md="6">
                                                 <VFileInput
+                                                    accept="image/*,application/pdf"
                                                     v-model="file_account"
                                                     value=""
                                                     placeholder="Upload your documents"
-                                                    label="Certificación Bancaria"
+                                                    label="Certificación Bancaria (images/pdf)"
                                                     prepend-icon="tabler-paperclip"
                                                 >
                                                     <template #selection="{ fileNames }">
