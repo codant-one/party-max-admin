@@ -11,6 +11,7 @@ import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPa
 import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
 import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
 import CustomerTabAddressAndBilling from '@/views/apps/ecommerce/customer/view/CustomerTabAddressAndBilling.vue'
+import CustomerTabCompany from '@/views/apps/ecommerce/customer/view/CustomerTabCompany.vue'
 
 const route = useRoute()
 const suppliersStores = useSuppliersStores()
@@ -26,7 +27,8 @@ const isRequestOngoing = ref(true)
 const tabs = [
   { title: 'Descripción general' },
   { title: 'Seguridad' },
-  { title: 'Facturación' }
+  { title: 'Facturación' },
+  { title: 'Empresa' }
 ]
 
 const advisor = ref({
@@ -55,36 +57,53 @@ async function fetchData() {
   isRequestOngoing.value = false
 }
 
-const handleDownload = async(file) => {
-    console.log('descargar', file)
+const handleDownload = async(data) => {
+    if(data.icon === 'pdf' || data.icon === 'docx' || data.icon === 'doc') {
+        try {
+            const link = document.createElement('a');
+            link.href = themeConfig.settings.urlStorage + 'documents/' + data.document
+            link.target = '_blank'
+            document.body.appendChild(link);
+            link.click();
 
-    try {
-        const response = await axios.get( 
-            themeConfig.settings.urlbase + 'proxy-document?file=documents/' + file, 
-            { responseType: 'blob'
-        });
+            link.parentNode.removeChild(link);
 
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file);
-        document.body.appendChild(link);
-        link.click();
+            advisor.value.type = 'success'
+            advisor.value.show = true
+            advisor.value.message = 'Descarga Exitosa!'
 
-        link.parentNode.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        } catch (error) {
 
-        advisor.value.type = 'success'
-        advisor.value.show = true
-        advisor.value.message = 'Descarga Exitosa!'
+            advisor.value.type = 'error'
+            advisor.value.show = true
+            advisor.value.message = 'Error al descargar el documento:' + error
+        }
+    } else {
+        try {
+            const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + 'documents/' + data.document);
+            const blob = await response.blob();
 
-    } catch (error) {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
 
-        advisor.value.type = 'error'
-        advisor.value.show = true
-        advisor.value.message = 'Error al descargar la imagen:' + error
+            link.setAttribute('download', 'image.jpg');
 
-        console.log('EEOR', error)
+            document.body.appendChild(link);
+            link.click();
+
+            window.URL.revokeObjectURL(url);
+
+            advisor.value.type = 'success'
+            advisor.value.show = true
+            advisor.value.message = 'Descarga Exitosa!'
+
+        } catch (error) {
+
+            advisor.value.type = 'error'
+            advisor.value.show = true
+            advisor.value.message = 'Error al descargar la imagen:' + error
+        }
     }
 
     setTimeout(() => {
@@ -208,6 +227,13 @@ const handleCopy = (data) => {
                 </VWindowItem>
                 <VWindowItem>
                     <CustomerTabAddressAndBilling 
+                        :customer-data="supplier"
+                        :is-supplier="true"
+                        @copy="handleCopy"
+                        @download="handleDownload"/>
+                </VWindowItem>
+                <VWindowItem>
+                    <CustomerTabCompany
                         :customer-data="supplier"
                         :is-supplier="true"
                         @copy="handleCopy"

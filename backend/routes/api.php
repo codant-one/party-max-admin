@@ -216,7 +216,6 @@ Route::group(['prefix' => 'payments'], function () {
 
 //PROXY
 Route::get('/proxy-image',[ProxyController::class, 'getImage']);
-Route::get('/proxy-document',[ProxyController::class, 'getDocument']);
 
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
