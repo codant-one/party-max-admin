@@ -89,6 +89,7 @@ class MiscellaneousController extends Controller
                                     'orderBy',
                                     'category',
                                     'subcategory',
+                                    'subcategory2',
                                     'colorId',
                                     'min',
                                     'max',
@@ -103,9 +104,11 @@ class MiscellaneousController extends Controller
                             'orderBy',
                             'category',
                             'subcategory',
+                            'subcategory2',
                             'colorId',
                             'min',
-                            'max'
+                            'max',
+                            'wholesalers'
                         ])
                     )->count();
                            
