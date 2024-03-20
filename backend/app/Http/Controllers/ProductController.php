@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\Supplier;
 
 class ProductController extends Controller
 {
@@ -72,11 +74,19 @@ class ProductController extends Controller
             
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
+            $data = [
+                'ordersTotalCount' => Order::count(),
+                'ordersClient' => Order::distinct('client_id')->count('client_id'),
+                'ordersSales' => Order::sum('total'),
+                'suppliersTotalCount' => Supplier::count()
+            ];
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'products' => $products,
-                    'productsTotalCount' => $count
+                    'productsTotalCount' => $count,
+                    'data' => $data
                 ]
             ]);
 

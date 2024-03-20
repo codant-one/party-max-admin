@@ -1,7 +1,7 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { prefixWithPlus } from '@/@core/utils/formatters'
+import { formatNumber } from '@/@core/utils/formatters'
 import { useProductsStores } from '@/stores/useProducts'
 import { excelParser } from '@/plugins/csv/excelParser'
 import router from '@/router'
@@ -10,35 +10,8 @@ const productsStores = useProductsStores()
 
 const isMobile = ref(false)
 
-const widgetData = ref([
-  {
-    title: 'Ventas',
-    value: '$5,345.43',
-    icon: 'tabler-home',
-    desc: '5k orders',
-    change: 5.7,
-  },
-  {
-    title: 'Website Sales',
-    value: '$674,347.12',
-    icon: 'tabler-device-laptop',
-    desc: '21k orders',
-    change: 12.4,
-  },
-  {
-    title: 'Descuentos',
-    value: '$14,235.12',
-    icon: 'tabler-gift',
-    desc: '6k orders',
-  },
-  {
-    title: 'Proveedores',
-    value: '$8,345.23',
-    icon: 'tabler-wallet',
-    desc: '150 orders',
-    change: -3.5,
-  },
-])
+const data = ref(null)
+const widgetData = ref([])
 
 const products = ref([])
 const searchQuery = ref('')
@@ -95,6 +68,35 @@ async function fetchData() {
 
     totalPages.value = productsStores.last_page
     totalProducts.value = productsStores.productsTotalCount
+
+    data.value = productsStores.data
+
+    widgetData.value = [
+        {
+            title: 'Ventas',
+            value: '$' + formatNumber(data.value.ordersSales),
+            icon: 'tabler-home',
+            desc: data.value.ordersTotalCount + ' pedidos'
+        },
+        {
+            title: 'Clientes con Pedidos',
+            value: data.value.ordersClient,
+            icon: 'tabler-device-laptop',
+            desc: data.value.ordersTotalCount + ' pedidos'
+        },
+        {
+            title: 'Descuentos',
+            value: '$0.00',
+            icon: 'tabler-gift',
+            desc: '0 pedidos',
+        },
+        {
+            title: 'Proveedores',
+            value: data.value.suppliersTotalCount,
+            icon: 'tabler-wallet',
+            desc: ''
+        }
+    ]
 
     isRequestOngoing.value = false
 }
@@ -292,14 +294,6 @@ const downloadCSV = async () => {
                                         <div class="me-2 text-disabled text-no-wrap">
                                             {{ data.desc }}
                                         </div>
-
-                                        <VChip
-                                            v-if="data.change"
-                                            label
-                                            :color="data.change > 0 ? 'success' : 'error'"
-                                        >
-                                            {{ prefixWithPlus(data.change) }}%
-                                        </VChip>
                                     </div>
                                 </div>
 
