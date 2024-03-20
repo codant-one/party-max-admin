@@ -153,10 +153,6 @@ class Product extends Model
             $query->whereSubCategory($filters->get('subcategory'));
         }
 
-        if ($filters->get('subcategory2') !== null) {
-            $query->whereSubCategory($filters->get('subcategory2'));
-        }
-
         if($filters->get('colorId') !== null){
             $query->whereColor($filters->get('colorId'));
         }
