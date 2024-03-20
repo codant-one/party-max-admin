@@ -338,6 +338,7 @@ class Product extends Model
             'description' => $request->description === 'null' ? null : $request->description,
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
+            'wholesale' => $request->wholesale,
             'wholesale_price' => $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)

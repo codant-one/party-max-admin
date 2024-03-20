@@ -233,7 +233,9 @@ const downloadCSV = async () => {
       NOMBRE: element.user.name,
       APELLIDO: element.user.last_name ?? '',
       USUARIO: element.user.username,
-      PAÍS:  element.user.user_detail.province.country.name
+      PAÍS:  element.user.user_detail.province.country.name,
+      PEDIDOS: element.orders_count,
+      TOTAL_VENTAS: formatNumber(element.sales) ?? '0.00'
     }
           
     dataArray.push(data)

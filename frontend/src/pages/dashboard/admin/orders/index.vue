@@ -29,28 +29,8 @@ const advisor = ref({
   show: false
 })
 
-const widgetData = ref([
-  {
-    title: 'Pending Payment',
-    value: 56,
-    icon: 'tabler-calendar-stats',
-  },
-  {
-    title: 'Unfulfilled',
-    value: 25,
-    icon: 'tabler-circle-x',
-  },
-  {
-    title: 'Completed',
-    value: 12689,
-    icon: 'tabler-checks',
-  },
-  {
-    title: 'Refunded',
-    value: 124,
-    icon: 'tabler-wallet',
-  },
-])
+const payments = ref(null)
+const widgetData = ref([])
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
@@ -59,7 +39,6 @@ const paginationData = computed(() => {
 
   return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
 })
-
 
 // 👉 watching current page
 watchEffect(() => {
@@ -86,10 +65,33 @@ async function fetchData() {
   orders.value = ordersStores.getOrders
   totalPages.value = ordersStores.last_page
   totalOrders.value = ordersStores.ordersTotalCount
+  payments.value = ordersStores.payments
+
+  widgetData.value = [
+    {
+        title: 'Pagos Pendientes',
+        value: payments.value.pendingPayments,
+        icon: 'tabler-calendar-stats',
+    },
+    {
+        title: 'Pagos Fallidos',
+        value: payments.value.failedPayments,
+        icon: 'tabler-circle-x',
+    },
+    {
+        title: 'Pagos Completados',
+        value: payments.value.successPayments,
+        icon: 'tabler-checks',
+    },
+    {
+        title: 'Pagos Cancelados',
+        value: payments.value.canceledPayments,
+        icon: 'tabler-wallet',
+    }
+    ]
 
   isRequestOngoing.value = false
 }
-
 
 const showDeleteDialog = orderData => {
   isConfirmDeleteDialogVisible.value = true
@@ -163,10 +165,13 @@ const downloadCSV = async () => {
   ordersStores.getOrders.forEach(element => {
 
     let data = {
-      ID: element.id,
-      NOMBRE: element.user.name,
-      APELLIDO: element.user.last_name ?? '',
-      USUARIO: element.user.username
+      REFERENCIA: element.reference_code ?? '',
+      FECHA: format(element.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
+      CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
+      CORREO: element.client.user.email,
+      ESTADO_ENVIO: element.shipping.name,
+      ESTADO_PAGO: element.payment.name,
+      MONTO: formatNumber(element.total)
     }
           
     dataArray.push(data)
@@ -183,6 +188,13 @@ const downloadCSV = async () => {
 <template>
   <section>
     <div>
+        <v-alert
+            v-if="advisor.show"
+            :type="advisor.type"
+            class="mb-6">
+            
+          {{ advisor.message }}
+        </v-alert>
         <VDialog
             v-model="isRequestOngoing"
             width="300"
@@ -457,6 +469,35 @@ const downloadCSV = async () => {
             </VCardText>
         </VCard>
     </div>
+    <!-- 👉 Confirm Delete -->
+    <VDialog
+      v-model="isConfirmDeleteDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Eliminar Pedido">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de eliminar el pedido <strong>{{ selectedOrder.reference_code }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmDeleteDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="removeOrder">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 </template>
 

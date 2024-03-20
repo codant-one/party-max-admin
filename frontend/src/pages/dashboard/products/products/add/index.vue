@@ -52,7 +52,7 @@ const description = ref(' ')
 const price = ref('')
 const price_for_sale = ref('')
 const wholesale_price = ref('')
-const wholesale = ref(0)
+const wholesale = ref(false)
 const stock = ref('')
 const image = ref('')
 const avatar = ref('')
@@ -223,7 +223,7 @@ const onSubmit = () => {
           formData.append('description', description.value)
           formData.append('price', price.value)
           formData.append('price_for_sale', price_for_sale.value)
-          formData.append('wholesale', wholesale.value)
+          formData.append('wholesale', wholesale.value ? 1 : 0)
           formData.append('wholesale_price', wholesale_price.value)
           formData.append('stock', stock.value)
           formData.append('image', image.value)
@@ -559,10 +559,13 @@ const onSubmit = () => {
               />
               <label for="wholesale">¿Producto disponible al por mayor?</label>
               <VCheckbox
-                label="SI"
                 v-model="wholesale"
                 :value=1  
-              />
+              > 
+                <template #label>
+                  {{ wholesale ? 'SI' : 'NO' }}
+                </template>
+              </VCheckbox>
 
               <AppTextField
                 v-model="wholesale_price"

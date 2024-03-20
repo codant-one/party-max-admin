@@ -53,11 +53,19 @@ class OrderController extends Controller
 
             $orders = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
+            $payments = [
+                'pendingPayments' => Order::where('payment_state_id', 1)->count(),
+                'canceledPayments' => Order::where('payment_state_id', 2)->count(),
+                'failedPayments' => Order::where('payment_state_id', 3)->count(),
+                'successPayments' => Order::where('payment_state_id', 4)->count(),
+            ];
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'orders' => $orders,
-                    'ordersTotalCount' => $count
+                    'ordersTotalCount' => $count,
+                    'payments' => $payments
                 ]
             ]);
 

@@ -6,7 +6,8 @@ export const useOrdersStores = defineStore('orders', {
         orders: {},
         loading: false,
         last_page: 1,
-        ordersTotalCount: 6
+        ordersTotalCount: 6,
+        payments: {}
     }),
     getters:{
         getOrders(){
@@ -25,6 +26,7 @@ export const useOrdersStores = defineStore('orders', {
                     this.orders = response.data.data.orders.data
                     this.last_page = response.data.data.orders.last_page
                     this.ordersTotalCount = response.data.data.ordersTotalCount
+                    this.payments = response.data.data.payments
                 })
                 .catch(error => console.log(error))
                 .finally(() => {

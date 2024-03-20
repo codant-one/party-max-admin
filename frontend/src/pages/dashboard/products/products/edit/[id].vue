@@ -54,6 +54,7 @@ const description = ref(' ')
 const price = ref('')
 const price_for_sale = ref('')
 const wholesale_price = ref('')
+const wholesale = ref(false)
 const stock = ref('')
 const image = ref('')
 const avatar = ref('')
@@ -159,6 +160,7 @@ async function fetchData() {
     price.value = product.value.price
     price_for_sale.value = product.value.price_for_sale
     wholesale_price.value = product.value.wholesale_price
+    wholesale.value = product.value.wholesale
     stock.value = product.value.stock
 
     avatar.value = product.value.image === null ? '' : themeConfig.settings.urlStorage + product.value.image
@@ -276,6 +278,7 @@ const onSubmit = () => {
             formData.append('description', description.value)
             formData.append('price', price.value)
             formData.append('price_for_sale', price_for_sale.value)
+            formData.append('wholesale', wholesale.value ? 1 : 0)
             formData.append('wholesale_price', wholesale_price.value)
             formData.append('stock', stock.value)
             formData.append('image', image.value)
@@ -616,13 +619,23 @@ const onSubmit = () => {
                 :rules="[requiredValidator]"
               />
 
+              <label for="wholesale">¿Producto disponible al por mayor?</label>
+              <VCheckbox
+                v-model="wholesale"
+                :value=1  
+              > 
+                <template #label>
+                  {{ wholesale ? 'SI' : 'NO' }}
+                </template>
+              </VCheckbox>
+
               <AppTextField
                 v-model="wholesale_price"
+                v-if="wholesale === 1"
                 prefix="COP"
                 type="number"
                 label="Precio por mayor"
                 class="mb-4"
-                :rules="[requiredValidator]"
               />
 
               <AppTextField
