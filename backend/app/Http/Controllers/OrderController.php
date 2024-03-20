@@ -102,7 +102,16 @@ class OrderController extends Controller
     {
         try {
 
-            $order = Order::with(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail'])->find($id);
+            $order = Order::with([
+                'details.product_color.product', 
+                'details.product_color.color',
+                'details.product_color.images', 
+                'address.type', 
+                'billing', 
+                'shipping', 
+                'payment', 
+                'client.user.userDetail'
+            ])->find($id);
 
             if (!$order)
                 return response()->json([
@@ -111,10 +120,13 @@ class OrderController extends Controller
                     'message' => 'Pedido no encontrada'
                 ], 404);
 
+            $count = Order::where('client_id', $order->client_id)->count();
+
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'order' => $order
+                    'order' => $order,
+                    'ordersTotalCount' => $count
                 ]
             ]);
 

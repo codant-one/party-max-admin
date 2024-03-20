@@ -35,8 +35,7 @@ class PaymentController extends Controller
                     'merchantId' => env('PAYU_MERCHANT_ID'),
                     'accountId' => env('PAYU_ACCOUNT_ID'),
                     'responseUrl' => env('APP_DOMAIN').'/cart',
-                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation',
-                    'test' => env('PAYU_DEBUG')
+                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation'
                 ]
             ]);
 
@@ -133,7 +132,7 @@ class PaymentController extends Controller
                 break;
             default:
                 $payment_state_id = 3;  
-            }
+        }
 
         $order->update([
             'payment_state_id' => $payment_state_id

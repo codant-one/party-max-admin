@@ -1,6 +1,5 @@
 <script setup>
 
-import { useAddressesStores } from '@/stores/useAddresses'
 import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
 import { format } from 'date-fns';
@@ -13,6 +12,7 @@ const ordersStores = useOrdersStores()
 
 const order = ref(null)
 const date = ref(null)
+const total = ref(0)
 
 const isRequestOngoing = ref(true)
 
@@ -23,9 +23,11 @@ async function fetchData() {
   isRequestOngoing.value = true
 
   if(Number(route.params.id)) {
-    order.value = await ordersStores.showOrder(Number(route.params.id))
+    const response = await ordersStores.showOrder(Number(route.params.id))
 
-    console.log('order', order.value)
+    order.value = response.order
+    total.value = response.ordersTotalCount
+
     date.value = order.value.created_at
   }
 
@@ -147,7 +149,54 @@ const resolveStatusPayment = shipping_state_id => {
 
           <VDivider />
           
-          tabla
+          <v-table class="text-no-wrap">
+            <thead>
+              <tr class="text-no-wrap">
+                <th class="font-weight-semibold"> PRODUCTO </th>
+                <th class="font-weight-semibold"> PRECIO </th>
+                <th class="font-weight-semibold"> CANTIDAD </th>
+                <th class="font-weight-semibold"> TOTAL </th>   
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="order in order.details"
+                :key="order.id"
+                style="height: 3.75rem;">
+                <td>
+                  <div class="d-flex gap-x-3">
+                    <VAvatar
+                      v-if="order.product_color.images.length > 0"
+                      size="38"
+                      :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
+                      :rounded="0"
+                    />
+                    <VAvatar
+                      v-else
+                      size="38"
+                      :image="themeConfig.settings.urlStorage + order.product_color.product.image"
+                      :rounded="0"
+                    />
+
+
+                    <div class="d-flex flex-column align-start">
+                      <span class="text-body-1 font-weight-medium">
+                        {{ order.product_color.product.name }}
+                      </span>
+
+                      <span class="text-sm text-disabled">
+                        Color: {{ order.product_color.color.name }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td><span>${{ formatNumber(order.price) }}</span></td>
+                <td><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
+                <td><span class="text-h6">${{ formatNumber(order.total) }}</span></td>
+              </tr>
+            </tbody>
+          </v-table>
+
           <VDivider />
 
           <VCardText>
@@ -205,14 +254,14 @@ const resolveStatusPayment = shipping_state_id => {
               >
                 <div class="d-flex justify-space-between align-center">
                   <div class="app-timeline-title">
-                    Order was placed (Order ID: #32543)
+                    Se realizo el pedido (Pedido ID: #{{ route.params.id }})
                   </div>
                   <div class="app-timeline-meta">
                     Tuesday 10:20 AM
                   </div>
                 </div>
                 <p class="app-timeline-text mb-0">
-                  Your order has been placed successfully
+                  Su pedido ha sido realizado con éxito
                 </p>
               </VTimelineItem>
 
@@ -324,10 +373,13 @@ const resolveStatusPayment = shipping_state_id => {
               >
                 <VIcon icon="tabler-shopping-cart" />
               </VAvatar>
-              <span class="text-body-1 font-weight-medium text-high-emphasis">12 Orders</span>
+              <span class="text-body-1 font-weight-medium text-high-emphasis">{{ total }} {{ total > 1 ? 'Pedidos' : 'Pedido' }}</span>
             </div>
 
             <div class="d-flex flex-column gap-y-1">
+              <div class="d-flex justify-space-between align-center text-body-2">
+                <span class="text-body-1 text-high-emphasis font-weight-medium">Datos de contacto</span>
+              </div>
               <span>Email: {{ order.client.user.email }} </span>
               <span>Teléfono: {{ order.client.user.user_detail.phone }}</span>
             </div>
@@ -372,7 +424,7 @@ const resolveStatusPayment = shipping_state_id => {
               {{ order.billing.postal_code }}
             </div>
 
-            <div class="mt-6">
+            <div class="mt-6" v-if="order.billing.pse === 0">
               <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                 {{ order.billing.payment_method_name }}
               </div>

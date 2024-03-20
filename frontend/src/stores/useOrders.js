@@ -52,7 +52,7 @@ export const useOrdersStores = defineStore('orders', {
             return Orders.show(id)
                 .then((response) => {
                     if(response.data.success)
-                        return Promise.resolve(response.data.data.order)
+                        return Promise.resolve(response.data.data)
                 })
                 .catch(error => Promise.reject(error))
                 .finally(() => {
