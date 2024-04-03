@@ -7,7 +7,7 @@ import { useCategoriesStores } from '@/stores/useCategories'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import detailsProduct from "@/components/products/detailsProduct.vue";
-import show from './show.vue'
+import show from "@/components/products/show.vue";
 
 const productsStores = useProductsStores()
 const categoriesStores = useCategoriesStores()
@@ -183,6 +183,11 @@ const showStateDialog = (productData, id) => {
     isConfirmApproveDialogVisible.value = true
     state_id.value = id
     selectedProduct.value = { ...productData }
+}
+
+const showDeleteDialog = productData => {
+  isConfirmDeleteDialogVisible.value = true
+  selectedProduct.value = { ...productData }
 }
 
 const stateProduct = async state_id => {

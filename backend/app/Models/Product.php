@@ -124,6 +124,10 @@ class Product extends Model
         if ($filters->get('favourite') !== null) {
             $query->where('favourite', $filters->get('favourite'));
         }
+        
+        if($filters->get('supplierId')) {
+            $query->where('user_id', $filters->get('supplierId'));
+        }
 
         if ($filters->get('archived') !== null) {
             $query->where('archived', $filters->get('archived'));
