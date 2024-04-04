@@ -459,18 +459,18 @@ const printInvoice = () => {
         <VCard>
           <VCardText>
             <!-- 👉 Send Invoice Trigger button -->
-            <VBtn
+            <!-- <VBtn
               block
               prepend-icon="mdi-cloud-download-outline"
               class="mb-2"
               @click="download"
             >
               DESCARGAR
-            </VBtn>
+            </VBtn> -->
 
             <VBtn
               block
-              color="success"
+              prepend-icon="mdi-printer"
               class="mb-2"
               @click="printInvoice"
             >
