@@ -200,13 +200,13 @@ const editProduct = id => {
             <!-- 👉 table head -->
             <thead>
                 <tr>
-                    <th> PRODUCTO </th>
-                    <th class="pe-4"> STOCK </th>
-                    <th class="pe-4"> SKU </th>
-                    <th class="pe-4"> PRECIO </th>
-                    <th class="pe-4"> QTY </th>
-                    <th class="pe-4"> STATUS </th>
-                    <th scope="pe-4" v-if="
+                    <th class="px-2"> PRODUCTO </th>
+                    <th class="px-2"> STOCK </th>
+                    <th class="px-2"> SKU </th>
+                    <th class="px-2"> PRECIO </th>
+                    <th class="px-2"> QTY </th>
+                    <th class="px-2"> STATUS </th>
+                    <th class="px-2 text-end" v-if="
                         $can('aprobar', 'productos') || 
                         $can('rechazar', 'productos') || 
                         $can('editar', 'productos') || 
@@ -221,7 +221,7 @@ const editProduct = id => {
                     v-for="product in myProductsList"
                     :key="product.id"
                     style="height: 3.75rem;">
-                    <td> 
+                    <td class="text-wrap px-1"> 
                         <div class="d-flex align-center gap-x-2">
                             <VAvatar
                                 v-if="product.image"
@@ -230,22 +230,22 @@ const editProduct = id => {
                                 rounded
                                 :image="themeConfig.settings.urlStorage + product.image"
                             />
-                            <div class="d-flex flex-column text-wrap">
+                            <div class="d-flex flex-column">
                                 <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
                                 <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
                             </div>
                         </div>
                     </td>
-                    <td>   
+                    <td class="px-2">   
                         <VSwitch 
                             :model-value="product.in_stock === 1 ? true : false"
                             readonly
                         /> 
                     </td>
-                    <td> {{ product.colors[0].sku }} </td>
-                    <td> {{ product.price_for_sale }} </td>
-                    <td> {{ product.stock }} </td>
-                    <td> 
+                    <td class="px-2"> {{ product.colors[0].sku }} </td>
+                    <td class="px-2"> {{ product.price_for_sale }} </td>
+                    <td class="px-2"> {{ product.stock }} </td>
+                    <td class="px-2"> 
                         <VChip
                             v-bind="resolveStatus(product.state_id)"
                             density="default"
@@ -253,7 +253,7 @@ const editProduct = id => {
                         />
                     </td>
                     <!-- 👉 Acciones -->
-                    <td class="text-center" style="width: 5rem;" 
+                    <td class="text-end px-2"
                         v-if="$can('aprobar', 'productos') ||
                         $can('rechazar', 'productos') || 
                         $can('editar', 'productos') || 
