@@ -242,7 +242,7 @@ const downloadCSV = async () => {
                     {{  blog.is_popular_blog === 1 ? 'SI' : 'NO' }}
                   </VChip>  
                 </td>
-                <td>
+                <td class="text-wrap">
                   <span v-if="blog.description" v-html="blog.description.slice(0,50) + '...'"></span>
                 </td>
                 <td>

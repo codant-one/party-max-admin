@@ -60,7 +60,7 @@ const modules = {
 
         axios.post('/blogs/upload-image', formData)
           .then(res => {
-            resolve(themeConfig.configuraciones.urlStorage + res.data.url);
+            resolve(themeConfig.settings.urlStorage + res.data.url);
           })
           .catch(err => {
             reject("Upload failed");
