@@ -221,7 +221,7 @@ const editProduct = id => {
                     v-for="product in myProductsList"
                     :key="product.id"
                     style="height: 3.75rem;">
-                    <td> 
+                    <td class="text-wrap"> 
                         <div class="d-flex align-center gap-x-2">
                             <VAvatar
                                 v-if="product.image"
