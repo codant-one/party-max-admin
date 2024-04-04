@@ -168,6 +168,19 @@ class Product extends Model
         if ($filters->get('wholesalers')) {
             $query->whereNotNull('wholesale_price');
         }
+
+        if ($filters->get('type_sales')) {
+
+            if ($filters->get('type_sales')==='2') {
+                $query->whereNotNull('wholesale_price');
+            }
+
+            else
+            {
+                $query->whereNull('wholesale_price'); 
+            }
+            
+        }
                 
 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {

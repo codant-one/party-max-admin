@@ -52,6 +52,7 @@ class ProductController extends Controller
                                 'discarded',
                                 'state_id',
                                 'in_stock',
+                                'type_sales',
                                 'category_id',
                                 'supplierId'
                             ])
@@ -68,6 +69,7 @@ class ProductController extends Controller
                                 'discarded',
                                 'state_id',
                                 'in_stock',
+                                'type_sales',
                                 'category_id',
                                 'supplierId'
                             ])
