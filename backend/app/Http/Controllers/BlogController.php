@@ -32,7 +32,8 @@ class BlogController extends Controller
                             $request->only([
                                     'search',
                                     'orderByField',
-                                    'orderBy'
+                                    'orderBy',
+                                    'category_id'
                                 ])
                           );            
 
@@ -40,7 +41,8 @@ class BlogController extends Controller
                         $request->only([
                                 'search',
                                 'orderByField',
-                                'orderBy'
+                                'orderBy',
+                                'category_id'
                             ])
                     )->count();
 
@@ -90,6 +92,16 @@ class BlogController extends Controller
                 $blog->image = $file_data['filePath'];
                 $blog->update();
             } 
+
+            $order_id = Blog::where('blog_category_id', $blog->blog_category_id)
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? null;
+
+            if($order_id) {
+                $blog->order_id = $order_id + 1;
+                $blog->update();
+            }
 
             return response()->json([
                 'success' => true,
@@ -249,5 +261,27 @@ class BlogController extends Controller
             ], 500);
         }
 
+    }
+
+    /**
+     * update the order_id.
+     */
+    public function updateOrder(Request $request): JsonResponse
+    { 
+        $countBlogs = 1;
+
+        foreach($request->all() as $blogRequest){
+            Blog::updateOrCreate(
+                [ 
+                    'id' => $blogRequest['id'],
+                    'blog_category_id' => $blogRequest['blog_category_id']
+                ],
+                [ 'order_id' => $countBlogs++ ]
+            );
+        }
+
+        return response()->json([
+            'success' => 1
+        ]);
     }
 }

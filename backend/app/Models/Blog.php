@@ -110,6 +110,10 @@ class Blog extends Model
             $query->whereSearch($filters->get('search'));
         }
 
+        if ($filters->get('category_id')) {
+            $query->where('blog_category_id', $filters->get('category_id'));
+        }
+
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'created_at';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';

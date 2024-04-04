@@ -18,6 +18,9 @@ class Faqs {
         return axios.delete(`/faqs/${id}`)
     }
     
+    updateOrder(data) {
+        return axios.post('/faqs/order_id',data)
+    }
 }
 
 const faqs = new Faqs();

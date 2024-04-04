@@ -37,8 +37,15 @@ export default [
           to: 'dashboard-products-pendings', 
           action: 'ver' , 
           subject: 'productos-pendientes', 
+        },
+        { 
+          title: 'Ordenar Productos', 
+          icon: { icon: 'mdi-sort' },
+          to: 'dashboard-products-orders', 
+          action: 'ver' , 
+          subject: 'productos-pendientes', 
         }
-      ],
+      ]
     }
 ]
   

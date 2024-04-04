@@ -39,7 +39,8 @@ class FaqController extends Controller
                             $request->only([
                                 'search',
                                 'orderByField',
-                                'orderBy'
+                                'orderBy',
+                                'category_id'
                             ])
                         );
 
@@ -47,7 +48,8 @@ class FaqController extends Controller
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'category_id'
                         ])
                     )->count();
 
@@ -78,6 +80,16 @@ class FaqController extends Controller
         try {
 
             $faq = Faq::createFaq($request);
+
+            $order_id = Faq::where('faq_category_id', $faq->faq_category_id)
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? null;
+
+            if($order_id) {
+                $faq->order_id = $order_id + 1;
+                $faq->update();
+            }
 
             return response()->json([
                 'success' => true,
@@ -196,5 +208,27 @@ class FaqController extends Controller
             ], 500);
         }
     
+    }
+
+    /**
+     * update the order_id.
+     */
+    public function updateOrder(Request $request): JsonResponse
+    { 
+        $countFaqs = 1;
+
+        foreach($request->all() as $faqRequest){
+            Faq::updateOrCreate(
+                [ 
+                    'id' => $faqRequest['id'],
+                    'faq_category_id' => $faqRequest['faq_category_id']
+                ],
+                [ 'order_id' => $countFaqs++ ]
+            );
+        }
+
+        return response()->json([
+            'success' => 1
+        ]);
     }
 }

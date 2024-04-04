@@ -155,7 +155,9 @@ async function fetchData() {
 
   let tags = { 
     tag_type_id: 2,
-    limit: -1 
+    limit: -1,
+    orderByField: 'name',
+    orderBy: 'asc',
   }
 
   await tagsStores.fetchTags(tags)
@@ -285,7 +287,7 @@ const capitalizedLabel = label => {
                 </VCol>
               
                 <VCol cols="12">
-                  <AppSelect
+                  <VAutocomplete
                     v-model="tag_id"
                     chips
                     multiple
@@ -295,7 +297,25 @@ const capitalizedLabel = label => {
                     item-title="name"
                     placeholder="Tags"
                     color="primary"
-                  />
+                  >
+                    <template v-slot:item="{ props, item }">
+                      <v-list-item
+                        v-bind="props"
+                        :title="item?.raw?.name"
+                        :style="{ 
+                          paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                          paddingTop: `0 !important`,
+                          height: `10px !important`
+                        }"
+                      >
+                        <template v-slot:prepend="{ isActive }">
+                          <v-list-item-action start>
+                            <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                          </v-list-item-action>
+                        </template>
+                      </v-list-item>
+                    </template>
+                  </VAutocomplete>
                 </VCol>
                 <VCol cols="12">
                     <VImg

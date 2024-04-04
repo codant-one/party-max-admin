@@ -74,6 +74,18 @@ export const useFaqsStores = defineStore('faqs', {
                 .finally(() => {
                     this.setLoading(false)
                 })  
+        },
+        updateOrder(data){
+            this.setLoading(true)
+            
+            return Faqs.updateOrder(data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
         }
     }
 })

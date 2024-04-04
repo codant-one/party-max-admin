@@ -136,6 +136,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::put('updateStates/{id}', [ProductController::class, 'updateStates']);
     });
 
+    //Faqs
+    Route::group(['prefix' => 'faqs'], function () {
+        Route::post('order_id', [FaqController::class, 'updateOrder']);
+    });
+
     //Faq-categories
     Route::group(['prefix' => 'faq-categories'], function () {
         Route::post('delete', [FaqCategoryController::class, 'delete']);
@@ -145,6 +150,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Blogs
     Route::group(['prefix' => 'blogs'], function () {
         Route::post('upload-image', [BlogController::class, 'uploadImage']);
+        Route::post('order_id', [BlogController::class, 'updateOrder']);
     });
 
      //Blog-categories

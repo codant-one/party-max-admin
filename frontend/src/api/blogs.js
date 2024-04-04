@@ -21,6 +21,10 @@ class Blogs {
     delete(id){
         return axios.delete(`/blogs/${id}`)
     }
+
+    updateOrder(data) {
+        return axios.post('/blogs/order_id',data)
+    }
 }
 
 const blogs = new Blogs();

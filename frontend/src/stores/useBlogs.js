@@ -88,6 +88,18 @@ export const useBlogsStores = defineStore('blogs', {
                 .finally(() => {
                     this.setLoading(false)
                 })  
+        },
+        updateOrder(data){
+            this.setLoading(true)
+            
+            return Blogs.updateOrder(data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
         }
     }
 })

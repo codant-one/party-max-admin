@@ -1,12 +1,18 @@
 <script setup>
 
+import { useCategoriesStores } from '@/stores/useBlogCategories'
 import { useBlogsStores } from '@/stores/useBlogs'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
+import draggable from 'vuedraggable'
 
+const categoriesStores = useCategoriesStores()
 const blogsStores = useBlogsStores()
+
+const selectedCategory = ref('')
+const categories = ref([])
 
 const blogs = ref([])
 const searchQuery = ref('')
@@ -17,6 +23,8 @@ const totalBlogs = ref(0)
 const isRequestOngoing = ref(true)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedBlog = ref({})
+
+const enabled = ref(true)
 
 const advisor = ref({
   type: '',
@@ -42,18 +50,27 @@ watchEffect(fetchData)
 
 async function fetchData() {
   
+  if(selectedCategory.value !== '' && selectedCategory.value !== null) {
+    enabled.value = false
+  } else {
+    enabled.value = true
+  }
+
   let data = {
     search: searchQuery.value,
-    orderByField: 'id',
-    orderBy: 'desc',
+    orderByField: 'order_id',
+    orderBy: 'asc',
     limit: rowPerPage.value,
-    page: currentPage.value
+    page: currentPage.value,
+    category_id: selectedCategory.value
   }
 
   isRequestOngoing.value = true
 
   await blogsStores.fetchBlogs(data)
+  await categoriesStores.fetchCategories({limit: -1})
 
+  categories.value = categoriesStores.getCategories
   blogs.value = blogsStores.getBlogs
   totalPages.value = blogsStores.last_page
   totalBlogs.value = blogsStores.blogsTotalCount
@@ -124,6 +141,19 @@ const downloadCSV = async () => {
   isRequestOngoing.value = false
 }
 
+const onStart = async (e) => {
+  // console.log('oldIndex',e.oldIndex)
+}
+
+const onEnd = async (e) => {
+  blogsStores.updateOrder(blogs.value)
+  fetchData()
+}
+
+const closeDropdown = () => { 
+  document.getElementById("selectCategory").blur()
+}
+
 </script>
 
 <template>
@@ -185,6 +215,50 @@ const downloadCSV = async () => {
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
+              <VAutocomplete
+                id="selectCategory"
+                v-model="selectedCategory"
+                label="Categoría"
+                autocomplete="off"
+                clearable
+                :items="categories"
+                :item-title="item => item.name"
+                :item-value="item => item.id"
+                :menu-props="{ maxHeight: '300px' }"
+                style="width: 15rem;">
+                <template v-slot:item="{ props, item }">
+                  <v-list-item
+                    v-bind="props"
+                    :title="item?.raw?.name"
+                    :style="{ 
+                    paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                    paddingTop: `0 !important`,
+                    height: `10px !important`
+                    }"
+                  >
+                    <template v-slot:prepend="{ isActive }">
+                      <v-list-item-action start>
+                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                      </v-list-item-action>
+                    </template>
+                  </v-list-item>
+                </template>
+                <template v-slot:append-item>
+                  <v-divider class="mt-2"></v-divider>
+                  <v-list-item title="Cerrar Opciones" class="text-right">
+                    <template v-slot:append>
+                      <VBtn
+                        size="small"
+                        variant="plain"
+                        icon="tabler-x"
+                        color="black"
+                        :ripple="false"
+                        @click="closeDropdown"/>
+                    </template>
+                  </v-list-item>
+                </template>
+              </VAutocomplete>
+
               <!-- 👉 Search  -->
               <div style="width: 30rem;">
                 <VTextField
@@ -211,7 +285,7 @@ const downloadCSV = async () => {
             <!-- 👉 table head -->
             <thead>
               <tr>
-                <th scope="col"> #ID </th>
+                <th scope="col"> #ORDEN ID  </th>
                 <th scope="col"> TÍTULO </th>
                 <th scope="col"> FECHA </th>
                 <th scope="col"> CATEGORÍA </th>
@@ -224,75 +298,82 @@ const downloadCSV = async () => {
               </tr>
             </thead>
             <!-- 👉 table body -->
-            <tbody>
-              <tr 
-                v-for="blog in blogs"
-                :key="blog.id"
-                style="height: 3.75rem;">
+            <draggable 
+              v-model="blogs" 
+              tag="tbody"
+              item-key="id"
+              :disabled="enabled"
+              @start="onStart"
+              @end="onEnd">
+              <template #item="{ element }">
+                <tr 
+                  style="height: 3.75rem;"
+                  :class="!enabled ? 'draggable-item' : ''">
 
-                <td> {{ blog.id }} </td>
-                <td class="text-wrap"> {{ blog.title }} </td>
-                <td> {{ blog.date }} </td>
-                <td class="text-wrap"> {{ blog.category.name }} </td>
-                <td> 
-                  <VChip
-                    label
-                    :color="blog.is_popular_blog === 1 ? 'success' : 'error'"
-                    size="small">
-                    {{  blog.is_popular_blog === 1 ? 'SI' : 'NO' }}
-                  </VChip>  
-                </td>
-                <td class="text-wrap">
-                  <span v-if="blog.description" v-html="blog.description.slice(0,50) + '...'"></span>
-                </td>
-                <td>
-                    <VImg
-                        v-if="blog.image !== null"
-                        :src="themeConfig.settings.urlStorage + blog.image"
-                        :height="50"
-                        aspect-ratio="1/1"
-                    />
-                </td>
-                <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar','blogs') || $can('eliminar','blogs')">      
-                  <VBtn
-                    v-if="$can('editar','blogs')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="editBlog(blog)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Editar
-                    </VTooltip>          
-                    <VIcon
+                  <td> {{ element.order_id }} </td>
+                  <td class="text-wrap"> {{ element.title }} </td>
+                  <td> {{ element.date }} </td>
+                  <td class="text-wrap"> {{ element.category.name }} </td>
+                  <td> 
+                    <VChip
+                      label
+                      :color="element.is_popular_blog === 1 ? 'success' : 'error'"
+                      size="small">
+                      {{  element.is_popular_blog === 1 ? 'SI' : 'NO' }}
+                    </VChip>  
+                  </td>
+                  <td class="text-wrap">
+                    <span v-if="element.description" v-html="element.description.slice(0,50) + '...'"></span>
+                  </td>
+                  <td>
+                      <VImg
+                          v-if="element.image !== null"
+                          :src="themeConfig.settings.urlStorage + element.image"
+                          :height="50"
+                          aspect-ratio="1/1"
+                      />
+                  </td>
+                  <!-- 👉 Acciones -->
+                  <td class="text-center" style="width: 5rem;" v-if="$can('editar','blogs') || $can('eliminar','blogs')">      
+                    <VBtn
+                      v-if="$can('editar','blogs')"
+                      icon
+                      size="x-small"
+                      color="default"
+                      variant="text"
+                      @click="editBlog(element)">
+                      <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Editar
+                      </VTooltip>          
+                      <VIcon
+                          size="22"
+                          icon="tabler-edit" />
+                    </VBtn>
+
+                    <VBtn
+                      v-if="$can('eliminar','blogs')"
+                      icon
+                      size="x-small"
+                      color="default"
+                      variant="text"
+                      @click="showDeleteDialog(element)">
+                      <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Eliminar
+                      </VTooltip>          
+                      <VIcon
                         size="22"
-                        icon="tabler-edit" />
-                  </VBtn>
-
-                  <VBtn
-                    v-if="$can('eliminar','blogs')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="showDeleteDialog(blog)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Eliminar
-                    </VTooltip>          
-                    <VIcon
-                      size="22"
-                      icon="tabler-trash" />
-                  </VBtn>
-                </td>
-              </tr>
-            </tbody>
+                        icon="tabler-trash" />
+                    </VBtn>
+                  </td>
+                </tr>
+              </template>
+            </draggable>
             <!-- 👉 table footer  -->
             <tfoot v-show="!blogs.length">
               <tr>
@@ -354,7 +435,22 @@ const downloadCSV = async () => {
     </VDialog>
   </section>
 </template>
+<style scope>
+    .search {
+        width: 100%;
+    }
 
+    .draggable-item:hover {
+      background-color: #e9ecef; /* Color de fondo al hacer hover */
+      cursor: move; /* Cambia el cursor para indicar que el elemento es interactivo */
+    }
+
+    @media(min-width: 991px){
+        .search {
+            width: 30rem;
+        }
+    }
+</style>
 <route lang="yaml">
   meta:
     action: ver

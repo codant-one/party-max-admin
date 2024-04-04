@@ -1,10 +1,16 @@
 <script setup>
 
+import { useCategoriesStores } from '@/stores/useFaqCategories'
 import { useFaqsStores } from '@/stores/useFaqs'
 import { excelParser } from '@/plugins/csv/excelParser'
 import AddNewFaqDrawer from './AddNewFaqDrawer.vue' 
+import draggable from 'vuedraggable'
 
+const categoriesStores = useCategoriesStores()
 const faqsStores = useFaqsStores()
+
+const selectedCategory = ref('')
+const categories = ref([])
 
 const faqs = ref([])
 const searchQuery = ref('')
@@ -16,6 +22,8 @@ const isRequestOngoing = ref(true)
 const isAddNewFaqDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedFaq = ref({})
+
+const enabled = ref(true)
 
 const advisor = ref({
   type: '',
@@ -44,18 +52,27 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
+  if(selectedCategory.value !== '' && selectedCategory.value !== null) {
+    enabled.value = false
+  } else {
+    enabled.value = true
+  }
+
   let data = {
     search: searchQuery.value,
-    orderByField: 'id',
-    orderBy: 'desc',
+    orderByField: 'order_id',
+    orderBy: 'asc',
     limit: rowPerPage.value,
-    page: currentPage.value
+    page: currentPage.value,
+    category_id: selectedCategory.value
   }
 
   isRequestOngoing.value = true
 
   await faqsStores.fetchFaqs(data)
+  await categoriesStores.fetchCategories({limit: -1})
 
+  categories.value = categoriesStores.getCategories
   faqs.value = faqsStores.getFaqs
   totalPages.value = faqsStores.last_page
   totalFaqs.value = faqsStores.faqsTotalCount
@@ -202,6 +219,20 @@ const downloadCSV = async () => {
   isRequestOngoing.value = false
 
 }
+
+const onStart = async (e) => {
+  // console.log('oldIndex',e.oldIndex)
+}
+
+const onEnd = async (e) => {
+  faqsStores.updateOrder(faqs.value)
+  fetchData()
+}
+
+const closeDropdown = () => { 
+  document.getElementById("selectCategory").blur()
+}
+
 </script>
 
 <template>
@@ -262,6 +293,49 @@ const downloadCSV = async () => {
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
+              <VAutocomplete
+                id="selectCategory"
+                v-model="selectedCategory"
+                label="Categoría"
+                autocomplete="off"
+                clearable
+                :items="categories"
+                :item-title="item => item.name"
+                :item-value="item => item.id"
+                :menu-props="{ maxHeight: '300px' }"
+                style="width: 15rem;">
+                <template v-slot:item="{ props, item }">
+                  <v-list-item
+                    v-bind="props"
+                    :title="item?.raw?.name"
+                    :style="{ 
+                    paddingLeft: `${(item?.raw?.level) * 20}px !important`,
+                    paddingTop: `0 !important`,
+                    height: `10px !important`
+                    }"
+                  >
+                    <template v-slot:prepend="{ isActive }">
+                      <v-list-item-action start>
+                        <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
+                      </v-list-item-action>
+                    </template>
+                  </v-list-item>
+                </template>
+                <template v-slot:append-item>
+                  <v-divider class="mt-2"></v-divider>
+                  <v-list-item title="Cerrar Opciones" class="text-right">
+                    <template v-slot:append>
+                      <VBtn
+                        size="small"
+                        variant="plain"
+                        icon="tabler-x"
+                        color="black"
+                        :ripple="false"
+                        @click="closeDropdown"/>
+                    </template>
+                  </v-list-item>
+                </template>
+              </VAutocomplete>
               <!-- 👉 Search  -->
               <div class="search">
                 <VTextField
@@ -288,7 +362,7 @@ const downloadCSV = async () => {
             <!-- 👉 table head -->
             <thead>
               <tr>
-                <th scope="col"> #ID </th>
+                <th scope="col"> #ORDEN ID </th>
                 <th scope="col"> TITULO </th>
                 <th scope="col"> DESCRIPCIÓN </th>
                 <th scope="col"> CATEGORÍA </th>
@@ -298,56 +372,62 @@ const downloadCSV = async () => {
               </tr>
             </thead>
             <!-- 👉 table body -->
-            <tbody>
-              <tr 
-                v-for="faq in faqs"
-                :key="faq.id"
-                style="height: 3.75rem;">
+            <draggable 
+              v-model="faqs" 
+              tag="tbody"
+              item-key="id"
+              :disabled="enabled"
+              @start="onStart"
+              @end="onEnd">
+              <template #item="{ element }">
+                <tr 
+                  style="height: 3.75rem;"
+                  :class="!enabled ? 'draggable-item' : ''">
+                  <td> {{ element.order_id }} </td>
+                  <td class="text-wrap"> {{ element.title }} </td>
+                  <td class="text-wrap"> {{ element.description }} </td>
+                  <td class="text-wrap"> {{ element.category.name }} </td>
+                  <!-- 👉 Acciones -->
+                  <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
+                    <VBtn
+                      v-if="$can('editar', 'faqs')"
+                      icon
+                      size="x-small"
+                      color="default"
+                      variant="text"
+                      @click="editFaq(element)">
+                      <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Editar
+                      </VTooltip>          
+                      <VIcon
+                          size="22"
+                          icon="tabler-edit" />
+                    </VBtn>
 
-                <td> {{ faq.id }} </td>
-                <td class="text-wrap"> {{ faq.title }} </td>
-                <td class="text-wrap"> {{ faq.description }} </td>
-                <td class="text-wrap"> {{ faq.category.name }} </td>
-                <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'faqs') || $can('eliminar', 'faqs')">      
-                  <VBtn
-                    v-if="$can('editar', 'faqs')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="editFaq(faq)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Editar
-                    </VTooltip>          
-                    <VIcon
+                    <VBtn
+                      v-if="$can('eliminar','faqs')"
+                      icon
+                      size="x-small"
+                      color="default"
+                      variant="text"
+                      @click="showDeleteDialog(faq)">
+                      <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Eliminar
+                      </VTooltip>          
+                      <VIcon
                         size="22"
-                        icon="tabler-edit" />
-                  </VBtn>
-
-                  <VBtn
-                    v-if="$can('eliminar','faqs')"
-                    icon
-                    size="x-small"
-                    color="default"
-                    variant="text"
-                    @click="showDeleteDialog(faq)">
-                    <VTooltip
-                      open-on-focus
-                      location="top"
-                      activator="parent">
-                      Eliminar
-                    </VTooltip>          
-                    <VIcon
-                      size="22"
-                      icon="tabler-trash" />
-                  </VBtn>
-                </td>
-              </tr>
-            </tbody>
+                        icon="tabler-trash" />
+                    </VBtn>
+                  </td>
+                </tr>
+              </template>
+            </draggable>
             <!-- 👉 table footer  -->
             <tfoot v-show="!faqs.length">
               <tr>
@@ -419,6 +499,11 @@ const downloadCSV = async () => {
 <style scope>
     .search {
         width: 100%;
+    }
+
+    .draggable-item:hover {
+      background-color: #e9ecef; /* Color de fondo al hacer hover */
+      cursor: move; /* Cambia el cursor para indicar que el elemento es interactivo */
     }
 
     @media(min-width: 991px){

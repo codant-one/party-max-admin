@@ -394,10 +394,27 @@ const removeProduct = async () => {
       {{ advisor.message }}
     </VAlert>
     <Toaster />
-
+    <VDialog
+      v-model="isRequestOngoing"
+      width="300"
+      persistent>
+      <VCard
+        color="primary"
+        width="300">
+        <VCardText class="pt-3">
+          Cargando
+          <VProgressLinear
+            indeterminate
+            color="white"
+            class="mb-0"
+          />
+        </VCardText>
+      </VCard>
+    </VDialog>
     <VCard v-if="products"
       id="rol-list"
       title="Filtros">
+
       <VCardText>
         <VRow>
           <VCol cols="12" sm="10">
@@ -550,311 +567,285 @@ const removeProduct = async () => {
         </VRow>
       </VCardText>
 
-      <VRow>
-        <VDialog
-          v-model="isRequestOngoing"
-          width="300"
-          persistent>
-          <VCard
-            color="primary"
-            width="300">
-            <VCardText class="pt-3">
-              Cargando
-              <VProgressLinear
-                indeterminate
-                color="white"
-                class="mb-0"
-              />
-            </VCardText>
-          </VCard>
-        </VDialog>
+      <VDivider />
 
-        <VCol cols="12">
-          <VCard title="">
-            <VCardText class="d-flex align-center flex-wrap gap-4">
-              <div
-                class="d-flex align-center"
-                style="width: 135px;">
-                <span class="text-no-wrap me-3">Ver:</span>
-                <VSelect
-                  v-model="rowPerPage"
-                  density="compact"
-                  variant="outlined"
-                  :items="[10, 20, 30, 50]"
-                />
-              </div>
+      <VCardText class="d-flex align-center flex-wrap gap-4">
+        <div
+          class="d-flex align-center"
+          style="width: 135px;">
+          <span class="text-no-wrap me-3">Ver:</span>
+          <VSelect
+            v-model="rowPerPage"
+            density="compact"
+            variant="outlined"
+            :items="[10, 20, 30, 50]"
+          />
+        </div>
 
-              <VSpacer />
+        <VSpacer />
 
-              <VBtn
-                v-if="$can('crear','productos')"
-                prepend-icon="tabler-plus"
-                :to="{ name: 'dashboard-products-products-add' }">
-                Agregar Producto
-              </VBtn>
+        <VBtn
+          v-if="$can('crear','productos')"
+          prepend-icon="tabler-plus"
+          :to="{ name: 'dashboard-products-products-add' }">
+          Agregar Producto
+        </VBtn>
+      </VCardText>
+
+      <VDivider />
+
+      <VCardText>
+        <VTabs
+          v-model="currentTab"
+          grow
+          stacked
+          >
+          <VTab class="hover-icon">
+            <VIcon
+              icon="mdi-grid"
+              class="mb-2"
+            />
+              <span>ICONO</span>
+          </VTab>
+          <VTab>
+            <VIcon
+              icon="mdi-format-list-bulleted"
+              class="mb-2"
+            />
+            <span>LISTA</span>
+          </VTab>
+        </VTabs>
+      </VCardText>
+            
+      <VCardText class="px-0">   
+        <VWindow v-model="currentTab">
+          <!-- CATALOGO -->
+          <VWindowItem>              
+            <VCardText>
+              <VRow  class="gap-y-4">
+                <VCol
+                  v-for="product in products"
+                  cols="12"
+                  md="6"
+                  sm="12"
+                  class="ps-6">
+                  <detailsProduct
+                    :isShowComponent="true"
+                    :product="product"
+                    @alert="showAlert"
+                    @copy="copy"
+                    @open="open"
+                    @download="download"
+                    @updateLink="updateLink"
+                    @show="showProduct"
+                    @editProduct="editProduct"
+                    @deleteProduct="deleteProduct"
+                  />
+                </VCol>
+              </VRow>
             </VCardText>
 
             <VDivider />
 
-            <VCardText>
-              <VTabs
-                v-model="currentTab"
-                grow
-                stacked
-              >
-                <VTab class="hover-icon">
-                  <VIcon
-                    icon="mdi-grid"
-                    class="mb-2"
-                  />
-                  <span>ICONO</span>
-                </VTab>
+            <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
+              <span class="text-sm text-disabled">
+                {{ paginationData }}
+              </span>
 
-                <VTab>
-                  <VIcon
-                    icon="mdi-format-list-bulleted"
-                    class="mb-2"
-                  />
-                  <span>LISTA</span>
-                </VTab>
-              </VTabs>
+              <VPagination
+                v-model="currentPage"
+                size="small"
+                :total-visible="5"
+                :length="totalPages"
+              />
             </VCardText>
-                         
-            <VWindow v-model="currentTab">
-              <!-- CATALOGO -->
-              <VWindowItem>              
-                <VCardText>
-                  <VRow  class="gap-y-4">
-                    <VCol
-                      v-for="product in products"
-                        cols="12"
-                        md="6"
-                        sm="12"
-                        class="ps-6">
-                      <detailsProduct
-                        :isShowComponent="true"
-                        :product="product"
-                        @alert="showAlert"
-                        @copy="copy"
-                        @open="open"
-                        @download="download"
-                        @updateLink="updateLink"
-                        @show="showProduct"
-                        @editProduct="editProduct"
-                        @deleteProduct="deleteProduct"
-                        />
-                    </VCol>
-                  </VRow>
-                </VCardText>
 
-                <VDivider />
+          </VWindowItem>
 
-                <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-                  <span class="text-sm text-disabled">
-                    {{ paginationData }}
-                  </span>
-
-                  <VPagination
-                    v-model="currentPage"
-                    size="small"
-                    :total-visible="5"
-                    :length="totalPages"
+          <!-- LISTADO -->
+          <VWindowItem>
+            <v-table class="text-no-wrap">
+              <thead>
+                <tr class="text-no-wrap">
+                  <th> #ID </th>
+                  <th> PRODUCTO </th>
+                  <th class="pe-4"> STOCK </th>
+                  <th class="pe-4"> SKU </th>
+                  <th class="pe-4"> PRECIO </th>
+                  <th class="pe-4"> QTY </th>
+                  <th class="pe-4"> STATUS </th>
+                  <th scope="pe-4" v-if="
+                    $can('aprobar', 'productos') || 
+                    $can('rechazar', 'productos') || 
+                    $can('editar', 'productos') || 
+                    $can('eliminar', 'productos')">
+                    ACCIONES
+                  </th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="product in myProductsList"
+                :key="product.id"
+                style="height: 3.75rem;">
+                <td> {{ product.id }} </td>
+                <td> 
+                  <div class="d-flex align-center gap-x-2">
+                    <VAvatar
+                      v-if="product.image"
+                      size="38"
+                      variant="tonal"
+                      rounded
+                      :image="themeConfig.settings.urlStorage + product.image"
+                    />
+                    <div class="d-flex flex-column">
+                      <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
+                      <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>   
+                  <VSwitch 
+                      :model-value="product.in_stock === 1 ? true : false"
+                      readonly
+                  /> 
+                </td>
+                <td> {{ product.colors[0].sku }} </td>
+                <td> {{ product.price_for_sale }} </td>
+                <td> {{ product.stock }} </td>
+                <td> 
+                  <VChip
+                    v-bind="resolveStatus(product.state_id)"
+                    density="default"
+                    label
                   />
-                </VCardText>
-
-              </VWindowItem>
-              <!-- LISTADO -->
-              <VWindowItem>
-
-                <v-table class="text-no-wrap">
-                <thead>
-                    <tr class="text-no-wrap">
-                        <th> #ID </th>
-                        <th> PRODUCTO </th>
-                        <th class="pe-4"> STOCK </th>
-                        <th class="pe-4"> SKU </th>
-                        <th class="pe-4"> PRECIO </th>
-                        <th class="pe-4"> QTY </th>
-                        <th class="pe-4"> STATUS </th>
-                        <th scope="pe-4" v-if="
-                          $can('aprobar', 'productos') || 
-                          $can('rechazar', 'productos') || 
-                          $can('editar', 'productos') || 
-                          $can('eliminar', 'productos')">
-                            ACCIONES
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="product in myProductsList"
-                        :key="product.id"
-                        style="height: 3.75rem;">
-                        <td> {{ product.id }} </td>
-                        <td> 
-                            <div class="d-flex align-center gap-x-2">
-                                <VAvatar
-                                    v-if="product.image"
-                                    size="38"
-                                    variant="tonal"
-                                    rounded
-                                    :image="themeConfig.settings.urlStorage + product.image"
-                                />
-                                <div class="d-flex flex-column">
-                                    <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
-                                    <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td>   
-                            <VSwitch 
-                                :model-value="product.in_stock === 1 ? true : false"
-                                readonly
-                            /> 
-                        </td>
-                        <td> {{ product.colors[0].sku }} </td>
-                        <td> {{ product.price_for_sale }} </td>
-                        <td> {{ product.stock }} </td>
-                        <td> 
-                            <VChip
-                                v-bind="resolveStatus(product.state_id)"
-                                density="default"
-                                label
-                            />
-                        </td>
-                        <td class="text-center" style="width: 5rem;" 
-                          v-if="$can('aprobar', 'productos') ||
-                                $can('rechazar', 'productos') || 
-                                $can('editar', 'productos') || 
-                                $can('eliminar', 'productos')"> 
-                                
-                          <VBtn
-                          v-if="$can('ver', 'productos')"
-                            @click="showProduct(product.id)"
-                            icon
-                            variant="text"
-                            color="default"
-                            size="x-small">
-                            <VTooltip
-                              open-on-focus
-                              location="top"
-                              activator="parent">
-                              Ver
-                            </VTooltip>
-                            <VIcon
-                              size="28"
-                              icon="tabler-eye"
-                              class="me-1"
-                            />
-                          </VBtn>          
-                          <VBtn
-                                v-if="$can('aprobar', 'productos') && product.state_id === 4"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="showStateDialog(product, 3)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Aprobar
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-cart-check" />
-                            </VBtn>
-
-                            <VBtn
-                                v-if="$can('rechazar', 'productos') && product.state_id === 4"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="showStateDialog(product, 6)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Rechazar
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-cart-off" />
-                            </VBtn>
-
-                            <VBtn
-                                v-if="$can('editar', 'productos') && product.state_id !== 4"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                :disabled="product.state_id === 5"
-                                @click="editProduct(product.id)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Editar
-                                </VTooltip>
-                                <VIcon
-                                    size="22"
-                                    icon="tabler-edit" />
-                            </VBtn>
-
-                            <VBtn
-                                v-if="$can('eliminar','productos')"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                :disabled="product.state_id === 5"
-                                @click="showDeleteDialog(product)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Eliminar
-                                </VTooltip>  
-                                <VIcon
-                                    size="22"
-                                    icon="tabler-trash" />
-                            </VBtn>
-                        </td>
-                    </tr>
-                </tbody>
-                <!-- 👉 table footer  -->
-                <tfoot v-show="!products.length">
-                    <tr>
-                        <td
-                        colspan="8"
-                        class="text-center">
-                        Datos no disponibles
-                        </td>
-                    </tr>
-                </tfoot>
+                </td>
+                <td class="text-center" style="width: 5rem;" 
+                    v-if="$can('aprobar', 'productos') ||
+                    $can('rechazar', 'productos') || 
+                    $can('editar', 'productos') || 
+                    $can('eliminar', 'productos')">          
+                  <VBtn
+                    v-if="$can('ver', 'productos')"
+                    @click="showProduct(product.id)"
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Ver
+                    </VTooltip>
+                    <VIcon
+                      size="28"
+                      icon="tabler-eye"
+                      class="me-1"
+                    />
+                  </VBtn>          
+                  <VBtn
+                    v-if="$can('aprobar', 'productos') && product.state_id === 4"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showStateDialog(product, 3)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Aprobar
+                    </VTooltip>      
+                    <VIcon
+                      size="22"
+                      icon="mdi-cart-check" />
+                  </VBtn>
+                  <VBtn
+                    v-if="$can('rechazar', 'productos') && product.state_id === 4"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showStateDialog(product, 6)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Rechazar
+                    </VTooltip>      
+                    <VIcon
+                      size="22"
+                      icon="mdi-cart-off" />
+                  </VBtn>
+                  <VBtn
+                    v-if="$can('editar', 'productos') && product.state_id !== 4"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    :disabled="product.state_id === 5"
+                    @click="editProduct(product.id)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Editar
+                    </VTooltip>
+                    <VIcon
+                      size="22"
+                      icon="tabler-edit" />
+                  </VBtn>
+                  <VBtn
+                    v-if="$can('eliminar','productos')"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    :disabled="product.state_id === 5"
+                    @click="showDeleteDialog(product)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Eliminar
+                    </VTooltip>  
+                    <VIcon
+                      size="22"
+                      icon="tabler-trash" />
+                  </VBtn>
+                </td>
+              </tr>
+            </tbody>
+            <!-- 👉 table footer  -->
+            <tfoot v-show="!products.length">
+              <tr>
+                <td
+                  colspan="8"
+                  class="text-center">
+                  Datos no disponibles
+                </td>
+              </tr>
+            </tfoot>
             </v-table>
         
             <v-divider />
 
             <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-                <span class="text-sm text-disabled">
+              <span class="text-sm text-disabled">
                 {{ paginationData }}
-                </span>
+              </span>
 
-                <VPagination
-                    v-model="currentPage"
-                    size="small"
-                    :total-visible="5"
-                    :length="totalPages"/>
-            
+              <VPagination
+                v-model="currentPage"
+                size="small"
+                :total-visible="5"
+                :length="totalPages"/>
             </VCardText>
 
-              </VWindowItem>
-            </VWindow>
-          </VCard>
-        </VCol>
-      </VRow>
+          </VWindowItem>
+        </VWindow>
+      </VCardText>
     </VCard>
 
     <show 
