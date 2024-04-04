@@ -196,7 +196,7 @@ const onSubmit = () => {
       formData.append('title', title.value)
       formData.append('date', date.value)
       formData.append('description', description.value)
-      formData.append('date', date.value)
+      formData.append('image', image.value)
       formData.append('_method', 'PUT')
 
       //blog_tags

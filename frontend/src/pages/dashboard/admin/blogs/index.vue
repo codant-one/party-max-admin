@@ -231,9 +231,9 @@ const downloadCSV = async () => {
                 style="height: 3.75rem;">
 
                 <td> {{ blog.id }} </td>
-                <td> {{ blog.title }} </td>
+                <td class="text-wrap"> {{ blog.title }} </td>
                 <td> {{ blog.date }} </td>
-                <td> {{ blog.category.name }} </td>
+                <td class="text-wrap"> {{ blog.category.name }} </td>
                 <td> 
                   <VChip
                     label
