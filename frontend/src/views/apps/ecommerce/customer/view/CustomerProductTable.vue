@@ -221,7 +221,7 @@ const editProduct = id => {
                     v-for="product in myProductsList"
                     :key="product.id"
                     style="height: 3.75rem;">
-                    <td class="text-wrap"> 
+                    <td> 
                         <div class="d-flex align-center gap-x-2">
                             <VAvatar
                                 v-if="product.image"
@@ -230,7 +230,7 @@ const editProduct = id => {
                                 rounded
                                 :image="themeConfig.settings.urlStorage + product.image"
                             />
-                            <div class="d-flex flex-column">
+                            <div class="d-flex flex-column text-wrap">
                                 <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
                                 <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
                             </div>
