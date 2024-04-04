@@ -250,4 +250,35 @@ class SupplierController extends Controller
         }
     }
 
+    public function updateCommission(Request $request, $id)
+    {
+        try {
+            $supplier = Supplier::find($id);
+
+            if (!$supplier)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Proveedor no encontrado'
+                ], 404);
+            
+            $supplier->updateCommission($request, $supplier);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'Supplier' => $supplier
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
 }

@@ -1,10 +1,27 @@
 <script setup>
 
+import router from '@/router'
+
 import { formatNumber } from '@/@core/utils/formatters'
 import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
+import {requiredValidator} from '@/@core/utils/validators'
+import { useSuppliersStores } from '@/stores/useSuppliers'
 import americanExpress from '@images/icons/payments/img/american-express.png'
 import mastercard from '@images/icons/payments/img/mastercard.png'
 import visa from '@images/icons/payments/img/visa-light.png'
+
+const refForm = ref()
+const isFormValid = ref(false)
+const cant_commission = ref(0)
+const settings = ref(0)
+const route = useRoute()
+const suppliersStores = useSuppliersStores()
+
+const advisor = ref({
+  type: '',
+  message: '',
+  show: false
+})
 
 const props = defineProps({
   addresses: {
@@ -99,6 +116,12 @@ async function fetchData() {
       }
     }
   }
+
+  if (props.customerData.commission !== null) 
+{
+    cant_commission.value = props.customerData.commission
+}
+ 
 }
 
 const download = (file) => {
@@ -131,6 +154,43 @@ const showDeleteDialog = addressData => {
 
 const onSubmit = (address, method) => {
   emit('submit', address, method)
+}
+
+const addcommission = ()=>
+{
+  refForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) {
+      let data = {
+        commission: cant_commission.value
+      }
+
+      suppliersStores.updateCommission(route.params.id, data)
+        .then(response => {
+          window.scrollTo(0, 0)
+
+          advisor.value.show = true
+          advisor.value.type = 'success'
+          advisor.value.message = 'Comisión actualizada!'
+                    
+          emit('alert', advisor)
+
+          setTimeout(() => {
+            advisor.value.show = false
+            advisor.value.type = ''
+            advisor.value.message = ''
+            emit('alert', advisor)
+          }, 5000)
+
+      })
+    }
+  })
+
+  settings.value = 0;
+}
+
+const change_settings = () =>
+{
+  settings.value = 1;
 }
 </script>
 
@@ -319,6 +379,35 @@ const onSubmit = (address, method) => {
                           </span>
                         </h6>
                       </VListItemTitle>
+                      <VListItemTitle>
+                        <VForm
+                          ref="refForm"
+                          v-model="isFormValid"
+                          @submit.prevent="addcommission"
+                        >
+
+                          <VCol cols="6" md="3" style="padding-left:0px;">
+                            <div style="display:flex; align-items: center; gap: 20px;">
+                              <label class="text-primary font-weight-bold">Comisión PartyMax: {{cant_commission}}</label>
+                              <VBtn v-model="settings" @click="change_settings">Ajustar</VBtn>
+                            </div>
+                            <div  v-if="settings === 1">
+                                <VTextField
+                                  v-model="cant_commission"
+                                  :rules="[requiredValidator]"
+                                  label="Comisión"
+                                  style="margin-top: 10px"
+                                />
+
+                                <VBtn type="submit" style="margin-top:20px">
+                                  Actualizar       
+                                </VBtn>
+                            </div>
+                            
+                          </VCol>
+
+                        </VForm>
+                      </VListItemTitle>  
                     </VListItem>
                   </VList>
                 </VCol>
