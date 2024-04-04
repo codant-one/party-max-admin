@@ -188,10 +188,10 @@ const addcommission = ()=>
   settings.value = 0;
 }
 
-const change_settings = () =>
-{
-  settings.value = 1;
+const change_settings = () => {
+  settings.value = settings.value === 1 ? 0 : 1;
 }
+
 </script>
 
 <template>
@@ -387,9 +387,14 @@ const change_settings = () =>
                         >
 
                           <VCol cols="6" md="3" style="padding-left:0px;">
-                            <div style="display:flex; align-items: center; gap: 20px;">
-                              <label class="text-primary font-weight-bold">Comisión PartyMax: {{cant_commission}}</label>
-                              <VBtn v-model="settings" @click="change_settings">Ajustar</VBtn>
+                            <div style="display:flex; align-items: center; gap: 10px;">
+                              <label class="text-primary font-weight-bold">Comisión PartyMax: {{cant_commission}}%</label>
+                              <VBtn 
+                                icon="mdi-pencil"
+                                variant="text"
+                                size="small"
+                                @click="change_settings" 
+                              />
                             </div>
                             <div  v-if="settings === 1">
                                 <VTextField
