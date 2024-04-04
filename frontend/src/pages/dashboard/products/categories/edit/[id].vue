@@ -49,14 +49,16 @@ async function fetchData() {
 
     isRequestOngoing.value = true
 
-    let data = { limit: -1 }
-
-    await categoriesStores.fetchCategoriesOrder(data)
-
-    categories.value = categoriesStores.getCategories
-    categories_.value = categories.value.filter(item => item.category_id === Number(route.params.id))
-
     if(Number(route.params.id)) {
+
+        
+        let data = { limit: -1 }
+
+        await categoriesStores.fetchCategoriesOrder(data)
+
+        categories.value = categoriesStores.getCategories
+        categories_.value = categories.value.filter(item => item.category_id === Number(route.params.id))
+
         category.value = await categoriesStores.showCategory(Number(route.params.id))
 
         category_id.value = category.value.category_id

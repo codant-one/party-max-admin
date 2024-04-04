@@ -52,7 +52,8 @@ class ProductController extends Controller
                                 'discarded',
                                 'state_id',
                                 'in_stock',
-                                'category_id'
+                                'category_id',
+                                'supplierId'
                             ])
                         )
                         ->withTrashed();
@@ -67,7 +68,8 @@ class ProductController extends Controller
                                 'discarded',
                                 'state_id',
                                 'in_stock',
-                                'category_id'
+                                'category_id',
+                                'supplierId'
                             ])
                         )
                         ->withTrashed()->count();

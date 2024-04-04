@@ -1,12 +1,12 @@
 <script setup>
 
-import axios from '@axios'
 import { themeConfig } from '@themeConfig'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useClipboard } from '@vueuse/core';
 
+import Toaster from "@/components/common/Toaster.vue";
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
 import CustomerTabOverview from '@/views/apps/ecommerce/customer/view/CustomerTabOverview.vue'
 import CustomerTabSecurity from '@/views/apps/ecommerce/customer/view/CustomerTabSecurity.vue'
@@ -158,6 +158,7 @@ const handleCopy = (data) => {
           class="mb-6">
             {{ advisor.message }}
         </v-alert>
+        <Toaster />
     </v-col>
 
     <!-- 👉 Header  -->

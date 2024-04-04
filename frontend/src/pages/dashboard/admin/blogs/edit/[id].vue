@@ -60,7 +60,7 @@ const modules = {
 
         axios.post('/blogs/upload-image', formData)
           .then(res => {
-            resolve(themeConfig.configuraciones.urlStorage + res.data.url);
+            resolve(themeConfig.settings.urlStorage + res.data.url);
           })
           .catch(err => {
             reject("Upload failed");
@@ -196,7 +196,7 @@ const onSubmit = () => {
       formData.append('title', title.value)
       formData.append('date', date.value)
       formData.append('description', description.value)
-      formData.append('date', date.value)
+      formData.append('image', image.value)
       formData.append('_method', 'PUT')
 
       //blog_tags

@@ -21,12 +21,13 @@ const fetchBlogsData = async () => {
 
   isRequestOngoing.value = true
 
-  data.value = await categoriesStores.allCategories()
+  if(Number(route.params.blog)) {
+    data.value = await categoriesStores.allCategories()
 
-  apiData.value = data.value.categories.filter(category => category.slug === route.params.category)[0];
+    apiData.value = data.value.categories.filter(category => category.slug === route.params.category)[0];
 
-  activeBlog.value = apiData.value.blogs.filter(blog => blog.slug === route.params.blog)[0];
-  
+    activeBlog.value = apiData.value.blogs.filter(blog => blog.slug === route.params.blog)[0];
+  }
   isRequestOngoing.value = false
   
   images.value = imagesContent();

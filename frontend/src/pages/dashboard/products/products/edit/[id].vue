@@ -98,82 +98,85 @@ async function fetchData() {
 
     isRequestOngoing.value = true
 
-    let data = { 
-      tag_type_id: 1,
-      limit: -1 
-    }
+    if(Number(route.params.id)) {
 
-    await colorsStores.fetchColors();
-    await categoriesStores.fetchCategoriesOrder(data)
-    await brandsStores.fetchBrands(data)
-    await tagsStores.fetchTags(data)
+      let data = { 
+        tag_type_id: 1,
+        limit: -1 
+      }
 
-    listColors.value = colorsStores.getColors
-    categories.value = categoriesStores.getCategories
-    listBrands.value = brandsStores.getBrands
-    listTags.value = tagsStores.getTags
+      await colorsStores.fetchColors();
+      await categoriesStores.fetchCategoriesOrder(data)
+      await brandsStores.fetchBrands(data)
+      await tagsStores.fetchTags(data)
 
-    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
-    rol.value = userData.value.roles[0].name
+      listColors.value = colorsStores.getColors
+      categories.value = categoriesStores.getCategories
+      listBrands.value = brandsStores.getBrands
+      listTags.value = tagsStores.getTags
 
-    if(rol.value !== 'Proveedor') {
-      await suppliersStores.fetchSuppliers(data)
-      listSuppliers.value = suppliersStores.getSuppliers
-    }
+      userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+      rol.value = userData.value.roles[0].name
 
-    product.value = await productsStores.showProduct(Number(route.params.id))
-    tag_id.value = product.value.tags.map(color => color.tag_id)
-    color_id.value = product.value.colors.map(color => color.color_id)
-    product.value.colors.forEach(function callback(value, index) { 
-        category_id.value.push(value.categories.map(category => category.category_id))
-    });
-    sku.value = product.value.colors.map(color => color.sku)
-   
-    product.value.colors.forEach(async function callback(value, index) { 
-        let files = []
-        for(var i = 0; i < value.images.length; i++) {
+      if(rol.value !== 'Proveedor') {
+        await suppliersStores.fetchSuppliers(data)
+        listSuppliers.value = suppliersStores.getSuppliers
+      }
 
-            const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + value.images[i].image);
-            const blob = await response.blob();
-            const file = new File([blob], value.images[i].image.replaceAll('products/gallery/',''), { type: blob.type });
-          
-            URL.createObjectURL(file)
-
-            const blog = await resizeImage(file, 400, 400, 0.9)
-
-            files.push({
-                file,
-                url: themeConfig.settings.urlStorage + value.images[i].image,
-                blob: blob
-            })
-
-        }
-
-        product_files.value[index] = files
-    });
-
-    brand_id.value = product.value.brand_id
-    user_id.value = (product.value.user_id === userData.value.id) ? null : product.value.user_id 
-    name.value = product.value.name
-    single_description.value = product.value.single_description
-    description.value = product.value.description
-    price.value = product.value.price
-    price_for_sale.value = product.value.price_for_sale
-    wholesale_price.value = product.value.wholesale_price
-    wholesale.value = product.value.wholesale
-    stock.value = product.value.stock
-
-    avatar.value = product.value.image === null ? '' : themeConfig.settings.urlStorage + product.value.image
-
-    width.value = product.value.detail.width
-    height.value = product.value.detail.height
-    deep.value = product.value.detail.deep
-    weigth.value = product.value.detail.weigth
-    material.value = product.value.detail.material
-    estimated_delivery_time.value = product.value.estimated_delivery_time
+      product.value = await productsStores.showProduct(Number(route.params.id))
+      tag_id.value = product.value.tags.map(color => color.tag_id)
+      color_id.value = product.value.colors.map(color => color.color_id)
+      product.value.colors.forEach(function callback(value, index) { 
+          category_id.value.push(value.categories.map(category => category.category_id))
+      });
+      sku.value = product.value.colors.map(color => color.sku)
     
-    optionCounter.value = product.value.colors.length
+      product.value.colors.forEach(async function callback(value, index) { 
+          let files = []
+          for(var i = 0; i < value.images.length; i++) {
 
+              const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + value.images[i].image);
+              const blob = await response.blob();
+              const file = new File([blob], value.images[i].image.replaceAll('products/gallery/',''), { type: blob.type });
+            
+              URL.createObjectURL(file)
+
+              const blog = await resizeImage(file, 400, 400, 0.9)
+
+              files.push({
+                  file,
+                  url: themeConfig.settings.urlStorage + value.images[i].image,
+                  blob: blob
+              })
+
+          }
+
+          product_files.value[index] = files
+      });
+
+      brand_id.value = product.value.brand_id
+      user_id.value = (product.value.user_id === userData.value.id) ? null : product.value.user_id 
+      name.value = product.value.name
+      single_description.value = product.value.single_description
+      description.value = product.value.description
+      price.value = product.value.price
+      price_for_sale.value = product.value.price_for_sale
+      wholesale_price.value = product.value.wholesale_price
+      wholesale.value = product.value.wholesale
+      stock.value = product.value.stock
+
+      avatar.value = product.value.image === null ? '' : themeConfig.settings.urlStorage + product.value.image
+
+      width.value = product.value.detail.width
+      height.value = product.value.detail.height
+      deep.value = product.value.detail.deep
+      weigth.value = product.value.detail.weigth
+      material.value = product.value.detail.material
+      estimated_delivery_time.value = product.value.estimated_delivery_time
+      
+      optionCounter.value = product.value.colors.length
+    }
+    
     isRequestOngoing.value = false
 }
 
