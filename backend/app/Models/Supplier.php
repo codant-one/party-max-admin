@@ -173,4 +173,13 @@ class Supplier extends Model
         }
     }
 
+    public static function updateCommission($request, $supplier)
+    {
+        $supplier->update([
+            'commission' => $request->commission
+        ]);      
+    
+        return $supplier;
+    }
+
 }

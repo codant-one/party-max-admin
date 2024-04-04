@@ -190,6 +190,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
     });
 
+    //Suppliers
+
+    Route::group(['prefix' => 'suppliers'], function () {
+        Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);
+    });
+
 });
 
 //Public Endpoints

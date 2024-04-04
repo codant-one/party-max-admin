@@ -22,6 +22,9 @@ class Suppliers {
         return axios.delete(`/suppliers/${id}`)
     }
     
+    update_Commission(id, data) {
+        return axios.put(`/suppliers/updateCommission/${id}`, data)
+    }
 }
 
 const suppliers = new Suppliers();

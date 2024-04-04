@@ -33,6 +33,7 @@ const discarded = ref(null)
 const selectedStatus = ref(3)
 const selectedCategory = ref()
 const selectedStock = ref()
+const selectedDetail = ref()
 
 const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
@@ -78,6 +79,18 @@ const status = ref([
     title: 'Rechazado',
     value: 6
   },
+])
+
+
+const typesales = ref([
+  {
+    title: 'Venta Detal',
+    value: 1
+  },
+  {
+    title: 'Venta por mayor',
+    value: 2
+  }
 ])
 
 const categories = ref([])
@@ -132,6 +145,7 @@ async function fetchData() {
     discarded: discarded.value,
     state_id: selectedStatus.value,
     in_stock: selectedStock.value,
+    type_sales: selectedDetail.value,
     category_id: selectedCategory.value,
     orderByField: 'id',
     orderBy: 'desc',
@@ -491,7 +505,7 @@ const removeProduct = async () => {
           <!-- 👉 Select Status -->
           <VCol
             cols="12"
-            sm="4"
+            sm="3"
           >
             <AppSelect
               v-model="selectedStatus"
@@ -505,7 +519,7 @@ const removeProduct = async () => {
           <!-- 👉 Select Category -->
           <VCol
             cols="12"
-            sm="4"
+            sm="3"
           >
             <VAutocomplete
               id="selectCategory"
@@ -554,12 +568,26 @@ const removeProduct = async () => {
           <!-- 👉 Select Stock Status -->
           <VCol
             cols="12"
-            sm="4"
+            sm="3"
           >
             <AppSelect
               v-model="selectedStock"
               placeholder="Stock"
               :items="stockStatus"
+              clearable
+              clear-icon="tabler-x"
+            />
+          </VCol>
+
+          <!-- 👉 Select Detail  -->
+          <VCol
+            cols="12"
+            sm="3"
+          >
+            <AppSelect
+              v-model="selectedDetail"
+              placeholder="Tipo de venta"
+              :items="typesales"
               clearable
               clear-icon="tabler-x"
             />
