@@ -29,6 +29,10 @@ class Products {
     updateState(data, id) {
         return axios.put(`/products/updateStates/${id}`, data)
     }
+
+    updateOrder(data) {
+        return axios.post('/products/order_id',data)
+    }
 }
 
 const products = new Products();

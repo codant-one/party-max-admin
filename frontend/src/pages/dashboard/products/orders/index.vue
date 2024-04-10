@@ -49,8 +49,8 @@ const enabled = ref(true)
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = (rowPerPage.value === 'Todos') ? 1 : products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = (rowPerPage.value === 'Todos') ? totalProducts.value : products.value.length + (currentPage.value - 1) * rowPerPage.value
 
   return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalProducts.value } registros`
 })
@@ -77,8 +77,8 @@ async function fetchData() {
     search: searchQuery.value,
     state_id: 3,
     category_id: selectedCategory.value,
-    orderByField: 'id',
-    orderBy: 'desc',
+    orderByField: 'order_id',
+    orderBy: 'asc',
     limit: rowPerPage.value,
     page: currentPage.value
   }
@@ -96,6 +96,7 @@ async function fetchData() {
   myProductsList.value.forEach(element =>
     products.value.push({
       id: element.id,
+      name: element.name,
       favourite: element.favourite,
       discarded: element.discarded,
       user: element.user,
@@ -109,13 +110,15 @@ async function fetchData() {
       price: element.price_for_sale,
       sku: element.colors[0].sku,
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
-      categories_id: element.colors[0]?.categories.map(item => item.category.id),// Utiliza map para extraer los id de las categorías
+      categories: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.name)))],// Utiliza map para extraer los nombres de las categorías
+      categories_id: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.id)))],// Utiliza map para extraer los id de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
       selling_price: 0,//agregar mas adelante informacion,
-      likes: element.likes
+      likes: element.likes,
+      order_id: element.order_id,
+      category_id: selectedCategory.value
     })
   );
 
@@ -134,8 +137,8 @@ const onStart = async (e) => {
 }
 
 const onEnd = async (e) => {
-  console.log('oldIndex',e.oldIndex)
-  // schedulesStores.updateOrder(schedules.value)
+  productsStores.updateOrder(products.value)
+  fetchData()
 }
 
 </script>
@@ -169,7 +172,7 @@ const onEnd = async (e) => {
             v-model="rowPerPage"
             density="compact"
             variant="outlined"
-            :items="[10, 20, 30, 50]"
+            :items="[10, 20, 30, 50, 'Todos']"
           />
         </div>
 
@@ -223,7 +226,7 @@ const onEnd = async (e) => {
         <v-table class="text-no-wrap">
           <thead>
             <tr class="text-no-wrap">
-              <th> #ID </th>
+              <th> #ORDEN ID </th>
               <th> PRODUCTO </th>
               <th class="pe-4"> STOCK </th>
               <th class="pe-4"> SKU </th>
@@ -245,7 +248,7 @@ const onEnd = async (e) => {
               <tr 
                 style="height: 3.75rem;"
                 :class="!enabled ? 'draggable-item' : ''">
-                <td> {{ element.id }} </td>
+                <td> {{ !enabled ? element.order_id : '' }} </td>
                 <td> 
                   <div class="d-flex align-center gap-x-2">
                     <VAvatar
@@ -274,7 +277,7 @@ const onEnd = async (e) => {
                     :key="index"
                     class="d-block">
                       <VChip
-                        class="my-1 d-block"
+                        class="my-1 d-flex align-center"
                         label
                         size="small"
                         color="secondary"

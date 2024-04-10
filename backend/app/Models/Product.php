@@ -66,7 +66,27 @@ class Product extends Model
         return $this->belongsTo(Brand::class, 'brand_id','id');
     }
 
+    public function order()
+    {
+        return $this->hasMany(ProductList::class, 'product_id','id');
+    }
+
     /**** Scopes ****/
+    public function scopeOrder($query, $categoryId = null)
+    {
+        if(!is_null($categoryId))
+            return  $query->addSelect(['order_id' => function ($q) use ($categoryId) {
+                        $q->selectRaw('pl.order_id')
+                        ->from('products as p')
+                        ->join('product_lists as pl', 'p.id', '=', 'pl.product_id')
+                        ->where('pl.category_id', $categoryId)
+                        ->whereColumn('p.id', 'products.id');
+                    }]);
+        else 
+            return $query->addSelect([DB::raw('NULL as order_id')]);
+   
+    }
+
     public function scopeFavorites($query)
     {
         return  $query->addSelect(['likes' => function ($q){

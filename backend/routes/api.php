@@ -134,6 +134,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('upload-image', [ProductController::class, 'uploadImage']);
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
         Route::put('updateStates/{id}', [ProductController::class, 'updateStates']);
+        Route::post('order_id', [ProductController::class, 'updateOrder']);
     });
 
     //Faqs

@@ -11,6 +11,9 @@ use App\Models\Faq;
 use App\Models\FaqCategory;
 use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductList;
 
 class UpdateItemOrder extends Command
 {
@@ -47,6 +50,7 @@ class UpdateItemOrder extends Command
     {
         self::updateFaqs();
         self::updateBlogs();
+        self::updateProducts();
 
         return 0;
     }
@@ -75,5 +79,43 @@ class UpdateItemOrder extends Command
                 Blog::where('id', $blog->id)->update(['order_id' => $key + 1]);
             }
         }
+    }
+
+    private function updateProducts() {
+
+        $products = Product::with('colors.categories')->get();
+        
+        $products->each(function ($product) {
+            $cat = collect($product->colors)
+                ->flatMap(function ($color) {
+                    return $color->categories;
+                })
+                ->unique('category_id')
+                ->values()
+                ->toArray();
+        
+            $product->categories = $cat;
+        });
+
+
+        foreach($products as $product){
+            foreach($product->categories as $key => $category) {
+                ProductList::create([
+                    'product_id' => $product->id,
+                    'category_id' => $category['category_id']
+                ]);
+            }
+        }
+
+        $categories = Category::all()->pluck('id');
+        
+        foreach($categories as $id){
+            $products = ProductList::where('category_id', $id)->get();
+
+            foreach($products as $key => $product) {
+                ProductList::where('id', $product->id)->update(['order_id' => $key + 1]);
+            }
+        }
+
     }
 }

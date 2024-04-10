@@ -13,6 +13,7 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\Supplier;
+use App\Models\ProductList;
 
 class ProductController extends Controller
 {
@@ -31,7 +32,7 @@ class ProductController extends Controller
     {
         try {
 
-            $limit = $request->has('limit') ? $request->limit : 10;
+            $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
         
             $query = Product::with([
                             'colors.categories.category', 
@@ -41,7 +42,9 @@ class ProductController extends Controller
                             'user.userDetail', 
                             'state',
                             'tags'
-                        ])->favorites()
+                        ])
+                        ->favorites()
+                        ->order($request->category_id)
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -354,5 +357,27 @@ class ProductController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * update the order_id.
+     */
+    public function updateOrder(Request $request): JsonResponse
+    { 
+        $countProducts = 1;
+
+        foreach($request->all() as $productRequest){
+            ProductList::updateOrCreate(
+                [ 
+                    'product_id' => $productRequest['id'],
+                    'category_id' => $productRequest['category_id']
+                ],
+                [ 'order_id' => $countProducts++ ]
+            );
+        }
+
+        return response()->json([
+            'success' => 1
+        ]);
     }
 }

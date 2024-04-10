@@ -117,6 +117,18 @@ export const useProductsStores = defineStore('products', {
                     this.setLoading(false)
                 })
          
+        },
+        updateOrder(data){
+            this.setLoading(true)
+            
+            return Products.updateOrder(data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
         }
     }
 })
