@@ -109,13 +109,10 @@ class Product extends Model
     }
 
     public function scopeWhereCategorySlug($query, $search) {
-        $query->whereHas('colors', function ($q) use ($search) {
-            $q->whereHas('categories', function ($q) use ($search) {
-                $q->whereHas('category', function ($q) use ($search) {
-                    $q->where('slug', 'LIKE', '%' . $search);
-                });
-            });
-        });
+
+        $query->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
+              ->join('categories as c', 'c.id', '=', 'pl.category_id')
+              ->where('c.slug', 'LIKE', '%' . $search);
     }
 
     public function scopeWhereColor($query, $search) {

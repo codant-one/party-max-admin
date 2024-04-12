@@ -9,5 +9,16 @@ class ProductList extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];   
+    protected $guarded = [];
+
+    /**** Relationship ****/
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }

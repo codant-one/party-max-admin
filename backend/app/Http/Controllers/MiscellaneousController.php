@@ -82,9 +82,6 @@ class MiscellaneousController extends Controller
             $products = Product::with(['user'])->get();
 
             $query = Product::with(['user', 'order'])
-                            ->select('products.*', 'pl.order_id') // Seleccionar específicamente las columnas
-                            ->distinct()
-                            ->join('product_lists as pl', 'pl.product_id', 'products.id')
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -107,7 +104,6 @@ class MiscellaneousController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'test' => $query->get(),
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
                     'products' => $products,
                     'productsTotalCount' => $count                    
