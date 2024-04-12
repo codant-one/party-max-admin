@@ -97,7 +97,7 @@ class MiscellaneousController extends Controller
                                     'wholesalers'
                                 ])
                             )
-                            ->distinct(['products.id']);
+                            ->distinct(['products.name', 'pl.id']);
 
             $count = $query->applyFilters(
                         $request->only([
