@@ -194,7 +194,7 @@ class Product extends Model
         }
                 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
-            $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
+            $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
             $query->whereOrder($field, $orderBy);
         }
