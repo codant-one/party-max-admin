@@ -100,25 +100,14 @@ class MiscellaneousController extends Controller
                                 ])
                             );
 
-            $count = $query->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy',
-                            'category',
-                            'subcategory',
-                            'colorId',
-                            'min',
-                            'max',
-                            'wholesalers'
-                        ])
-                    )->count();
+            $count = $query->count();
                            
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'test' => $query->get(),
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
                     'products' => $products,
                     'productsTotalCount' => $count                    
