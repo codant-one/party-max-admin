@@ -467,6 +467,11 @@ const closeModal = function(){
                                 label="eliminar productos"
                                 value="eliminar productos"
                             />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver ordenar-productos"
+                                value="ver ordenar-productos"
+                            />
                         </div>
                         <VLabel style="font-weight: bold;">
                             Productos Pendientes

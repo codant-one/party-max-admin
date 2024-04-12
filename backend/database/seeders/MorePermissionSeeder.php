@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\Faq;
 use Spatie\Permission\Models\Permission;
 
 class MorePermissionSeeder extends Seeder

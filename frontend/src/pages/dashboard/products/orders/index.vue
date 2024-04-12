@@ -357,5 +357,5 @@ const onEnd = async (e) => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: productos
+    subject: ordenar-productos
 </route>

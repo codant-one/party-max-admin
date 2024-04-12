@@ -581,6 +581,12 @@ const closeRoleDetailDialog = function(){
                                 value="eliminar productos"
                                 :readonly="readonly"
                             />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver ordenar-productos"
+                                value="ver ordenar-productos"
+                                :readonly="readonly"
+                            />
                         </div>
                         <VLabel style="font-weight: bold;">
                             Productos Pendientes

@@ -43,7 +43,7 @@ export default [
           icon: { icon: 'mdi-sort' },
           to: 'dashboard-products-orders', 
           action: 'ver' , 
-          subject: 'productos-pendientes', 
+          subject: 'ordenar-productos', 
         }
       ]
     }
