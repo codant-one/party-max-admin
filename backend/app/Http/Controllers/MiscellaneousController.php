@@ -82,7 +82,7 @@ class MiscellaneousController extends Controller
             $products = Product::with(['user'])->get();
 
             $query = Product::with(['user', 'order'])
-                            ->distinct(['products.id', 'pl.category_id'])
+                            ->distinct(['products.id', 'pl.order_id'])
                             ->join('product_lists as pl', 'pl.product_id', 'products.id')
                             ->where('state_id', 3)
                             ->applyFilters(
