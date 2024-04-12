@@ -190,7 +190,6 @@ class ColorSeeder extends Seeder
             ]
         ];
        
-
         Color::insert($colors);
     }
 }
