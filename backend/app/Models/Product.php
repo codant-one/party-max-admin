@@ -14,6 +14,7 @@ use App\Models\ProductDetail;
 use App\Models\ProductImage;
 use App\Models\ProductColor;
 use App\Models\ProductTag;
+use App\Models\ProductList;
 use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
@@ -217,6 +218,34 @@ class Product extends Model
         }
     }
 
+    public static function createProductOrder($product_id) {
+        ProductList::where('product_id', $product_id)->delete();
+        
+        $product = Product::with('colors.categories')->find($product_id);
+        
+        $categories = collect($product->colors)
+            ->flatMap(function ($color) {
+                return $color->categories;
+            })
+            ->unique('category_id')
+            ->values()
+            ->toArray();
+        
+        foreach($categories as $key => $category) {
+            $order_id = 
+                ProductList::where('category_id', $category['category_id'])
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? null;
+
+            ProductList::create([
+                'product_id' => $product_id,
+                'category_id' => $category['category_id'],
+                'order_id' => $order_id ? $order_id + 1 : 1
+            ]);
+        }
+    }
+
     public static function createProductDetails($product_id, $request) {
         ProductDetail::create([
             'product_id' => $product_id,
@@ -342,6 +371,7 @@ class Product extends Model
         self::createProductDetails($product->id, $request);
         self::createProductTags($product->id, $request);
         self::createProductColors($product->id, $request);
+        self::createProductOrder($product->id);
 
         return $product;
     }
@@ -371,7 +401,8 @@ class Product extends Model
         self::updateProductDetails($product->id, $request);
         self::updateProductTags($product->id, $request);
         self::updateProductColors($product->id, $request);
- 
+        self::createProductOrder($product->id);
+
         return $product;
     }
  

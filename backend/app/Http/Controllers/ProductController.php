@@ -124,7 +124,7 @@ class ProductController extends Controller
 
                 $product->image = $file_data['filePath'];
                 $product->update();
-            } 
+            }
 
             return response()->json([
                 'success' => true,
