@@ -109,14 +109,12 @@ class Product extends Model
     }
 
     public function scopeWhereCategorySlug($query, $search) {
-        $query->whereHas('colors.categories.category', function ($q) use ($search) {
-            $q->where('slug', $search);
-        });
-    }
-
-    public function scopeWhereSubCategory($query, $search) {
-        $query->whereHas('colors.categories.category', function ($q) use ($search) {
-            $q->where('slug', 'LIKE', '%' . $search);
+        $query->whereHas('colors', function ($q) use ($search) {
+            $q->whereHas('categories', function ($q) use ($search) {
+                $q->whereHas('category', function ($q) use ($search) {
+                    $q->where('slug', 'LIKE', '%' . $search);
+                });
+            });
         });
     }
 
@@ -127,7 +125,7 @@ class Product extends Model
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
-        $query->orderByRaw('(IFNULL('. $orderByField .', id)) '. $orderBy);
+        $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
     }
  
     public function scopeApplyFilters($query, array $filters) {
@@ -169,40 +167,32 @@ class Product extends Model
             $query->whereCategory($filters->get('category_id'));
         }
 
-        if ($filters->get('category') !== null) {
-            $query->whereCategorySlug($filters->get('category'));
-        }
-
         if ($filters->get('subcategory') !== null) {
-            $query->whereSubCategory($filters->get('subcategory'));
+            $query->whereCategorySlug($filters->get('subcategory'));
+        } else if ($filters->get('category') !== null) {
+            $query->whereCategorySlug($filters->get('category'));
         }
 
         if($filters->get('colorId') !== null){
             $query->whereColor($filters->get('colorId'));
         }
 
-        if($filters->get('min')!=null && $filters->get('max')!=null) {
+        if($filters->get('min') !== null && $filters->get('max') !== null) {
             $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
         }
 
-        if ($filters->get('wholesalers')) {
+        if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true') {
             $query->whereNotNull('wholesale_price');
         }
 
         if ($filters->get('type_sales')) {
-
-            if ($filters->get('type_sales')==='2') {
+            if ($filters->get('type_sales') === '2' ) {
                 $query->whereNotNull('wholesale_price');
-            }
-
-            else
-            {
+            } else {
                 $query->whereNull('wholesale_price'); 
             }
-            
         }
                 
-
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';

@@ -81,7 +81,8 @@ class MiscellaneousController extends Controller
 
             $products = Product::with(['user'])->get();
 
-            $query = Product::with(['user'])
+            $query = Product::with(['user', 'order'])
+                            ->join('product_lists as pl', 'pl.product_id', 'products.id')
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -111,18 +112,6 @@ class MiscellaneousController extends Controller
                         ])
                     )->count();
                            
-                    /*$highest_price =Product::with(['user'])
-                    ->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy',
-                            'category',
-                            'subcategory',
-                            'colorId'
-                        ])
-                    )->selectRaw('MAX(CAST(wholesale_price AS DECIMAL(10, 2))) as highest_price')->value('wholesale_price');*/
-
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
             return response()->json([
