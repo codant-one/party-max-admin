@@ -231,8 +231,8 @@ const editProduct = id => {
                                 :image="themeConfig.settings.urlStorage + product.image"
                             />
                             <div class="d-flex flex-column">
-                                <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
-                                <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
+                                <span class="text-body-1 font-weight-medium text-uppercase">{{ product.name }}</span>
+                                <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.supplier?.company_name ?? (product.user.name + ' ' + (product.user.last_name ?? ''))) }}</span>
                             </div>
                         </div>
                     </td>

@@ -39,7 +39,8 @@ class ProductController extends Controller
                             'colors.images', 
                             'colors.color', 
                             'detail', 
-                            'user.userDetail', 
+                            'user.userDetail',
+                            'user.supplier',
                             'state',
                             'tags'
                         ])

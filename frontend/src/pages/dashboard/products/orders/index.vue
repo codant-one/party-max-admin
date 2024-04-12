@@ -259,8 +259,8 @@ const onEnd = async (e) => {
                       :image="themeConfig.settings.urlStorage + element.image"
                     />
                     <div class="d-flex flex-column">
-                      <span class="text-body-1 font-weight-medium">{{ element.name }}</span>
-                      <span class="text-sm text-disabled">Tienda: {{ element.user.user_detail.store_name ?? (element.user.name + ' ' + (element.user.last_name ?? '')) }}</span>
+                      <span class="text-body-1 font-weight-medium text-uppercase">{{ element.name }}</span>
+                      <span class="text-sm text-disabled">Tienda: {{ element.user.user_detail.store_name ?? (element.user.supplier?.company_name ?? (element.user.name + ' ' + (element.user.last_name ?? ''))) }}</span>
                     </div>
                   </div>
                 </td>

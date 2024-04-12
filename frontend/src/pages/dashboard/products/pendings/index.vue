@@ -224,7 +224,7 @@ const downloadCSV = async () => {
     let data = {
         ID: element.id,
         PRODUCTO: element.name,
-        TIENDA: element.user.user_detail.store_name ?? (element.user.name + ' ' + (element.user.last_name ?? '')),
+        TIENDA: element.user.user_detail.store_name ?? (element.user.supplier?.company_name ?? (element.user.name + ' ' + (element.user.last_name ?? ''))),
         STOCK: element.in_stock === 0 ? 'NO' : 'SI',
         SKU: element.colors[0].sku,
         PRECIO: element.price_for_sale,
@@ -392,8 +392,8 @@ const downloadCSV = async () => {
                                     :image="themeConfig.settings.urlStorage + product.image"
                                 />
                                 <div class="d-flex flex-column">
-                                    <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
-                                    <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
+                                    <span class="text-body-1 font-weight-medium text-uppercase">{{ product.name }}</span>
+                                    <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.supplier?.company_name ?? (product.user.name + ' ' + (product.user.last_name ?? ''))) }}</span>
                                 </div>
                             </div>
                         </td>
