@@ -111,7 +111,8 @@ class Product extends Model
 
     public function scopeWhereCategorySlug($query, $search) {
 
-        $query->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
+        $query->select('products.*')
+              ->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
               ->join('categories as c', 'c.id', '=', 'pl.category_id')
               ->where('c.slug', 'LIKE', '%' . $search);
     }
@@ -190,6 +191,16 @@ class Product extends Model
                 $query->whereNull('wholesale_price'); 
             }
         }
+
+        if ($filters->get('isFilterPublic') && $filters->get('isFilterPublic') === 'true') {
+            if ($filters->get('type_sales') === '2' ) {
+                $query->whereNotNull('wholesale_price');
+            } else {
+                $query->whereNull('wholesale_price'); 
+            }
+        }
+
+        
                 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'id';
@@ -363,7 +374,7 @@ class Product extends Model
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
             'wholesale' => $request->wholesale,
-            'wholesale_price' => $request->wholesale_price,
+            'wholesale_price' => $request->wholesale_price === 'null' ? null : $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
@@ -393,7 +404,7 @@ class Product extends Model
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
             'wholesale' => $request->wholesale,
-            'wholesale_price' => $request->wholesale_price,
+            'wholesale_price' => $request->wholesale_price === 'null' ? null : $request->wholesale_price,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);

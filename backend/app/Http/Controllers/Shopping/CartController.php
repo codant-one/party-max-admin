@@ -19,7 +19,12 @@ class CartController extends Controller
         try {
 
             $cart = 
-                ShoppingCart::with(['color.color','color.product.user', 'color.images'])
+                ShoppingCart::with([
+                                'color.color',
+                                'color.product.user.userDetail',
+                                'color.product.user.supplier',
+                                'color.images'
+                            ])
                             ->where('client_id', $request->client_id)
                             ->get()
                             ->groupBy('client_id')
@@ -27,6 +32,9 @@ class CartController extends Controller
                                 return $group->map(function ($item) {
                                     $product = $item->color;
                                     $product->product = $item->color->product;
+                                    $product->user = $item->color->product->user;
+                                    $product->userDetail = $item->color->product->user->userDetail;
+                                    $product->supplier = $item->color->product->user->supplier;
                                     $product->color = $item->color->color;
                                     $product->images = $item->color->images;
                                     $product->product_color_id = $item->product_color_id;
