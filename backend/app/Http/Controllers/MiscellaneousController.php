@@ -14,6 +14,7 @@ use App\Models\BlogCategory;
 use App\Models\Tag;
 use App\Models\ProductLike;
 use App\Models\ProductTag;
+use App\Models\Color;
 
 class MiscellaneousController extends Controller
 {
@@ -127,6 +128,7 @@ class MiscellaneousController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'colors' => Color::where('name', '<>', 'Ninguno')->get(),
                     'products' => $products,
                     'productsTotalCount' => $count                    
                 ]
