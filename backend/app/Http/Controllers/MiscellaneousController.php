@@ -26,7 +26,7 @@ class MiscellaneousController extends Controller
                                 ->where('slug', $slug)
                                 ->first();
     
-            $products = Product::with(['user', 'colors.categories'])
+            $products = Product::with(['user.userDetail', 'user.supplier', 'colors.categories'])
                                 ->whereHas('colors.categories', function($query) use ($category) {
                                     $query->where('category_id', $category->id);
                                 })
