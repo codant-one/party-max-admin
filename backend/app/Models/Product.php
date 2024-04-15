@@ -137,24 +137,18 @@ class Product extends Model
             else {
                 switch ($filters->get('sortBy')) {
                     case 1:
-                        $orderByField = 'products.price_for_sale';
-                        $orderBy = 'asc';
+                        $query->orderByRaw('CAST(price_for_sale AS DECIMAL(10,2)) ASC');
                         break;
                     case 2:
-                        $orderByField = 'products.price_for_sale';
-                        $orderBy = 'desc';
+                        $query->orderByRaw('CAST(price_for_sale AS DECIMAL(10,2)) DESC');
                         break;
                     case 3:
-                        $orderByField = 'products.rating';
-                        $orderBy = 'desc';
+                        $query->orderBy('rating', 'desc');
                         break;
                     case 4:
-                        $orderByField = 'products.created_at';
-                        $orderBy = 'desc';
+                        $query->orderBy('products.created_at', 'desc');
                         break;
                 }
-
-                $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
             }
         } else
             $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
