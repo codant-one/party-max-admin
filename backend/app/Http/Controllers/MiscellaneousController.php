@@ -91,7 +91,8 @@ class MiscellaneousController extends Controller
                                     'colorId',
                                     'min',
                                     'max',
-                                    'wholesalers'
+                                    'wholesalers',
+                                    'sortBy'
                                 ])
                             );
 

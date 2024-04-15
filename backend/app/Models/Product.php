@@ -128,8 +128,36 @@ class Product extends Model
         });
     }
 
-    public function scopeWhereOrder($query, $orderByField, $orderBy) {
-        $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
+    public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
+
+        if($filters->get('sortBy')) {
+
+            if($filters->get('sortBy') === 0) 
+                $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
+            else {
+                switch ($filters->get('sortBy')) {
+                    case 1:
+                        $orderByField = 'price_for_sale';
+                        $orderBy = 'asc';
+                        break;
+                    case 2:
+                        $orderByField = 'price_for_sale';
+                        $orderBy = 'desc';
+                        break;
+                    case 3:
+                        $orderByField = 'rating';
+                        $orderBy = 'desc';
+                        break;
+                    case 4:
+                        $orderByField = 'products.created_at';
+                        $orderBy = 'desc';
+                        break;
+                }
+
+                $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
+            }
+        } else
+            $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
     }
  
     public function scopeApplyFilters($query, array $filters) {
@@ -208,13 +236,11 @@ class Product extends Model
                 $query->whereNull('wholesale_price'); 
             }
         }
-
-        
                 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
-            $query->whereOrder($field, $orderBy);
+            $query->whereOrder($field, $orderBy, $filters);
         }
      }
  
