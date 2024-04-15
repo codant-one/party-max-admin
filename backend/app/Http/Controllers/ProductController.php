@@ -63,22 +63,7 @@ class ProductController extends Controller
                         )
                         ->withTrashed();
             
-            $count = $query->applyFilters(
-                            $request->only([
-                                'search',
-                                'orderByField',
-                                'orderBy',
-                                'favourite',
-                                'archived',
-                                'discarded',
-                                'state_id',
-                                'in_stock',
-                                'type_sales',
-                                'category_id',
-                                'supplierId'
-                            ])
-                        )
-                        ->withTrashed()->count();
+            $count = $query->count();
             
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 

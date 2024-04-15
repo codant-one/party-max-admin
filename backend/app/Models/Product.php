@@ -103,6 +103,11 @@ class Product extends Model
               ->orWhere('description', 'LIKE', '%' . $search . '%');
     }
 
+    public function scopeWhereSearchPublic($query, $search) {
+        $query->where('products.name', 'LIKE', '%' . $search . '%')
+              ->orWhere('products.description', 'LIKE', '%' . $search . '%');
+    }
+
     public function scopeWhereCategory($query, $search) {
         $query->whereHas('colors.categories', function ($q) use ($search) {
             $q->where('category_id', $search);
@@ -138,6 +143,10 @@ class Product extends Model
             $query->whereSearch($filters->get('search'));
         }
 
+        if ($filters->get('searchPublic')) {
+            $query->whereSearchPublic($filters->get('searchPublic'));
+        }
+
         if ($filters->get('favourite') !== null) {
             $query->where('favourite', $filters->get('favourite'));
         }
@@ -168,7 +177,7 @@ class Product extends Model
 
         if ($filters->get('subcategory') !== null) {
             $query->whereCategorySlug($filters->get('subcategory'));
-        } else if ($filters->get('category') !== null) {
+        } else if ($filters->get('category') !== null && $filters->get('category') !== 'all') {
             $query->whereCategorySlug($filters->get('category'));
         }
 

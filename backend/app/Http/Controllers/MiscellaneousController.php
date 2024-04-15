@@ -83,7 +83,7 @@ class MiscellaneousController extends Controller
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
-                                    'search',
+                                    'searchPublic',
                                     'orderByField',
                                     'orderBy',
                                     'category',
