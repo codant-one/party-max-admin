@@ -139,8 +139,6 @@ class Category extends Model
         return $grandfather . $father . Str::slug($request->name);
     }
     
-
-
     public function scopeCategoryTotalPrice($query)
     {
         return $query->addSelect(['sum' => function ($q){
@@ -153,7 +151,6 @@ class Category extends Model
                      ->groupBy('c.id');
         }]);
     }
-
 
     /**** Public methods ****/
     public static function createCategory($request) {
