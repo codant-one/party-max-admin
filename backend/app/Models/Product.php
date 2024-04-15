@@ -137,15 +137,15 @@ class Product extends Model
             else {
                 switch ($filters->get('sortBy')) {
                     case 1:
-                        $orderByField = 'price_for_sale';
+                        $orderByField = 'products.price_for_sale';
                         $orderBy = 'asc';
                         break;
                     case 2:
-                        $orderByField = 'price_for_sale';
+                        $orderByField = 'products.price_for_sale';
                         $orderBy = 'desc';
                         break;
                     case 3:
-                        $orderByField = 'rating';
+                        $orderByField = 'products.rating';
                         $orderBy = 'desc';
                         break;
                     case 4:
