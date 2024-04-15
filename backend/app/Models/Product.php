@@ -130,16 +130,19 @@ class Product extends Model
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
 
+        $wholesalersActive = $filters->get('wholesalers') === 'true';
+        $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
+
         if($filters->get('sortBy')) {
             if($filters->get('sortBy') === 0) 
                 $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
             else {
                 switch ($filters->get('sortBy')) {
                     case 1:
-                        $query->orderByRaw('CAST(price_for_sale AS DECIMAL(10,2)) ASC');
+                        $query->orderByRaw("CAST($orderByField AS DECIMAL(10,2)) ASC");
                         break;
                     case 2:
-                        $query->orderByRaw('CAST(price_for_sale AS DECIMAL(10,2)) DESC');
+                        $query->orderByRaw("CAST($orderByField AS DECIMAL(10,2)) DESC");
                         break;
                     case 3:
                         $query->orderBy('rating', 'desc');
@@ -208,7 +211,10 @@ class Product extends Model
         }
 
         if($filters->get('min') !== null && $filters->get('max') !== null) {
-            $query->whereBetween(\DB::raw('CAST(price_for_sale AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
+            if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true')
+                $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
+            else
+                $query->whereBetween(\DB::raw('CAST(price_for_sale AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
         }
 
         if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true') {
