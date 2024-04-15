@@ -73,6 +73,18 @@ class Product extends Model
     }
 
     /**** Scopes ****/
+    public function scopeBestSellers($query)
+    {
+        return  $query->addSelect(['count' => function ($q) {
+                    $q->selectRaw('count(p.id)')
+                      ->from('products as p')
+                      ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                      ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
+                      ->whereColumn('p.id', 'products.id')
+                      ->groupBy('p.id');
+                }]);   
+    }
+
     public function scopeOrder($query, $categoryId = null)
     {
         if(!is_null($categoryId))

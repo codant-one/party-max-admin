@@ -91,7 +91,8 @@ class HomeController extends Controller
                                      ->get();
         
             $bestSellers = Product::with(['user.userDetail', 'user.supplier'])
-                                  ->orderBy('id', 'asc')
+                                  ->bestSellers()
+                                  ->orderBy('count', 'desc')
                                   ->limit(10)
                                   ->get();
         
