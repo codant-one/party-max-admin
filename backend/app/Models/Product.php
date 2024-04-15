@@ -236,6 +236,10 @@ class Product extends Model
                 $query->whereNull('wholesale_price'); 
             }
         }
+
+        if($filters->get('rating') !== null){
+            $query->where('rating', '<=', doubleval($filters->get('rating')));
+        }
                 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'id';

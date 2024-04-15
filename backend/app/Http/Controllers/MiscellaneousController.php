@@ -92,7 +92,8 @@ class MiscellaneousController extends Controller
                                     'min',
                                     'max',
                                     'wholesalers',
-                                    'sortBy'
+                                    'sortBy',
+                                    'rating'
                                 ])
                             );
 
