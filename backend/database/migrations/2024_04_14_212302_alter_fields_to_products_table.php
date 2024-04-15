@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->float('price', 10, 2)->nullable()->change();
-            $table->float('price_for_sale', 10, 2)->nullable()->change();
-            $table->float('wholesale_price', 10, 2)->nullable()->change();
+            $table->double('price', 10, 2)->nullable()->change();
+            $table->double('price_for_sale', 10, 2)->nullable()->change();
+            $table->double('wholesale_price', 10, 2)->nullable()->change();
         });
     }
 
