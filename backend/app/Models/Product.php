@@ -124,14 +124,13 @@ class Product extends Model
 
     public function scopeWhereColor($query, $search) {
         $query->whereHas('colors', function ($q) use ($search) {
-            $q->where('color_id', $search);
+            $q->whereIn('color_id', [$search]);
         });
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
 
         if($filters->get('sortBy')) {
-
             if($filters->get('sortBy') === 0) 
                 $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
             else {
