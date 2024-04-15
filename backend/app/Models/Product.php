@@ -208,7 +208,7 @@ class Product extends Model
         }
 
         if($filters->get('min') !== null && $filters->get('max') !== null) {
-            $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
+            $query->whereBetween(\DB::raw('CAST(price_for_sale AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
         }
 
         if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true') {
