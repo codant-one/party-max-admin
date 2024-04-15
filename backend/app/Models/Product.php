@@ -122,9 +122,9 @@ class Product extends Model
               ->where('c.slug', 'LIKE', '%' . $search);
     }
 
-    public function scopeWhereColor($query, $search) {
-        $query->whereHas('colors', function ($q) use ($search) {
-            $q->whereIn('color_id', [$search]);
+    public function scopeWhereColor($query, $colorIds) {
+        $query->whereHas('colors', function ($q) use ($colorIds) {
+            $q->whereIn('color_id', $colorIds);
         });
     }
 
@@ -203,7 +203,8 @@ class Product extends Model
         }
 
         if($filters->get('colorId') !== null){
-            $query->whereColor($filters->get('colorId'));
+            $colorIds = explode(',', $filters->get('colorId'));
+            $query->whereColor($colorIds);
         }
 
         if($filters->get('min') !== null && $filters->get('max') !== null) {
