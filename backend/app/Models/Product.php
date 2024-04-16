@@ -73,6 +73,21 @@ class Product extends Model
     }
 
     /**** Scopes ****/
+    public function scopeIsFavorite($query)
+    {
+        return $query->addSelect(['is_favorite' => function($q) {
+            if (Auth::check()) {
+                $q->selectRaw('count(*)')
+                    ->from('product_likes')
+                    ->whereColumn('product_id', 'products.id')
+                    ->where('user_id', Auth::id());
+            } else {
+                $q->selectRaw('0');
+            }
+        }]);
+   
+    }
+
     public function scopeBestSellers($query)
     {
         return  $query->addSelect(['count' => function ($q) {

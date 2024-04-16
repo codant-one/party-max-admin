@@ -79,7 +79,13 @@ class MiscellaneousController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 12;
 
-            $query = Product::with(['user.userDetail', 'user.supplier', 'order'])
+            $query = Product::with([
+                                'user.userDetail', 
+                                'user.supplier', 
+                                'order',
+                                'colors'
+                            ])
+                            ->isFavorite()
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
