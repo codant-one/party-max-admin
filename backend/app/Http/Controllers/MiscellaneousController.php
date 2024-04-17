@@ -131,7 +131,7 @@ class MiscellaneousController extends Controller
     {
         try {
     
-            $wholesale = false;
+            $wholesale = 0;
 
             $product = Product::with([
                                 'user.userDetail', 
@@ -172,7 +172,8 @@ class MiscellaneousController extends Controller
                 }
 
                 $user = Auth::user()->load(['client']);
-                $wholesale = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale')[0] === 0 ? false : true;
+                $shoppingCart = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale');
+                $wholesale = (count($shoppingCart) === 0) ? -1 : $shoppingCart[0];
 
             }
 
