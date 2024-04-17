@@ -649,7 +649,7 @@ const onSubmit = () => {
                   v-model="wholesale_min"
                   v-if="wholesale === 1"
                   type="number"
-                  label="Cantidad minima"
+                  label="Cantidad mínima"
                   class="mb-4"
                   :min="1"
                 />
