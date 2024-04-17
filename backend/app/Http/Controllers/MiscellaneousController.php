@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -15,6 +16,7 @@ use App\Models\Tag;
 use App\Models\ProductLike;
 use App\Models\ProductTag;
 use App\Models\Color;
+use App\Models\ShoppingCart;
 
 class MiscellaneousController extends Controller
 {
@@ -129,6 +131,8 @@ class MiscellaneousController extends Controller
     {
         try {
     
+            $wholesale = false;
+
             $product = Product::with([
                                 'user.userDetail', 
                                 'user.supplier',
@@ -150,7 +154,7 @@ class MiscellaneousController extends Controller
                        ->get();
 
             // Validate if the user is authenticated
-            if (auth()->check()) {
+            if (Auth::check()) {
 
                 $productTag = ProductTag::where('product_id', $product->id)->first();
                     
@@ -167,11 +171,15 @@ class MiscellaneousController extends Controller
                                    ->get();
                 }
 
+                $user = Auth::user()->load(['client']);
+                $wholesale = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale')[0] === 0 ? false : true;
+
             }
 
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'wholesale' => $wholesale,
                     'product' => $product,
                     'recommendations' => $recommendations,
                 ]

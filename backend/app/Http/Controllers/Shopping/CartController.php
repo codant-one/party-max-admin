@@ -71,7 +71,8 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => $cart
+                    'cart' => $cart,
+                    'count' => ShoppingCart::where('client_id', $request->client_id)->count()
                 ]
             ], 200);
         } catch (\Illuminate\Database\QueryException $ex) {
