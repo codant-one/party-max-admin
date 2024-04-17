@@ -441,6 +441,7 @@ class Product extends Model
             'price_for_sale' => $request->price_for_sale,
             'wholesale' => $request->wholesale,
             'wholesale_price' => $request->wholesale_price === 'null' ? null : $request->wholesale_price,
+            'wholesale_min' => $request->wholesale_min,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
@@ -470,7 +471,8 @@ class Product extends Model
             'price' => $request->price,
             'price_for_sale' => $request->price_for_sale,
             'wholesale' => $request->wholesale,
-            'wholesale_price' => $request->wholesale_price === 'null' ? null : $request->wholesale_price,
+            'wholesale_price' => ($request->wholesale_price === 'null' || $request->wholesale === '0') ? null : $request->wholesale_price,
+            'wholesale_min' => $request->wholesale_min,
             'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
