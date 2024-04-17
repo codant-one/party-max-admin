@@ -39,6 +39,7 @@ class CartController extends Controller
                                     $product->images = $item->color->images;
                                     $product->product_color_id = $item->product_color_id;
                                     $product->quantity = $item->quantity;
+                                    $product->wholesale = $item->wholesale;
                                     return $product;
                                 })->all();
                             })
