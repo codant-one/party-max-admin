@@ -80,6 +80,7 @@ class MiscellaneousController extends Controller
         try {
 
             $limit = $request->has('limit') ? $request->limit : 12;
+            $wholesale = 0;
 
             $query = Product::with([
                                 'user.userDetail', 
@@ -109,9 +110,16 @@ class MiscellaneousController extends Controller
                            
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
+            if (Auth::check()) {
+                $user = Auth::user()->load(['client']);
+                $shoppingCart = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale');
+                $wholesale = (count($shoppingCart) === 0) ? -1 : $shoppingCart[0];
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'wholesale' => $wholesale,
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
                     'products' => $products,
                     'productsTotalCount' => $count                    
