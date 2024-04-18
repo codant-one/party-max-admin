@@ -63,10 +63,9 @@ class CartController extends Controller
 
     }
 
-    public function add(Request $request)
+    public function add(Request $request): JsonResponse
     {
-        try 
-        {
+        try {
             $cart = ShoppingCart::addCart($request);
 
             return response()->json([
@@ -85,10 +84,9 @@ class CartController extends Controller
         }
     }
 
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
-        try 
-        {
+        try {
             $cart = ShoppingCart::deleteCart($request);
 
             return response()->json([
@@ -106,10 +104,9 @@ class CartController extends Controller
         }
     }
 
-    public function deleteAll(Request $request)
+    public function deleteAll(Request $request): JsonResponse
     {
-        try 
-        {
+        try {
             $cart = ShoppingCart::deleteAll($request);
 
             return response()->json([
@@ -125,6 +122,36 @@ class CartController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function checkAvailability(Request $request): JsonResponse
+    {
+        try {
+
+            $cart = 
+                ShoppingCart::with(['color.product:id,stock'])
+                            ->where('client_id', $request->client_id)
+                            ->get(['product_color_id', 'quantity']);
+
+            $allAvailable = $cart->every(function ($item) {
+                return $item['color']['product']['stock'] > $item['quantity'];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'allAvailable' => $allAvailable
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
     }
 
     

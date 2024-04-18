@@ -174,6 +174,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('add', [CartController::class, 'add']);
         Route::post('delete', [CartController::class, 'delete']);
         Route::post('deleteAll', [CartController::class, 'deleteAll']);
+        Route::get('checkAvailability', [CartController::class, 'checkAvailability']);
     });
 
     //Favorites
