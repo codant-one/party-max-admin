@@ -12,6 +12,7 @@ use App\Models\ShippingState;
 use App\Models\PaymentState;
 use App\Models\Client;
 use App\Models\Address;
+use App\Models\Product;
 
 class Order extends Model
 {
@@ -128,7 +129,6 @@ class Order extends Model
         return $order;
     }
 
-
     public static function deleteOrder($id) {
         self::deleteOrders(array($id));
     }
@@ -147,5 +147,25 @@ class Order extends Model
         ]);      
     
         return $order;
+    }
+
+    public static function minusStock($orderId) {
+        $order_details = 
+            OrderDetail::with(['product_color'])
+                       ->where('order_id', $orderId)
+                       ->get(); 
+        
+        $productDetails = $order_details->map(function ($detail) {
+            return [
+                'product_id' => $detail->product_color->product_id,
+                'quantity' => $detail->quantity,
+            ];
+        })->toArray();
+
+        foreach ($productDetails as $item) {
+            $product = Product::find($item['product_id']);
+            if ($product) 
+                $product->updateStockProduct($product, $item['quantity']);            
+        }
     }
 }

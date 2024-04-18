@@ -48,7 +48,6 @@ class TestingController extends Controller
 
     public function minus_stock($orderId)
     {
-
         $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get(); 
         
         $productDetails = $order_details->map(function ($detail) {
@@ -58,18 +57,17 @@ class TestingController extends Controller
             ];
         })->toArray();
 
-     foreach ($productDetails as $item) 
-        {
+        foreach ($productDetails as $item) {
             try {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    $product->updateStockProduct($product, $item['quantity']);
+                     $product->updateStockProduct($product, $item['quantity']);
                 }
-                
+                    
             } catch (Exception $e) {
                 echo "Error updating stock for product ID: $product->id - " . $e->getMessage() . "<br>";
             }
-           
+            
         }
 
         return response()->json([

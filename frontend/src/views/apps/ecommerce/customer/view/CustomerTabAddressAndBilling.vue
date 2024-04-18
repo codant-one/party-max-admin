@@ -445,6 +445,24 @@ function calculate_balance ()
                       </VListItemTitle>
                       <VListItemTitle>
                         <h6 class="text-base font-weight-semibold">
+                          Certificación Bancaria:
+                          <span class="text-body-2" v-if="document">
+                            {{ document }}
+
+                            <VTooltip
+                              open-on-focus
+                              location="top"
+                              activator="parent"
+                              text="Descargar">
+                              <template v-slot:activator="{ props }">
+                                <VIcon color="primary" :icon="icon_type" size="x-large" @click="download(document)" />
+                              </template>
+                            </VTooltip>
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold mt-10">
                           Saldo:
                           <span class="text-body-2">
                             COP {{ total_balance }}
@@ -468,58 +486,40 @@ function calculate_balance ()
                         </h6>
                       </VListItemTitle>
                       <VListItemTitle>
-                        <h6 class="text-base font-weight-semibold">
-                          Certificación Bancaria:
-                          <span class="text-body-2" v-if="document">
-                            {{ document }}
-
-                            <VTooltip
-                              open-on-focus
-                              location="top"
-                              activator="parent"
-                              text="Descargar">
-                              <template v-slot:activator="{ props }">
-                                <VIcon color="primary" :icon="icon_type" size="x-large" @click="download(document)" />
-                              </template>
-                            </VTooltip>
-                          </span>
-                        </h6>
-                      </VListItemTitle>
-                      <VListItemTitle>
                         <VForm
                           ref="refForm"
                           v-model="isFormValid"
                           @submit.prevent="addcommission"
                         >
-
-                          <VCol cols="6" md="3" style="padding-left:0px;">
-                            <div style="display:flex; align-items: center; gap: 10px;">
-                              <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{cant_commission}}%</label>
-                              <VBtn 
-                                icon="mdi-pencil"
-                                variant="text"
-                                size="small"
-                                @click="change_settings" 
-                              />
-                            </div>
-                            <div  v-if="settings === 1">
-                                <VTextField
-                                  v-model="cant_commission"
-                                  :rules="[requiredValidator]"
-                                  type="number"
-                                  min= 0
-                                  max= 100 
-                                  label="Comisión"
-                                  style="margin-top: 10px"
+                          <VRow no-gutters>
+                            <VCol cols="6" md="3">
+                              <div class="d-flex align-center">
+                                <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{ cant_commission }}%</label>
+                                <VBtn 
+                                  icon="mdi-pencil"
+                                  variant="text"
+                                  size="small"
+                                  @click="change_settings" 
                                 />
+                              </div>
+                              <div  v-if="settings === 1">
+                                  <VTextField
+                                    v-model="cant_commission"
+                                    :rules="[requiredValidator]"
+                                    type="number"
+                                    min= 0
+                                    max= 100 
+                                    label="Comisión"
+                                    style="margin-top: 10px"
+                                  />
 
-                                <VBtn type="submit" style="margin-top:20px">
-                                  Actualizar       
-                                </VBtn>
-                            </div>
-                            
-                          </VCol>
-
+                                  <VBtn type="submit" style="margin-top:20px">
+                                    Actualizar       
+                                  </VBtn>
+                              </div>
+                              
+                            </VCol>
+                          </VRow>
                         </VForm>
                       </VListItemTitle>
                       <VListItemTitle>
@@ -528,33 +528,35 @@ function calculate_balance ()
                           v-model="isFormValid"
                           @submit.prevent="add_whocommission"
                         >
-                          <VCol cols="6" md="3" style="padding-left:0px;">
-                            <div style="display:flex; align-items: center; gap: 10px;">
-                              <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{who_commission}}%</label>
-                              <VBtn 
-                                icon="mdi-pencil"
-                                variant="text"
-                                size="small"
-                                @click="change_whosettings" 
-                              />
-                            </div>
-                            <div  v-if="who_settings === 1">
-                                <VTextField
-                                  v-model="who_commission"
-                                  :rules="[requiredValidator]"
-                                  type="number"
-                                  min= 0
-                                  max= 100
-                                  label="Comisión Mayorista"
-                                  style="margin-top: 10px"
+                          <VRow no-gutters>
+                            <VCol cols="6" md="3">
+                              <div class="d-flex align-center">
+                                <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{who_commission}}%</label>
+                                <VBtn 
+                                  icon="mdi-pencil"
+                                  variant="text"
+                                  size="small"
+                                  @click="change_whosettings" 
                                 />
+                              </div>
+                              <div  v-if="who_settings === 1">
+                                  <VTextField
+                                    v-model="who_commission"
+                                    :rules="[requiredValidator]"
+                                    type="number"
+                                    min= 0
+                                    max= 100
+                                    label="Comisión Mayorista"
+                                    style="margin-top: 10px"
+                                  />
 
-                                <VBtn type="submit" style="margin-top:20px">
-                                  Actualizar       
-                                </VBtn>
-                            </div>
-                            
-                          </VCol>
+                                  <VBtn type="submit" style="margin-top:20px">
+                                    Actualizar       
+                                  </VBtn>
+                              </div>
+                              
+                            </VCol>
+                          </VRow>
                         </VForm>
                       </VListItemTitle>  
                     </VListItem>

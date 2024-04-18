@@ -124,6 +124,7 @@ class PaymentController extends Controller
                 $payment_state_id = 4;
                 $request->request->add(['client_id' => $order->client_id ]);
                 ShoppingCart::deleteAll($request);
+                Order::minusStock($order->id);
                 break;
             case '4':
                 $payment_state_id = 3;
@@ -148,8 +149,6 @@ class PaymentController extends Controller
                     'card_name' => ($pse === 0) ? $request->cc_holder : null,
                     'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null
                 ]);
-
-        $order_details = OrderDetail::where('order_id', $order->id)->get();        
                 
         return response()->json([
             'success' => true
