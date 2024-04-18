@@ -177,10 +177,19 @@ class Supplier extends Model
 
     public static function updateCommission($request, $supplier)
     {
-        $supplier->update([
-            'commission' => $request->commission
-        ]);      
-    
+        if($request->type_commission == 0)
+        {
+            $supplier->update([
+                'commission' => $request->commission
+            ]);      
+        }
+
+        elseif($request->type_commission == 1)
+        {
+            $supplier->update([
+                'wholesale_commission' => $request->wholesale_commission
+            ]);      
+        }
         return $supplier;
     }
 

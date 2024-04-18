@@ -531,4 +531,22 @@ class Product extends Model
 
         return $product;
     }
+
+    public static function updateStockProduct($product, $quantity)
+    {
+        $in_stock = 1;
+        $new_stock = $product->stock - $quantity;
+        if($new_stock>0)
+        {
+            $in_stock = 1;
+        }
+        else {
+            $in_stock = 0;
+        }
+
+        $product->update([
+            'stock' => $new_stock,
+            'in_stock' => $in_stock 
+        ]);
+    }
 }

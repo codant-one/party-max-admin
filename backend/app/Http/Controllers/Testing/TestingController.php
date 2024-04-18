@@ -8,6 +8,8 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Str;
 
 use App\Models\User;
+use App\Models\OrderDetail;
+use App\Models\Product;
 
 class TestingController extends Controller
 {
@@ -42,6 +44,38 @@ class TestingController extends Controller
         ];
 
         return view('emails.auth.testing', compact('data'));
+    }
+
+    public function minus_stock($orderId)
+    {
+
+        $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get(); 
+        
+        $productDetails = $order_details->map(function ($detail) {
+            return [
+                'product_id' => $detail->product_color->product_id,
+                'quantity' => $detail->quantity,
+            ];
+        })->toArray();
+
+     foreach ($productDetails as $item) 
+        {
+            try {
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $product->updateStockProduct($product, $item['quantity']);
+                }
+                
+            } catch (Exception $e) {
+                echo "Error updating stock for product ID: $product->id - " . $e->getMessage() . "<br>";
+            }
+           
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $productDetails
+        ], 200);
     }
 
 }

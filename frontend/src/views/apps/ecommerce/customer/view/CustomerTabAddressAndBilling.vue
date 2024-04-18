@@ -13,7 +13,10 @@ import visa from '@images/icons/payments/img/visa-light.png'
 const refForm = ref()
 const isFormValid = ref(false)
 const cant_commission = ref(0)
+const who_commission = ref(0)
+const total_balance = ref(0)
 const settings = ref(0)
+const who_settings = ref(0)
 const route = useRoute()
 const suppliersStores = useSuppliersStores()
 
@@ -42,7 +45,8 @@ const emit = defineEmits([
   'submit',
   'delete',
   'copy',
-  'download'
+  'download',
+  'alert'
 ])
 
 const show = ref([
@@ -121,7 +125,14 @@ async function fetchData() {
 {
     cant_commission.value = props.customerData.commission
 }
- 
+
+if (props.customerData.wholesale_commission !== null) 
+{
+    who_commission.value = props.customerData.wholesale_commission
+}
+
+calculate_balance();
+
 }
 
 const download = (file) => {
@@ -161,11 +172,12 @@ const addcommission = ()=>
   refForm.value?.validate().then(({ valid: isValid }) => {
     if (isValid) {
       let data = {
-        commission: cant_commission.value
+        commission: cant_commission.value,
+        type_commission: 0
       }
 
       suppliersStores.updateCommission(route.params.id, data)
-        .then(response => {
+        .then(async response => {
           window.scrollTo(0, 0)
 
           advisor.value.show = true
@@ -180,16 +192,94 @@ const addcommission = ()=>
             advisor.value.message = ''
             emit('alert', advisor)
           }, 5000)
-
+          let res = await suppliersStores.updateBalance(route.params.id, data)
+          total_balance.value = res.data.data.supplierAccount.balance
       })
+      
     }
   })
 
   settings.value = 0;
 }
 
+
+const add_whocommission = ()=>
+{
+  refForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) {
+      let data = {
+        wholesale_commission: who_commission.value,
+        type_commission: 1
+      }
+
+      suppliersStores.updateCommission(route.params.id, data)
+        .then(async response => {
+          window.scrollTo(0, 0)
+          advisor.value.show = true
+          advisor.value.type = 'success'
+          advisor.value.message = 'Comisión actualizada!'
+                    
+          emit('alert', advisor)
+
+          setTimeout(() => {
+            advisor.value.show = false
+            advisor.value.type = ''
+            advisor.value.message = ''
+            emit('alert', advisor)
+          }, 5000)
+          let res = await suppliersStores.updateBalance(route.params.id, data)
+
+          total_balance.value = res.data.data.supplierAccount.balance
+      })
+      
+
+    }
+  })
+
+  who_settings.value = 0;
+}
+
+
 const change_settings = () => {
   settings.value = settings.value === 1 ? 0 : 1;
+}
+
+const change_whosettings = ()=>
+{
+  who_settings.value = who_settings.value === 1 ? 0 : 1;
+}
+
+function calculate_balance ()
+{
+  if(props.customerData.account.balance !== null)
+  {
+    total_balance.value = props.customerData.account.balance;
+  }
+
+  else
+  {
+    if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null)
+    {
+      const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
+      const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
+      const total_sales = retail_sales + wholesale_sales
+      const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
+      const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
+      total_balance.value = total_sales - commission_retail - commission_wholesale
+     
+    }
+
+    else
+    {
+      total_balance.value = 0;
+    }
+
+    let data = {
+        balance: total_balance.value,
+        type_commission: 2
+      }
+      suppliersStores.updateBalance(route.params.id, data)
+  }
 }
 
 </script>
@@ -357,7 +447,23 @@ const change_settings = () => {
                         <h6 class="text-base font-weight-semibold">
                           Saldo:
                           <span class="text-body-2">
-                            COP {{ formatNumber(props.customerData.account?.balance) ?? '0.00' }}
+                            COP {{ total_balance }}
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Detal:
+                          <span class="text-body-2">
+                            COP {{ formatNumber(props.customerData.account?.retail_sales_amount) ?? '0.00' }}
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Por Mayor:
+                          <span class="text-body-2">
+                            COP {{ formatNumber(props.customerData.account?.wholesale_sales_amount) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>
@@ -388,7 +494,7 @@ const change_settings = () => {
 
                           <VCol cols="6" md="3" style="padding-left:0px;">
                             <div style="display:flex; align-items: center; gap: 10px;">
-                              <label class="text-primary font-weight-bold">Comisión PartyMax: {{cant_commission}}%</label>
+                              <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{cant_commission}}%</label>
                               <VBtn 
                                 icon="mdi-pencil"
                                 variant="text"
@@ -400,6 +506,9 @@ const change_settings = () => {
                                 <VTextField
                                   v-model="cant_commission"
                                   :rules="[requiredValidator]"
+                                  type="number"
+                                  min= 0
+                                  max= 100 
                                   label="Comisión"
                                   style="margin-top: 10px"
                                 />
@@ -411,6 +520,41 @@ const change_settings = () => {
                             
                           </VCol>
 
+                        </VForm>
+                      </VListItemTitle>
+                      <VListItemTitle>
+                        <VForm
+                          ref="refForm"
+                          v-model="isFormValid"
+                          @submit.prevent="add_whocommission"
+                        >
+                          <VCol cols="6" md="3" style="padding-left:0px;">
+                            <div style="display:flex; align-items: center; gap: 10px;">
+                              <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{who_commission}}%</label>
+                              <VBtn 
+                                icon="mdi-pencil"
+                                variant="text"
+                                size="small"
+                                @click="change_whosettings" 
+                              />
+                            </div>
+                            <div  v-if="who_settings === 1">
+                                <VTextField
+                                  v-model="who_commission"
+                                  :rules="[requiredValidator]"
+                                  type="number"
+                                  min= 0
+                                  max= 100
+                                  label="Comisión Mayorista"
+                                  style="margin-top: 10px"
+                                />
+
+                                <VBtn type="submit" style="margin-top:20px">
+                                  Actualizar       
+                                </VBtn>
+                            </div>
+                            
+                          </VCol>
                         </VForm>
                       </VListItemTitle>  
                     </VListItem>

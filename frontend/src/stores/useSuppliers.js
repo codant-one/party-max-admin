@@ -98,6 +98,19 @@ export const useSuppliersStores = defineStore('suppliers', {
                 .finally(() => {
                     this.setLoading(false)
                 })
+        },
+
+        updateBalance(id, data)
+        {
+            this.setLoading(true)
+            return Suppliers.update_Balance(id, data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
         }
     }
 })

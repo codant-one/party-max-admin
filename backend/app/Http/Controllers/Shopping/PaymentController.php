@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\Billing;
 use App\Models\ShoppingCart;
 
@@ -148,6 +149,8 @@ class PaymentController extends Controller
                     'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null
                 ]);
 
+        $order_details = OrderDetail::where('order_id', $order->id)->get();        
+                
         return response()->json([
             'success' => true
         ], 200);
