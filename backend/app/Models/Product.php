@@ -157,10 +157,10 @@ class Product extends Model
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
 
-        $wholesalersActive = $filters->get('wholesalers') === 'true';
-        $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
-
         if($filters->get('sortBy')) {
+            $wholesalersActive = $filters->get('wholesalers') === 'true';
+            $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
+            
             if($filters->get('sortBy') === 0) 
                 $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
             else {
