@@ -63,7 +63,9 @@ class Supplier extends Model
                         ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
                         ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
                         ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
                         ->whereColumn('s.id', 'suppliers.id');
                 }]);
     }

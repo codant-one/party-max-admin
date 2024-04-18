@@ -12,13 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            
-            $table->unsignedBigInteger('user_id')->nullable()->after('id')->default(1);
-            $table->integer('sales')->nullable()->after('stock')->default(0);
-            $table->float('rating')->nullable()->after('sales')->default(0);
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
+            $table->decimal('price', 10, 2)->change();
+            $table->decimal('price_for_sale', 10, 2)->change();
+            $table->decimal('wholesale_price', 10, 2)->nullable()->change();
         });
     }
 
@@ -28,9 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('user_id');
-            $table->dropColumn('sales');
-            $table->dropColumn('rating');
+            $table->dropColumn('price');
+            $table->dropColumn('price_for_sale');
+            $table->dropColumn('wholesale_price');
         });
     }
 };

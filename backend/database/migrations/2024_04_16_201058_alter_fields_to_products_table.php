@@ -12,13 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            
-            $table->unsignedBigInteger('user_id')->nullable()->after('id')->default(1);
-            $table->integer('sales')->nullable()->after('stock')->default(0);
-            $table->float('rating')->nullable()->after('sales')->default(0);
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
+            $table->integer('stock')->change();
+            $table->integer('wholesale_min')->nullable()->after('wholesale_price')->default(6);
         });
     }
 
@@ -28,9 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('user_id');
-            $table->dropColumn('sales');
-            $table->dropColumn('rating');
+            $table->dropColumn('stock');
+            $table->dropColumn('wholesale_min');
         });
     }
 };

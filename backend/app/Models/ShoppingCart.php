@@ -33,6 +33,7 @@ class ShoppingCart extends Model
             ],
             [
                 'quantity' => $request->quantity,
+                'wholesale' => $request->wholesale,
                 'created_at' => now(),
                 'updated_at' => now()
             ]

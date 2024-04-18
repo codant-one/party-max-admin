@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -15,6 +16,7 @@ use App\Models\Tag;
 use App\Models\ProductLike;
 use App\Models\ProductTag;
 use App\Models\Color;
+use App\Models\ShoppingCart;
 
 class MiscellaneousController extends Controller
 {
@@ -78,8 +80,15 @@ class MiscellaneousController extends Controller
         try {
 
             $limit = $request->has('limit') ? $request->limit : 12;
+            $wholesale = 0;
 
-            $query = Product::with(['user.userDetail', 'user.supplier', 'order'])
+            $query = Product::with([
+                                'user.userDetail', 
+                                'user.supplier', 
+                                'order',
+                                'colors'
+                            ])
+                            ->isFavorite()
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -101,9 +110,16 @@ class MiscellaneousController extends Controller
                            
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             
+            if (Auth::check()) {
+                $user = Auth::user()->load(['client']);
+                $shoppingCart = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale');
+                $wholesale = (count($shoppingCart) === 0) ? -1 : $shoppingCart[0];
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'wholesale' => $wholesale,
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
                     'products' => $products,
                     'productsTotalCount' => $count                    
@@ -123,6 +139,8 @@ class MiscellaneousController extends Controller
     {
         try {
     
+            $wholesale = 0;
+
             $product = Product::with([
                                 'user.userDetail', 
                                 'user.supplier',
@@ -144,7 +162,7 @@ class MiscellaneousController extends Controller
                        ->get();
 
             // Validate if the user is authenticated
-            if (auth()->check()) {
+            if (Auth::check()) {
 
                 $productTag = ProductTag::where('product_id', $product->id)->first();
                     
@@ -161,11 +179,16 @@ class MiscellaneousController extends Controller
                                    ->get();
                 }
 
+                $user = Auth::user()->load(['client']);
+                $shoppingCart = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale');
+                $wholesale = (count($shoppingCart) === 0) ? -1 : $shoppingCart[0];
+
             }
 
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'wholesale' => $wholesale,
                     'product' => $product,
                     'recommendations' => $recommendations,
                 ]

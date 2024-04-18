@@ -39,6 +39,7 @@ class CartController extends Controller
                                     $product->images = $item->color->images;
                                     $product->product_color_id = $item->product_color_id;
                                     $product->quantity = $item->quantity;
+                                    $product->wholesale = $item->wholesale;
                                     return $product;
                                 })->all();
                             })
@@ -71,7 +72,8 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'cart' => $cart
+                    'cart' => $cart,
+                    'count' => ShoppingCart::where('client_id', $request->client_id)->count()
                 ]
             ], 200);
         } catch (\Illuminate\Database\QueryException $ex) {
