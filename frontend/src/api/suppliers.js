@@ -25,6 +25,10 @@ class Suppliers {
     update_Commission(id, data) {
         return axios.put(`/suppliers/updateCommission/${id}`, data)
     }
+
+    update_Balance(id, data) {
+        return axios.put(`/suppliers/updateBalance/${id}`, data)
+    }
 }
 
 const suppliers = new Suppliers();

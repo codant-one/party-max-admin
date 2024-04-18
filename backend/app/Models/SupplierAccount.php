@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Models\Supplier;
 
 class SupplierAccount extends Model
 {
@@ -59,6 +60,29 @@ class SupplierAccount extends Model
         }
 
         return $supplierAccount;
+    }
+
+    public static function update_Balance($request, $supplierAccount)
+    {
+        if($request->type_commission == 2)
+        {
+            $supplierAccount->update([
+                'balance' => $request->balance
+            ]);      
+        }
+
+        else
+        {
+            $supplier = Supplier::find($supplierAccount->supplier_id);
+            $total_sales = ($supplierAccount->retail_sales_amount ?? 0) + ($supplierAccount->wholesale_sales_amount ?? 0);
+            $retail_commission = (($supplier->commission?? 0)/100) * ($supplierAccount->retail_sales_amount ?? 0);
+            $wholesale_commission = (($supplier->wholesale_commission?? 0)/100) * ($supplierAccount->wholesale_sales_amount ?? 0);
+            $new_balance = $total_sales - $retail_commission - $wholesale_commission;
+            $supplierAccount->update([
+                'balance' => $new_balance
+            ]);      
+        }
+        return  $supplierAccount;
     }
 
 }

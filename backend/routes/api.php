@@ -195,6 +195,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     Route::group(['prefix' => 'suppliers'], function () {
         Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);
+        Route::put('/updateBalance/{id}', [SupplierController::class, 'update_Balance']);
     });
 
 });
@@ -233,3 +234,4 @@ Route::get('/proxy-image',[ProxyController::class, 'getImage']);
 //Testing Endpoints
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
 Route::get('emails', [TestingController::class , 'emails'])->name('emails');
+Route::get('minus-stock/{order}', [TestingController::class , 'minus_stock'])->name('minus_stock');

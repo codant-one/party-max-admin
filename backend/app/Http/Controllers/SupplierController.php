@@ -17,6 +17,7 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 use App\Models\User;
 use App\Models\UserRegisterToken;
 use App\Models\Supplier;
+use App\Models\SupplierAccount;
 use App\Models\UserDetails;
 
 class SupplierController extends Controller
@@ -267,7 +268,7 @@ class SupplierController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'Supplier' => $supplier
+                    'supplier' => $supplier
                 ]
             ], 200);
 
@@ -280,5 +281,37 @@ class SupplierController extends Controller
             ], 500);
         }
     }
+
+    public function update_Balance(Request $request, $id)
+    {
+        try {
+            $supplierAccount = SupplierAccount::where('supplier_id',$id)->first();
+
+            if (!$supplierAccount)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Proveedor no encontrado'
+                ], 404);
+            
+            $supplierAccount->update_Balance($request, $supplierAccount);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'supplierAccount' => $supplierAccount
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
 
 }
