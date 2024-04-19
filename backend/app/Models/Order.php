@@ -113,7 +113,7 @@ class Order extends Model
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
                            ->first()
-                           ->reference_code ?? $prefix.'000000';
+                           ->reference_code ?? $prefix.'000003';
 
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
