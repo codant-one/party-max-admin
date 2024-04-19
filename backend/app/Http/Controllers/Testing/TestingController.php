@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\SupplierAccount;
+
 
 class TestingController extends Controller
 {
@@ -74,6 +76,32 @@ class TestingController extends Controller
             'success' => true,
             'data' => $productDetails
         ], 200);
+    }
+
+    public function sum_sales($orderId)
+    {
+        $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get();
+
+        $productDetails = $order_details->map(function ($detail) {
+            return [
+                'product_id' => $detail->product_color->product_id,
+                'subtotal' => $detail->total
+            ];
+        })->toArray();
+
+        foreach ($productDetails as $item) 
+        {
+            $product = Product::find($item['product_id']);
+            $update_sales = SupplierAccount::update_Sales($product->user_id, $item['subtotal']);
+        }
+
+
+
+        return response()->json([
+            'success' => true,
+            'total' => $productDetails
+        ], 200);
+        
     }
 
 }

@@ -236,3 +236,4 @@ Route::get('/proxy-image',[ProxyController::class, 'getImage']);
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
 Route::get('emails', [TestingController::class , 'emails'])->name('emails');
 Route::get('minus-stock/{order}', [TestingController::class , 'minus_stock'])->name('minus_stock');
+Route::get('sum-sales/{order}', [TestingController::class , 'sum_sales'])->name('sum_sales');
