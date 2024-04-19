@@ -85,22 +85,4 @@ class SupplierAccount extends Model
         return  $supplierAccount;
     }
 
-    public static function updateSales($total, $supplierAccount, $order)
-    {
-        if($order->wholesale === 1) {
-            $update_sales = ($supplierAccount->wholesale_sales_amount ?? 0) + $total;
-
-            $supplierAccount->update([
-                'wholesale_sales_amount' => $update_sales
-            ]);
-        } else {
-            $update_sales = ($supplierAccount->retail_sales_amount ?? 0) + $total;
-            $supplierAccount->update([
-                'retail_sales_amount' => $update_sales
-            ]);
-        }
-
-        return $supplierAccount;
-    }
-
 }

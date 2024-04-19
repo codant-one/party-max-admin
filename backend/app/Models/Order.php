@@ -13,7 +13,7 @@ use App\Models\PaymentState;
 use App\Models\Client;
 use App\Models\Address;
 use App\Models\Product;
-use App\Models\SupplierAccount;
+use App\Models\Supplier;
 
 class Order extends Model
 {
@@ -113,7 +113,7 @@ class Order extends Model
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
                            ->first()
-                           ->reference_code ?? $prefix.'000003';
+                           ->reference_code ?? $prefix.'000004';
 
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
@@ -189,9 +189,9 @@ class Order extends Model
             if ($product) {
                 $product->updateStockProduct($product, $item['quantity']);  
                 
-                $supplierAccount = SupplierAccount::where('user_id', $product->user_id)->first();
-                if ($supplierAccount) 
-                    $supplierAccount->updateSales($item['total'], $supplierAccount, $order);
+                $supplier = Supplier::where('user_id', $product->user_id)->first();
+                if ($supplier) 
+                    $supplier->updateSales($item['total'], $supplier, $order);
             }
         }
     }

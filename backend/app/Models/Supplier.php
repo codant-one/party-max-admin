@@ -177,20 +177,37 @@ class Supplier extends Model
 
     public static function updateCommission($request, $supplier)
     {
-        if($request->type_commission == 0)
-        {
+        if($request->type_commission == 0) {
             $supplier->update([
                 'commission' => $request->commission
             ]);      
-        }
-
-        elseif($request->type_commission == 1)
-        {
+        } elseif($request->type_commission == 1) {
             $supplier->update([
                 'wholesale_commission' => $request->wholesale_commission
             ]);      
         }
+
         return $supplier;
+    }
+
+    public static function updateSales($total, $supplier, $order)
+    {
+        $supplierAccount = SupplierAccount::where('supplier_id', $supplier->id)->first();
+
+        if($order->wholesale === 1) {
+            $update_sales = ($supplierAccount->wholesale_sales_amount ?? 0) + $total;
+
+            $supplierAccount->update([
+                'wholesale_sales_amount' => $update_sales
+            ]);
+        } else {
+            $update_sales = ($supplierAccount->retail_sales_amount ?? 0) + $total;
+            $supplierAccount->update([
+                'retail_sales_amount' => $update_sales
+            ]);
+        }
+
+        return $supplierAccount;
     }
 
 }
