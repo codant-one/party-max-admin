@@ -92,7 +92,7 @@ class TestingController extends Controller
         foreach ($productDetails as $item) 
         {
             $product = Product::find($item['product_id']);
-            $update_sales = SupplierAccount::update_Sales($product->user_id, $item['subtotal']);
+            $update_sales = SupplierAccount::updateSales($product->user_id, $item['subtotal']);
         }
 
 

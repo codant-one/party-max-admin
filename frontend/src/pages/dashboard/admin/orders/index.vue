@@ -22,6 +22,28 @@ const totalOrders = ref(0)
 const isRequestOngoing = ref(true)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedOrder = ref({})
+const wholesale = ref(null)
+const shipping_state_id = ref(null)
+const payment_state_id = ref(null)
+
+const references = ref([
+  { title: 'Al mayor', value: 1 },
+  { title: 'Al detal', value: 0 }
+])
+
+const shippingStates = ref([
+  { title: 'Listo para recoger', value: 1 },
+  { title: 'Fuera para entrega', value: 2 },
+  { title: 'Entregado', value: 3 },
+  { title: 'Enviado', value: 4 }
+])
+
+const paymentStates = ref([
+  { title: 'Pendiente', value: 1 },
+  { title: 'Cancelado', value: 2 },
+  { title: 'Fallido', value: 3 },
+  { title: 'Pagada', value: 4 }
+])
 
 const advisor = ref({
   type: '',
@@ -55,7 +77,10 @@ async function fetchData() {
     orderByField: 'id',
     orderBy: 'desc',
     limit: rowPerPage.value,
-    page: currentPage.value
+    page: currentPage.value,
+    wholesale: wholesale.value,
+    shipping_state_id: shipping_state_id.value,
+    payment_state_id: payment_state_id.value
   }
 
   isRequestOngoing.value = true
@@ -269,10 +294,54 @@ const downloadCSV = async () => {
       
         <!-- 👉 orders -->
         <VCard
-            title="Pedidos"
+            title="Filtros"
             class="mb-6" >
 
-            <div class="d-flex flex-wrap gap-4 mx-5">
+            <VCardText>
+                <VRow>
+
+                    <VCol
+                        cols="12"
+                        sm="4"
+                    >
+                        <AppSelect
+                            v-model="wholesale"
+                            placeholder="Referencias"
+                            :items="references"
+                            clearable
+                            clear-icon="tabler-x"
+                        />
+                    </VCol>
+
+                    <VCol
+                        cols="12"
+                        sm="4"
+                    >
+                        <AppSelect
+                            v-model="shipping_state_id"
+                            placeholder="Estados de envios"
+                            :items="shippingStates"
+                            clearable
+                            clear-icon="tabler-x"
+                        />
+                    </VCol>
+
+                    <VCol
+                        cols="12"
+                        sm="4"
+                    >
+                        <AppSelect
+                            v-model="payment_state_id"
+                            placeholder="Estados de pagos"
+                            :items="paymentStates"
+                            clearable
+                            clear-icon="tabler-x"
+                        />
+                    </VCol>
+                </VRow>
+            </VCardText>
+
+            <VCardText class="d-flex flex-wrap gap-4">
                 <div class="d-flex align-center">
                     <!-- 👉 Search  -->
                     <AppTextField
@@ -302,7 +371,7 @@ const downloadCSV = async () => {
                         Exportar
                     </VBtn>
                 </div>
-            </div>
+            </VCardText>
 
             <VDivider class="mt-4" />
 
@@ -329,7 +398,10 @@ const downloadCSV = async () => {
                         :key="order.id"
                         style="height: 3.75rem;">
                         <td>
-                            <span class="font-weight-medium cursor-pointer text-primary" @click="seeOrder(order)">
+                            <span 
+                                class="font-weight-medium cursor-pointer" 
+                                :class="order.wholesale === 0 ? 'text-success': 'text-primary'" 
+                                @click="seeOrder(order)">
                                 {{ order.reference_code }} 
                             </span>
                         </td>
@@ -504,6 +576,10 @@ const downloadCSV = async () => {
 <style scope>
     .search {
         width: 100%;
+    }
+
+    .text-success:hover {
+        color: #FF0090 !important
     }
 
     @media(min-width: 991px){

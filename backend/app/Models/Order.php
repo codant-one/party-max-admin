@@ -13,6 +13,7 @@ use App\Models\PaymentState;
 use App\Models\Client;
 use App\Models\Address;
 use App\Models\Product;
+use App\Models\SupplierAccount;
 
 class Order extends Model
 {
@@ -66,6 +67,18 @@ class Order extends Model
             $query->where('client_id', $filters->get('clientId'));
         }
 
+        if ($filters->get('wholesale') || $filters->get('wholesale') === '0') {
+            $query->where('wholesale', $filters->get('wholesale'));
+        }
+
+        if ($filters->get('shipping_state_id')) {
+            $query->where('shipping_state_id', $filters->get('shipping_state_id'));
+        }
+
+        if ($filters->get('payment_state_id')) {
+            $query->where('payment_state_id', $filters->get('payment_state_id'));
+        }
+
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
@@ -81,7 +94,6 @@ class Order extends Model
         return $query->paginate($limit);
     }
 
-
     /**** Public methods ****/
     public static function createOrder($request) {
 
@@ -92,11 +104,19 @@ class Order extends Model
             'sub_total' => $request->sub_total,
             'shipping_total' => $request->shipping_total,
             'tax' => $request->tax,
-            'total' => $request->total, 
+            'total' => $request->total,
+            'wholesale' => $request->wholesale 
         ]);
 
+        $prefix = $request->wholesale === 0 ? '06' : '09';
+
+        $reference_code = Order::where('wholesale', $request->wholesale)
+                           ->latest('reference_code')
+                           ->first()
+                           ->reference_code ?? $prefix.'000000';
+
         $order->update([
-            'reference_code' => 'PARTYMAX-'.$request->client_id.'-'.$order->id
+            'reference_code' => self::generateNextCode($reference_code)
         ]);
 
         //Order_details
@@ -149,23 +169,42 @@ class Order extends Model
         return $order;
     }
 
-    public static function minusStock($orderId) {
-        $order_details = 
+    public static function updateInventary($order) {
+
+        $orderDetails = 
             OrderDetail::with(['product_color'])
-                       ->where('order_id', $orderId)
+                       ->where('order_id', $order->id)
                        ->get(); 
         
-        $productDetails = $order_details->map(function ($detail) {
+        $productDetails = $orderDetails->map(function ($detail) {
             return [
                 'product_id' => $detail->product_color->product_id,
                 'quantity' => $detail->quantity,
+                'total' => $detail->total
             ];
         })->toArray();
 
         foreach ($productDetails as $item) {
             $product = Product::find($item['product_id']);
-            if ($product) 
-                $product->updateStockProduct($product, $item['quantity']);            
+            if ($product) {
+                $product->updateStockProduct($product, $item['quantity']);  
+                
+                $supplierAccount = SupplierAccount::where('user_id', $product->user_id)->first();
+                if ($supplierAccount) 
+                    $supplierAccount->updateSales($item['total'], $supplierAccount, $order);
+            }
         }
+    }
+
+    public static function generateNextCode($lastCode) {
+        $prefix = substr($lastCode, 0, 2); 
+        $number = (int) substr($lastCode, 2);
+        $number++;
+        if ($number > 999999) {
+            $prefix++;
+            $number = 1000000;
+        }
+    
+        return $prefix . sprintf('%06d', $number);
     }
 }

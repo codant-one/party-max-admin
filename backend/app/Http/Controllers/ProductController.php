@@ -140,7 +140,7 @@ class ProductController extends Controller
                 'colors.categories.category', 
                 'colors.images', 
                 'detail', 
-                'user', 
+                'user.userDetail', 
                 'state',
                 'tags'
             ])->find($id);

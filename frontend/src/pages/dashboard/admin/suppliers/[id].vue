@@ -131,36 +131,38 @@ const handleCopy = (data) => {
 
 <template>
   <div>
-    <VDialog
-        v-model="isRequestOngoing"
-        width="300"
-        persistent>
-                    
-        <VCard
-            color="primary"
-            width="300">
+    <v-row>
+        <VDialog
+            v-model="isRequestOngoing"
+            width="300"
+            persistent>
                         
-            <VCardText class="pt-3">
-                Cargando
+            <VCard
+                color="primary"
+                width="300">
+                            
+                <VCardText class="pt-3">
+                    Cargando
 
-                <VProgressLinear
-                    indeterminate
-                    color="white"
-                    class="mb-0"/>
-            </VCardText>
-        </VCard>
-    </VDialog>
+                    <VProgressLinear
+                        indeterminate
+                        color="white"
+                        class="mb-0"/>
+                </VCardText>
+            </VCard>
+        </VDialog>
 
-    <v-col cols="12">
-        <v-alert
-          v-if="advisor.show"
-          :type="advisor.type"
-          class="mb-6">
-            {{ advisor.message }}
-        </v-alert>
-        <Toaster />
-    </v-col>
-
+        <v-col cols="12">
+            <v-alert
+            v-if="advisor.show"
+            :type="advisor.type"
+            class="mb-6">
+                {{ advisor.message }}
+            </v-alert>
+            <Toaster />
+        </v-col>
+    </v-row>
+    
     <!-- 👉 Header  -->
     <div v-if="supplier" class="d-flex justify-space-between align-center flex-wrap gap-y-4 mb-6">
         <div>

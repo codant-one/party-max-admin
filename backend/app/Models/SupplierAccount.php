@@ -85,38 +85,22 @@ class SupplierAccount extends Model
         return  $supplierAccount;
     }
 
-    public static function update_Sales($user_id, $total)
+    public static function updateSales($total, $supplierAccount, $order)
     {
-        $supplier = Supplier::where('user_id',$user_id)->first();
+        if($order->wholesale === 1) {
+            $update_sales = ($supplierAccount->wholesale_sales_amount ?? 0) + $total;
 
-        if (!$supplier) 
-        {
-            return response()->json([
-                'success' => false,
-                'info' => "Proveedor no encontrado"
-            ], 404);
-        } 
-        
-        else 
-        {
-            $supplier_a = self::where('supplier_id', $supplier->id);
-
-            if (!$supplier_a) {
-                return response()->json([
-                    'success' => false,
-                    'info' => "No se ha encontrado una cuenta de facturación asociada a este proveedor"
-                ], 404); 
-            }
-
-            else {
-                $update_sales = ($supplier_a->retail_sales_amount ?? 0) + $total;
-                $supplier_a->update([
-                    'retail_sales_amount' => $update_sales
-                ]);
-            }
+            $supplierAccount->update([
+                'wholesale_sales_amount' => $update_sales
+            ]);
+        } else {
+            $update_sales = ($supplierAccount->retail_sales_amount ?? 0) + $total;
+            $supplierAccount->update([
+                'retail_sales_amount' => $update_sales
+            ]);
         }
 
-        return $supplier_a;
+        return $supplierAccount;
     }
 
 }

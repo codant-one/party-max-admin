@@ -1,14 +1,10 @@
 <script setup>
 
-import router from '@/router'
-
 import { formatNumber } from '@/@core/utils/formatters'
-import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
 import {requiredValidator} from '@/@core/utils/validators'
 import { useSuppliersStores } from '@/stores/useSuppliers'
-import americanExpress from '@images/icons/payments/img/american-express.png'
-import mastercard from '@images/icons/payments/img/mastercard.png'
-import visa from '@images/icons/payments/img/visa-light.png'
+import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
+import router from '@/router'
 
 const refForm = ref()
 const isFormValid = ref(false)
@@ -92,6 +88,27 @@ watchEffect(() => {
       selectedAddress.value = {}
 })
 
+const calculateBalance = () => {
+
+total_balance.value = props.customerData.account.balance ?? 0;
+
+if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null) {
+  const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
+  const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
+  const total_sales = retail_sales + wholesale_sales
+  const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
+  const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
+  total_balance.value = total_sales - commission_retail - commission_wholesale
+}
+
+let data = {
+  balance: total_balance.value,
+  type_commission: 2
+}
+
+suppliersStores.updateBalance(route.params.id, data)
+}
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -121,17 +138,10 @@ async function fetchData() {
     }
   }
 
-  if (props.customerData.commission !== null) 
-{
-    cant_commission.value = props.customerData.commission
-}
+  cant_commission.value = props.customerData.commission ?? 0
+  who_commission.value = props.customerData.wholesale_commission ?? 0
 
-if (props.customerData.wholesale_commission !== null) 
-{
-    who_commission.value = props.customerData.wholesale_commission
-}
-
-calculate_balance();
+  calculateBalance()
 
 }
 
@@ -167,10 +177,10 @@ const onSubmit = (address, method) => {
   emit('submit', address, method)
 }
 
-const addcommission = ()=>
-{
+const addCommission = () => {
   refForm.value?.validate().then(({ valid: isValid }) => {
     if (isValid) {
+
       let data = {
         commission: cant_commission.value,
         type_commission: 0
@@ -192,7 +202,9 @@ const addcommission = ()=>
             advisor.value.message = ''
             emit('alert', advisor)
           }, 5000)
+
           let res = await suppliersStores.updateBalance(route.params.id, data)
+
           total_balance.value = res.data.data.supplierAccount.balance
       })
       
@@ -202,9 +214,7 @@ const addcommission = ()=>
   settings.value = 0;
 }
 
-
-const add_whocommission = ()=>
-{
+const addWhocommission = () => {
   refForm.value?.validate().then(({ valid: isValid }) => {
     if (isValid) {
       let data = {
@@ -227,59 +237,22 @@ const add_whocommission = ()=>
             advisor.value.message = ''
             emit('alert', advisor)
           }, 5000)
-          let res = await suppliersStores.updateBalance(route.params.id, data)
 
+          let res = await suppliersStores.updateBalance(route.params.id, data)
           total_balance.value = res.data.data.supplierAccount.balance
       })
-      
-
     }
   })
 
   who_settings.value = 0;
 }
 
-
-const change_settings = () => {
+const changeSettings = () => {
   settings.value = settings.value === 1 ? 0 : 1;
 }
 
-const change_whosettings = ()=>
-{
+const changeWhosettings = () => {
   who_settings.value = who_settings.value === 1 ? 0 : 1;
-}
-
-function calculate_balance ()
-{
-  if(props.customerData.account.balance !== null)
-  {
-    total_balance.value = props.customerData.account.balance;
-  }
-
-  else
-  {
-    if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null)
-    {
-      const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
-      const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
-      const total_sales = retail_sales + wholesale_sales
-      const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
-      const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
-      total_balance.value = total_sales - commission_retail - commission_wholesale
-     
-    }
-
-    else
-    {
-      total_balance.value = 0;
-    }
-
-    let data = {
-        balance: total_balance.value,
-        type_commission: 2
-      }
-      suppliersStores.updateBalance(route.params.id, data)
-  }
 }
 
 </script>
@@ -465,7 +438,7 @@ function calculate_balance ()
                         <h6 class="text-base font-weight-semibold mt-10">
                           Saldo:
                           <span class="text-body-2">
-                            COP {{ total_balance }}
+                            COP {{ formatNumber(total_balance) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>
@@ -489,17 +462,17 @@ function calculate_balance ()
                         <VForm
                           ref="refForm"
                           v-model="isFormValid"
-                          @submit.prevent="addcommission"
+                          @submit.prevent="addCommission"
                         >
                           <VRow no-gutters>
                             <VCol cols="6" md="3">
                               <div class="d-flex align-center">
-                                <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{ cant_commission }}%</label>
+                                <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{ formatNumber(cant_commission) }}%</label>
                                 <VBtn 
                                   icon="mdi-pencil"
                                   variant="text"
                                   size="small"
-                                  @click="change_settings" 
+                                  @click="changeSettings" 
                                 />
                               </div>
                               <div  v-if="settings === 1">
@@ -526,17 +499,17 @@ function calculate_balance ()
                         <VForm
                           ref="refForm"
                           v-model="isFormValid"
-                          @submit.prevent="add_whocommission"
+                          @submit.prevent="addWhocommission"
                         >
                           <VRow no-gutters>
                             <VCol cols="6" md="3">
                               <div class="d-flex align-center">
-                                <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{who_commission}}%</label>
+                                <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{ formatNumber(who_commission) }}%</label>
                                 <VBtn 
                                   icon="mdi-pencil"
                                   variant="text"
                                   size="small"
-                                  @click="change_whosettings" 
+                                  @click="changeWhosettings" 
                                 />
                               </div>
                               <div  v-if="who_settings === 1">

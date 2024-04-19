@@ -22,17 +22,16 @@ class PaymentController extends Controller
 
             $ApiKey = env('PAYU_API_KEY');
             $merchantId = env('PAYU_MERCHANT_ID');
-            $referenceCode = 'PARTYMAX-'.$request->client_id.'-'.$request->referenceCode;
             $amount = $request->amount;
             $currency = 'COP';
            
-            $signature = md5($ApiKey.'~'.$merchantId.'~'.$referenceCode.'~'.$amount.'~'.$currency);
+            $signature = md5($ApiKey.'~'.$merchantId.'~'.$request->referenceCode.'~'.$amount.'~'.$currency);
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'signature' => $signature,
-                    'referenceCode' => $referenceCode,
+                    'referenceCode' => $request->referenceCode,
                     'merchantId' => env('PAYU_MERCHANT_ID'),
                     'accountId' => env('PAYU_ACCOUNT_ID'),
                     'responseUrl' => env('APP_DOMAIN').'/cart',
@@ -124,7 +123,7 @@ class PaymentController extends Controller
                 $payment_state_id = 4;
                 $request->request->add(['client_id' => $order->client_id ]);
                 ShoppingCart::deleteAll($request);
-                Order::minusStock($order->id);
+                Order::updateInventary($order);
                 break;
             case '4':
                 $payment_state_id = 3;

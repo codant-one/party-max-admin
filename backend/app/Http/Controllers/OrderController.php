@@ -38,18 +38,14 @@ class OrderController extends Controller
                                 'search',
                                 'orderByField',
                                 'orderBy',
-                                'clientId'
+                                'clientId',
+                                'wholesale',
+                                'shipping_state_id',
+                                'payment_state_id'
                             ])
                         );
 
-            $count = $query->applyFilters(
-                        $request->only([
-                            'search',
-                            'orderByField',
-                            'orderBy',
-                            'clientId'
-                        ])
-                    )->count();
+            $count = $query->count();
 
             $orders = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
