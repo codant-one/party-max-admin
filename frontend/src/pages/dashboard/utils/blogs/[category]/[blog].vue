@@ -188,19 +188,20 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
-.v-card .v-card-text, .v-card-item {
-  padding: 20px 70px;
+  .v-card .v-card-text, .v-card-item {
+    padding: 20px 70px;
 
-  @media (max-width: 767px) {
-    padding: 10px 30px;
+    @media (max-width: 767px) {
+      padding: 10px 30px;
+    }
   }
-}
-.v-card-title {
-  @media (max-width: 767px) {
-    display: inline;
-    white-space: normal;
+  .v-card-title {
+    @media (max-width: 767px) {
+      display: inline;
+      white-space: normal;
+    }
   }
-}
+
   .content-blog {
     position: relative;
     padding: 20px 70px;
@@ -208,6 +209,10 @@ onBeforeUnmount(() => {
     :deep(img)  {
       max-width: 100%;
       cursor: pointer;
+    }
+
+    :deep(a:hover){
+      color: rgb(var(--v-theme-secondary)) !important;
     }
 
     :deep(ul)  {
