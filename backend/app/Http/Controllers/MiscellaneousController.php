@@ -208,8 +208,11 @@ class MiscellaneousController extends Controller
         try {
 
             $categories = 
-                FaqCategory::with(['faqs'])
-                           ->get();
+                FaqCategory::with(['faqs'=> 
+                        function ($query) {
+                            $query->orderBy('order_id', 'asc');
+                        }
+                    ])->get();
         
             return response()->json([
                 'success' => true,
