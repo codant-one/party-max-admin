@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
     }
 
     :deep(a:hover){
-      color: rgb(var(--v-theme-secondary)) !important;
+      color: #6FDDEF !important;
     }
 
     :deep(ul)  {
