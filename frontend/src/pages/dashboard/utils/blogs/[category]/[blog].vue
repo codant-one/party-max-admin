@@ -17,24 +17,6 @@ const isRequestOngoing = ref(true)
 
 const categoriesStores = useCategoriesStores()
 
-const fetchBlogsData = async () => {
-
-  isRequestOngoing.value = true
-
-  if(Number(route.params.blog)) {
-    data.value = await categoriesStores.allCategories()
-
-    apiData.value = data.value.categories.filter(category => category.slug === route.params.category)[0];
-
-    activeBlog.value = apiData.value.blogs.filter(blog => blog.slug === route.params.blog)[0];
-  }
-  isRequestOngoing.value = false
-  
-  images.value = imagesContent();
-}
-
-watch(activeTab, fetchBlogsData, { immediate: true })
-
 const imagesContent = () => {
   const imgRegExp = /<img.*?src="(.*?)".*?>/g;
   const images = [];
@@ -45,7 +27,26 @@ const imagesContent = () => {
   }
   
   return images;
-};
+}
+
+const fetchBlogsData = async () => {
+
+  isRequestOngoing.value = true
+
+  if(route.params.blog) {
+    data.value = await categoriesStores.allCategories()
+
+    apiData.value = data.value.categories.filter(category => category.slug === route.params.category)[0];
+
+    activeBlog.value = apiData.value.blogs.filter(blog => blog.slug === route.params.blog)[0];
+
+    images.value = imagesContent()
+  }
+
+  isRequestOngoing.value = false
+}
+
+watch(activeTab, fetchBlogsData, { immediate: true })
 
 const onContentClick = (event) => {
   const target = event.target;
