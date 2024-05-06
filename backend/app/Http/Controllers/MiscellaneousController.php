@@ -234,18 +234,14 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $tag = $request->has('tag') ? $request->tag : false;
+            $category = $request->has('category') ? $request->category : false;
             $search = $request->has('search') ? $request->search : false;
             $query = Blog::with(['user']);
 
-            if($tag) {
-                $query = $query->whereHas('tags', function ($q) use ($tag) {
-                            $q->whereHas('tag', function ($q) use ($tag) {
-                                $q->where(function ($query) use ($tag) {
-                                    $query->where('slug', $tag );
-                                });
-                            });
-                        });
+            if($category) {
+                $query = $query->whereHas('category', function ($q) use ($category) {
+                            $q->where('slug', $category );
+                         })->orderBy('order_id', 'asc');
             } else 
                 $query = $query->where('is_popular_blog', 1);
 
@@ -255,7 +251,7 @@ class MiscellaneousController extends Controller
 
             $blogs = $query->get();
                 
-            $tags = Tag::withCount('blogTags')->where('tag_type_id', 2)->get();
+            $categories = BlogCategory::withCount('blogs')->get();
 
             $latestBlogs = Blog::orderBy('created_at', 'desc')
                                ->limit(5)          
@@ -265,7 +261,7 @@ class MiscellaneousController extends Controller
                 'success' => true,
                 'data' => [ 
                     'blogs' => $blogs,
-                    'tags' => $tags,
+                    'categories' => $categories,
                     'latestBlogs' => $latestBlogs
                 ]
             ]);
@@ -287,7 +283,7 @@ class MiscellaneousController extends Controller
                         ->where('slug',$slug)
                         ->first();
 
-            $tags = Tag::withCount('blogTags')->where('tag_type_id', 2)->get();
+            $categories = BlogCategory::withCount('blogs')->get();
 
             $latestBlogs = Blog::orderBy('created_at', 'desc')
                                ->limit(5)          
@@ -297,7 +293,7 @@ class MiscellaneousController extends Controller
                 'success' => true,
                 'data' => [ 
                     'blog' => $blog,
-                    'tags' => $tags,
+                    'categories' => $categories,
                     'latestBlogs' => $latestBlogs
                 ]
             ]);
