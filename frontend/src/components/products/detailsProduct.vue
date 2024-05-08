@@ -136,15 +136,19 @@ const colors = (id) => {
                 <span class="text-uppercase">{{ title }}</span>
             </template>
             <template v-slot:subtitle>
-                <strong>Tienda: </strong>
+                <div class="d-block">
+                    <strong>Tienda: </strong>
                     {{ store.toUpperCase() }}
-                <strong>Status: </strong>
+                </div>
+                <div class="d-block">
+                    <strong>Status: </strong>
                     <VChip label :color="colors(state.id)" >
                         {{ state.name }}
                     </VChip>
+                </div>
             </template>
-            <template #append>
-                <div class="mt-n4 me-n2">
+            <template #append class="d-flex align-end">
+                <div class="d-flex align-end me-n2">
                     <VBtn
                         v-if="$can('editar','productos')"
                         icon
