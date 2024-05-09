@@ -41,9 +41,15 @@ class Address extends Model
         ]);
 
         if ($address->default == 1) {
-            Address::where('client_id', $request->client_id)
-                ->where('id', '!=', $address->id) 
-                ->update(['default' => 0]);
+            Address::where([
+                    ['client_id', $request->client_id],
+                    ['id', '!=', $address->id]])
+                   ->update(['default' => 0]);
+        } else {
+            $existDefault = Address::where([['client_id', $request->client_id], ['default', 1]])->first();
+
+            if(!$existDefault)
+                $address->update(['default' => 1]);
         }
 
         return $address;
@@ -66,9 +72,15 @@ class Address extends Model
 
         
         if ($address->default == 1) {
-            Address::where('client_id', $request->client_id)
-                ->where('id', '!=', $address->id) 
-                ->update(['default' => 0]);
+            Address::where([
+                    ['client_id', $request->client_id],
+                    ['id', '!=', $address->id]])
+                  ->update(['default' => 0]);
+        } else {
+            $existDefault = Address::where([['client_id', $request->client_id], ['default', 1]])->first();
+
+            if(!$existDefault)
+                $address->update(['default' => 1]);
         }
 
         return $address;
@@ -77,6 +89,15 @@ class Address extends Model
     public static function deleteAddress($id) {
         $address = self::find($id);
         $address->delete();
+
+        $existDefault = Address::where([['client_id', $address->client_id], ['default', 1]])->first();
+
+        if(!$existDefault) {
+            $firstAddress = Address::where('client_id', $address->client_id)->first();
+
+            if(!$existDefault) 
+                $firstAddress->update(['default' => 1]);
+        }
     }
 
     /**** Scopes ****/

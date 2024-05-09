@@ -134,7 +134,7 @@ class CartController extends Controller
                             ->get(['product_color_id', 'quantity']);
 
             $allAvailable = $cart->every(function ($item) {
-                return $item['color']['product']['stock'] > $item['quantity'];
+                return $item['color']['product']['stock'] >= $item['quantity'];
             });
 
             return response()->json([
