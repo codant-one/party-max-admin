@@ -1,13 +1,12 @@
 <script setup>
 
 import { VIcon } from 'vuetify/components/VIcon'
-import sliderBar1 from '@images/illustrations/sidebar-pic-1.png'
-import sliderBar2 from '@images/illustrations/sidebar-pic-2.png'
-import sliderBar3 from '@images/illustrations/sidebar-pic-3.png'
+import sliderBar1 from '@images/festin/002@2x.png'
+import sliderBar2 from '@images/festin/03@2x.png'
+import sliderBar3 from '@images/festin/04@2x.png'
 
 const userDataJ = ref('')
 const name = ref('')
-const data = ref([])
 
 const websiteAnalytics = [
   {

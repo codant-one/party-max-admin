@@ -24,7 +24,7 @@ const tabs = [
   },
   {
     icon: 'tabler-shopping-cart-cog',
-    title: 'Tienda',
+    title: 'Empresa',
   },
   {
     icon: 'tabler-chart-pie-filled',

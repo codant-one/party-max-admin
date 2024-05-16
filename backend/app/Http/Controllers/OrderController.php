@@ -240,7 +240,7 @@ class OrderController extends Controller
 
         try {
 
-            $orders = Order::with(['details.product_color.product'])->where('client_id',$id)->get();
+            $orders = Order::with(['details.product_color.product', 'shipping', 'payment'])->where('client_id',$id)->get();
             
             $orderData = [];
 
@@ -249,6 +249,8 @@ class OrderController extends Controller
                 $orderInfo = [
                     'order_id' => $order->id,
                     'order_date' => $order->date,
+                    'shipping' => $order->shipping,
+                    'payment' => $order->payment,
                     'products' => []
                 ];
             

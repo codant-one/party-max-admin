@@ -114,7 +114,7 @@ class Order extends Model
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.'0000008';
-                           
+                        // ->reference_code ?? $prefix.rand(1,999999999)   ;
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
         ]);

@@ -166,7 +166,7 @@ const editProduct = id => {
 
 <template>
     <section>
-        <VCard title="Productos subidos">
+        <VCard title="Productos publicados">
             <VCardText class="d-flex flex-wrap py-4 gap-4">
             <div
                 class="me-3"

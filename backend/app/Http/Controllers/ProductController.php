@@ -353,13 +353,23 @@ class ProductController extends Controller
         $countProducts = 1;
 
         foreach($request->all() as $productRequest){
-            ProductList::updateOrCreate(
-                [ 
-                    'product_id' => $productRequest['id'],
-                    'category_id' => $productRequest['category_id']
-                ],
-                [ 'order_id' => $countProducts++ ]
-            );
+
+            if($productRequest['category_id'] != '')
+                ProductList::updateOrCreate(
+                    [ 
+                        'product_id' => $productRequest['id'],
+                        'category_id' => $productRequest['category_id']
+                    ],
+                    [ 'order_id' => $countProducts++ ]
+                );
+            else 
+                Product::updateOrCreate(
+                    [ 
+                        'id' => $productRequest['id'],
+                        'name' => $productRequest['name']
+                    ],
+                    [ 'order_id' => $countProducts++ ]
+                );
         }
 
         return response()->json([

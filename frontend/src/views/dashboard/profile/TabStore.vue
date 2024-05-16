@@ -249,7 +249,7 @@ const onSubmit = () => {
             </VCard>
         </VCol>
         <VCol cols="12">
-            <VCard title="Editar Información de la Tienda">
+            <VCard title="Editar Información de la Empresa">
                 <VCardText>
                     <VForm
                         ref="refVForm"
@@ -258,7 +258,7 @@ const onSubmit = () => {
                             <VCol cols="12" md="6">
                                 <VTextField
                                     v-model="store_name"
-                                    label="Nombre de la tienda"
+                                    label="Nombre de la empresa"
                                     :rules="[requiredValidator]"
                                 />
                             </VCol>

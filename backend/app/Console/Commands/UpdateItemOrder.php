@@ -48,8 +48,9 @@ class UpdateItemOrder extends Command
      */
     public function handle()
     {
-        self::updateFaqs();
-        self::updateBlogs();
+        // self::updateFaqs();
+        // self::updateBlogs();
+        // self::updateProductsByCategory();
         self::updateProducts();
 
         return 0;
@@ -81,7 +82,7 @@ class UpdateItemOrder extends Command
         }
     }
 
-    private function updateProducts() {
+    private function updateProductsByCategory() {
 
         $products = Product::with('colors.categories')->get();
         
@@ -118,4 +119,15 @@ class UpdateItemOrder extends Command
         }
 
     }
+
+    private function updateProducts() {
+
+        $products = Product::all()->pluck('id');
+        
+        foreach($products as $key => $id){
+            Product::where('id', $id)->update(['order_id' => $key + 1]);
+        }
+    }
+
+
 }

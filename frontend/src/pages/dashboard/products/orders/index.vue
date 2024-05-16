@@ -45,8 +45,6 @@ const resolveStatus = statusMsg => {
     }
 }
 
-const enabled = ref(true)
-
 // 👉 Computing pagination data
 const paginationData = computed(() => {
   const firstIndex = (rowPerPage.value === 'Todos') ? 1 : products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
@@ -67,17 +65,11 @@ async function fetchData() {
 
   products.value =  []
 
-  if(selectedCategory.value !== '' && selectedCategory.value !== null) {
-    enabled.value = false
-  } else {
-    enabled.value = true
-  }
-
   let data = {
     search: searchQuery.value,
     state_id: 3,
     category_id: selectedCategory.value,
-    orderByField: 'order_id',
+    orderByField: selectedCategory.value != '' ? 'category_order_id' : 'order_id',
     orderBy: 'asc',
     limit: rowPerPage.value,
     page: currentPage.value
@@ -118,6 +110,7 @@ async function fetchData() {
       selling_price: 0,//agregar mas adelante informacion,
       likes: element.likes,
       order_id: element.order_id,
+      category_order_id: element.category_order_id,
       category_id: selectedCategory.value
     })
   );
@@ -241,14 +234,13 @@ const onEnd = async (e) => {
             v-model="products" 
             tag="tbody"
             item-key="id"
-            :disabled="enabled"
             @start="onStart"
             @end="onEnd">
             <template #item="{ element }">
               <tr 
                 style="height: 3.75rem;"
-                :class="!enabled ? 'draggable-item' : ''">
-                <td> {{ !enabled ? element.order_id : '' }} </td>
+                class="draggable-item">
+                <td> {{ selectedCategory != '' ? element.category_order_id : element.order_id }}  </td>
                 <td> 
                   <div class="d-flex align-center gap-x-2">
                     <VAvatar

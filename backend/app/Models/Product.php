@@ -103,15 +103,13 @@ class Product extends Model
     public function scopeOrder($query, $categoryId = null)
     {
         if(!is_null($categoryId))
-            return  $query->addSelect(['order_id' => function ($q) use ($categoryId) {
+            return  $query->addSelect(['category_order_id' => function ($q) use ($categoryId) {
                         $q->selectRaw('pl.order_id')
                         ->from('products as p')
                         ->join('product_lists as pl', 'p.id', '=', 'pl.product_id')
                         ->where('pl.category_id', $categoryId)
                         ->whereColumn('p.id', 'products.id');
                     }]);
-        else 
-            return $query->addSelect([DB::raw('NULL as order_id')]);
    
     }
 
@@ -157,13 +155,13 @@ class Product extends Model
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
 
-        if($filters->get('sortBy')) {
-            $wholesalersActive = $filters->get('wholesalers') === 'true';
-            $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
-            
+        if($filters->get('sortBy')) {            
             if($filters->get('sortBy') === 0) 
                 $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
             else {
+                $wholesalersActive = $filters->get('wholesalers') === 'true';
+                $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
+
                 switch ($filters->get('sortBy')) {
                     case 1:
                         $query->orderByRaw("CAST($orderByField AS DECIMAL(10,2)) ASC");

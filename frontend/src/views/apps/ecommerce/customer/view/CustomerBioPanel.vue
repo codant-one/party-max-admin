@@ -9,6 +9,10 @@ const props = defineProps({
   customerData: {
     type: Object,
     required: true,
+  },
+  isSupplier: {
+    type: Boolean,
+    required: true
   }
 })
 
@@ -85,7 +89,7 @@ const getFlagCountry = country => {
           <h4 class="text-h4 mt-4">
             {{ props.customerData.user.name }}  {{ props.customerData.user.last_name ?? '' }}
           </h4>
-          <span class="text-sm">Cliente ID #{{ props.customerData.id }}</span>
+          <span class="text-sm"> {{ props.isSupplier ? 'Proveedor' : 'Cliente' }} ID #{{ props.customerData.id }}</span>
 
           <div class="d-flex justify-center gap-x-5 mt-6">
             <div class="d-flex align-center">
@@ -113,7 +117,7 @@ const getFlagCountry = country => {
               </VAvatar>
               <div class="d-flex flex-column align-start">
                 <span class="text-body-1 font-weight-medium">COP {{ formatNumber(props.customerData.sales) ?? '0.00' }}</span>
-                <span class="text-body-2">Ventas</span>
+                <span class="text-body-2">Ventas Totales</span>
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ class Products {
     }
 
     updateOrder(data) {
-        return axios.post('/products/order_id',data)
+        return axios.post('/products/order_id', data)
     }
 }
 

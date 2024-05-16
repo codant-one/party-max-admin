@@ -198,7 +198,9 @@ const handleCopy = (data) => {
             md="5"
             lg="4"
         >
-            <CustomerBioPanel :customer-data="supplier" />
+            <CustomerBioPanel 
+                :customer-data="supplier"
+                :is-supplier="true" />
         </VCol>
         <VCol
             cols="12"

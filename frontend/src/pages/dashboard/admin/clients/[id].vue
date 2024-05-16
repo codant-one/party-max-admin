@@ -235,7 +235,9 @@ const removeAddress = async () => {
             md="5"
             lg="4"
         >
-            <CustomerBioPanel :customer-data="client" />
+            <CustomerBioPanel 
+                :customer-data="client" 
+                :is-supplier="false"/>
         </VCol>
         <VCol
             cols="12"
