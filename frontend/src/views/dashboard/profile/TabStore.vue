@@ -4,7 +4,7 @@ import { requiredValidator } from '@/@core/utils/validators'
 import { useProfileStores } from '@/stores/useProfile'
 import { useAuthStores } from '@/stores/useAuth'
 import { themeConfig } from '@themeConfig'
-import banner from '@images/logos/banner.png'
+import banner from '@images/logos/banner3.png'
 import supplier from '@images/logos/supplier.png';
 
 const authStores = useAuthStores()

@@ -4,6 +4,7 @@ import { VIcon } from 'vuetify/components/VIcon'
 import sliderBar1 from '@images/festin/002@2x.png'
 import sliderBar2 from '@images/festin/03@2x.png'
 import sliderBar3 from '@images/festin/04@2x.png'
+import banner from '@images/logos/banner4.png'
 
 const userDataJ = ref('')
 const name = ref('')
@@ -90,7 +91,7 @@ async function fetchData() {
 </script>
 
 <template>
-    <VCard color="primary">
+    <VCard :style="{ backgroundImage: `url(${banner})`, backgroundSize: `cover`}">
         <VCarousel
             cycle
             :continuous="false"
@@ -107,10 +108,10 @@ async function fetchData() {
                 <VCardText>
                     <VRow>
                         <VCol cols="12">
-                        <h4 class="text-h4 text-white mb-1">
+                        <h4 class="text-h4 text-magenta mb-1">
                             Análisis de Estadísticas
                         </h4>
-                        <p class="text-sm mb-0">
+                        <p class="text-sm mb-0 text-blue">
                             {{ name }}
                         </p>
                         </VCol>
@@ -123,7 +124,7 @@ async function fetchData() {
                             >
                             <VRow>
                                 <VCol cols="12" class="pb-0 pt-1">
-                                    <p class="font-weight-bold mb-1">
+                                    <p class="font-weight-bold mb-1 text-blue">
                                         {{ item.name }}
                                     </p>
                                 </VCol>
@@ -138,12 +139,12 @@ async function fetchData() {
                                         label
                                         variant="flat"
                                         size="default"
-                                        color="rgba(var(--v-theme-on-surface), 0.12)"
+                                        color="rgba(var(--v-theme-primary), 1)"
                                         class="font-weight-medium text-white rounded me-2"
                                     >
                                         {{ d.number }}
                                     </VChip>
-                                    <span>{{ d.text }}</span>
+                                    <span class="text-blue">{{ d.text }}</span>
                                 </VCol>
                             </VRow>
                         </VCol>
@@ -175,6 +176,14 @@ async function fetchData() {
 
     .card-website-analytics-img {
         block-size: 160px;
+    }
+
+    .text-blue {
+      color: #0A1B33 !important;
+    }
+    
+    .text-magenta {
+      color: #FF0090 !important;
     }
 
     @media screen and (min-width: 600px) {
