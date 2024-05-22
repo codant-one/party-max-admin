@@ -102,7 +102,7 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
         try {
 
@@ -235,13 +235,44 @@ class OrderController extends Controller
             }
     }
 
-    public function ordersbyclient($id)
+    public function ordersbyclient(Request $request, $id): JsonResponse
     {
 
         try {
 
-            $orders = Order::with(['details.product_color.product', 'shipping', 'payment'])->where('client_id',$id)->get();
+            $ordersPending = Order::where([['client_id', $id], ['payment_state_id', 1]])->get();
             
+            foreach ($ordersPending as $item) {
+
+                $order = Order::find($item->id);
+
+                if($order) {
+                    $order->update([
+                        'payment_state_id' => 2
+                    ]);  
+                }
+            }
+
+            $limit = $request->has('limit') ? $request->limit : 5;
+
+            $query = Order::with(['details.product_color.product', 'shipping', 'payment'])
+                            ->where('client_id', $id)
+                            ->applyFilters(
+                                $request->only([
+                                    'search',
+                                    'orderByField',
+                                    'orderBy',
+                                    'clientId',
+                                    'wholesale',
+                                    'shipping_state_id',
+                                    'payment_state_id'
+                                ])
+                            );
+
+            $count = $query->count();
+
+            $orders = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
             $orderData = [];
 
             foreach ($orders as $order) {
@@ -267,15 +298,14 @@ class OrderController extends Controller
                 }
             
                 $orderData[] = $orderInfo;
-    
-    
-                }
-
+            }
         
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'orders' => $orderData
+                    'orders' => $orderData,
+                    'ordersAll' => $orders,
+                    'ordersTotalCount' => $count,
                 ]
             ], 200);
 
@@ -288,11 +318,13 @@ class OrderController extends Controller
         }
     }
 
-    public function orderbyID($id)
+    public function orderbyID($id): JsonResponse
     {
         try {
 
-            $orders = Order::with(['details.product_color.product'])->where('id',$id)->get();
+            $orders = Order::with(['details.product_color.product', 'shipping', 'payment', 'address.province'])
+                           ->where('id', $id)
+                           ->get();
             
             $orderData = [];
 
@@ -302,8 +334,12 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'order_date' => $order->date,
                     'subtotal' => $order->sub_total,
-                    'costo_envio'=> $order->shipping_total,
-                    'total'=> $order->total,
+                    'shipping_cost' => $order->shipping_total,
+                    'total' => $order->total,
+                    'shipping' => $order->shipping,
+                    'payment' => $order->payment,
+                    'address' => $order->address,
+                    'updated_at' => $order->updated_at,
                     'products' => []
                 ];
             
@@ -312,7 +348,7 @@ class OrderController extends Controller
                         'product_id' => $detail->product_color->product->id,
                         'product_name' => $detail->product_color->product->name,
                         'product_image' => $detail->product_color->product->image,
-                        'slug'=> $detail->product_color->product->slug,
+                        'slug' => $detail->product_color->product->slug,
                         'quantity' => $detail->quantity
                     ];
             
@@ -320,10 +356,7 @@ class OrderController extends Controller
                 }
             
                 $orderData[] = $orderInfo;
-    
-    
-                }
-
+            }
         
             return response()->json([
                 'success' => true,

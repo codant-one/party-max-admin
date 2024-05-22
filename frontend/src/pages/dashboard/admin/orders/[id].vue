@@ -46,14 +46,14 @@ const resolveStatusShipping = shipping_state_id => {
     return { color: 'success' }
 }
 
-const resolveStatusPayment = shipping_state_id => {
-  if (shipping_state_id === 1)
+const resolveStatusPayment = payment_state_id => {
+  if (payment_state_id === 1)
     return { color: 'error' }
-  if (shipping_state_id === 2)
+  if (payment_state_id === 2)
     return { color: 'default' }
-  if (shipping_state_id === 3)
+  if (payment_state_id === 3)
     return { color: 'warning' }
-  if (shipping_state_id === 4)
+  if (payment_state_id === 4)
     return { color: 'info' }
 }
 
