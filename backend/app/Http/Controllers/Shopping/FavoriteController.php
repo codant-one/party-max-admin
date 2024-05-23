@@ -17,24 +17,32 @@ class FavoriteController extends Controller
     {
         try {
 
-            $favorites = 
-                ProductLike::with(['user', 'product'])
-                           ->where('user_id', $request->user_id)
-                           ->get()
-                           ->groupBy('user_id')
-                           ->map(function ($group) {
+            $limit = $request->has('limit') ? $request->limit : 5;
+
+            $favoritesQuery = ProductLike::with(['user', 'product'])
+                             ->where('user_id', $request->user_id)
+                             ->paginate($limit); 
+
+            $favorites = $favoritesQuery->getCollection()
+                            ->groupBy('user_id')
+                            ->map(function ($group) {
                                 return $group->map(function ($item) {
                                     $product = $item->product;
                                     return $product;
-                                })->all();
+                                });
                             })
-                           ->values()
-                           ->all();
+                            ->values()
+                            ->all();
+
+            $favoritesQuery->setCollection(collect($favorites));
+
+            $count = $favoritesQuery->count();
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'favorites' => (count($favorites) === 0) ? [] : $favorites[0]
+                    'favorites' => $favoritesQuery,
+                    'favoritesTotalCount' => $count
                 ]
             ], 200);
 

@@ -305,7 +305,7 @@ class OrderController extends Controller
                 'data' => [ 
                     'orders' => $orderData,
                     'ordersAll' => $orders,
-                    'ordersTotalCount' => $count,
+                    'ordersTotalCount' => $count
                 ]
             ], 200);
 
