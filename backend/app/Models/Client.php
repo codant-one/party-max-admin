@@ -154,14 +154,15 @@ class Client extends Model
 
         $link_send = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
         $link_purchases = env('APP_DOMAIN').'/purchases';
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
 
         $address = 
             $order->address->address . ', ' . 
             $order->address->street . ', ' . 
             $order->address->city . ', ' . 
             $order->address->postal_code . ', ' . 
-            $order->address->province->name . '. (' .
-            $order->billing->note . ').';
+            $order->address->province->name .
+            $note;
 
         $payment_method = 
             ($order->billing->pse === 0) ? 
