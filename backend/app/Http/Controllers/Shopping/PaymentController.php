@@ -124,7 +124,6 @@ class PaymentController extends Controller
                 $request->request->add(['client_id' => $order->client_id ]);
                 ShoppingCart::deleteAll($request);
                 Order::updateInventary($order);
-                Client::sendMail($order->id);
                 break;
             case '4':
                 $payment_state_id = 3;
@@ -149,6 +148,9 @@ class PaymentController extends Controller
                     'card_name' => ($pse === 0) ? $request->cc_holder : null,
                     'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null
                 ]);
+
+        if($request->response_code_pol === '1')
+            Client::sendMail($order->id);
                 
         return response()->json([
             'success' => true
