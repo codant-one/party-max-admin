@@ -32,7 +32,7 @@ const references = ref([
 ])
 
 const shippingStates = ref([
-  { title: 'Listo para recoger', value: 1 },
+  { title: 'Listo para enviar', value: 1 },
   { title: 'Fuera para entrega', value: 2 },
   { title: 'Entregado', value: 3 },
   { title: 'Enviado', value: 4 }

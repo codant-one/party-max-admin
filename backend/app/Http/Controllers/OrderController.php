@@ -332,6 +332,7 @@ class OrderController extends Controller
                                 'details.product_color.color',
                                 'shipping', 
                                 'payment', 
+                                'billing',
                                 'address.province'
                            ])
                            ->where('id', $id)
@@ -349,6 +350,7 @@ class OrderController extends Controller
                     'total' => $order->total,
                     'shipping' => $order->shipping,
                     'payment' => $order->payment,
+                    'billing' => $order->billing,
                     'address' => $order->address,
                     'updated_at' => $order->updated_at,
                     'products' => []

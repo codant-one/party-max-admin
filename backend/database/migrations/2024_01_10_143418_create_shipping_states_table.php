@@ -20,7 +20,7 @@ return new class extends Migration
 
         DB::table('shipping_states')->insert([
             [
-                'name' => 'Listo para recoger',
+                'name' => 'Listo para enviar',
                 'label' => 'listo',
                 'created_at' => now(),
                 'updated_at' => now() 

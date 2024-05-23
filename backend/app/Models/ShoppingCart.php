@@ -42,17 +42,14 @@ class ShoppingCart extends Model
         return $cart;
     }
 
-
-    public static function deleteCart($request) 
-    {
+    public static function deleteCart($request) {
         ShoppingCart::where([
             ['client_id', $request->client_id],
             ['product_color_id', $request->product_color_id]]
         )->delete(); 
     }
 
-    public static function deleteAll($request) 
-    {
+    public static function deleteAll($request) {
         ShoppingCart::where('client_id', $request->client_id)->delete(); 
     }
 

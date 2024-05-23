@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
 use App\Models\Address;
@@ -87,7 +88,6 @@ class Client extends Model
         return $query->paginate($limit);
     }
 
-
     /**** Public methods ****/
     public static function createClient($request) {
         $user = User::createUser($request);
@@ -140,5 +140,78 @@ class Client extends Model
         );
 
         return $clientD;
+    }
+
+    public static function sendMail($orderId) {
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
+        $link_purchases = env('APP_DOMAIN').'/purchases';
+
+        $address = 
+            $order->address->address . ', ' . 
+            $order->address->street . ', ' . 
+            $order->address->city . ', ' . 
+            $order->address->postal_code . ', ' . 
+            $order->address->province->name . '. (' .
+            $order->billing->note . ').';
+
+        $payment_method = 
+            ($order->billing->pse === 0) ? 
+                $order->billing->payment_method_name . ' terminada en ' . $order->billing->card_number: 
+                'PSE';
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' => $detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        
+        }
+
+        $data = [
+            'address' => $address,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'phone' => $order->client->user->userDetail->phone,
+            'total' => $order->total,
+            'payment_method' => $payment_method,
+            'products' => $products,
+            'link_send' => $link_send,
+            'link_purchases' => $link_purchases
+        ];
+        
+        $email = $order->client->user->email;
+        $subject = 'Tu pedido en PARTYMAX se completó con éxito';
+
+        try {
+            \Mail::send(
+                'emails.payment.purchase_detail'
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
     }
 }

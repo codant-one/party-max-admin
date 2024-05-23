@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Billing;
 use App\Models\ShoppingCart;
+use App\Models\Client;
 
 class PaymentController extends Controller
 {
@@ -123,6 +124,7 @@ class PaymentController extends Controller
                 $request->request->add(['client_id' => $order->client_id ]);
                 ShoppingCart::deleteAll($request);
                 Order::updateInventary($order);
+                Client::sendMail($order->id);
                 break;
             case '4':
                 $payment_state_id = 3;
