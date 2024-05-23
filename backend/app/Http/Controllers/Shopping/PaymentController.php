@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
 use App\Models\Billing;
 use App\Models\ShoppingCart;
 

@@ -27,6 +27,4 @@ class OrderDetail extends Model
     {
         return $this->hasOne(ProductColor::class, 'id', 'product_color_id');
     }
-
-
 }

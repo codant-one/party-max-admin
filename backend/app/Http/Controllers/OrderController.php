@@ -12,7 +12,6 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
 use App\Models\ProductColor;
 use App\Models\Product;
 
