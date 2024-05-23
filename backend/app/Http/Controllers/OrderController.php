@@ -255,7 +255,12 @@ class OrderController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 5;
 
-            $query = Order::with(['details.product_color.product', 'shipping', 'payment'])
+            $query = Order::with([
+                                'details.product_color.product', 
+                                'details.product_color.color', 
+                                'shipping', 
+                                'payment'
+                            ])
                             ->where('client_id', $id)
                             ->applyFilters(
                                 $request->only([
@@ -290,6 +295,7 @@ class OrderController extends Controller
                         'product_id' => $detail->product_color->product->id,
                         'product_name' => $detail->product_color->product->name,
                         'product_image' => $detail->product_color->product->image,
+                        'color' => $detail->product_color->color->name,
                         'slug'=> $detail->product_color->product->slug,
                         'quantity' => $detail->quantity
                     ];
@@ -322,7 +328,13 @@ class OrderController extends Controller
     {
         try {
 
-            $orders = Order::with(['details.product_color.product', 'shipping', 'payment', 'address.province'])
+            $orders = Order::with([
+                                'details.product_color.product', 
+                                'details.product_color.color',
+                                'shipping', 
+                                'payment', 
+                                'address.province'
+                           ])
                            ->where('id', $id)
                            ->get();
             
@@ -348,6 +360,7 @@ class OrderController extends Controller
                         'product_id' => $detail->product_color->product->id,
                         'product_name' => $detail->product_color->product->name,
                         'product_image' => $detail->product_color->product->image,
+                        'color' => $detail->product_color->color->name,
                         'slug' => $detail->product_color->product->slug,
                         'quantity' => $detail->quantity
                     ];
