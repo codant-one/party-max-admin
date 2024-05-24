@@ -234,3 +234,9 @@ const resolveStatusPayment = payment_state_id => {
     </VCardText>
   </VCard>
 </template>
+
+<style scoped>
+  .text-success:hover {
+    color: #FF0090 !important
+  }
+</style>
