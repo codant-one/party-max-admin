@@ -372,7 +372,7 @@ class Product extends Model
 
         foreach(explode(",", $request->color_id) as $key => $color) {
             
-            $product_color = ProductColor::where('color_id', $color)->first();
+            $product_color = ProductColor::where([['product_id', $product_id], ['color_id', $color]])->first();
 
             if($product_color)
                 $product_color->update([
