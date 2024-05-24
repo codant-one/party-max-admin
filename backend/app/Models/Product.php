@@ -472,6 +472,7 @@ class Product extends Model
             'wholesale_price' => ($request->wholesale_price === 'null' || $request->wholesale === '0') ? null : $request->wholesale_price,
             'wholesale_min' => $request->wholesale_min,
             'stock' => $request->stock,
+            'in_stock' => (intval($request->stock) > 1) ? 1 : 0,
             'slug' => Str::slug($request->name)
         ]);
 
