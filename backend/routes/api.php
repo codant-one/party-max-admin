@@ -236,6 +236,7 @@ Route::get('/proxy-image',[ProxyController::class, 'getImage']);
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
 Route::get('emails', [TestingController::class , 'emails'])->name('emails');
 Route::get('paymentSummaryEmail', [TestingController::class , 'paymentSummaryEmail'])->name('paymentSummaryEmail');
-Route::get('littleProductExistence', [TestingController::class , 'littleProductExistence'])->name('littleProductExistence');
+Route::get('littleProductExistence', [TestingController::class , 'littleProductExistenceEmail'])->name('littleProductExistence');
+Route::get('outOfStockEmail', [TestingController::class , 'outOfStockEmail'])->name('outOfStockEmail');
 Route::get('minus-stock/{order}', [TestingController::class , 'minus_stock'])->name('minus_stock');
 Route::get('sum-sales/{order}', [TestingController::class , 'sum_sales'])->name('sum_sales');

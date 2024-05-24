@@ -539,23 +539,38 @@ class Product extends Model
             'in_stock' => ($new_stock === 0) ? 0 : 1
         ]);
 
-        // if($new_stock < 3 && $new_stock !== 0)
-        //     self::sendMail($product, 1);
-        // else if($new_stock === 0)
-        //     self::sendMail($product, 2);
+        if(intval($new_stock) < 3 && intval($new_stock) !== 0)
+            self::sendMail($product, 1);
+        else if(intval($new_stock) === 0)
+            self::sendMail($product, 2);
     }
 
     public static function sendMail($product, $type) {
 
-        $email = $order->client->user->email;// del proveedor
+        $email = $product->user->email;
 
         if($type === 1) {
-            $subject = $order->client->user->name . ' ' . $order->client->user->last_name. ' tienes poca existencia, monitorea tu producto.';
+            $subject = '('. $product->user->name . ' ' . $product->user->last_name . ') tienes poca existencia, monitorea tu producto.';
             $view = 'emails.suppliers.little_product_existence';
         } else {
-            $subject = $order->client->user->name . ' ' . $order->client->user->last_name. ' inventario agotado.';
+            $subject = '('. $product->user->name . ' ' . $product->user->last_name . ') inventario agotado.';
             $view = 'emails.suppliers.out_of_stock';
         }
+
+        $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
+
+        $productInfo = [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_image' => asset('storage/' . $product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
+            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+        ];
+
+        $data = [
+            'product' => $productInfo,
+            'link' => $link
+        ];
 
         try {
             \Mail::send(

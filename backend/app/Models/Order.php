@@ -185,7 +185,7 @@ class Order extends Model
         })->toArray();
 
         foreach ($productDetails as $item) {
-            $product = Product::find($item['product_id']);
+            $product = Product::with(['colors.product', 'user'])->find($item['product_id']);
             if ($product) {
                 $product->updateStockProduct($product, $item['quantity']);  
                 

@@ -108,67 +108,52 @@ class TestingController extends Controller
         return view('emails.payment.purchase_detail', compact('data'));
     }
 
-    public function littleProductExistence() {
+    public function littleProductExistenceEmail() {
 
-        $orderId = 7;
+        $productId = 16;
 
-        $order = 
-            Order::with([
-                'billing', 
-                'details.product_color.product', 
-                'address.province', 
-                'client.user.userDetail'
-            ])->find($orderId); 
+        $product = Product::with(['colors.product', 'user'])->find($productId); 
+        $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
 
-        $link_send = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
-        $link_purchases = env('APP_DOMAIN').'/purchases';
-        $linkProducts = env('APP_DOMAIN').'/products/';
+        $productInfo = [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_image' => asset('storage/' . $product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
+            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+        ];
 
-        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';        
-
-        $address = 
-            $order->address->address . ', ' . 
-            $order->address->street . ', ' . 
-            $order->address->city . ', ' . 
-            $order->address->postal_code . ', ' . 
-            $order->address->province->name .
-            $note;
-
-        $payment_method = 
-            ($order->billing->pse === 0) ? 
-                $order->billing->payment_method_name . ' terminada en ' . $order->billing->card_number: 
-                'PSE';
-
-        $products = [];
-
-        foreach ($order->details as $detail) {
-            $productInfo = [
-                'product_id' => $detail->product_color->product->id,
-                'product_name' => $detail->product_color->product->name,
-                'product_image' => asset('storage/' . $detail->product_color->product->image),
-                'color' => $detail->product_color->color->name,
-                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
-                'quantity' => $detail->quantity,
-                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
-            ];
-            
-            array_push($products, $productInfo);
-        
-        }
-        //dd($products);
         $data = [
-            'address' => $address,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
-            'phone' => $order->client->user->userDetail->phone,
-            'total' => $order->total,
-            'payment_method' => $payment_method,
-            'products' => $products,
-            'link_send' => $link_send,
-            'link_purchases' => $link_purchases
+            'product' => $productInfo,
+            'link' => $link
         ];
 
         //dd($data);
-        return view('emails.payment.purchase_detail', compact('data'));
+        return view('emails.suppliers.little_product_existence', compact('data'));
+    }
+
+    public function outOfStockEmail() {
+
+        $productId = 16;
+
+        $product = Product::with(['colors.product', 'user'])->find($productId); 
+        $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
+
+        $productInfo = [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_image' => asset('storage/' . $product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
+            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+        ];
+
+        $data = [
+            'product' => $productInfo,
+            'link' => $link
+        ];
+
+        //dd($data);
+        return view('emails.suppliers.out_of_stock', compact('data'));
     }
 
     public function minus_stock($orderId) {

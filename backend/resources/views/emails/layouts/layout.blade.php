@@ -76,6 +76,10 @@
                 .es-header .es-right img { 
                     width: 100px!important; 
                 }
+
+                .out_of_stock img {
+                    width: 60px!important; 
+                }
             }
         </style>
     </head>

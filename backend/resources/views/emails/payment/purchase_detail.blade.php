@@ -21,7 +21,7 @@
                                     <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 25%; max-width: 120px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                                         <img src="{{ $product['product_image'] }}" width="90%">
                                     </a>
-                                    <div style="width: 75%; justify-content: start; align-items: center; display: flex;" class="text">
+                                    <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                                         <div style="display:block;">
                                             <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
                                                 {{ $product['product_name'] }}
@@ -53,7 +53,7 @@
                     <td style="padding-left: 15px; padding-right: 15px;">
                         <table width="100%" class="address">
                             <td width="10%" style="vertical-align: top;">
-                                <img src="{{ asset('/images/truck.png') }}" alt="Facebook" title="Facebook" width="24" height="24" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                <img src="{{ asset('/images/truck.png') }}" alt="truck" title="truck" width="24" height="24" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                             </td>
                             <td width="90%">
                                 <p style="font-size: 16px; color: #0a1b33; font-weight: 700; margin: 0; padding-bottom: 12px;">Envío a domicilio</p>
@@ -69,7 +69,7 @@
                     <td style="padding-left: 15px; padding-right: 15px;">
                         <table width="100%" style="margin-top: 16px;" class="address">
                             <td width="10%" style="vertical-align: top;">
-                                <img src="{{ asset('/images/dollar-sign.png') }}" alt="Facebook" title="Facebook" width="24" height="24" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                <img src="{{ asset('/images/dollar-sign.png') }}" alt="dollar" title="dollar" width="24" height="24" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                             </td>
                             <td width="90%" style="padding-bottom: 12px;">
                                 <p style="font-size: 16px; color: #0a1b33; font-weight: 700; margin: 0; padding-bottom: 12px;">Pagaste ${{ $data['total'] }}</p>
