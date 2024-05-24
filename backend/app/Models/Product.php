@@ -365,18 +365,29 @@ class Product extends Model
             foreach($products_images as $products_image) {
                 if($products_image->image)
                     deleteFile($products_image->image);
-            }
 
-            $productColor->delete();
+                $products_image->delete();
+            }
         }
 
         foreach(explode(",", $request->color_id) as $key => $color) {
             
-            $product_color = ProductColor::create([
-                'product_id' => $product_id,
-                'color_id' => $color,
-                'sku' => explode(",", $request->sku)[$key]
-            ]);
+            $product_color = ProductColor::where('color_id', $color)->first();
+
+            if($product_color)
+                $product_color->update([
+                    'product_id' => $product_id,
+                    'color_id' => $color,
+                    'sku' => explode(",", $request->sku)[$key]
+                ]);
+            else 
+                $product_color = ProductColor::create([
+                    'product_id' => $product_id,
+                    'color_id' => $color,
+                    'sku' => explode(",", $request->sku)[$key]
+                ]);
+
+            $product_color->categories()->delete();
 
             self::createProductImages($product_color->id, $key, $request);
             self::createProductCategories($product_color->id, $key, $request);
