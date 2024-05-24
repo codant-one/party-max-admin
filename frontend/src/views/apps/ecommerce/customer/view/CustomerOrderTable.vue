@@ -148,7 +148,19 @@ const resolveStatusPayment = payment_state_id => {
             </VChip>
           </td>
           <td> 
-            COP {{ formatNumber(order.sub_total) }} 
+            <span class="text-body-1 font-weight-medium text-uppercase" v-if="order.payment.id === 4">
+              TOTAL: COP {{ formatNumber(order.total) }} 
+            </span>
+            <div class="d-flex align-center gap-x-2" v-if="order.payment.id === 4">
+              <div class="d-flex flex-column">
+                <span class="text-sm text-disabled">
+                  VENTA: COP {{ formatNumber(order.sub_total) }} 
+                </span>
+                <span class="text-sm text-disabled">
+                  ENVÍO: COP {{ formatNumber(order.shipping_total) }} 
+                </span>
+              </div>
+              </div>
           </td>
           <!-- 👉 Acciones -->
           <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">      
