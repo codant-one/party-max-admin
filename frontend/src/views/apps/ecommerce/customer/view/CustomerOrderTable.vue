@@ -125,8 +125,11 @@ const resolveStatusPayment = payment_state_id => {
           :key="order.id"
           style="height: 3.75rem;">
           <td>
-            <span class="font-weight-medium cursor-pointer text-primary" @click="seeOrder(order)">
-              {{ order.reference_code }} 
+            <span 
+              class="font-weight-medium cursor-pointer" 
+              :class="order.wholesale === 0 ? 'text-success': 'text-primary'" 
+              @click="seeOrder(order)">
+              {{ order.reference_code }}
             </span>
           </td>
           <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
