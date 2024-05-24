@@ -148,7 +148,7 @@ const resolveStatusPayment = payment_state_id => {
             </VChip>
           </td>
           <td> 
-            COP {{ formatNumber(order.total) }} 
+            COP {{ formatNumber(order.sub_total) }} 
           </td>
           <!-- 👉 Acciones -->
           <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">      

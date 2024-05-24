@@ -43,9 +43,10 @@ class Client extends Model
     public function scopeSales($query)
     {
         return  $query->addSelect(['sales' => function ($q){
-                    $q->selectRaw('SUM(CAST(o.total AS DECIMAL(10, 2)))')
+                    $q->selectRaw('SUM(CAST(o.sub_total AS DECIMAL(10, 2)))')
                         ->from('clients as c')
                         ->leftJoin('orders as o', 'o.client_id', '=', 'c.id')
+                        ->where('o.payment_state_id', 4)
                         ->whereColumn('c.id', 'clients.id')
                         ->groupBy('c.id');
                 }]);
