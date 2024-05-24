@@ -84,7 +84,7 @@ class TestingController extends Controller
                 'product_name' => $detail->product_color->product->name,
                 'product_image' => asset('storage/' . $detail->product_color->product->image),
                 'color' => $detail->product_color->color->name,
-                'slug' => $detail->product_color->product->slug,
+                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
                 'quantity' => $detail->quantity,
                 'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
             ];
@@ -93,6 +93,69 @@ class TestingController extends Controller
         
         }
         //dd($order);
+        $data = [
+            'address' => $address,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'phone' => $order->client->user->userDetail->phone,
+            'total' => $order->total,
+            'payment_method' => $payment_method,
+            'products' => $products,
+            'link_send' => $link_send,
+            'link_purchases' => $link_purchases
+        ];
+
+        //dd($data);
+        return view('emails.payment.purchase_detail', compact('data'));
+    }
+
+    public function littleProductExistence() {
+
+        $orderId = 7;
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
+        $link_purchases = env('APP_DOMAIN').'/purchases';
+        $linkProducts = env('APP_DOMAIN').'/products/';
+
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';        
+
+        $address = 
+            $order->address->address . ', ' . 
+            $order->address->street . ', ' . 
+            $order->address->city . ', ' . 
+            $order->address->postal_code . ', ' . 
+            $order->address->province->name .
+            $note;
+
+        $payment_method = 
+            ($order->billing->pse === 0) ? 
+                $order->billing->payment_method_name . ' terminada en ' . $order->billing->card_number: 
+                'PSE';
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        
+        }
+        //dd($products);
         $data = [
             'address' => $address,
             'user' => $order->client->user->name . ' ' . $order->client->user->last_name,

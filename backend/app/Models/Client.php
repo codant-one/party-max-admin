@@ -177,7 +177,7 @@ class Client extends Model
                 'product_name' => $detail->product_color->product->name,
                 'product_image' => asset('storage/' . $detail->product_color->product->image),
                 'color' => $detail->product_color->color->name,
-                'slug' => $detail->product_color->product->slug,
+                'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
                 'quantity' => $detail->quantity,
                 'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
             ];

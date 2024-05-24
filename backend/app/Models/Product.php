@@ -537,5 +537,38 @@ class Product extends Model
             'stock' => $new_stock,
             'in_stock' => ($new_stock === 0) ? 0 : 1
         ]);
+
+        // if($new_stock < 3 && $new_stock !== 0)
+        //     self::sendMail($product, 1);
+        // else if($new_stock === 0)
+        //     self::sendMail($product, 2);
+    }
+
+    public static function sendMail($product, $type) {
+
+        $email = $order->client->user->email;// del proveedor
+
+        if($type === 1) {
+            $subject = $order->client->user->name . ' ' . $order->client->user->last_name. ' tienes poca existencia, monitorea tu producto.';
+            $view = 'emails.suppliers.little_product_existence';
+        } else {
+            $subject = $order->client->user->name . ' ' . $order->client->user->last_name. ' inventario agotado.';
+            $view = 'emails.suppliers.out_of_stock';
+        }
+
+        try {
+            \Mail::send(
+                $view
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
     }
 }
