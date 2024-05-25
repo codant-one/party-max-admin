@@ -4,7 +4,6 @@ import { formatNumber } from '@/@core/utils/formatters'
 import {requiredValidator} from '@/@core/utils/validators'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import AddEditAddressDialog from "@/components/dialogs/AddEditAddressDialog.vue";
-import router from '@/router'
 
 const refForm = ref()
 const isFormValid = ref(false)
@@ -84,29 +83,29 @@ watch(() =>
   });
 
 watchEffect(() => {
-    if (!isEditAddressDialogVisible.value)
-      selectedAddress.value = {}
+  if (!isEditAddressDialogVisible.value)
+    selectedAddress.value = {}
 })
 
 const calculateBalance = () => {
 
-total_balance.value = props.customerData.account.balance ?? 0;
+  total_balance.value = props.customerData.account.balance ?? 0;
 
-if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null) {
-  const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
-  const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
-  const total_sales = retail_sales + wholesale_sales
-  const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
-  const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
-  total_balance.value = total_sales - commission_retail - commission_wholesale
-}
+  if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null) {
+    const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
+    const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
+    const total_sales = retail_sales + wholesale_sales
+    const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
+    const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
+    total_balance.value = total_sales - commission_retail - commission_wholesale
+  }
 
-let data = {
-  balance: total_balance.value,
-  type_commission: 2
-}
+  let data = {
+    balance: total_balance.value,
+    type_commission: 2
+  }
 
-suppliersStores.updateBalance(route.params.id, data)
+  suppliersStores.updateBalance(route.params.id, data)
 }
 
 watchEffect(fetchData)

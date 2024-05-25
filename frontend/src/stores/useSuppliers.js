@@ -90,7 +90,7 @@ export const useSuppliersStores = defineStore('suppliers', {
         updateCommission(id, data)
         {
             this.setLoading(true)
-            return Suppliers.update_Commission(id, data)
+            return Suppliers.updateCommission(id, data)
                 .then((response) => {
                     return Promise.resolve(response)
                 })
@@ -103,7 +103,7 @@ export const useSuppliersStores = defineStore('suppliers', {
         updateBalance(id, data)
         {
             this.setLoading(true)
-            return Suppliers.update_Balance(id, data)
+            return Suppliers.updateBalance(id, data)
                 .then((response) => {
                     return Promise.resolve(response)
                 })

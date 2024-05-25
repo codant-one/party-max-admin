@@ -196,7 +196,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 
     Route::group(['prefix' => 'suppliers'], function () {
         Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);
-        Route::put('/updateBalance/{id}', [SupplierController::class, 'update_Balance']);
+        Route::put('/updateBalance/{id}', [SupplierController::class, 'updateBalance']);
     });
 
 });

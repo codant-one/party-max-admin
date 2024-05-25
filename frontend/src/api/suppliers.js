@@ -22,11 +22,11 @@ class Suppliers {
         return axios.delete(`/suppliers/${id}`)
     }
     
-    update_Commission(id, data) {
+    updateCommission(id, data) {
         return axios.put(`/suppliers/updateCommission/${id}`, data)
     }
 
-    update_Balance(id, data) {
+    updateBalance(id, data) {
         return axios.put(`/suppliers/updateBalance/${id}`, data)
     }
 }

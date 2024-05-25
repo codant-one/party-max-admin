@@ -282,7 +282,7 @@ class SupplierController extends Controller
         }
     }
 
-    public function update_Balance(Request $request, $id)
+    public function updateBalance(Request $request, $id)
     {
         try {
             $supplierAccount = SupplierAccount::where('supplier_id',$id)->first();
@@ -294,7 +294,7 @@ class SupplierController extends Controller
                     'message' => 'Proveedor no encontrado'
                 ], 404);
             
-            $supplierAccount->update_Balance($request, $supplierAccount);
+            $supplierAccount->updateBalance($request, $supplierAccount);
 
             return response()->json([
                 'success' => true,

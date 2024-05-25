@@ -62,17 +62,13 @@ class SupplierAccount extends Model
         return $supplierAccount;
     }
 
-    public static function update_Balance($request, $supplierAccount)
+    public static function updateBalance($request, $supplierAccount)
     {
-        if($request->type_commission == 2)
-        {
+        if($request->type_commission == 2) {//detal
             $supplierAccount->update([
                 'balance' => $request->balance
             ]);      
-        }
-
-        else
-        {
+        } else {//mayor
             $supplier = Supplier::find($supplierAccount->supplier_id);
             $total_sales = ($supplierAccount->retail_sales_amount ?? 0) + ($supplierAccount->wholesale_sales_amount ?? 0);
             $retail_commission = (($supplier->commission?? 0)/100) * ($supplierAccount->retail_sales_amount ?? 0);
@@ -82,6 +78,7 @@ class SupplierAccount extends Model
                 'balance' => $new_balance
             ]);      
         }
+
         return  $supplierAccount;
     }
 
