@@ -41,7 +41,8 @@ const emit = defineEmits([
   'delete',
   'copy',
   'download',
-  'alert'
+  'alert',
+  'updateBalance'
 ])
 
 const show = ref([
@@ -194,6 +195,7 @@ const addCommission = () => {
           advisor.value.message = 'Comisión actualizada!'
                     
           emit('alert', advisor)
+          emit('updateBalance')
 
           setTimeout(() => {
             advisor.value.show = false
@@ -229,6 +231,7 @@ const addWhocommission = () => {
           advisor.value.message = 'Comisión actualizada!'
                     
           emit('alert', advisor)
+          emit('updateBalance')
 
           setTimeout(() => {
             advisor.value.show = false

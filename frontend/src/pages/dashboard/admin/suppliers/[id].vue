@@ -236,7 +236,8 @@ const handleCopy = (data) => {
                         :is-supplier="true"
                         @copy="handleCopy"
                         @download="handleDownload"
-                        @alert="showAlert"/>
+                        @alert="showAlert"
+                        @updateBalance="fetchData"/>
                 </VWindowItem>
                 <VWindowItem>
                     <CustomerTabCompany

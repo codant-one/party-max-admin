@@ -17,13 +17,16 @@ const props = defineProps({
 
 const balance = ref(null)
 
+watch(() =>  
+  props.isSupplier, (addreses_) => {
+    fetchData()
+  });
+
 watchEffect(fetchData)
 
 async function fetchData() {
-
   if(props.isSupplier)
     balance.value = (props.customerData.account === null) ? '0.00' : props.customerData.account.balance
-
 }
 
 </script>
