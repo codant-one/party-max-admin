@@ -69,7 +69,7 @@ async function fetchData() {
     search: searchQuery.value,
     state_id: 3,
     category_id: selectedCategory.value,
-    orderByField: selectedCategory.value != '' ? 'category_order_id' : 'order_id',
+    orderByField: (selectedCategory.value != '' && selectedCategory.value != null) ? 'category_order_id' : 'order_id',
     orderBy: 'asc',
     limit: rowPerPage.value,
     page: currentPage.value
@@ -77,7 +77,12 @@ async function fetchData() {
 
   isRequestOngoing.value = true
   
-  await categoriesStores.fetchCategoriesOrder({ limit: -1 })
+  let info = { 
+    limit: -1, 
+    category_type_id: 1
+  }
+
+  await categoriesStores.fetchCategoriesOrder(info)
 
   categories.value = categoriesStores.getCategories
 
@@ -240,7 +245,7 @@ const onEnd = async (e) => {
               <tr 
                 style="height: 3.75rem;"
                 class="draggable-item">
-                <td> {{ selectedCategory != '' ? element.category_order_id : element.order_id }}  </td>
+                <td> {{ (selectedCategory != '' && selectedCategory != null) ? element.category_order_id : element.order_id }}  </td>
                 <td> 
                   <div class="d-flex align-center gap-x-2">
                     <VAvatar

@@ -35,7 +35,7 @@ const filename3 = ref([])
 const filename4 = ref([])
 const fileicon = ref([])
 
-const category_type_id = ref()
+const category_type_id = ref(1)
 const categoryTypes = ref([
   {id: 1, name: 'Productos'},
   {id: 2, name: 'Servicios'},
@@ -50,14 +50,6 @@ async function fetchData() {
     isRequestOngoing.value = true
 
     if(Number(route.params.id)) {
-
-        
-        let data = { limit: -1 }
-
-        await categoriesStores.fetchCategoriesOrder(data)
-
-        categories.value = categoriesStores.getCategories
-        categories_.value = categories.value.filter(item => item.category_id === Number(route.params.id))
 
         category.value = await categoriesStores.showCategory(Number(route.params.id))
 
@@ -85,6 +77,15 @@ async function fetchData() {
         avatars.value[4] = category.value.icon_subcategory === null ? '' : themeConfig.settings.urlStorage + category.value.icon_subcategory
         avatarsOld.value[4] = category.value.icon_subcategory === null ? '' : themeConfig.settings.urlStorage + category.value.icon_subcategory
 
+        let data = { 
+            limit: -1, 
+            category_type_id: category_type_id .value
+        }
+
+        await categoriesStores.fetchCategoriesOrder(data)
+
+        categories.value = categoriesStores.getCategories
+        categories_.value = categories.value.filter(item => item.category_id === Number(route.params.id))
     }
 
     isRequestOngoing.value = false
@@ -284,7 +285,7 @@ const onSubmit = () => {
                                         variant="outlined"
                                         :rules="[requiredValidator]"/>
                                 </VCol>
-                                <VCol cols="12"  md="12">
+                                <VCol cols="12"  md="12" v-if="category_id !== null">
                                     <VAutocomplete
                                         id="selectCategory"
                                         v-model="category_id"
@@ -327,15 +328,26 @@ const onSubmit = () => {
                                         </template>
                                     </VAutocomplete>
                                 </VCol>
-                                <VCol cols="12" md="6">
+                                <VCol cols="12" md="6" v-if="category_id !== null">
                                     <VFileInput
-                                            v-model="filename"
-                                            label="Icono Categoria"
-                                            class="mb-2 me-2"
-                                            accept="image/png, image/jpeg, image/bmp"
-                                            prepend-icon="tabler-camera"
-                                            @change="onImageSelected($event, 4)"
-                                            @click:clear="avatars[4] = avatarsOld[4]"
+                                        v-model="filename"
+                                        label="Icono Categoria"
+                                        class="mb-2 me-2"
+                                        accept="image/png, image/jpeg, image/bmp"
+                                        prepend-icon="tabler-camera"
+                                        @change="onImageSelected($event, 4)"
+                                        @click:clear="avatars[4] = avatarsOld[4]"
+                                    />
+                                </VCol>
+                                <VCol cols="12" md="6" class="d-flex justify-center align-center"  v-if="category_id !== null">
+                                    <VImg
+                                        :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[4] !== null"
+                                        :src="avatars[4]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
                                     />
                                 </VCol>
                             </VRow>
@@ -344,8 +356,8 @@ const onSubmit = () => {
                             <VDivider />
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="6"></VCol>
-                                    <VCol cols="12"  md="3">
+                                    <VCol cols="12"  md="2"></VCol>
+                                    <VCol cols="12"  md="5">
                                         <VFileInput
                                             v-model="fileicon"
                                             label="Banner Principal"
@@ -356,9 +368,8 @@ const onSubmit = () => {
                                             @click:clear="avatars[0] = avatarsOld[0]"
                                         />
                                     </VCol>
-
                                     <!-- 👉 Banner Category 1 -->
-                                    <VCol cols="12" md="3">
+                                    <VCol cols="12" md="5">
                                         <VAutocomplete
                                             id="selectBanner1Category"
                                             v-model="banner_category_id"
@@ -399,16 +410,15 @@ const onSubmit = () => {
                                             cover
                                         />
                                     </VCol>
-                                </VRow>    
-                                
+                                </VRow>
                             </VCardText>
 
                             <VDivider />
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="6"></VCol>
-                                    <VCol cols="12"  md="3">
+                                    <VCol cols="12"  md="2"></VCol>
+                                    <VCol cols="12"  md="5">
                                         <VFileInput
                                             v-model="filename2"
                                             label="Banner 2"
@@ -419,9 +429,8 @@ const onSubmit = () => {
                                             @click:clear="avatars[1] = avatarsOld[1]"
                                         />
                                     </VCol>
-
                                     <!-- 👉 Banner Category 2 --> 
-                                    <VCol cols="12" md="3">
+                                    <VCol cols="12" md="5">
                                         <VAutocomplete
                                             id="selectBanner2Category"
                                             v-model="banner2_category_id"
@@ -469,8 +478,8 @@ const onSubmit = () => {
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="6"></VCol>
-                                    <VCol cols="12"  md="3">
+                                    <VCol cols="12"  md="2"></VCol>
+                                    <VCol cols="12"  md="5">
                                         <VFileInput
                                             v-model="filename3"
                                             label="Banner 3"
@@ -481,9 +490,8 @@ const onSubmit = () => {
                                             @click:clear="avatars[2] = avatarsOld[2]"
                                         />
                                     </VCol>
-
                                     <!-- 👉 Banner Category 3 -->
-                                    <VCol cols="12" md="3">
+                                    <VCol cols="12" md="5">
                                         <VAutocomplete
                                             id="selectBanner3Category"
                                             v-model="banner3_category_id"
@@ -531,8 +539,8 @@ const onSubmit = () => {
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="6"></VCol>
-                                    <VCol cols="12"  md="3">
+                                    <VCol cols="12"  md="2"></VCol>
+                                    <VCol cols="12"  md="5">
                                         <VFileInput
                                             v-model="filename4"
                                             label="Banner 4"
@@ -543,9 +551,8 @@ const onSubmit = () => {
                                             @click:clear="avatars[3] = avatarsOld[3]"
                                         />
                                     </VCol>
-
                                     <!-- 👉 Banner Category 4 -->
-                                    <VCol cols="12" md="3">
+                                    <VCol cols="12" md="5">
                                         <VAutocomplete
                                             id="selectBanner4Category"
                                             v-model="banner4_category_id"

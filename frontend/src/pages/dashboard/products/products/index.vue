@@ -153,10 +153,14 @@ async function fetchData() {
     page: currentPage.value
   }
 
-
   isRequestOngoing.value = true
   
-  await categoriesStores.fetchCategoriesOrder({ limit: -1 })
+  let info = { 
+    limit: -1, 
+    category_type_id: 1
+  }
+
+  await categoriesStores.fetchCategoriesOrder(info)
 
   categories.value = categoriesStores.getCategories
 

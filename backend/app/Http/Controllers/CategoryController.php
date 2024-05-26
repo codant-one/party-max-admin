@@ -97,9 +97,10 @@ class CategoryController extends Controller
         try {
 
             $query = Category::with('children')
-                                ->whereNull('category_id')
-                                ->orderBy('id')
-                                ->get();
+                             ->where('category_type_id', $request->category_type_id)
+                             ->whereNull('category_id')
+                             ->orderBy('id')
+                             ->get();
 
             foreach ($query as $category) {
                 $data = [

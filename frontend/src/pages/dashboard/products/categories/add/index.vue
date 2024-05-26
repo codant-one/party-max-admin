@@ -19,7 +19,7 @@ const emitter = inject("emitter")
 const name = ref('')
 const category_id = ref()
 const banners = ref([])
-const category_type_id = ref()
+const category_type_id = ref(1)
 const categoryTypes = ref([
   {id: 1, name: 'Productos'},
   {id: 2, name: 'Servicios'},
@@ -33,7 +33,10 @@ async function fetchData() {
 
     isRequestOngoing.value = true
 
-    let data = { limit: -1 }
+    let data = { 
+        limit: -1, 
+        category_type_id: category_type_id .value
+    }
 
     await categoriesStores.fetchCategoriesOrder(data)
 
@@ -147,9 +150,6 @@ const onSubmit = () => {
                                         :items="categoryTypes"
                                         item-value="id"
                                         item-title="name"
-                                        clearable
-                                        clear-icon="tabler-x"
-                                        no-data-text="No disponible"
                                         density="compact"
                                         variant="outlined"
                                         :rules="[requiredValidator]"/>

@@ -4,6 +4,7 @@ import { useCategoriesStores } from '@/stores/useCategories'
 import { themeConfig } from '@themeConfig'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
+import banner from '@images/banner.jpg'
 
 const categoriesStores = useCategoriesStores()
 
@@ -204,8 +205,8 @@ const removeCategory = async () => {
                 <th> NOMBRE </th>
                 <th> SUBCATEGORÍA </th>
                 <th> TIPO </th>
-                <th class="text-end pe-4"> TOTAL PRODUCTOS </th>
-                <th class="text-end pe-4"> GANANCIA TOTAL </th>
+                <th class="text-end pe-4"> PRODUCTOS PUBLICADOS</th>
+                <!-- <th class="text-end pe-4"> GANANCIA TOTAL </th> -->
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
@@ -222,17 +223,28 @@ const removeCategory = async () => {
                 <td>
                   <div class="d-flex gap-x-3">
                     <VAvatar
-                      variant="tonal"
+                      variant="outlined"
                       rounded
                       size="38"
                     >
-                      <img
-                        v-if="category.banner !== null"
+                      <VImg
+                        v-if="category.banner === null && category.icon_subcategory === null"
+                        :src="banner"
+                        :alt="category.name"
+                        cover
+                      />
+                      <VImg
+                        v-if="category.banner !== null && category.icon_subcategory === null"
                         :src="themeConfig.settings.urlStorage + category.banner"
                         :alt="category.name"
-                        width="38"
-                        height="38"
+                        cover
                       />
+                      <VImg
+                        v-if="category.banner === null && category.icon_subcategory !== null"
+                        :src="themeConfig.settings.urlStorage + category.icon_subcategory"
+                        :alt="category.name"
+                        cover
+                      />                      
                     </VAvatar>
                     <div class="d-block">
                       <span class="d-block text-base">
@@ -247,15 +259,15 @@ const removeCategory = async () => {
                 <td> {{ category.category?.name }} </td>
                 <td> {{ category.category_type?.name }} </td>
                 <td> 
-                  <div class="text-end">
+                  <h4 class="text-end">
                     {{ (category.product_count).toLocaleString() }}
-                  </div> 
+                  </h4> 
                 </td>
-                <td>
+                <!-- <td>
                   <h4 class="text-sm text-end">
                     {{ (parseFloat(category.sum ?? 0)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
                   </h4>
-                </td>
+                </td> -->
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">      
                   <VBtn

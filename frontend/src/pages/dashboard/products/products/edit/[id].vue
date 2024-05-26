@@ -103,6 +103,7 @@ async function fetchData() {
 
       let data = { 
         tag_type_id: 1,
+        category_type_id: 1,
         limit: -1 
       }
 
