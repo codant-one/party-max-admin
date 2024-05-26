@@ -351,7 +351,7 @@ const closeModal = function(){
                                 value="ver página-blogs"
                             />
                         </div>
-                        <VLabel style="font-weight: bold;">
+                        <!-- <VLabel style="font-weight: bold;">
                             Notificaciones
                         </VLabel>
                         <div class="demo-space-x ml-5">
@@ -360,7 +360,7 @@ const closeModal = function(){
                                 label="ver página-notificaciones"
                                 value="ver página-notificaciones"
                             />
-                        </div>
+                        </div> -->
                     </div>
                 </VCardText>
                 <VCardTitle>

@@ -448,7 +448,7 @@ const closeRoleDetailDialog = function(){
                                 :readonly="readonly"
                             />
                         </div>
-                        <VLabel style="font-weight: bold;">
+                        <!-- <VLabel style="font-weight: bold;">
                             Notificaciones
                         </VLabel>
                         <div class="demo-space-x ml-5">
@@ -458,7 +458,7 @@ const closeRoleDetailDialog = function(){
                                 value="ver página-notificaciones"
                                 :readonly="readonly"
                             />
-                        </div>
+                        </div> -->
                     </div>
                 </VCardText>
                 <VCardTitle>

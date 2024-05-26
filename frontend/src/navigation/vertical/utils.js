@@ -16,14 +16,14 @@ export default [
           to: 'dashboard-utils-blogs', 
           action: 'ver', 
           subject: 'página-blogs', 
-        },
-        {
-          title: 'Notificaciones',
-          icon: { icon: 'mdi-bell-badge' },
-          to: 'dashboard-utils-notifications',
-          action: 'ver' ,
-          subject: 'página-notificaciones', 
         }
+        // {
+        //   title: 'Notificaciones',
+        //   icon: { icon: 'mdi-bell-badge' },
+        //   to: 'dashboard-utils-notifications',
+        //   action: 'ver' ,
+        //   subject: 'página-notificaciones', 
+        // }
       ],
     }
 ]
