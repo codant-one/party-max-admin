@@ -103,6 +103,7 @@ class Order extends Model
             'date' => now(),
             'sub_total' => $request->sub_total,
             'shipping_total' => $request->shipping_total,
+            'shipping_express' => $request->shipping_express,
             'tax' => $request->tax,
             'total' => $request->total,
             'wholesale' => $request->wholesale 
