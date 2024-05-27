@@ -378,7 +378,7 @@ const printInvoice = () => {
                   </div>
                 </div>
 
-                <div>
+                <div class="d-print-none">
                   <VAvatar
                     variant="tonal"
                     color="success"
@@ -405,6 +405,9 @@ const printInvoice = () => {
                 <div class="d-flex align-center justify-space-between">
                   <div class="text-body-1 text-high-emphasis font-weight-medium">
                     Dirección de envío
+                  </div>
+                  <div class="text-body-1 text-high-emphasis font-weight-medium">
+                    Envío Express: {{ order.shipping_express === 0 ? 'NO' : 'SI'}}
                   </div>
                 </div>
                 <div>
@@ -437,7 +440,7 @@ const printInvoice = () => {
                   {{ order.billing.postal_code }}
                 </div>
 
-                <div class="mt-6" v-if="order.billing.pse === 0">
+                <div class="mt-6" v-if="order.billing.pse === 0 && order.payment_state_id === 4">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                     {{ order.billing.payment_method_name }}
                   </div>
