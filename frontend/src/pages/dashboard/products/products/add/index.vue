@@ -691,12 +691,12 @@ const onSubmit = () => {
                   :rules="[requiredValidator]"
                 />
                 
-                <AppTextField
+                <!-- <AppTextField
                   readonly
                   v-model="estimated_delivery_time"
                   label="Tiempo de entregada"
                   placeholder="Tiempo estimado de entrega"
-                />
+                /> -->
               </div>
             </VCardText>
           </VCard>
