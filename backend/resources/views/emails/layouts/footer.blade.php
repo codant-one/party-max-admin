@@ -14,16 +14,20 @@
                         <table cellpadding="0" cellspacing="0" class="es-table-not-adapt es-social" dir="ltr" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                             <tr>
                                 <td align="center" valign="top" style="padding:0;Margin:0;padding-right:10px">
-                                    <img src="{{ asset('/images/instagram.png') }}" alt="Instagram" title="Instagram" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                    <a href="https://www.instagram.com/partymaxcolombia" target="_blank">
+                                        <img src="{{ asset('/images/instagram.png') }}" alt="Instagram" title="Instagram" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                    </a>
                                 </td>
-                                <td align="center" valign="top" width="null" style="padding:0;Margin:0;padding-right:10px">
+                                <!-- <td align="center" valign="top" width="null" style="padding:0;Margin:0;padding-right:10px">
                                     <img src="{{ asset('/images/threads.png') }}" alt="Threads" title="Threads" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
-                                </td>
-                                <td align="center" valign="top" width="null" style="padding:0;Margin:0;padding-right:10px">
+                                </td> -->
+                                <!-- <td align="center" valign="top" width="null" style="padding:0;Margin:0;padding-right:10px">
                                     <img src="{{ asset('/images/subtract.png') }}" alt="Subtract" title="Subtract" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
-                                </td>
+                                </td> -->
                                 <td align="center" valign="top" width="null" style="padding:0;Margin:0">
-                                    <img src="{{ asset('/images/facebook.png') }}" alt="Facebook" title="Facebook" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                    <a href="https://www.facebook.com/PartymaxCo/?locale=es_LA" target="_blank">
+                                        <img src="{{ asset('/images/facebook.png') }}" alt="Facebook" title="Facebook" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                    </a>
                                 </td>
                             </tr>
                         </table>
