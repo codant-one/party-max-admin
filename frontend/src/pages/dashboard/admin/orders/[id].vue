@@ -359,7 +359,7 @@ const printInvoice = () => {
 
                 <div class="d-flex align-center">
                   <VAvatar
-                    class="me-3"
+                    class="me-3 d-print-none"
                     variant="tonal"
                     size="38"
                     >
@@ -374,7 +374,7 @@ const printInvoice = () => {
                     <div class="text-body-1 font-weight-medium">
                       {{ order.client.user.name }} {{ order.client.user.last_name }}
                     </div>
-                    <span class="text-sm text-disabled">Cliente ID: #{{ order.client_id }}</span>
+                    <span class="text-sm text-disabled d-print-none">Cliente ID: #{{ order.client_id }}</span>
                   </div>
                 </div>
 
@@ -390,7 +390,7 @@ const printInvoice = () => {
                 </div>
 
                 <div class="d-flex flex-column gap-y-1">
-                  <div class="d-flex justify-space-between align-center text-body-2">
+                  <div class="d-flex justify-space-between align-center text-body-2 d-print-none">
                     <span class="text-body-1 text-high-emphasis font-weight-medium">Datos de contacto</span>
                   </div>
                   <span>Email: {{ order.client.user.email }} </span>
@@ -411,7 +411,7 @@ const printInvoice = () => {
                   </div>
                 </div>
                 <div>
-                  <h6 class="text-h6 me-2 mt-4">
+                  <h6 class="text-h6 me-2 mt-4 d-print-none">
                     {{ order.address.type.name }}
                   </h6>
                   {{ order.address.address }} <br> 
