@@ -39,6 +39,9 @@ const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
 const currentTab = ref(0)
 
+const rol = ref(null)
+const userData = ref(null)
+
 const resolveStatus = statusMsg => {
   if (statusMsg === 3)
     return {
@@ -193,6 +196,9 @@ async function fetchData() {
 
   totalPages.value = productsStores.last_page
   totalProducts.value = productsStores.productsTotalCount
+
+  userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+  rol.value = userData.value.roles[0].name
 
   isRequestOngoing.value = false
 }
@@ -435,7 +441,7 @@ const removeProduct = async () => {
 
       <VCardText>
         <VRow>
-          <VCol cols="12" sm="10">
+          <VCol cols="12" :sm="rol === 'Proveedor' ? '12' : '10'">
             <VTextField
               v-model="searchQuery"
               label="Buscar"
@@ -444,7 +450,7 @@ const removeProduct = async () => {
               clearable
             />
           </VCol>
-          <VCol cols="12" sm="2">
+          <VCol cols="12" sm="2" v-if="rol !== 'Proveedor'">
             <div class="d-flex justify-content-end flex-wrap gap-4">
               <VBtn
                 @click="findArchived()"
@@ -664,6 +670,7 @@ const removeProduct = async () => {
                   <detailsProduct
                     :isShowComponent="true"
                     :product="product"
+                    :rol="rol"
                     @alert="showAlert"
                     @copy="copy"
                     @open="open"

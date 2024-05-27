@@ -6,6 +6,10 @@ const props = defineProps({
     product: {
         type: Object,
         required: true
+    },
+    rol: {
+        type: String,
+        required: true
     }
 })
 
@@ -39,6 +43,7 @@ const selling_price = ref(null)
 const likes =  ref(null)
 
 const categories = ref('')
+const rol = ref(null)
 
 watchEffect(() => {
 
@@ -61,6 +66,8 @@ watchEffect(() => {
         likes.value = props.product.likes ?? -1
         selling_price.value = props.product.selling_price ?? -1
         categories.value = props.product.categories
+
+        rol.value = props.rol
     }
 })
 
@@ -202,7 +209,7 @@ const colors = (id) => {
                         </span>
                     </VCol>
                     <VCol cols="12" md="7">
-                        <VRow class="text-center pt-2">
+                        <VRow class="text-end pt-2">
                             <VCol>
                                 <VBtn
                                     @click="show(id)"
@@ -223,7 +230,7 @@ const colors = (id) => {
                                     />
                                 </VBtn>                        
                             </VCol>
-                            <VCol>
+                            <VCol v-if="rol !== 'Proveedor'">
                                 <span v-if="id">
                                     <VBtn
                                         @click="updateLink('archived', id)"
@@ -253,7 +260,7 @@ const colors = (id) => {
                                     />
                                 </span>
                             </VCol>
-                            <VCol>
+                            <VCol v-if="rol !== 'Proveedor'">
                                 <span v-if="id">
                                     <VBtn
                                         @click="updateLink('favourite', id)"
@@ -283,7 +290,7 @@ const colors = (id) => {
                                     />
                                 </span>
                             </VCol>
-                            <VCol v-if="discarded !== null">
+                            <VCol v-if="discarded !== null && rol !== 'Proveedor'">
                                 <span v-if="id">
                                     <VBtn
                                         @click="updateLink('discarded', id)"
