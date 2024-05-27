@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\ProductCategory;
 use App\Models\ProductDetail;
@@ -392,6 +393,21 @@ class Product extends Model
             self::createProductImages($product_color->id, $key, $request);
             self::createProductCategories($product_color->id, $key, $request);
         }
+
+        $colors = 
+            ProductColor::where('product_id', $product_id)
+                        ->whereNotIn('color_id', explode(",", $request->color_id))
+                        ->get();    
+
+        foreach($colors as $item) {
+            
+            $color = ProductColor::find($item->id);
+                
+            if($color)
+                $color->delete();
+                         
+        }        
+                        
     }
 
     public static function createProductTags($product_id, $request) {
@@ -483,7 +499,7 @@ class Product extends Model
             'wholesale_price' => ($request->wholesale_price === 'null' || $request->wholesale === '0') ? null : $request->wholesale_price,
             'wholesale_min' => $request->wholesale_min,
             'stock' => $request->stock,
-            'in_stock' => (intval($request->stock) > 1) ? 1 : 0,
+            'in_stock' => (intval($request->stock) >= 1) ? 1 : 0,
             'slug' => Str::slug($request->name)
         ]);
 

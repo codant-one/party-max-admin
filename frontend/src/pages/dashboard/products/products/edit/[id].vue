@@ -268,6 +268,16 @@ const getFiles = (files, i) => {
   product_files.value[i-1] = files
 }
 
+const removeColor = id => {
+  if(optionCounter.value > 1) {
+    optionCounter.value--
+    category_id.value.splice(id, 1)
+    color_id.value.splice(id, 1)
+    sku.value.splice(id, 1)
+    product_files.value.splice(id, 1)
+  }
+}
+
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -467,23 +477,39 @@ const onSubmit = () => {
                 v-for="i in optionCounter"
                 :key="i"
               >
-                <VRow>
-                  
+                <VRow class="border-img mb-7">  
+                  <VCol
+                    cols="12"
+                    md="12"
+                    v-if="optionCounter > 1"
+                  >
+                    <!-- 👉 Item Actions -->
+                    <div class="d-flex">
+                      <VSpacer />
+                      <VBtn
+                        icon="tabler-x"
+                        variant="tonal"
+                        color="primary"
+                        size="x-small"
+                        @click="removeColor(i-1)"
+                      />
+                    </div>
+                  </VCol>
                   <VCol
                     cols="12"
                     md="3"
                   >
-                  <VSelect
-                    v-model="color_id[i-1]"
-                    label="Colores"
-                    :items="listColors"
-                    item-value="id"
-                    item-title="name"
-                    clearable
-                    clear-icon="tabler-x"
-                    no-data-text="No disponible"
-                    :rules="[requiredValidator]"
-                  />
+                    <VSelect
+                      v-model="color_id[i-1]"
+                      label="Colores"
+                      :items="listColors"
+                      item-value="id"
+                      item-title="name"
+                      clearable
+                      clear-icon="tabler-x"
+                      no-data-text="No disponible"
+                      :rules="[requiredValidator]"
+                    />
                   </VCol>
                   <VCol
                     cols="12"
@@ -556,8 +582,8 @@ const onSubmit = () => {
                   </VCol>
                   <VCol cols="12" v-if="product_files.length > 0">
                     <FileInput 
-                        :images="product_files[i-1]"
-                        @files="getFiles($event, i)"/>
+                      :images="product_files[i-1]"
+                      @files="getFiles($event, i)"/>
                   </VCol>
                 </VRow>
               </template>
@@ -566,7 +592,7 @@ const onSubmit = () => {
                 class="mt-6"
                 @click="optionCounter++"
               >
-              Agregar Color
+                Agregar Color
               </VBtn>
             </VCardText>
           </VCard>

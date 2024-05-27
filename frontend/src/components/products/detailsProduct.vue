@@ -332,23 +332,22 @@ const colors = (id) => {
                     </VCol>
                     <VCol cols="12" md="7">
                         <div>En Stock: 
-                                <VBadge
+                            <VBadge
                                 v-if="in_stock"
-                                    :content="stock"
-                                    bordered
-                                    color="primary"
-                                    >
-                                    <VIcon
-                                        size="25"
-                                        icon="mdi-cart"
-                                    />
-                                    </VBadge>
+                                :content="stock"
+                                bordered
+                                color="primary">
                                 <VIcon
-                                v-else
                                     size="25"
-                                    icon="mdi-cart-off"
-                                    class="me-1"
+                                    icon="mdi-cart"
                                 />
+                            </VBadge>
+                            <VIcon
+                                v-else
+                                size="25"
+                                icon="mdi-cart-off"
+                                class="me-1"
+                            />
                         </div>
                         <div>Envios: 
                             <span v-if="selling_price >= 0">{{ selling_price }}</span>
