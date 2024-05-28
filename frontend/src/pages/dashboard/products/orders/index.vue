@@ -105,7 +105,7 @@ async function fetchData() {
       title: element.name,
       image: element.image,
       price: element.price_for_sale,
-      sku: element.colors[0]?.sku ?? '-',
+      sku: element.colors[0]?.sku ?? '--',
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
       categories: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.name)))],// Utiliza map para extraer los nombres de las categorías
       categories_id: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.id)))],// Utiliza map para extraer los id de las categorías
