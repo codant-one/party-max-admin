@@ -266,7 +266,7 @@ const getFlagCountry = country => {
                 <td class="text-wrap w-25">
                   <div class="d-flex align-center gap-x-3">
                     <VAvatar
-                      variant="tonal"
+                      :variant="supplier.user.avatar ? 'outlined' : 'tonal'"
                       size="38"
                       >
                       <VImg

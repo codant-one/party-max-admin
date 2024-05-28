@@ -113,7 +113,8 @@ class UsersController extends Controller
             $query = User::with(['roles','userDetail.province.country'])
                          ->whereHas('roles', function ($query) {
                             $query->where('name', 'SuperAdmin')
-                                  ->orWhere('name', 'Administrador');
+                                  ->orWhere('name', 'Administrador')
+                                  ->orWhere('name', 'Operador');
                          })
                          ->applyFilters(
                             $request->only([
@@ -125,7 +126,8 @@ class UsersController extends Controller
 
             $count = $query->whereHas('roles', function ($query) {
                                 $query->where('name', 'SuperAdmin')
-                                      ->orWhere('name', 'Administrador');
+                                      ->orWhere('name', 'Administrador')
+                                      ->orWhere('name', 'Operador');
                             })
                            ->applyFilters(
                                 $request->only([

@@ -212,7 +212,7 @@ const getFlagCountry = country => {
               rounded
               :size="120"
               :color="avatar ? 'default' : 'primary'"
-              variant="tonal"
+              :variant="avatar ? 'outlined' : 'tonal'"
             >
               <VImg
                 v-if="avatar"
@@ -379,7 +379,7 @@ const getFlagCountry = country => {
                 size="100"
                 class="me-6"
                 :color="avatar ? 'default' : 'primary'"
-                variant="tonal"
+                :variant="avatar ? 'outlined' : 'tonal'"
               >
                 <VImg
                   v-if="avatar"

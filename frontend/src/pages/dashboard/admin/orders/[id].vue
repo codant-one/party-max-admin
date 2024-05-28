@@ -6,14 +6,16 @@ import { format } from 'date-fns';
 import { avatarText } from '@/@core/utils/formatters'
 import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
-import html2pdf from 'html2pdf.js';
+import router from '@/router'
 
 const route = useRoute()
 const ordersStores = useOrdersStores()
+const emitter = inject("emitter")
 
 const order = ref(null)
 const date = ref(null)
 const total = ref(0)
+const isConfirmDeleteDialogVisible = ref(false)
 
 const isRequestOngoing = ref(true)
 
@@ -57,92 +59,93 @@ const resolveStatusPayment = payment_state_id => {
     return { color: 'info' }
 }
 
-const download = () => {
-
-  const element = document.getElementById('invoice-detail');
-
-  const options = {
-    margin: 0,
-    filename: 'order-' + Number(route.params.id) + '.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 4, allowTaint: true },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-    pagebreak: { mode: 'css' } 
-  };
-
-  html2pdf().set(options).from(element).save();
-};
-
 const printInvoice = () => {
   window.print()
 }
 
+const showDeleteDialog = orderData => {
+  isConfirmDeleteDialogVisible.value = true
+}
+
+const back = () => {
+  if(typeof route.query.route === 'undefined') {
+    router.push({ name : 'dashboard-admin-orders'})
+  } else {
+    router.push({ name : 'dashboard-admin-shipping'})
+  }
+}
+
+const removeOrder = async () => {
+  isConfirmDeleteDialogVisible.value = false
+  let res = await ordersStores.deleteOrder(route.params.id)
+
+  let data = {
+    message: res.data.success ? 'Pedido eliminado!' : res.data.message,
+    error: res.data.success ? false : true
+  }
+
+  router.push({ name : 'dashboard-admin-orders'})
+  emitter.emit('toast', data)
+}
 </script>
 
 <template>
   <div>
     <VDialog
-        v-model="isRequestOngoing"
-        width="300"
-        persistent>
-                    
-        <VCard
-            color="primary"
-            width="300">
-                        
-            <VCardText class="pt-3">
-                Cargando
-
-                <VProgressLinear
-                    indeterminate
-                    color="white"
-                    class="mb-0"/>
-            </VCardText>
-        </VCard>
+      v-model="isRequestOngoing"
+      width="300"
+      persistent>            
+      <VCard
+        color="primary"
+        width="300">            
+        <VCardText class="pt-3">
+          Cargando
+          <VProgressLinear
+            indeterminate
+            color="white"
+            class="mb-0"/>
+        </VCardText>
+      </VCard>
     </VDialog>
 
     <!-- 👉 Header  -->
     <div v-if="order" class="d-flex justify-space-between align-center flex-wrap gap-y-4 mb-6 d-print-none">
+      <div>
+        <div class="d-flex gap-2 align-center mb-2 flex-wrap">
+          <h4 class="text-h4 font-weight-medium">
+            Pedido ID #{{ route.params.id }}
+          </h4>
+          <div class="d-flex gap-x-2">
+            <VChip
+              variant="tonal"
+              :color="resolveStatusShipping(order.shipping.id)?.color"
+              label>
+              {{ order.shipping.name }}
+            </VChip>
+            <VChip
+              variant="tonal"
+              :color="resolveStatusPayment(order.payment.id)?.color"
+              label>
+              {{ order.payment.name }}
+            </VChip>
+          </div>
+        </div>
         <div>
-            <div class="d-flex gap-2 align-center mb-2 flex-wrap">
-                <h4 class="text-h4 font-weight-medium">
-                    Pedido ID #{{ route.params.id }}
-                </h4>
-                <div class="d-flex gap-x-2">
-                    <VChip
-                        variant="tonal"
-                        :color="resolveStatusShipping(order.shipping.id)?.color"
-                        label
-                    >
-                        {{ order.shipping.name }}
-                    </VChip>
-                    <VChip
-                        variant="tonal"
-                        :color="resolveStatusPayment(order.payment.id)?.color"
-                        label
-                    >
-                        {{ order.payment.name }}
-                    </VChip>
-                </div>
-            </div>
-            <div>
-                <span class="text-body-1" v-if="date">
-                    {{  format(date, 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
-                    <span class="text-xs">
-                        (Fecha del pedido)
-                    </span>
-                </span>
-            </div>
+          <span class="text-body-1" v-if="date">
+            {{  format(date, 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+            <span class="text-xs"> (Fecha del pedido) </span>
+          </span>
         </div>
-        <div class="d-flex gap-4">
-           
-            <VBtn
-                variant="tonal"
-                color="error"
-            >
-                ELIMINAR PEDIDO
-            </VBtn>
-        </div>
+      </div>
+      <div class="d-flex gap-4">
+        <VBtn
+          v-if="$can('eliminar', 'pedidos')"
+          variant="tonal"
+          color="error"
+          @click="showDeleteDialog">
+          ELIMINAR PEDIDO
+        </VBtn>
+      </div>
     </div>
 
     <VRow v-if="order">
@@ -184,17 +187,17 @@ const printInvoice = () => {
                         <VAvatar
                           v-if="order.product_color.images.length > 0"
                           size="38"
+                          variant="outlined"
                           :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
-                          :rounded="0"
+                          rounded="lg"
                         />
                         <VAvatar
                           v-else
                           size="38"
+                          variant="outlined"
                           :image="themeConfig.settings.urlStorage + order.product_color.product.image"
-                          :rounded="0"
+                          rounded="lg"
                         />
-
-
                         <div class="d-flex flex-column align-start">
                           <span class="text-body-1 font-weight-medium">
                             {{ order.product_color.product.name }}
@@ -360,7 +363,7 @@ const printInvoice = () => {
                 <div class="d-flex align-center">
                   <VAvatar
                     class="me-3 d-print-none"
-                    variant="tonal"
+                    :variant="order.client.user.avatar ? 'outlined' : 'tonal'"
                     size="38"
                     >
                     <VImg
@@ -461,16 +464,6 @@ const printInvoice = () => {
       >
         <VCard>
           <VCardText>
-            <!-- 👉 Send Invoice Trigger button -->
-            <!-- <VBtn
-              block
-              prepend-icon="mdi-cloud-download-outline"
-              class="mb-2"
-              @click="download"
-            >
-              DESCARGAR
-            </VBtn> -->
-
             <VBtn
               block
               prepend-icon="mdi-printer"
@@ -485,7 +478,7 @@ const printInvoice = () => {
               variant="tonal"
               color="secondary"
               class="mb-2"
-              :to="{ name: 'dashboard-admin-orders' }"
+              @click="back"
               >
               REGRESAR
             </VBtn>
@@ -494,6 +487,36 @@ const printInvoice = () => {
         </VCard>
       </VCol>
     </VRow>
+
+    <!-- 👉 Confirm Delete -->
+    <VDialog
+      v-model="isConfirmDeleteDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Eliminar Pedido">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de eliminar el pedido <strong>{{ order.reference_code }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmDeleteDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="removeOrder">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 <style lang="scss">

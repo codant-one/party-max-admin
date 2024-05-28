@@ -53,6 +53,10 @@ class OrderController extends Controller
                 'canceledPayments' => Order::where('payment_state_id', 2)->count(),
                 'failedPayments' => Order::where('payment_state_id', 3)->count(),
                 'successPayments' => Order::where('payment_state_id', 4)->count(),
+                'pendingShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 1]])->count(),
+                'outforDeliveryShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 2]])->count(),
+                'sentShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 3]])->count(),
+                'deliveredShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 4]])->count(),
             ];
 
             return response()->json([
@@ -120,7 +124,7 @@ class OrderController extends Controller
                 return response()->json([
                     'sucess' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Pedido no encontrada'
+                    'message' => 'Pedido no encontrado'
                 ], 404);
 
             $count = Order::where('client_id', $order->client_id)->count();
@@ -164,7 +168,7 @@ class OrderController extends Controller
                 return response()->json([
                     'success' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Pedido no encontrada'
+                    'message' => 'Pedido no encontrado'
                 ], 404);
 
             $order->deleteOrder($id);
@@ -211,7 +215,7 @@ class OrderController extends Controller
                     return response()->json([
                         'success' => false,
                         'feedback' => 'not_found',
-                        'message' => 'Pedido no encontrada'
+                        'message' => 'Pedido no encontrado'
                     ], 404);
                 
                 $order->updatePaymentState($request, $order);
@@ -386,6 +390,38 @@ class OrderController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function send(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $order = Order::find($id);
+        
+            if (!$order)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Pedido no encontrado'
+                ], 404);
+
+            $order->sendOrder($order, $request);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'order' => $order
+                ]
+            ], 200);
+            
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    
     }
 
 }

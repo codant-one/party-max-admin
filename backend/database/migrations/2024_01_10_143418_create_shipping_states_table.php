@@ -26,7 +26,7 @@ return new class extends Migration
                 'updated_at' => now() 
             ],
             [
-                'name' => 'Fuera para entrega',
+                'name' => 'Fuera de entrega',
                 'label' => 'fuera',
                 'created_at' => now(),
                 'updated_at' => now() 

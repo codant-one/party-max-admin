@@ -387,7 +387,7 @@ const downloadCSV = async () => {
                                 <VAvatar
                                     v-if="product.image"
                                     size="38"
-                                    variant="tonal"
+                                    :variant="product.image ? 'outlined' : 'tonal'"
                                     rounded
                                     :image="themeConfig.settings.urlStorage + product.image"
                                 />

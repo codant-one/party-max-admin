@@ -55,7 +55,7 @@ const logout = () => {
     <VAvatar
       class="cursor-pointer"
       :color="userData('avatar') ? 'default' : 'primary'"
-      variant="tonal"
+      :variant="userData('avatar') ? 'outlined' : 'tonal'"
     >
       <VImg
         v-if="userData('avatar')"
@@ -90,7 +90,7 @@ const logout = () => {
                 >
                   <VAvatar
                     :color="userData('avatar') ? 'default' : 'primary'" 
-                    variant="tonal"
+                    :variant="userData('avatar') ? 'outlined' : 'tonal'"
                   >
                     <VImg
                       v-if="userData('avatar')"

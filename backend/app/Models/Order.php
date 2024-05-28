@@ -150,6 +150,14 @@ class Order extends Model
         return $order;
     }
 
+    public static function sendOrder($order, $request) {
+        $order->update([
+            'shipping_state_id' => $request->shipping_state_id
+        ]);      
+    
+        return $order;
+    }
+
     public static function deleteOrder($id) {
         self::deleteOrders(array($id));
     }

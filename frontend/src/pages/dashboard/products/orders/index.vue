@@ -251,7 +251,7 @@ const onEnd = async (e) => {
                     <VAvatar
                       v-if="element.image"
                       size="38"
-                      variant="tonal"
+                      :variant="element.image ? 'outlined' : 'tonal'"
                       rounded
                       :image="themeConfig.settings.urlStorage + element.image"
                     />

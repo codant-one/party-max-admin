@@ -353,7 +353,7 @@ const downloadCSV = async () => {
                       :color="online(user.id)"
                     >
                       <VAvatar
-                        variant="tonal"
+                        :variant="user.avatar ? 'outlined' : 'tonal'"
                         size="38"
                       >
                         <VImg

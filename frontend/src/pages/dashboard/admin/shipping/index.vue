@@ -7,7 +7,6 @@ import { es } from 'date-fns/locale';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
-import Toaster from "@/components/common/Toaster.vue";
 import mastercard from '@images/cards/mastercard.png'
 import visa from '@images/cards/visa.png'
 import pse from '@images/cards/pse.png'
@@ -21,16 +20,11 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalOrders = ref(0)
 const isRequestOngoing = ref(true)
-const isConfirmDeleteDialogVisible = ref(false)
+const isConfirmSendDialogVisible = ref(false)
 const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
-const payment_state_id = ref(null)
-
-const references = ref([
-  { title: 'Al mayor', value: 1 },
-  { title: 'Al detal', value: 0 }
-])
+const id = ref(null)
 
 const shippingStates = ref([
   { title: 'Listo para enviar', value: 1 },
@@ -39,34 +33,43 @@ const shippingStates = ref([
   { title: 'Enviado', value: 4 }
 ])
 
-const paymentStates = ref([
-  { title: 'Pendiente', value: 1 },
-  { title: 'Cancelado', value: 2 },
-  { title: 'Fallido', value: 3 },
-  { title: 'Pagada', value: 4 }
+const references = ref([
+    { title: 'Al mayor', value: 1 },
+    { title: 'Al detal', value: 0 }
 ])
 
 const advisor = ref({
-  type: '',
-  message: '',
-  show: false
+    type: '',
+    message: '',
+    show: false
 })
+
+const resolveStatusShipping = shipping_state_id => {
+  if (shipping_state_id === 1)
+    return { color: 'error' }
+  if (shipping_state_id === 2)
+    return { color: 'warning' }
+  if (shipping_state_id === 3)
+    return { color: 'info' }
+  if (shipping_state_id === 4)
+    return { color: 'success' }
+}
 
 const payments = ref(null)
 const widgetData = ref([])
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = orders.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = orders.value.length + (currentPage.value - 1) * rowPerPage.value
+    const firstIndex = orders.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+    const lastIndex = orders.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
+    return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalOrders.value } registros`
 })
 
 // 👉 watching current page
 watchEffect(() => {
-  if (currentPage.value > totalPages.value)
-    currentPage.value = totalPages.value
+    if (currentPage.value > totalPages.value)
+        currentPage.value = totalPages.value
 })
 
 watchEffect(fetchData)
@@ -81,7 +84,7 @@ async function fetchData() {
         page: currentPage.value,
         wholesale: wholesale.value,
         shipping_state_id: shipping_state_id.value,
-        payment_state_id: payment_state_id.value
+        payment_state_id: 4
     }
 
     isRequestOngoing.value = true
@@ -95,51 +98,56 @@ async function fetchData() {
 
     widgetData.value = [
         {
-            title: 'Pagos Pendientes',
-            value: payments.value.pendingPayments,
-            icon: 'tabler-calendar-stats'
+            title: 'Pedidos por enviar',
+            value: payments.value.pendingShipping,
+            icon: 'mdi-truck-fast-outline'
         },
         {
-            title: 'Pagos Fallidos',
-            value: payments.value.failedPayments,
-            icon: 'tabler-circle-x'
+            title: 'Pedidos fuera de entrega',
+            value: payments.value.outforDeliveryShipping,
+            icon: 'mdi-truck-remove-outline'
         },
         {
-            title: 'Pagos Completados',
-            value: payments.value.successPayments,
-            icon: 'tabler-checks'
+            title: 'Pedidos en tránsito',
+            value: payments.value.deliveredShipping,
+            icon: 'mdi-truck-delivery'
         },
         {
-            title: 'Pagos Cancelados',
-            value: payments.value.canceledPayments,
-            icon: 'tabler-wallet'
+            title: 'Pedidos Completados',
+            value: payments.value.sentShipping,
+            icon: 'mdi-truck-check-outline'
         }
     ]
 
     isRequestOngoing.value = false
 }
 
-const showDeleteDialog = orderData => {
-  isConfirmDeleteDialogVisible.value = true
-  selectedOrder.value = { ...orderData }
-}
-
 const seeClient = clientData => {
-  router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
+    router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
 }
 
 const seeOrder = orderData => {
-  router.push({ name : 'dashboard-admin-orders-id', params: { id: orderData.id } })
+    router.push({ 
+        name : 'dashboard-admin-orders-id', 
+        params: { id: orderData.id },
+        query: { route: 'shipping' } 
+    })
 }
 
-const removeOrder = async () => {
-  isConfirmDeleteDialogVisible.value = false
-  let res = await ordersStores.deleteOrder(selectedOrder.value.id)
+const showSendDialog = (orderData, shipping_state_id) => {
+    isConfirmSendDialogVisible.value = true
+    id.value = shipping_state_id
+    selectedOrder.value = { ...orderData }
+}
+
+const sendOrder = async () => {
+  isConfirmSendDialogVisible.value = false
+  let res = await ordersStores.sendOrder(selectedOrder.value.id, {shipping_state_id : id.value})
   selectedOrder.value = {}
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Pedido eliminado!' : res.data.message,
+    message: res.data.success ? 'Pedido actualizado!' : res.data.message,
     show: true
   }
 
@@ -156,57 +164,38 @@ const removeOrder = async () => {
   return true
 }
 
-const resolveStatusShipping = shipping_state_id => {
-  if (shipping_state_id === 1)
-    return { color: 'error' }
-  if (shipping_state_id === 2)
-    return { color: 'warning' }
-  if (shipping_state_id === 3)
-    return { color: 'info' }
-  if (shipping_state_id === 4)
-    return { color: 'success' }
-}
-
-const resolveStatusPayment = payment_state_id => {
-  if (payment_state_id === 1)
-    return { color: 'error' }
-  if (payment_state_id === 2)
-    return { color: 'default' }
-  if (payment_state_id === 3)
-    return { color: 'warning' }
-  if (payment_state_id === 4)
-    return { color: 'info' }
-}
-
 const downloadCSV = async () => {
 
-  isRequestOngoing.value = true
+    isRequestOngoing.value = true
 
-  let data = { limit: -1 }
-
-  await ordersStores.fetchOrders(data)
-
-  let dataArray = [];
-      
-  ordersStores.getOrders.forEach(element => {
-
-    let data = {
-      REFERENCIA: element.reference_code ?? '',
-      FECHA: format(element.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
-      CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
-      CORREO: element.client.user.email,
-      ESTADO_ENVIO: element.shipping.name,
-      ESTADO_PAGO: element.payment.name,
-      MONTO: formatNumber(element.total)
+    let data = { 
+        limit: -1,
+        payment_state_id: 4
     }
+
+    await ordersStores.fetchOrders(data)
+
+    let dataArray = [];
+      
+    ordersStores.getOrders.forEach(element => {
+
+        let data = {
+        REFERENCIA: element.reference_code ?? '',
+        FECHA: format(element.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
+        CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
+        CORREO: element.client.user.email,
+        ESTADO_ENVIO: element.shipping.name,
+        ESTADO_PAGO: element.payment.name,
+        MONTO: formatNumber(element.total)
+        }
           
-    dataArray.push(data)
-  })
+        dataArray.push(data)
+    })
 
-  excelParser()
-    .exportDataFromJSON(dataArray, "orders", "csv");
+    excelParser()
+        .exportDataFromJSON(dataArray, "orders", "csv");
 
-  isRequestOngoing.value = false
+    isRequestOngoing.value = false
 
 }
 </script>
@@ -221,7 +210,6 @@ const downloadCSV = async () => {
             
           {{ advisor.message }}
         </v-alert>
-        <Toaster />
         <VDialog
             v-model="isRequestOngoing"
             width="300"
@@ -270,7 +258,7 @@ const downloadCSV = async () => {
                                 </div>
 
                                 <VAvatar
-                                    variant="outlined"
+                                    variant="tonal"
                                     rounded
                                     size="38"
                                 >
@@ -293,8 +281,8 @@ const downloadCSV = async () => {
                 </VRow>
             </VCardText>
         </VCard>
-      
-        <!-- 👉 orders -->
+
+        <!-- 👉 shipping -->
         <VCard
             title="Filtros"
             class="mb-6" >
@@ -314,7 +302,6 @@ const downloadCSV = async () => {
                             clear-icon="tabler-x"
                         />
                     </VCol>
-
                     <VCol
                         cols="12"
                         sm="4"
@@ -327,52 +314,41 @@ const downloadCSV = async () => {
                             clear-icon="tabler-x"
                         />
                     </VCol>
-
                     <VCol
                         cols="12"
-                        sm="4"
-                    >
-                        <AppSelect
-                            v-model="payment_state_id"
-                            placeholder="Estados de pagos"
-                            :items="paymentStates"
+                        sm="4">
+                        <!-- 👉 Search  -->
+                        <AppTextField
+                            v-model="searchQuery"
+                            placeholder="Buscar"
+                            density="compact"
                             clearable
-                            clear-icon="tabler-x"
                         />
                     </VCol>
+                    <VCol
+                        cols="12"
+                        sm="12"
+                        class="d-flex flex-wrap gap-4">
+
+                        <VSpacer />
+
+                        <div class="d-flex gap-4 flex-wrap align-center">
+                            <AppSelect
+                                v-model="rowPerPage"
+                                :items="[5, 10, 20, 25, 50]"
+                            />
+                            <!-- 👉 Export button -->
+                            <VBtn
+                                variant="tonal"
+                                color="secondary"
+                                prepend-icon="tabler-file-export"
+                                @click="downloadCSV"
+                            >
+                                Exportar
+                            </VBtn>
+                        </div>
+                    </VCol>
                 </VRow>
-            </VCardText>
-
-            <VCardText class="d-flex flex-wrap gap-4">
-                <div class="d-flex align-center">
-                    <!-- 👉 Search  -->
-                    <AppTextField
-                        v-model="searchQuery"
-                        placeholder="Buscar"
-                        density="compact"
-                        style="inline-size: 700px;"
-                        class="me-3"
-                        clearable
-                    />
-                </div>
-
-                <VSpacer />
-
-                <div class="d-flex gap-4 flex-wrap align-center">
-                    <AppSelect
-                        v-model="rowPerPage"
-                        :items="[5, 10, 20, 25, 50]"
-                    />
-                    <!-- 👉 Export button -->
-                    <VBtn
-                        variant="tonal"
-                        color="secondary"
-                        prepend-icon="tabler-file-export"
-                        @click="downloadCSV"
-                    >
-                        Exportar
-                    </VBtn>
-                </div>
             </VCardText>
 
             <VDivider class="mt-4" />
@@ -388,8 +364,7 @@ const downloadCSV = async () => {
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
                         <th class="pe-4"> ESTADO DEL PAGO </th>
                         <th class="pe-4"> MÉTODO </th>
-                  
-                        <th scope="pe-4" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
+                        <th scope="pe-4" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
                             ACCIONES
                         </th>
                     </tr>
@@ -408,8 +383,7 @@ const downloadCSV = async () => {
                             </span>
                         </td>
                        
-                        <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
-                       
+                        <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
                         
                         <td class="text-wrap">
                             <div class="d-flex align-center gap-x-3">
@@ -441,12 +415,7 @@ const downloadCSV = async () => {
                             </li>
                         </td>
                         <td> 
-                            <VChip
-                                label
-                                :color="resolveStatusPayment(order.payment.id)?.color"
-                            >
-                            {{ order.payment.name }}
-                            </VChip>
+                            <VChip label color="info">{{ order.payment.name }}</VChip>
                         </td>
                         <td :class="order.billing?.pse ? 'px-0' : ''">
                             <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
@@ -476,9 +445,9 @@ const downloadCSV = async () => {
                             </div>
                             
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
+                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
                             <VBtn
-                                v-if="$can('ver', 'pedidos')"
+                                v-if="$can('ver', 'envíos')"
                                 icon
                                 size="x-small"
                                 color="default"
@@ -494,23 +463,56 @@ const downloadCSV = async () => {
                                     size="22"
                                     icon="tabler-eye" />
                             </VBtn>
-
                             <VBtn
-                                v-if="$can('eliminar','pedidos')"
+                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
                                 icon
                                 size="x-small"
                                 color="default"
                                 variant="text"
-                                @click="showDeleteDialog(order)">
+                                @click="showSendDialog(order, 2)">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
                                     activator="parent">
-                                    Eliminar
-                                </VTooltip>  
+                                    No enviar
+                                </VTooltip>      
                                 <VIcon
                                     size="22"
-                                    icon="tabler-trash" />
+                                    icon="mdi-truck-remove-outline" />
+                            </VBtn>
+                            <VBtn
+                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
+                                icon
+                                size="x-small"
+                                color="default"
+                                variant="text"
+                                @click="showSendDialog(order, 4)">
+                                <VTooltip
+                                    open-on-focus
+                                    location="top"
+                                    activator="parent">
+                                    Enviar
+                                </VTooltip>      
+                                <VIcon
+                                    size="22"
+                                    icon="mdi-truck-fast-outline" />
+                            </VBtn>
+                            <VBtn
+                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 4"
+                                icon
+                                size="x-small"
+                                color="default"
+                                variant="text"
+                                @click="showSendDialog(order, 3)">
+                                <VTooltip
+                                    open-on-focus
+                                    location="top"
+                                    activator="parent">
+                                    Entregar
+                                </VTooltip>      
+                                <VIcon
+                                    size="22"
+                                    icon="mdi-truck-check-outline" />
                             </VBtn>
                         </td>
                     </tr>
@@ -543,30 +545,36 @@ const downloadCSV = async () => {
             </VCardText>
         </VCard>
     </div>
-    <!-- 👉 Confirm Delete -->
+    <!-- 👉 Confirm Send -->
     <VDialog
-      v-model="isConfirmDeleteDialogVisible"
+      v-model="isConfirmSendDialogVisible"
       persistent
       class="v-dialog-sm" >
       <!-- Dialog close btn -->
         
-      <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
+      <DialogCloseBtn @click="isConfirmSendDialogVisible = !isConfirmSendDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar Pedido">
+      <VCard title="Control del Pedido">
         <VDivider class="mt-4"/>
-        <VCardText>
-          Está seguro de eliminar el pedido <strong>{{ selectedOrder.reference_code }}</strong>?.
+        <VCardText v-if="id === 2">
+          Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a fuera de entrega?.
+        </VCardText>
+        <VCardText v-if="id === 3">
+          Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a entregado?.
+        </VCardText>
+        <VCardText v-if="id === 4">
+          Enviar pedido <strong>{{ selectedOrder.reference_code }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
           <VBtn
             color="secondary"
             variant="tonal"
-            @click="isConfirmDeleteDialogVisible = false">
+            @click="isConfirmSendDialogVisible = false">
               Cancelar
           </VBtn>
-          <VBtn @click="removeOrder">
+          <VBtn @click="sendOrder">
               Aceptar
           </VBtn>
         </VCardText>
@@ -593,5 +601,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: pedidos
+    subject: envíos
 </route>

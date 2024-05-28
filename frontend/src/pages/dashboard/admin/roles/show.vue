@@ -61,7 +61,7 @@ const closeRoleDetailDialog = function(){
         <!-- Dialog Content -->
         <VCard title="Detalle Rol">
             <VDivider class="mt-4"/>
-            <VCardText>
+            <VCardText class="pb-0">
                 <VRow>
                     <VCol cols="12" >
                         <VTextField
@@ -102,11 +102,11 @@ const closeRoleDetailDialog = function(){
 
         <VCard title="Permisos">
             <VDivider class="mt-4"/>
-            <VCardText>
+            <VCardText class="pb-0">
                 <VCardTitle>
                     Administrador General  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Administrador
@@ -124,7 +124,7 @@ const closeRoleDetailDialog = function(){
                 <VCardTitle>
                     General  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Panel de Control
@@ -202,9 +202,47 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Pedidos  
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver pedidos"
+                            value="ver pedidos"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="eliminar pedidos"
+                            value="eliminar pedidos"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
+                    Envíos  
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver envíos"
+                            value="ver envíos"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="editar envíos"
+                            value="editar envíos"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administracion  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Usuarios
@@ -424,7 +462,7 @@ const closeRoleDetailDialog = function(){
                 <VCardTitle>
                     Utilidades  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             FAQ's
@@ -464,7 +502,7 @@ const closeRoleDetailDialog = function(){
                 <VCardTitle>
                     Productos  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Marcas

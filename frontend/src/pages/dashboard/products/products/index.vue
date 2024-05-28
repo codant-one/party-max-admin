@@ -733,7 +733,7 @@ const removeProduct = async () => {
                     <VAvatar
                       v-if="product.image"
                       size="38"
-                      variant="tonal"
+                      variant="outlined"
                       rounded
                       :image="themeConfig.settings.urlStorage + product.image"
                     />

@@ -45,11 +45,11 @@ const closeModal = function(){
 
         <VCard title="Permisos">
             <VDivider class="mt-4"/>
-            <VCardText>
+            <VCardText class="pb-0">
                 <VCardTitle>
                     Administrador General  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Administrador
@@ -66,7 +66,7 @@ const closeModal = function(){
                 <VCardTitle>
                     General  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Panel de Control
@@ -135,9 +135,43 @@ const closeModal = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Pedidos  
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver pedidos"
+                            value="ver pedidos"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="eliminar pedidos"
+                            value="eliminar pedidos"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
+                    Envíos  
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver envíos"
+                            value="ver envíos"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="editar envíos"
+                            value="editar envíos"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administracion  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Usuarios
@@ -329,7 +363,7 @@ const closeModal = function(){
                 <VCardTitle>
                     Utilidades  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             FAQ's
@@ -366,7 +400,7 @@ const closeModal = function(){
                 <VCardTitle>
                     Productos  
                 </VCardTitle>
-                <VCardText>
+                <VCardText class="pb-0">
                     <div class="ml-5">
                         <VLabel style="font-weight: bold;">
                             Marcas

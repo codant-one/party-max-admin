@@ -70,6 +70,22 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="n2">
+                            <strong>Pedidos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de pedidos</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Eliminar Pedidos</strong>&emsp;/&emsp;<code>Permite la eliminación de pedidos</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
+                            <strong>Envíos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de envíos</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Editar envíos</strong>&emsp;/&emsp;<code>Permite la actualización de estados de los envíos</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">
@@ -249,6 +265,9 @@ const closeTreeDialog  = function(){
                             </li>
                             <li class="tab n3">
                                 <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Ordenar Productos</strong>&emsp;/&emsp;<code>Permite ordenar productos</code>
                             </li>
                         </ul>
                         <li class="tab n3">

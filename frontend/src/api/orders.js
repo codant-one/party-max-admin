@@ -21,6 +21,10 @@ class Orders {
     delete(id){
         return axios.delete(`/orders/${id}`)
     }
+
+    send(id, params){
+        return axios.get(`/orders/send/${id}`, {params})
+    }
     
 }
 

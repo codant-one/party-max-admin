@@ -20,6 +20,13 @@ export default [
         to: 'dashboard-admin-orders', 
         action: 'ver' , 
         subject: 'pedidos', 
+    },
+    {
+        title: 'Envíos', 
+        icon: { icon: 'mdi-truck-outline' },
+        to: 'dashboard-admin-shipping', 
+        action: 'ver' , 
+        subject: 'envíos', 
     }
 ]
   

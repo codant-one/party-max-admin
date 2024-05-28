@@ -190,6 +190,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::put('/updatePaymentState/{id}', [OrderController::class, 'updatePaymentState']);
         Route::get('show/{id}', [OrderController::class, 'ordersbyclient']);
         Route::get('show-order/{id}', [OrderController::class, 'orderbyID']);
+        Route::get('send/{id}', [OrderController::class, 'send']);
     });
 
     //Suppliers

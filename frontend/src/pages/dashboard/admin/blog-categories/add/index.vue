@@ -227,8 +227,8 @@ const onSubmit = () => {
                 if (res.data.success) {
 
                     let data = {
-                    message: 'Categoría creada!',
-                    error: false
+                        message: 'Categoría creada!',
+                        error: false
                     }
 
                     router.push({ name : 'dashboard-admin-blog-categories'})
@@ -237,8 +237,8 @@ const onSubmit = () => {
                 } else {
 
                     let data = {
-                    message: 'ERROR',
-                    error: true
+                        message: 'ERROR',
+                        error: true
                     }
 
                     router.push({ name : 'dashboard-admin-blog-categories'})
@@ -247,8 +247,8 @@ const onSubmit = () => {
                 })
                 .catch((err) => {
                     let data = {
-                    message: err,
-                    error: true
+                        message: err,
+                        error: true
                     }
 
                     router.push({ name : 'dashboard-admin-blog-categories'})

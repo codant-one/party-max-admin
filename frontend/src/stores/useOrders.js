@@ -82,8 +82,18 @@ export const useOrdersStores = defineStore('orders', {
 
             return Orders.delete(id)
                 .then((response) => {
-                    let index = this.orders.findIndex((item) => item.id === id)
-                    this.orders.splice(index, 1)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })  
+        },
+        sendOrder(id, params) {
+            this.setLoading(true)
+
+            return Orders.send(id, params)
+                .then((response) => {
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))

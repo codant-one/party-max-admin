@@ -45,8 +45,10 @@ class DatabaseSeeder extends Seeder
 
             DocumentTypeSeeder::class,
             
+            OrderPermissionSeeder::class,
 
-            OrderPermissionSeeder::class
+            ShipmentPermissionSeeder::class,
+            OrdersPermissionSeeder::class
         ]);
 
     }
