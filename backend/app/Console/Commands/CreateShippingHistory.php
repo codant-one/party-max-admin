@@ -50,7 +50,7 @@ class CreateShippingHistory extends Command
 
     private function createShippingHistories() {
 
-        $orders = Orders::where('payment_state_id', 4)->get(); 
+        $orders = Order::where('payment_state_id', 4)->get(); 
 
         foreach($orders as $order){
             ShippingHistory::create([
