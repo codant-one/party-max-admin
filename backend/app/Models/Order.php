@@ -14,6 +14,7 @@ use App\Models\Client;
 use App\Models\Address;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\ShippingHistory;
 
 class Order extends Model
 {
@@ -44,6 +45,10 @@ class Order extends Model
 
     public function address() {
         return $this->belongsTo(Address::class, 'address_id', 'id');
+    }
+
+    public function histories() {
+        return $this->hasMany(ShippingHistory::class, 'order_id', 'id');
     }
 
     /**** Scopes ****/
@@ -114,7 +119,8 @@ class Order extends Model
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
                            ->first()
-                           ->reference_code ?? $prefix.'0000008';
+                           ->reference_code ?? $prefix.rand(1,999999999);
+                        //    reference_code ?? $prefix.'0000008'
                         // ->reference_code ?? $prefix.rand(1,999999999)   ;
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
@@ -147,6 +153,12 @@ class Order extends Model
             'note' => $request->note
         ]);
 
+        //history
+        ShippingHistory::create([
+            'order_id' => $order->id,
+            'shipping_state_id' => 1
+        ]);
+
         return $order;
     }
 
@@ -154,6 +166,12 @@ class Order extends Model
         $order->update([
             'shipping_state_id' => $request->shipping_state_id
         ]);      
+
+        // history
+        ShippingHistory::create([
+            'order_id' => $order->id,
+            'shipping_state_id' => $request->shipping_state_id
+        ]);
     
         return $order;
     }

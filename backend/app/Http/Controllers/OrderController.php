@@ -117,7 +117,8 @@ class OrderController extends Controller
                 'billing', 
                 'shipping', 
                 'payment', 
-                'client.user.userDetail'
+                'client.user.userDetail',
+                'histories'
             ])->find($id);
 
             if (!$order)

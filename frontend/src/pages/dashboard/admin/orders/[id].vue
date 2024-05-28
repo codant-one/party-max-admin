@@ -267,6 +267,7 @@ const removeOrder = async () => {
                   density="compact"
                   class="v-timeline-density-compact"
                 >
+                  <!-- estado 1 -->
                   <VTimelineItem
                     dot-color="primary"
                     size="x-small"
@@ -276,75 +277,115 @@ const removeOrder = async () => {
                         Se realizo el pedido (Pedido ID: #{{ route.params.id }})
                       </div>
                       <div class="app-timeline-meta">
-                        Tuesday 10:20 AM
+                        {{  format(order.histories[0].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
-                      Su pedido ha sido realizado con éxito
+                      El pedido ha sido realizado con éxito
                     </p>
                   </VTimelineItem>
-
                   <VTimelineItem
-                    dot-color="primary"
-                    size="x-small"
-                  >
-                    <div class="d-flex justify-space-between align-center">
-                      <span class="app-timeline-title">Pick-up</span>
-                      <span class="app-timeline-meta">Wednesday 11:29 AM</span>
-                    </div>
-                    <p class="app-timeline-text mb-0">
-                      Pick-up scheduled with courier
-                    </p>
-                  </VTimelineItem>
-
-                  <VTimelineItem
-                    dot-color="primary"
-                    size="x-small"
-                  >
-                    <div class="d-flex justify-space-between align-center">
-                      <span class="app-timeline-title">Dispatched</span>
-                      <span class="app-timeline-meta">Thursday 8:15 AM</span>
-                    </div>
-                    <p class="app-timeline-text mb-0">
-                      Item has been picked up by courier.
-                    </p>
-                  </VTimelineItem>
-
-                  <VTimelineItem
-                    dot-color="primary"
-                    size="x-small"
-                  >
-                    <div class="d-flex justify-space-between align-center">
-                      <span class="app-timeline-title">Package arrived</span>
-                      <span class="app-timeline-meta">Saturday 15:20 AM</span>
-                    </div>
-                    <p class="app-timeline-text mb-0">
-                      Package arrived at an Amazon facility, NY
-                    </p>
-                  </VTimelineItem>
-
-                  <VTimelineItem
-                    dot-color="primary"
-                    size="x-small"
-                  >
-                    <div class="d-flex justify-space-between align-center">
-                      <span class="app-timeline-title">Dispatched for delivery</span>
-                      <span class="app-timeline-meta">Today 14:12 PM</span>
-                    </div>
-                    <p class="app-timeline-text mb-0">
-                      Package has left an Amazon facility , NY
-                    </p>
-                  </VTimelineItem>
-
-                  <VTimelineItem
+                    v-if="order.shipping_state_id === 1"
                     dot-color="secondary"
                     size="x-small"
                   >
                     <div class="d-flex justify-space-between align-center">
-                      <span class="app-timeline-title">Delivery</span>
+                      <div class="app-timeline-title">
+                          Enviado
+                      </div>
+                      <div class="app-timeline-meta">
+                        
+                      </div>
                     </div>
                     <p class="app-timeline-text mb-0">
-                      Package will be delivered by tomorrow
+                      El pedido aún no se ha enviado
+                    </p>
+                  </VTimelineItem>
+                  <!-- estado 2 -->
+                  <VTimelineItem
+                    v-if="order.shipping_state_id === 2"
+                    dot-color="primary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                          No se pudo enviar el paquete
+                      </div>
+                      <div class="app-timeline-meta">
+                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      El pedido esta fuera de entrega
+                    </p>
+                  </VTimelineItem>
+                  <!-- estado 3 -->
+                  <VTimelineItem
+                    v-if="order.shipping_state_id === 3"
+                    dot-color="primary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                        Enviado
+                      </div>
+                      <div class="app-timeline-meta">
+                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      El pedido fue enviado
+                    </p>
+                  </VTimelineItem>
+                  <VTimelineItem
+                    v-if="order.shipping_state_id === 3"
+                    dot-color="primary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                        Entregado
+                      </div>
+                      <div class="app-timeline-meta">
+                        {{  format(order.histories[2].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      El pedido fue entregado
+                    </p>
+                  </VTimelineItem>
+                  <!-- estado 4 -->
+                  <VTimelineItem
+                    v-if="order.shipping_state_id === 4"
+                    dot-color="primary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                        Enviado
+                      </div>
+                      <div class="app-timeline-meta">
+                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      El pedido fue enviado
+                    </p>
+                  </VTimelineItem>
+                  <VTimelineItem
+                    v-if="order.shipping_state_id === 4"
+                    dot-color="secondary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                        Entregado
+                      </div>
+                      <div class="app-timeline-meta">
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      El pedido aún no se ha entregado
                     </p>
                   </VTimelineItem>
                 </VTimeline>
