@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
+import { requiredValidator } from '@validators'
 import router from '@/router'
 import mastercard from '@images/cards/mastercard.png'
 import visa from '@images/cards/visa.png'
@@ -25,6 +26,8 @@ const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
 const id = ref(null)
+const reason = ref(null)
+const refVForm = ref()
 
 const shippingStates = ref([
   { title: 'Listo para enviar', value: 1 },
@@ -141,27 +144,32 @@ const showSendDialog = (orderData, shipping_state_id) => {
 }
 
 const sendOrder = async () => {
-  isConfirmSendDialogVisible.value = false
-  let res = await ordersStores.sendOrder(selectedOrder.value.id, {shipping_state_id : id.value})
-  selectedOrder.value = {}
 
-  advisor.value = {
-    type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Pedido actualizado!' : res.data.message,
-    show: true
-  }
+    refVForm.value?.validate().then(async ({ valid: isValid }) => {
+        if (isValid) {
+            isConfirmSendDialogVisible.value = false
+            let res = await ordersStores.sendOrder(selectedOrder.value.id, {shipping_state_id : id.value, reason: reason.value})
+            selectedOrder.value = {}
 
-  await fetchData()
+            advisor.value = {
+                type: res.data.success ? 'success' : 'error',
+                message: res.data.success ? 'Pedido actualizado!' : res.data.message,
+                show: true
+            }
 
-  setTimeout(() => {
-    advisor.value = {
-      type: '',
-      message: '',
-      show: false
-    }
-  }, 3000)
+            await fetchData()
 
-  return true
+            setTimeout(() => {
+                advisor.value = {
+                type: '',
+                message: '',
+                show: false
+                }
+            }, 3000)
+
+            return true
+        }
+    })
 }
 
 const downloadCSV = async () => {
@@ -554,31 +562,41 @@ const downloadCSV = async () => {
         
       <DialogCloseBtn @click="isConfirmSendDialogVisible = !isConfirmSendDialogVisible" />
 
-      <!-- Dialog Content -->
-      <VCard title="Control del Pedido">
-        <VDivider class="mt-4"/>
-        <VCardText v-if="id === 2">
-          Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a fuera de entrega?.
-        </VCardText>
-        <VCardText v-if="id === 3">
-          Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a entregado?.
-        </VCardText>
-        <VCardText v-if="id === 4">
-          Enviar pedido <strong>{{ selectedOrder.reference_code }}</strong>?.
-        </VCardText>
+      <VForm
+        ref="refVForm"
+        @submit.prevent="sendOrder">
+        <!-- Dialog Content -->
+        <VCard title="Control del Pedido">
+            <VDivider />
+            <VCardText class="pb-0" v-if="id === 2">
+                Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a fuera de entrega?.
+                <VTextField
+                    class="my-2"
+                    v-model="reason"
+                    label="Razón"
+                    :rules="[requiredValidator]"
+                />
+            </VCardText>
+            <VCardText class="pb-0" v-if="id === 3">
+                Cambiar estado del pedido <strong>{{ selectedOrder.reference_code }}</strong> a entregado?.
+            </VCardText>
+            <VCardText class="pb-0" v-if="id === 4">
+                Enviar pedido <strong>{{ selectedOrder.reference_code }}</strong>?.
+            </VCardText>
 
-        <VCardText class="d-flex justify-end gap-3 flex-wrap">
-          <VBtn
-            color="secondary"
-            variant="tonal"
-            @click="isConfirmSendDialogVisible = false">
-              Cancelar
-          </VBtn>
-          <VBtn @click="sendOrder">
-              Aceptar
-          </VBtn>
-        </VCardText>
-      </VCard>
+            <VCardText class="d-flex justify-end gap-3 flex-wrap">
+                <VBtn
+                    color="secondary"
+                    variant="tonal"
+                    @click="isConfirmSendDialogVisible = false">
+                    Cancelar
+                </VBtn>
+                <VBtn type="submit">
+                    Aceptar
+                </VBtn>
+            </VCardText>
+        </VCard>
+      </VForm>
     </VDialog>
   </section>
 </template>

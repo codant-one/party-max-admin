@@ -156,6 +156,86 @@ class TestingController extends Controller
         return view('emails.suppliers.out_of_stock', compact('data'));
     }
 
+    public function sendOrder() {
+
+        $orderId = 10;
+        $shipping_state_id = 3;
+        $reason = 'no quise';
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link = env('APP_DOMAIN');
+        $link_contact = env('APP_DOMAIN').'/about-us';
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
+
+        $address = 
+            $order->address->address . ', ' . 
+            $order->address->street . ', ' . 
+            $order->address->city . ', ' . 
+            $order->address->postal_code . ', ' . 
+            $order->address->province->name .
+            $note;
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        }
+
+        switch ($shipping_state_id) {
+            case '2':
+                $title = 'Pedido no entregado';
+                $text = 'No se ha podido enviar su pedido.';
+                $subject = 'Pedido fuera de entrega.';
+                break;
+            case '3':
+                $title = 'Llegó tu compra';
+                $text = 'Hicimos entrega de tu producto en ';
+                $subject = 'Tu pedido ha sido entregado.';
+                break;
+            case '4':
+                $title = 'Pedido enviado';
+                $text = 'Enviamos tu pedido a ';
+                $subject = 'Tu pedido ha sido enviado.';
+                break;
+            default:
+                $title = 'Pedido enviado';
+                $text = 'Enviamos tu pedido a ';
+                $subject = 'Tu pedido ha sido enviado.';
+        }
+
+        $data = [
+            'address' => $address,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'products' => $products,
+            'link' => $link,
+            'link_contact' => $link_contact,
+            'title' => $title,
+            'text' => $text,
+            'reason' => $reason,
+            'shipping_state_id' => $shipping_state_id
+        ];
+
+        // dd($data);
+        return view('emails.clients.send_orders', compact('data'));
+    }
+
     public function minus_stock($orderId) {
         $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get(); 
         

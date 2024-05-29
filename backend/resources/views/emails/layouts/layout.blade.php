@@ -73,7 +73,7 @@
                     width: 40%!important; 
                 }
 
-                .es-header .es-right img { 
+                .es-header .es-right img, .festin img { 
                     width: 100px!important; 
                 }
 

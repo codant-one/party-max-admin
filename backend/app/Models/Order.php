@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\OrderDetail;
 use App\Models\ShippingState; 
@@ -165,13 +166,17 @@ class Order extends Model
     public static function sendOrder($order, $request) {
         $order->update([
             'shipping_state_id' => $request->shipping_state_id
-        ]);      
+        ]);   
 
         // history
         ShippingHistory::create([
             'order_id' => $order->id,
-            'shipping_state_id' => $request->shipping_state_id
+            'shipping_state_id' => $request->shipping_state_id,
+            'reason' => $request->reason
         ]);
+
+        if($request->shipping_state_id !== '1')
+            self::sendMail($order->id, $request->shipping_state_id, $request->reason);
     
         return $order;
     }
@@ -233,5 +238,95 @@ class Order extends Model
         }
     
         return $prefix . sprintf('%06d', $number);
+    }
+
+    public static function sendMail($orderId, $shipping_state_id, $reason) {
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link = env('APP_DOMAIN');
+        $link_contact = env('APP_DOMAIN').'/about-us';
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
+
+        $address = 
+            $order->address->address . ', ' . 
+            $order->address->street . ', ' . 
+            $order->address->city . ', ' . 
+            $order->address->postal_code . ', ' . 
+            $order->address->province->name .
+            $note;
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        }
+
+        switch ($shipping_state_id) {
+            case '2':
+                $title = 'Pedido no entregado';
+                $text = 'No se ha podido enviar su pedido.';
+                $subject = 'Pedido #'.$order->reference_code.' fuera de entrega.';
+                break;
+            case '3':
+                $title = 'Llegó tu compra';
+                $text = 'Hicimos entrega de tu producto en ';
+                $subject = 'Tu pedido #'.$order->reference_code.' ha sido entregado.';
+                break;
+            case '4':
+                $title = 'Pedido enviado';
+                $text = 'Enviamos tu pedido a ';
+                $subject = 'Tu pedido #'.$order->reference_code.' ha sido enviado.';
+                break;
+            default:
+                $title = 'Pedido enviado';
+                $text = 'Enviamos tu pedido a ';
+                $subject = 'Tu pedido ha sido enviado.';
+        }
+
+        $data = [
+            'address' => $address,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'products' => $products,
+            'link' => $link,
+            'link_contact' => $link_contact,
+            'title' => $title,
+            'text' => $text,
+            'reason' => $reason,
+            'shipping_state_id' => $shipping_state_id
+        ];
+        
+        $email = $order->client->user->email;
+
+        try {
+            \Mail::send(
+                'emails.clients.send_orders'
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
     }
 }

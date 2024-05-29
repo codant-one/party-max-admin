@@ -316,7 +316,8 @@ const removeOrder = async () => {
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
-                      El pedido esta fuera de entrega
+                      El pedido esta fuera de entrega.<br>
+                      Razón: {{ order.histories[1].reason }}
                     </p>
                   </VTimelineItem>
                   <!-- estado 3 -->
@@ -462,6 +463,10 @@ const removeOrder = async () => {
                   {{ order.address.street }} <br> 
                   {{ order.address.city }} <br> 
                   {{ order.address.postal_code }}
+
+                  <span v-if="order.billing.note !== null">
+                    <br>({{ order.billing.note }}).
+                  </span>
                 </div>
               </VCardText>
             </VCard>
