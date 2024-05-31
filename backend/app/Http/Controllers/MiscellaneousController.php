@@ -149,7 +149,8 @@ class MiscellaneousController extends Controller
                                 'colors.images',
                                 'colors.categories.category', 
                                 'tags.tag',
-                                'detail'
+                                'detail',
+                                'reviews.client.user'
                               ])
                               ->where('slug', $slug)
                               ->first();

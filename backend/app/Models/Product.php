@@ -19,6 +19,7 @@ use App\Models\ProductList;
 use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
+use App\Models\Review;
 
 class Product extends Model
 {
@@ -71,6 +72,11 @@ class Product extends Model
     public function order()
     {
         return $this->hasMany(ProductList::class, 'product_id','id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id','id');
     }
 
     /**** Scopes ****/
@@ -518,6 +524,20 @@ class Product extends Model
             $product->update();
             $product->delete();
         }
+    }
+
+    public static function calculateRating($product_id) {
+
+        $reviews = Review::where('product_id', $product_id)->get();
+        $sum = 0;
+
+        foreach($reviews as $review){
+            $sum = $sum + $review->rating;
+        }
+
+        $product = Product::find($product_id);
+        $product->rating = $sum/(count($reviews));//average
+        $product->update();
     }
 
     public static function updateStatusProduct($request, $field, $product) {

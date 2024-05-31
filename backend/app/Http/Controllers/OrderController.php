@@ -333,7 +333,7 @@ class OrderController extends Controller
         try {
 
             $orders = Order::with([
-                                'details.product_color.product', 
+                                'details.product_color.product.reviews', 
                                 'details.product_color.color',
                                 'shipping', 
                                 'payment', 
@@ -362,13 +362,18 @@ class OrderController extends Controller
                 ];
             
                 foreach ($order->details as $detail) {
+                   
+                    $review = 
+                        $detail->product_color->product->reviews->firstWhere('client_id', $order->client_id);
+                    
                     $productInfo = [
                         'product_id' => $detail->product_color->product->id,
                         'product_name' => $detail->product_color->product->name,
                         'product_image' => $detail->product_color->product->image,
                         'color' => $detail->product_color->color->name,
                         'slug' => $detail->product_color->product->slug,
-                        'quantity' => $detail->quantity
+                        'quantity' => $detail->quantity,
+                        'rating' => $review ? $review->rating : 0
                     ];
             
                     $orderInfo['products'][] = $productInfo;

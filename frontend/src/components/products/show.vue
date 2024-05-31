@@ -359,6 +359,8 @@ const chanceRadio = (value) => {
                                                         readonly
                                                         density="compact"
                                                         size="small"
+                                                        color="error"
+                                                        active-color="error"
                                                     />
                                                 </div>
                                                 <div>

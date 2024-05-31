@@ -260,6 +260,43 @@ const removeOrder = async () => {
             <VCard title="Actividad de envío" class="d-print-none">
               <VCardText>
                 <VTimeline
+                  v-if="order.payment.id !== 4"
+                  truncate-line="both"
+                  align="start"
+                  side="end"
+                  line-color="primary"
+                  density="compact"
+                  class="v-timeline-density-compact"
+                >
+                  <!-- estado 1 -->
+                  <VTimelineItem
+                    dot-color="secondary"
+                    size="x-small"
+                  >
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="app-timeline-title">
+                        Se realizo el pedido (Pedido ID: #{{ route.params.id }})
+                      </div>
+                      <div class="app-timeline-meta">
+                        {{  format(order.created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                      </div>
+                    </div>
+                    <p class="app-timeline-text mb-0">
+                      <span v-if="order.payment.id === 1">
+                        El pedido se encuentra pendiente por pagar.
+                      </span>
+                      <span v-if="order.payment.id === 2">
+                        El pago del pedido ha sido cancelado
+                      </span>
+                      <span v-if="order.payment.id === 3">
+                        El pago del pedido ha fallado
+                      </span>
+                    </p>
+                  </VTimelineItem>
+                  
+                </VTimeline>
+                <VTimeline
+                  v-else
                   truncate-line="both"
                   align="start"
                   side="end"

@@ -396,6 +396,8 @@ const colors = (id) => {
                                 half-increments
                                 readonly
                                 density="compact"
+                                color="error"
+                                active-color="error"
                                 size="small"
                             />
                         </div>

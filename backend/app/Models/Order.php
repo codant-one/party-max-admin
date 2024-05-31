@@ -197,6 +197,12 @@ class Order extends Model
         $order->update([
             'payment_state_id' => $request->payment_state_id
         ]);      
+
+        // history
+        ShippingHistory::create([
+            'order_id' => $order->id,
+            'shipping_state_id' => $request->shipping_state_id
+        ]);
     
         return $order;
     }

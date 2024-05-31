@@ -40,7 +40,8 @@ use App\Http\Controllers\{
     SupplierController,
     AddressController,
     DocumentTypeController,
-    ProxyController
+    ProxyController,
+    ReviewController
 
 };
 
@@ -95,6 +96,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('addresses', AddressController::class);
+    Route::apiResource('reviews', ReviewController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -193,8 +195,13 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('send/{id}', [OrderController::class, 'send']);
     });
 
+    //Reviews
+    Route::group(['prefix' => 'reviews'], function () {
+        Route::post('delete', [ReviewController::class, 'delete']);
+        Route::get('/show/{id}', [ReviewController::class, 'reviewbyclient']);
+    });
+    
     //Suppliers
-
     Route::group(['prefix' => 'suppliers'], function () {
         Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);
         Route::put('/updateBalance/{id}', [SupplierController::class, 'updateBalance']);
