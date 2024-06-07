@@ -236,6 +236,19 @@ class TestingController extends Controller
         return view('emails.clients.send_orders', compact('data'));
     }
 
+    public function sendInfo() {
+
+        $data = [
+            'name' => 'Steffani Castro',
+            'nit' => '4978824',
+            'email' => 'steffani.castro.useche@gmail.com',
+            'phone' => '3042603376'
+        ];
+
+        return view('emails.suppliers.send_info', compact('data'));
+    }
+
+
     public function minus_stock($orderId) {
         $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get(); 
         

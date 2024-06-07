@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
 use App\Http\Requests\RegisterClientRequest;
+use App\Http\Requests\RegisterSupplierRequest;
 
 use App\Models\Client;
 use App\Models\User;
@@ -29,7 +30,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('jwt', ['except' => 
-            ['login', 'register', 'find', 'completed']
+            ['login', 'register', 'find', 'completed', 'sendInfo']
         ]);
     }
 
@@ -437,7 +438,7 @@ class AuthController extends Controller
                     'email' => 'emails.auth.notifications'
                 ];
                 
-                $responseMail = $this->sendMail($user->id, $info); 
+                $responseMail = $this->sendMail($info, $user->id); 
             }
 
             return response()->json([
@@ -446,6 +447,39 @@ class AuthController extends Controller
                 'data' => [ 
                     'client' => Client::with(['user.userDetail.province.country', 'gender'])->find($client->id)
                 ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error '.$ex->getMessage(),
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
+
+    }
+
+    public function sendInfo(RegisterSupplierRequest $request)
+    {
+
+        try {
+ 
+            $info = [
+                'name' => $request->name,
+                'nit' => $request->nit,
+                'email_contact' => $request->email,
+                'phone' => $request->phone,
+                'subject' => 'Un proveedor te ha contactado.',
+                'email' => 'emails.suppliers.send_info'
+            ];
+                
+            $responseMail = $this->sendMail($info); 
+
+            return response()->json([
+                'success' => true,
+                'email_response' => $responseMail,
+                'data' => []
             ]);
 
         } catch(\Illuminate\Database\QueryException $ex) {
@@ -555,19 +589,23 @@ class AuthController extends Controller
         ];
     }
 
-    private function sendMail($id, $info ){
+    private function sendMail($info, $id = 1){
 
         $user = User::find($id);
         
         $data = [
-            'title' => $info['title'],
+            'name' => $info['name'] ?? null,
+            'nit' => $info['nit'] ?? null,
+            'email' => $info['email_contact'] ?? null,
+            'phone' => $info['phone'] ?? null,
+            'title' => $info['title'] ?? null,
             'user' => $user->name . ' ' . $user->last_name,
-            'text' => $info['text'],
+            'text' => $info['text'] ?? null,
             'buttonLink' =>  $info['buttonLink'] ?? null,
             'buttonText' =>  $info['buttonText'] ?? null
         ];
 
-        $clientEmail = $user->email;
+        $clientEmail = ($id === 1) ? env('MAIL_TO_CONTACT') : $user->email;
         $subject = $info['subject'];
         
         try {

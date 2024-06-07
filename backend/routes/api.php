@@ -62,6 +62,7 @@ Route::group([
 ], function () {
     Route::post('login', [AuthController::class , 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register']);
+    Route::post('sendInfo', [AuthController::class, 'sendInfo']);
     Route::get('find/{token}', [AuthController::class, 'find'])->name('find');
     Route::post('completed', [AuthController::class, 'completed'])->name('completed');
     Route::post('forgot-password', [PasswordResetController::class, 'forgot_password'])->name('forgot.password');
@@ -247,5 +248,6 @@ Route::get('paymentSummaryEmail', [TestingController::class , 'paymentSummaryEma
 Route::get('littleProductExistence', [TestingController::class , 'littleProductExistenceEmail'])->name('littleProductExistence');
 Route::get('outOfStockEmail', [TestingController::class , 'outOfStockEmail'])->name('outOfStockEmail');
 Route::get('sendOrder', [TestingController::class , 'sendOrder'])->name('sendOrder');
+Route::get('sendInfo', [TestingController::class , 'sendInfo'])->name('sendInfo');
 Route::get('minus-stock/{order}', [TestingController::class , 'minus_stock'])->name('minus_stock');
 Route::get('sum-sales/{order}', [TestingController::class , 'sum_sales'])->name('sum_sales');
