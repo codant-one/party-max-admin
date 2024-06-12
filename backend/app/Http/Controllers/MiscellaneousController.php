@@ -24,7 +24,7 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $category = Category::with(['banner1', 'banner2', 'banner3', 'banner4','children'])
+            $category = Category::with(['banner1', 'banner2', 'banner3', 'banner4', 'children'])
                                 ->where('slug', $slug)
                                 ->first();
     

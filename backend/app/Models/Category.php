@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Product;
 use App\Models\CategoryType;
@@ -101,43 +102,6 @@ class Category extends Model
 
         return $query->paginate($limit);
     }
-
-    public static function getSlug($request) {
-
-        $categories = self::get()->toArray();
-
-        $grandfather = '';
-        $father = '';
-
-        if($request->is_category) {
-            $result = [];
-            $category_id = intval($request->category_id);
-            
-            $result = array_filter($categories, function ($element) use ($category_id) {
-                return $element['id'] === $category_id;
-            });
-
-            $result = array_values($result)[0];
-
-            if(!is_null($result['category_id'])) {
-                $result2 = [];
-                $category_id = $result['category_id'];
-                $result2 = array_filter($categories, function ($element) use ($category_id) {
-                    return $element['id'] === $category_id;
-                });
-
-                // Convertir el resultado nuevamente en un array indexado
-                $result2 = array_values($result2)[0];
-
-                $grandfather = Str::slug($result2['name']) . '/';
-                $father = Str::slug($result['name']) . '/';
-            } else {
-                $father = Str::slug($result['name']) . '/';
-            }
-        }
-
-        return $grandfather . $father . Str::slug($request->name);
-    }
     
     public function scopeCategoryTotalPrice($query)
     {
@@ -153,6 +117,43 @@ class Category extends Model
     }
 
     /**** Public methods ****/
+    public static function getSlug($request) {
+
+        $categories = self::get()->toArray();
+    
+        $grandfather = '';
+        $father = '';
+    
+        if($request->is_category) {
+            $result = [];
+            $category_id = intval($request->category_id);
+                
+            $result = array_filter($categories, function ($element) use ($category_id) {
+                return $element['id'] === $category_id;
+            });
+    
+            $result = array_values($result)[0];
+    
+            if(!is_null($result['category_id'])) {
+                $result2 = [];
+                $category_id = $result['category_id'];
+                $result2 = array_filter($categories, function ($element) use ($category_id) {
+                    return $element['id'] === $category_id;
+                });
+    
+                // Convertir el resultado nuevamente en un array indexado
+                $result2 = array_values($result2)[0];
+    
+                $grandfather = Str::slug($result2['name']) . '/';
+                $father = Str::slug($result['name']) . '/';
+            } else {
+                $father = Str::slug($result['name']) . '/';
+            }
+        }
+    
+        return $grandfather . $father . Str::slug($request->name);
+    }
+
     public static function createCategory($request) {
         
         $slug = self::getSlug($request);
@@ -176,6 +177,36 @@ class Category extends Model
             'name' => $request->name,
             'slug' => $slug
         ]);
+
+        if(!($request->is_category)){
+            $subcategories = self::where('category_id', $category->id)->get();
+
+            foreach($subcategories as $subcategory) {
+                $request->request->remove('name');
+                $request->request->add(['is_category' =>  1]);
+                $request->request->add(['category_id' => intval($category->id)]);
+                $request->request->add(['name' => $subcategory->name]);
+                $slug_ = self::getSlug($request);
+
+                $category_ = self::find($subcategory->id);
+                $category_->slug = $slug_;
+                $category_->update();
+
+                $children = self::where('category_id', $subcategory->id)->get();
+
+                foreach($children as $c) {
+                    $request->request->remove('name');
+                    $request->request->remove('category_id');
+                    $request->request->add(['category_id' => intval($subcategory->id)]);
+                    $request->request->add(['name' => $c->name]);
+                    $slug_ = self::getSlug($request);
+    
+                    $category_ = self::find($c->id);
+                    $category_->slug = $slug_;
+                    $category_->update();
+                }
+            }
+        }
 
         return $category;
     }
