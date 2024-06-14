@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File; 
+use Illuminate\Support\Facades\Log;
 
 use App\Models\BlogCategory;
 use App\Models\BlogTag;
@@ -33,10 +34,11 @@ class Blog extends Model
     /**** Public methods ****/
     public static function createBlogTags($blog_id, $request) {
         foreach(explode(",", $request->tag_id) as $tag_id) {
-            BlogTag::create([
-                'blog_id' => $blog_id,
-                'tag_id' => $tag_id
-            ]);
+            if($tag_id !== '')
+                BlogTag::create([
+                    'blog_id' => $blog_id,
+                    'tag_id' => $tag_id
+                ]);
         }
     }
 
@@ -61,10 +63,11 @@ class Blog extends Model
         BlogTag::where('blog_id', $blog_id)->delete();
 
         foreach(explode(",", $request->tag_id) as $tag_id) {
-            BlogTag::create([
-                'blog_id' => $blog_id,
-                'tag_id' => $tag_id
-            ]);
+            if($tag_id !== '')
+                BlogTag::create([
+                    'blog_id' => $blog_id,
+                    'tag_id' => $tag_id
+                ]);
         }
     }
 

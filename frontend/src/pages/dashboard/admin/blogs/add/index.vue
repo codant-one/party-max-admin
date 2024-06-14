@@ -21,7 +21,7 @@ const isFormValid = ref(false)
 const emitter = inject("emitter")
 
 const listTags = ref([])
-const tag_id = ref()
+const tag_id = ref([])
 
 const categories = ref([])
 const blog_category_id = ref('')
@@ -179,7 +179,7 @@ const onSubmit = () => {
       formData.append('date', date.value)
 
       //product_tags
-      formData.append('tag_id', tag_id.value)
+      formData.append('tag_id', tag_id.value ?? [])
 
       blogsStores.addBlog(formData)
         .then(res => {

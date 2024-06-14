@@ -22,7 +22,7 @@ const isFormValid = ref(false)
 const emitter = inject("emitter")
 
 const listTags = ref([])
-const tag_id = ref()
+const tag_id = ref([])
 
 const categories = ref([])
 const blog_category_id = ref('')
@@ -202,7 +202,7 @@ const onSubmit = () => {
       formData.append('_method', 'PUT')
 
       //blog_tags
-      formData.append('tag_id', tag_id.value)
+      formData.append('tag_id', tag_id.value ?? [])
             
       let data = {
         data: formData, 
