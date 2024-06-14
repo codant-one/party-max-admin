@@ -338,7 +338,8 @@ class OrderController extends Controller
                                 'shipping', 
                                 'payment', 
                                 'billing',
-                                'address.province'
+                                'address.province',
+                                'histories'
                            ])
                            ->where('id', $id)
                            ->get();
@@ -357,6 +358,7 @@ class OrderController extends Controller
                     'payment' => $order->payment,
                     'billing' => $order->billing,
                     'address' => $order->address,
+                    'histories' => $order->histories,
                     'updated_at' => $order->updated_at,
                     'products' => []
                 ];
