@@ -307,5 +307,34 @@ class MiscellaneousController extends Controller
             ], 500);
         }
     }
+
+    public function colors(Request $request): JsonResponse
+    {
+        try {
+
+            $wholesale = 0;
+            
+            if (Auth::check()) {
+                $user = Auth::user()->load(['client']);
+                $shoppingCart = ShoppingCart::where('client_id', $user['client']['id'])->pluck('wholesale');
+                $wholesale = (count($shoppingCart) === 0) ? -1 : $shoppingCart[0];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'wholesale' => $wholesale,
+                    'colors' => Color::where('name', '<>', 'Ninguno')->get(),                 
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
     
 }

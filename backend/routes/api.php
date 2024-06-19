@@ -223,6 +223,7 @@ Route::group(['prefix' => 'miscellaneous'], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('products', [MiscellaneousController::class, 'products']);
+    Route::get('colors', [MiscellaneousController::class, 'colors']);
     Route::get('products/{slug}', [MiscellaneousController::class, 'productDetail']);
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
