@@ -131,13 +131,11 @@ class Product extends Model
     }
 
     public function scopeWhereSearch($query, $search) {
-        $query->where('name', 'LIKE', '%' . $search . '%')
-              ->orWhere('description', 'LIKE', '%' . $search . '%');
+        $query->where('name', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereSearchPublic($query, $search) {
-        $query->where('products.name', 'LIKE', '%' . $search . '%')
-              ->orWhere('products.description', 'LIKE', '%' . $search . '%');
+        $query->where('products.name', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereCategory($query, $search) {

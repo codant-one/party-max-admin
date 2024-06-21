@@ -58,7 +58,7 @@ const imageAux = ref('')
 
 const radioContent = ref([])
 const selectedColor = ref(null)
-const tab = ref(null)
+const tab = ref('1')
 
 watchEffect(() => {
     if (props.isDrawerOpen) {
@@ -244,12 +244,12 @@ const chanceRadio = (value) => {
                                 color="deep-purple-accent-4"
                                 align-tabs="center"
                             >
-                                <VTab>Descripción</VTab>
-                                <VTab>Especificaciones</VTab>
-                                <VTab>Detalles</VTab>
+                                <VTab value="0">Descripción</VTab>
+                                <VTab value="1">Especificaciones</VTab>
+                                <VTab value="2">Detalles</VTab>
                             </VTabs>
                             <VWindow v-model="tab">
-                                <VWindowItem>
+                                <VWindowItem value="0">
                                     <VContainer fluid>
                                         <VRow>
                                             <VCol cols="12">
@@ -258,7 +258,7 @@ const chanceRadio = (value) => {
                                         </VRow>
                                     </VContainer>
                                 </VWindowItem>
-                                <VWindowItem>
+                                <VWindowItem value="1">
                                     <VContainer fluid>
                                         <VRow>
                                             <VCol cols="12">
@@ -302,7 +302,7 @@ const chanceRadio = (value) => {
                                         </VRow>
                                     </VContainer>
                                 </VWindowItem>
-                                <VWindowItem>
+                                <VWindowItem value="2">
                                     <VContainer fluid>
                                         <VRow>
                                             <VCol cols="12">

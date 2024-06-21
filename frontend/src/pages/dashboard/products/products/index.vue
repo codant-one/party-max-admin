@@ -133,8 +133,6 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
-  products.value =  []
-
   if(favourite.value === 0 && archived.value === 0 && discarded.value === 0) {
     favourite.value = null
     archived.value = null
@@ -169,6 +167,8 @@ async function fetchData() {
 
   await productsStores.fetchProducts(data)
 
+  products.value =  []
+  myProductsList.value =  []
   myProductsList.value = productsStores.getProducts
 
   myProductsList.value.forEach(element =>
