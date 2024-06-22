@@ -115,13 +115,13 @@ class Order extends Model
             'wholesale' => $request->wholesale 
         ]);
 
-        $prefix = $request->wholesale === 0 ? '06' : '09';
+        $prefix = $request->wholesale === 0 ? '06-' : '09-';
 
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.rand(1,999999999);
-                        //    reference_code ?? $prefix.'0000008'
+                        //    reference_code ?? $prefix.'00000001'
                         // ->reference_code ?? $prefix.rand(1,999999999)   ;
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
@@ -238,9 +238,9 @@ class Order extends Model
         $prefix = substr($lastCode, 0, 2); 
         $number = (int) substr($lastCode, 2);
         $number++;
-        if ($number > 999999) {
+        if ($number > 9999999) {
             $prefix++;
-            $number = 1000000;
+            $number = 10000000;
         }
     
         return $prefix . sprintf('%06d', $number);
