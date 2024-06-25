@@ -31,7 +31,8 @@ class CartController extends Controller
                             ->groupBy('client_id')
                             ->map(function ($group) {
                                 return $group->map(function ($item) {
-                                    Log::info($item->color->product);
+                                    Log::info($item->color);
+                                    Log::info($item->color->product->user);
                                     $product = $item->color;
                                     $product->product = $item->color->product;
                                     $product->user = $item->color->product->user;
