@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shopping;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\ShoppingCart;
 use App\Models\Client;
@@ -30,6 +31,7 @@ class CartController extends Controller
                             ->groupBy('client_id')
                             ->map(function ($group) {
                                 return $group->map(function ($item) {
+                                    Log::info($item->color->product);
                                     $product = $item->color;
                                     $product->product = $item->color->product;
                                     $product->user = $item->color->product->user;

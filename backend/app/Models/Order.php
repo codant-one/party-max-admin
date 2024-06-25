@@ -115,14 +115,14 @@ class Order extends Model
             'wholesale' => $request->wholesale 
         ]);
 
-        $prefix = $request->wholesale === 0 ? '06-' : '09-';
+        $prefix = $request->wholesale === 0 ? '00' : '99';
+        //PRODUCCION $request->wholesale === 0 ? '03' : '05';
 
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
                            ->first()
-                           ->reference_code ?? $prefix.rand(1,999999999);
-                        //    reference_code ?? $prefix.'00000001'
-                        // ->reference_code ?? $prefix.rand(1,999999999)   ;
+                           ->reference_code ?? $prefix.'0000000';
+
         $order->update([
             'reference_code' => self::generateNextCode($reference_code)
         ]);
@@ -196,12 +196,6 @@ class Order extends Model
  
         $order->update([
             'payment_state_id' => $request->payment_state_id
-        ]);      
-
-        // history
-        ShippingHistory::create([
-            'order_id' => $order->id,
-            'shipping_state_id' => $request->shipping_state_id
         ]);
     
         return $order;
@@ -238,9 +232,9 @@ class Order extends Model
         $prefix = substr($lastCode, 0, 2); 
         $number = (int) substr($lastCode, 2);
         $number++;
-        if ($number > 9999999) {
+        if ($number > 999999) {
             $prefix++;
-            $number = 10000000;
+            $number = 1000000;
         }
     
         return $prefix . sprintf('%06d', $number);
