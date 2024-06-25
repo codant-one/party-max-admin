@@ -79,6 +79,17 @@ class Product extends Model
         return $this->hasMany(Review::class, 'product_id','id');
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($product) {
+            $product->colors()->each(function ($color) {
+                $color->cart()->delete();
+            });
+        });
+    }
+
     /**** Scopes ****/
     public function scopeIsFavorite($query)
     {

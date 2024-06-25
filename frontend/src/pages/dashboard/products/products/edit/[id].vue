@@ -159,7 +159,7 @@ async function fetchData() {
       brand_id.value = product.value.brand_id
       user_id.value = (product.value.user_id === userData.value.id) ? null : product.value.user_id 
       name.value = product.value.name
-      single_description.value = product.value.single_description
+      single_description.value = product.value.single_description ?? ' '
       description.value = product.value.description
       price.value = product.value.price
       price_for_sale.value = product.value.price_for_sale
@@ -290,7 +290,7 @@ const onSubmit = () => {
             formData.append('user_id', user_id.value ?? 0)
             formData.append('brand_id', brand_id.value)
             formData.append('name', name.value)
-            formData.append('single_description', single_description.value)
+            formData.append('single_description', (single_description.value === ' ') ? null : single_description.value)
             formData.append('description', description.value)
             formData.append('price', price.value)
             formData.append('price_for_sale', price_for_sale.value)

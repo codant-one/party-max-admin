@@ -388,7 +388,8 @@ const removeProduct = async () => {
 
   let res = await productsStores.deleteProduct({ ids: [selectedProduct.value.id] })
   selectedProduct.value = {}
-
+  searchQuery.value = ''
+  
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
     message: res.data.success ? 'Producto eliminado!' : res.data.message,
