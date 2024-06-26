@@ -122,7 +122,6 @@ class PaymentController extends Controller
             case '1':
                 $payment_state_id = 4;
                 $request->request->add(['client_id' => $order->client_id ]);
-                ShoppingCart::deleteAll($request);
                 Order::updateInventary($order);
                 break;
             case '4':
@@ -139,6 +138,8 @@ class PaymentController extends Controller
             'payment_state_id' => $payment_state_id
         ]);
 
+        ShoppingCart::deleteAll($request);
+        
         $pse = is_null($request->pse_bank) ? 0 : 1;
 
         Billing::where('order_id', $order->id)

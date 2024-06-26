@@ -244,18 +244,18 @@ class OrderController extends Controller
 
         try {
 
-            $ordersPending = Order::where([['client_id', $id], ['payment_state_id', 1]])->get();
+            // $ordersPending = Order::where([['client_id', $id], ['payment_state_id', 1]])->get();
             
-            foreach ($ordersPending as $item) {
+            // foreach ($ordersPending as $item) {
 
-                $order = Order::find($item->id);
+            //     $order = Order::find($item->id);
 
-                if($order) {
-                    $order->update([
-                        'payment_state_id' => 2
-                    ]);  
-                }
-            }
+            //     if($order) {
+            //         $order->update([
+            //             'payment_state_id' => 2
+            //         ]);  
+            //     }
+            // }
 
             $limit = $request->has('limit') ? $request->limit : 5;
 
