@@ -900,4 +900,28 @@ class UsersController extends Controller
         }
     }
 
+    public function getProfile(): JsonResponse
+    {
+
+        try {
+
+            $user = User::productsCount()->ordersCount()->sales()->find(Auth::user()->id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'user_data' => $user
+                ]
+            ], 200);
+
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
 }

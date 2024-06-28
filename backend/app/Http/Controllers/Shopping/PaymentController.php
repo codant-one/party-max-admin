@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\GuzzleException;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Order;
 use App\Models\Billing;
@@ -109,6 +110,7 @@ class PaymentController extends Controller
 
     public function confirmation(Request $request): JsonResponse
     {
+        Log::info($request->all()); //pruebas;
         $order = Order::where('reference_code', $request->reference_sale)->first();
 
         if (!$order)
@@ -117,21 +119,143 @@ class PaymentController extends Controller
                 'feedback' => 'not_found',
                 'message' => 'Pedido no encontrada'
             ], 404);
+ 
 
-        switch ($request->response_code_pol) {
+        $payment_state_id = 1;
+        $payment_method_type = 2;
+        $payment_method = '';
+        $pseReference1 = $request->pseReference1;
+        $response_message_pol = $request->response_message_pol;
+        $message = '';
+
+        switch ($request->response_code_pol) {//4: pagado, 3: fallido, 2: cancelado , 1: pendiente
             case '1':
                 $payment_state_id = 4;
+                $message = 'Transacción aprobada.';
                 $request->request->add(['client_id' => $order->client_id ]);
                 Order::updateInventary($order);
                 break;
             case '4':
                 $payment_state_id = 3;
+                $message = 'Transacción rechazada por entidad financiera.';
+                break;
+            case '5':
+                $payment_state_id = 3;
+                $message = 'Transacción rechazada por el banco.';
+                break;
+            case '6':
+                $payment_state_id = 3;
+                $message = 'Fondos insuficientes.';
+                break;
+            case '7':
+                $payment_state_id = 3;
+                $message = 'Tarjeta inválida.';
+                break;
+            case '8':
+                $payment_state_id = 3;
+                $message = ($response_message_pol === 'CONTACT_THE_ENTITY') ? 'Contactar a la entidad financiera.' : 'Débito automático no permitido.';
+                break;
+            case '9':
+                $payment_state_id = 3;
+                $message = 'Tarjeta vencida.';
+                break;
+            case '10':
+                $payment_state_id = 3;
+                $message = 'Tarjeta restringida.';
+                break;
+            case '12':
+                $payment_state_id = 3;
+                $message = 'La fecha de expiración o el código de seguridad son inválidos.';
+                break;
+            case '13':
+                $payment_state_id = 3;
+                $message = 'Reintentar pago.';
+                break;
+            case '14':
+                $payment_state_id = 3;
+                $message = 'Transacción inválida.';
+                break;
+            case '17':
+                $payment_state_id = 3;
+                $message = 'El valor excede el máximo permitido por la entidad.';
+                break;
+            case '19':
+                $payment_state_id = 3;
+                $message = 'Transacción abandonada por el pagador.';
+                break;
+            case '22':
+                $payment_state_id = 3;
+                $message = 'Tarjeta no autorizada para comprar por internet.';
+                break;
+            case '23':
+                $payment_state_id = 3;
+                $message = ($response_message_pol === 'ANTIFRAUD_REJECTED') ? 'Transacción rechazada por sospecha de fraude.' : 'Transacción rechazada debido a sospecha de fraude en la entidad financiera.';
+                break;
+            case '9995':
+                $payment_state_id = 3;
+                $message = 'Certificado digital no encontrado.';
+                break;
+            case '9996':
+                $payment_state_id = 3;
+                $message = ($response_message_pol === 'BANK_UNREACHABLE') ? 'Error tratando de comunicarse con el banco.' : 'No se recibió respuesta de la entidad financiera.';
+                break;
+            case '9997':
+                $payment_state_id = 3;
+                $message = 'Error comunicándose con la entidad financiera.';
+                break;
+            case '9998':
+                $payment_state_id = 3;
+                $message = 'Transacción no permitida.';
+                break;
+            case '9999':
+                $payment_state_id = 3;
+                $message = 'Error interno.';
                 break;
             case '20':
                 $payment_state_id = 2;
+                $message = 'Transacción expirada.';
                 break;
             default:
-                $payment_state_id = 3;  
+                $payment_state_id = 1;  
+                $message = 'Transaccion pendiente.';
+        }
+
+        switch ($request->payment_method_type) {
+            case '2': //CREDIT_CARD
+                $payment_method_type = 2;
+                $payment_method = 'Tarjetas de Crédito.';
+                break;
+            case '4': //PSE
+                $payment_method_type = 4;
+                $payment_method = 'Transferencias bancarias PSE.';
+                break;
+            case '5': //ACH
+                $payment_method_type = 5;
+                $payment_method = 'Débitos ACH.';
+                break;
+            case '6': //DEBIT_CARD
+                $payment_method_type = 6;
+                $payment_method = 'Tarjetas débito.';
+                break;
+            case '7': //CASH
+                $payment_method_type = 7;
+                $payment_method = 'Efectivo.';
+                break;
+            case '8': //REFERENCED
+                $payment_method_type = 8;
+                $payment_method = 'Referencia de pago.';
+                break;
+            case '10': //BANK_REFERENCED
+                $payment_method_type = 10;
+                $payment_method = 'Pago en bancos.';
+                break;
+            case '14': //SPEI
+                $payment_method_type = 14;
+                $payment_method = 'Transferencias bancarias SPEI.';
+                break;
+            default:
+                $payment_method_type = 2;
+                $payment_method = 'Tarjetas de Crédito';
         }
 
         $order->update([
@@ -150,8 +274,17 @@ class PaymentController extends Controller
                     'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null
                 ]);
 
-        if($request->response_code_pol === '1')
-            Client::sendMail($order->id);
+        switch ($payment_state_id) { //4: pagado, 3: fallido, 2: cancelado , 1: pendiente
+            case 2: 
+                Client::sendMailError($order->id, 2, $message);    
+                break;
+            case 3:
+                Client::sendMailError($order->id, 3, $message);  
+                break;
+            case 4: 
+                Client::sendMail($order->id);
+                break;           
+        }          
                 
         return response()->json([
             'success' => true

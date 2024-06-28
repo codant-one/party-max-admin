@@ -94,6 +94,17 @@ export const useUsersStores = defineStore('users', {
                     }).catch(error => {
                         console.error(error.response.data)
                     }) 
-        }
+        },
+        getProfile() {
+            this.setLoading(true)
+            
+            return Users.getProfile()
+                .then((response) => {
+                    return Promise.resolve(response.data.data.user_data)
+                }).catch(error => {
+                    return Promise.reject(error)
+                }) 
+            
+        },
     }
 })

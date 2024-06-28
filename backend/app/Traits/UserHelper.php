@@ -11,6 +11,9 @@ use App\Models\Product;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+
+use Carbon\Carbon;
+
 /**
  * Trait for models with stores
  */
@@ -143,9 +146,6 @@ trait UserHelper
         return $user;
     }
 
-    
-
-
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
         foreach (explode(' ', $search) as $term) {
@@ -183,6 +183,125 @@ trait UserHelper
         }
 
         return $query->paginate($limit);
+    }
+
+    public function scopeProductsCount($query)
+    {
+        return  $query->addSelect(['product_count_published' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->where('p.state_id', 3)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['product_count_pending' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->where('p.state_id', 4)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['product_count_rejected' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->where('p.state_id', 6)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['product_count_deleted' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->where('p.state_id', 5)
+                        ->whereColumn('u.id', 'users.id');
+                }]);
+    }
+  
+    public function scopeOrdersCount($query)
+    {
+        return  $query->addSelect(['order_count_payment' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['order_count_pending' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 1)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['order_count_failed' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 3)
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['order_count_canceled' => function ($q){
+                    $q->selectRaw('COUNT(*)')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 2)
+                        ->whereColumn('u.id', 'users.id');
+                }]);
+    }
+
+    public function scopeSales($query)
+    {
+        return  $query->addSelect(['sales_today' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereDate('o.updated_at', Carbon::today())
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['sales_last_7_days' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereBetween('o.updated_at', [Carbon::now()->subDays(7), Carbon::now()])                        
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['sales_last_30_days' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereBetween('o.updated_at', [Carbon::now()->subDays(30), Carbon::now()])                        
+                        ->whereColumn('u.id', 'users.id');
+                }])->addSelect(['sales_year' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('users as u')
+                        ->join('products as p', 'p.user_id', '=', 'u.id')
+                        ->join('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->join('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereYear('o.updated_at', now()->year)                        
+                        ->whereColumn('u.id', 'users.id');
+                }]);
     }
 
 }

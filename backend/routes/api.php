@@ -106,6 +106,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('update/password', [UsersController::class, 'updatePassword']);
         Route::post('update/profile',  [UsersController::class, 'updateProfile']);
         Route::post('update/store', [UsersController::class, 'updateStore']);
+        Route::get('user/profile',  [UsersController::class, 'getProfile']);
     });
 
     //Roles
@@ -246,6 +247,7 @@ Route::get('/proxy-image',[ProxyController::class, 'getImage']);
 Route::get('testing', [TestingController::class , 'permissions'])->name('permissions');
 Route::get('emails', [TestingController::class , 'emails'])->name('emails');
 Route::get('paymentSummaryEmail', [TestingController::class , 'paymentSummaryEmail'])->name('paymentSummaryEmail');
+Route::get('confirmationOrderPayU', [TestingController::class , 'confirmationOrderPayU'])->name('confirmationOrderPayU');
 Route::get('littleProductExistence', [TestingController::class , 'littleProductExistenceEmail'])->name('littleProductExistence');
 Route::get('outOfStockEmail', [TestingController::class , 'outOfStockEmail'])->name('outOfStockEmail');
 Route::get('sendOrder', [TestingController::class , 'sendOrder'])->name('sendOrder');

@@ -1,13 +1,32 @@
 <script setup>
 
+import { formatNumber } from '@/@core/utils/formatters'
 import { VIcon } from 'vuetify/components/VIcon'
 import sliderBar1 from '@images/festin/002@2x.png'
 import sliderBar2 from '@images/festin/03@2x.png'
 import sliderBar3 from '@images/festin/04@2x.png'
 import banner from '@images/logos/banner4.png'
 
+const props = defineProps({
+  productCount: {
+    type: Object,
+    required: false
+  },
+  orderCount: {
+    type: Object,
+    required: false
+  },
+  sales: {
+    type: Object,
+    required: false
+  }
+})
+
 const userDataJ = ref('')
 const name = ref('')
+const product_count = ref(props.productCount)
+const order_count = ref(props.orderCount)
+const salesTotal = ref(props.sales)
 
 const websiteAnalytics = [
   {
@@ -15,19 +34,19 @@ const websiteAnalytics = [
     slideImg: sliderBar1,
     data: [
       {
-        number: '0',
+        number: product_count.value.published ?? '0',
         text: 'Publicados'
       },
       {
-        number: '0',
+        number: product_count.value.pending ?? '0',
         text: 'Pendientes'
       },
       {
-        number: '0',
+        number: product_count.value.rejeted ?? '0',
         text: 'Rechazados'
       },
       {
-        number: '0',
+        number: product_count.value.deleted ?? '0',
         text: 'Eliminados'
       },
     ],
@@ -37,19 +56,19 @@ const websiteAnalytics = [
     slideImg: sliderBar2,
     data: [
       {
-        number: '0',
+        number: order_count.value.payment ?? '0',
         text: 'Pagados'
       },
       {
-        number: '0',
+        number: order_count.value.pending ?? '0',
         text: 'Pendientes'
       },
       {
-        number: '0',
+        number: order_count.value.failed ?? '0',
         text: 'Fallidos'
       },
       {
-        number: '0',
+        number: order_count.value.canceled ?? '0',
         text: 'Cancelados'
       },
     ],
@@ -59,19 +78,19 @@ const websiteAnalytics = [
     slideImg: sliderBar3,
     data: [
       {
-        number: 'COP 0.00',
+        number: 'COP ' + formatNumber(salesTotal.value.today ?? '0.00'),
         text: 'Hoy'
       },
       {
-        number: 'COP 0.00',
+        number: 'COP ' + formatNumber(salesTotal.value.last_7_days ?? '0.00'),
         text: 'Semana'
       },
       {
-        number: 'COP 0.00',
+        number: 'COP ' + formatNumber(salesTotal.value.last_30_days ?? '0.00'),
         text: 'Mes'
       },
       {
-        number: 'COP 0.00',
+        number: 'COP ' + formatNumber(salesTotal.value.year ?? '0.00'),
         text: 'Año'
       },
     ],
@@ -141,6 +160,7 @@ async function fetchData() {
                                         size="default"
                                         color="rgba(var(--v-theme-primary), 1)"
                                         class="font-weight-medium text-white rounded me-2"
+                                        :style="{ minWidth: '50px'}"
                                     >
                                         {{ d.number }}
                                     </VChip>

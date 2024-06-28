@@ -1,5 +1,6 @@
 <script setup>
 
+import { useUsersStores } from '@/stores/useUsers'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
 import TabSecurity from '@/views/dashboard/profile/TabSecurity.vue'
@@ -9,6 +10,7 @@ import UserProfile from '@/views/dashboard/profile/UserProfile.vue'
 
 const countriesStores = useCountriesStores()
 const provincesStores = useProvincesStores()
+const usersStores = useUsersStores()
 
 const avatar = ref('')
 const avatarOld = ref('')
@@ -16,6 +18,26 @@ const userData = ref(null)
 const userTab = ref(null)
 const listCountries = ref([])
 const listProvinces = ref([])
+const productCount = ref({
+  published: 0,
+  pending: 0,
+  rejeted: 0,
+  deleted: 0
+})
+
+const orderCount = ref({
+  payment: 0,
+  pending: 0,
+  failed: 0,
+  canceled: 0
+})
+
+const sales = ref({
+  today: 0,
+  last_7_days: 0,
+  last_30_days: 0,
+  year: 0
+})
 
 const tabs = [
   {
@@ -49,6 +71,27 @@ async function fetchData() {
 
   loadCountries()
   loadProvinces()
+
+  usersStores.getProfile()
+      .then(response => {
+
+        productCount.value.published = response.product_count_published
+        productCount.value.pending = response.product_count_pending
+        productCount.value.rejeted = response.product_count_rejected
+        productCount.value.deleted = response.product_count_deleted
+
+        orderCount.value.payment = response.order_count_payment
+        orderCount.value.pending = response.order_count_pending
+        orderCount.value.failed = response.order_count_failed
+        orderCount.value.canceled = response.order_count_canceled
+
+        sales.value.today = response.sales_today
+        sales.value.last_7_days = response.sales_last_7_days
+        sales.value.last_30_days = response.sales_last_30_days
+        sales.value.year = response.sales_year
+
+        resolve()
+      }).catch(error => {})
 
   userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
 
@@ -175,7 +218,11 @@ const onImageSelected = event => {
             <TabStore />
           </VWindowItem>
           <VWindowItem>
-            <TabStatistics />
+            <TabStatistics 
+              :productCount="productCount"
+              :orderCount="orderCount"
+              :sales="sales"
+            />
           </VWindowItem>
         </VWindow>
       </VCol>

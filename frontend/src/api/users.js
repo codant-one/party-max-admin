@@ -25,6 +25,10 @@ class Users {
     updatePasswordUser(data, id) {
         return axios.post(`users/update/password/${id}`, data)
     }
+
+    getProfile() {
+        return axios.get('users/user/profile')
+    }
     
 }
 

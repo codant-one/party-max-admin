@@ -216,4 +216,34 @@ class Client extends Model
             Log::info($message . ' ' . $responseMail);
         } 
     }
+
+    public static function sendMailError($orderId, $payment_state_id, $message) {
+
+        $order =  Order::with(['client.user.userDetail'])->find($orderId); 
+
+        $data = [
+            'orderId' => $order->id,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'message' => $message,
+            'payment_state_id' => $payment_state_id === 3 ? 'FALLIDA' : 'CANCELADA'
+        ];
+        
+        $email = $order->client->user->email;
+        $subject = 'Tu pedido en PARTYMAX no se ha podido completar con éxito';
+
+        try {
+            \Mail::send(
+                'emails.payment.failed'
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
+    }
 }

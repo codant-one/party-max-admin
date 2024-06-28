@@ -46,6 +46,24 @@ class TestingController extends Controller
         return view('emails.auth.testing', compact('data'));
     }
 
+    public function confirmationOrderPayU() {
+
+        $orderId = 7;
+        $message = 'Transacción rechazada por entidad financiera.';
+        $payment_state_id = 3;
+
+        $order =  Order::with(['client.user.userDetail'])->find($orderId); 
+
+        $data = [
+            'orderId' => $order->id,
+            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'message' => $message,
+            'payment_state_id' => $payment_state_id === 3 ? 'FALLIDA' : 'CANCELADA'
+        ];
+
+        return view('emails.payment.failed', compact('data'));
+    }
+
     public function paymentSummaryEmail() {
 
         $orderId = 7;
@@ -247,7 +265,6 @@ class TestingController extends Controller
 
         return view('emails.suppliers.send_info', compact('data'));
     }
-
 
     public function minus_stock($orderId) {
         $order_details = OrderDetail::with(['product_color'])->where('order_id', $orderId)->get(); 
