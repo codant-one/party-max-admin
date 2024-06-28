@@ -540,7 +540,7 @@ const removeOrder = async () => {
                     PSE: {{ order.billing.pse_bank }}
                   </div>
                   <div class="text-body-1">
-                    Referencia de pago: {{ order.billing.pse_reference1 }}
+                    Referencia de pago: {{ order.billing.reference_pol }}
                   </div>
                 </div>
 

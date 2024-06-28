@@ -2,8 +2,9 @@
 
 import { useOrdersStores } from '@/stores/useOrders'
 import { excelParser } from '@/plugins/csv/excelParser'
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { utcToZonedTime } from 'date-fns-tz';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
@@ -27,6 +28,8 @@ const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
 const payment_state_id = ref(null)
+
+const timeZone = ref('UTC');
 
 const references = ref([
   { title: 'Al mayor', value: 1 },
@@ -409,7 +412,7 @@ const downloadCSV = async () => {
                             </span>
                         </td>
                        
-                        <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
+                        <td> {{ format(utcToZonedTime(parseISO(order.date), timeZone), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
                        
                         
                         <td class="text-wrap">
