@@ -270,7 +270,7 @@ const downloadCSV = async () => {
                                 </div>
 
                                 <VAvatar
-                                    variant="outlined"
+                                    variant="tonal"
                                     rounded
                                     size="38"
                                 >
