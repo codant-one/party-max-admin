@@ -526,7 +526,7 @@ const removeOrder = async () => {
                   {{ order.billing.postal_code }}
                 </div>
 
-                <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number>
+                <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                     {{ order.billing.payment_method_name }}
                   </div>
