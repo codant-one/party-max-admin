@@ -217,7 +217,7 @@ trait UserHelper
     public function scopeOrdersCount($query)
     {
         return  $query->addSelect(['order_count_payment' => function ($q){
-                    $q->selectRaw('COUNT(*)')
+                    $q->selectRaw('COUNT(DISTINCT o.id')
                         ->from('users as u')
                         ->join('products as p', 'p.user_id', '=', 'u.id')
                         ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
@@ -226,7 +226,7 @@ trait UserHelper
                         ->where('o.payment_state_id', 4)
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_pending' => function ($q){
-                    $q->selectRaw('COUNT(*)')
+                    $q->selectRaw('COUNT(DISTINCT o.id')
                         ->from('users as u')
                         ->join('products as p', 'p.user_id', '=', 'u.id')
                         ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
@@ -235,7 +235,7 @@ trait UserHelper
                         ->where('o.payment_state_id', 1)
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_failed' => function ($q){
-                    $q->selectRaw('COUNT(*)')
+                    $q->selectRaw('COUNT(DISTINCT o.id')
                         ->from('users as u')
                         ->join('products as p', 'p.user_id', '=', 'u.id')
                         ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
@@ -244,7 +244,7 @@ trait UserHelper
                         ->where('o.payment_state_id', 3)
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_canceled' => function ($q){
-                    $q->selectRaw('COUNT(*)')
+                    $q->selectRaw('COUNT(DISTINCT o.id')
                         ->from('users as u')
                         ->join('products as p', 'p.user_id', '=', 'u.id')
                         ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
