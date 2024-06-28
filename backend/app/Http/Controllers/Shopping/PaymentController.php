@@ -264,11 +264,16 @@ class PaymentController extends Controller
 
         ShoppingCart::deleteAll($request);
         
+        $nequi = $request->payment_method_name === 'NEQUI' ? 1 : 0;
         $pse = is_null($request->pse_bank) ? 0 : 1;
 
         Billing::where('order_id', $order->id)
                ->update([
+                    'reference_pol' => $request->reference_pol,
+                    'nequi' => $nequi,
                     'pse' => $pse,
+                    'pse_bank' => $request->pse_bank,
+                    'pse_reference1' => $request->pse_reference1,
                     'card_number' => ($pse === 0) ? $request->cc_number : null,
                     'card_name' => ($pse === 0) ? $request->cc_holder : null,
                     'payment_method_name' => ($pse === 0) ? $request->payment_method_name : null

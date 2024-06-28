@@ -526,12 +526,30 @@ const removeOrder = async () => {
                   {{ order.billing.postal_code }}
                 </div>
 
-                <div class="mt-6" v-if="order.billing.pse === 0 && order.payment_state_id === 4">
+                <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number && order.payment_state_id === 4">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                     {{ order.billing.payment_method_name }}
                   </div>
                   <div class="text-body-1">
                     Número de tarjeta: {{ order.billing.card_number }}
+                  </div>
+                </div>
+
+                <div class="mt-6" v-if="order.billing.pse === 1 && order.payment_state_id === 4">
+                  <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
+                    PSE: {{ order.billing.pse_bank }}
+                  </div>
+                  <div class="text-body-1">
+                    Referencia de pago: {{ order.billing.pse_reference1 }}
+                  </div>
+                </div>
+
+                <div class="mt-6" v-if="order.billing.nequi === 1 && order.payment_state_id === 4">
+                  <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
+                    {{ order.billing.payment_method_name }}
+                  </div>
+                  <div class="text-body-1">
+                    Referencia de pago: {{ order.billing.reference_pol }}
                   </div>
                 </div>
               </VCardText>

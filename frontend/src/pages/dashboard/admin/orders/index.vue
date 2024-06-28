@@ -11,6 +11,7 @@ import Toaster from "@/components/common/Toaster.vue";
 import mastercard from '@images/cards/mastercard.png'
 import visa from '@images/cards/visa.png'
 import pse from '@images/cards/pse.png'
+import nequi from '@images/cards/nequi.png'
 
 const ordersStores = useOrdersStores()
 
@@ -449,6 +450,14 @@ const downloadCSV = async () => {
                             </VChip>
                         </td>
                         <td :class="order.billing?.pse ? 'px-0' : ''">
+                            <div class="d-flex align-start px-0" v-if="order.billing?.nequi === 1">
+                                <VImg
+                                    :src="nequi"
+                                    height="65"
+                                    max-width="65"
+                                    min-width="65"
+                                />
+                            </div>
                             <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
                                 <VImg
                                     :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
@@ -456,7 +465,7 @@ const downloadCSV = async () => {
                                     max-width="40"
                                     min-width="40"
                                 />
-                                <div class="mt-2">
+                                <!-- <div class="mt-2">
                                     <VIcon
                                         icon="tabler-dots"
                                         class="mt-1"
@@ -464,7 +473,7 @@ const downloadCSV = async () => {
                                     <span class="mt-2">
                                         {{ order.billing.card_number.replaceAll('*', '').trim() }}
                                     </span>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="d-flex align-start px-0" v-if="order.billing?.pse === 1">
                                 <VImg
