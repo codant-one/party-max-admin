@@ -15,6 +15,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('blogs:update')
                  ->daily()
                  ->at('00:00');
+
+        $schedule->command('order-payment-state:update')
+                 ->daily()
+                 ->at('00:00');
     }
 
     /**
