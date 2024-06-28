@@ -2,7 +2,7 @@
 
 import { useAddressesStores } from '@/stores/useAddresses'
 import { useClientsStores } from '@/stores/useClients'
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import CustomerBioPanel from '@/views/apps/ecommerce/customer/view/CustomerBioPanel.vue'
@@ -210,7 +210,7 @@ const removeAddress = async () => {
             </div>
             <div>
             <span class="text-body-1" v-if="online">
-                {{  format(online, 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                {{  format(parseISO(online), 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                 <span class="text-xs">
                     (Última Conexión)
                 </span>

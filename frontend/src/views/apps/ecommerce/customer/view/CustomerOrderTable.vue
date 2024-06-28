@@ -2,7 +2,7 @@
 
 import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import router from '@/router'
 
@@ -132,7 +132,7 @@ const resolveStatusPayment = payment_state_id => {
               {{ order.reference_code }}
             </span>
           </td>
-          <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
+          <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
           <td> 
             <VChip
               label

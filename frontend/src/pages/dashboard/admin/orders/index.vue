@@ -4,7 +4,6 @@ import { useOrdersStores } from '@/stores/useOrders'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { utcToZonedTime } from 'date-fns-tz';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
@@ -28,8 +27,6 @@ const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
 const payment_state_id = ref(null)
-
-const timeZone = ref('UTC');
 
 const references = ref([
   { title: 'Al mayor', value: 1 },
@@ -196,7 +193,7 @@ const downloadCSV = async () => {
 
     let data = {
       REFERENCIA: element.reference_code ?? '',
-      FECHA: format(element.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
+      FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
       CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
       CORREO: element.client.user.email,
       ESTADO_ENVIO: element.shipping.name,
@@ -412,7 +409,7 @@ const downloadCSV = async () => {
                             </span>
                         </td>
                        
-                        <td> {{ format(utcToZonedTime(parseISO(order.date), timeZone), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
+                        <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
                        
                         
                         <td class="text-wrap">

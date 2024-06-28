@@ -2,7 +2,7 @@
 
 import { useOrdersStores } from '@/stores/useOrders'
 import { excelParser } from '@/plugins/csv/excelParser'
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
@@ -189,7 +189,7 @@ const downloadCSV = async () => {
 
         let data = {
         REFERENCIA: element.reference_code ?? '',
-        FECHA: format(element.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
+        FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
         CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
         CORREO: element.client.user.email,
         ESTADO_ENVIO: element.shipping.name,
@@ -391,7 +391,7 @@ const downloadCSV = async () => {
                             </span>
                         </td>
                        
-                        <td> {{ format(order.date, 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
+                        <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
                         
                         <td class="text-wrap">
                             <div class="d-flex align-center gap-x-3">

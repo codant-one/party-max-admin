@@ -2,7 +2,7 @@
 
 import { useOrdersStores } from '@/stores/useOrders'
 import { formatNumber } from '@/@core/utils/formatters'
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { avatarText } from '@/@core/utils/formatters'
 import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
@@ -132,7 +132,7 @@ const removeOrder = async () => {
         </div>
         <div>
           <span class="text-body-1" v-if="date">
-            {{  format(date, 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+            {{  format(parseISO(date), 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
             <span class="text-xs"> (Fecha del pedido) </span>
           </span>
         </div>
@@ -278,7 +278,7 @@ const removeOrder = async () => {
                         Se realizo el pedido (Pedido ID: #{{ route.params.id }})
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
@@ -314,7 +314,7 @@ const removeOrder = async () => {
                         Se realizo el pedido (Pedido ID: #{{ route.params.id }})
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.histories[0].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.histories[0].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
@@ -349,7 +349,7 @@ const removeOrder = async () => {
                           No se pudo enviar el paquete
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.histories[1].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
@@ -368,7 +368,7 @@ const removeOrder = async () => {
                         Enviado
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.histories[1].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
@@ -385,7 +385,7 @@ const removeOrder = async () => {
                         Entregado
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.histories[2].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.histories[2].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
@@ -403,7 +403,7 @@ const removeOrder = async () => {
                         Enviado
                       </div>
                       <div class="app-timeline-meta">
-                        {{  format(order.histories[1].created_at, 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
+                        {{  format(parseISO(order.histories[1].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
                       </div>
                     </div>
                     <p class="app-timeline-text mb-0">
