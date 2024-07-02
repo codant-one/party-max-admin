@@ -87,6 +87,8 @@ class Product extends Model
             $product->colors()->each(function ($color) {
                 $color->cart()->delete();
             });
+
+            $product->productlike()->delete();
         });
     }
 
