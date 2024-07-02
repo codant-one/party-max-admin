@@ -115,8 +115,9 @@ class Order extends Model
             'wholesale' => $request->wholesale 
         ]);
 
-        $prefix = $request->wholesale === 0 ? '00' : '99';
+        $prefix = $request->wholesale === 0 ? '03' : '05';
         //PRODUCCION $request->wholesale === 0 ? '03' : '05';
+        //STAGING $request->wholesale === 0 ? '00' : '99';
 
         $reference_code = Order::where('wholesale', $request->wholesale)
                            ->latest('reference_code')
