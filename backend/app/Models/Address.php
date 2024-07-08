@@ -88,7 +88,6 @@ class Address extends Model
 
     public static function deleteAddress($id) {
         $address = self::find($id);
-        $address->delete();
 
         $existDefault = Address::where([['client_id', $address->client_id], ['default', 1]])->first();
 
@@ -98,6 +97,8 @@ class Address extends Model
             if(!$existDefault) 
                 $firstAddress->update(['default' => 1]);
         }
+
+        $address->delete();
     }
 
     /**** Scopes ****/
