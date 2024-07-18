@@ -20,7 +20,7 @@ return new class extends Migration
             $table->longtext('shipping_address')->nullable()->after('shipping_phone');
             $table->text('shipping_street')->nullable()->after('shipping_address');
             $table->string('shipping_city')->nullable()->after('shipping_street');
-            $table->string('shipping_postal_code', 20)->nullable()->after('shipping_postal_code');
+            $table->string('shipping_postal_code', 20)->nullable()->after('shipping_city');
 
             $table->foreign('addresses_type_id')->references('id')->on('addresses_types')->onDelete('cascade');
             $table->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
