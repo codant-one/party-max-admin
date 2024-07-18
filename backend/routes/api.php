@@ -94,7 +94,6 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('blog-categories', BlogCategoryController::class);
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('tags', TagController::class);
-    Route::apiResource('orders', OrderController::class);
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('addresses', AddressController::class);
     Route::apiResource('reviews', ReviewController::class);
@@ -172,15 +171,6 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
        Route::post('/changePhone', [ClientController::class, 'changePhone']);       
     });
 
-    //ShoppingCart
-    Route::group(['prefix' => 'shopping-cart'], function () {
-        Route::get('/', [CartController::class, 'index']);
-        Route::post('add', [CartController::class, 'add']);
-        Route::post('delete', [CartController::class, 'delete']);
-        Route::post('deleteAll', [CartController::class, 'deleteAll']);
-        Route::get('checkAvailability', [CartController::class, 'checkAvailability']);
-    });
-
     //Favorites
     Route::group(['prefix' => 'favorites'], function () {
         Route::get('/', [FavoriteController::class, 'index']);
@@ -231,6 +221,12 @@ Route::group(['prefix' => 'miscellaneous'], function () {
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
 });
 
+//Shopping-Cart
+Route::group(['prefix' => 'shopping-cart'], function () {
+    Route::get('/', [CartController::class, 'index']);
+    Route::get('checkAvailability', [CartController::class, 'checkAvailability']);
+});
+
 //PAYU
 Route::group(['prefix' => 'payments'], function () {
     Route::get('/signature', [PaymentController::class, 'signature']);
@@ -239,6 +235,9 @@ Route::group(['prefix' => 'payments'], function () {
     Route::get('response', [PaymentController::class, 'response']);
     Route::post('confirmation', [PaymentController::class, 'confirmation']);
 });
+
+//ORDERS
+Route::apiResource('orders', OrderController::class);
 
 //PROXY
 Route::get('/proxy-image',[ProxyController::class, 'getImage']);

@@ -157,13 +157,31 @@ class Client extends Model
         $link_purchases = env('APP_DOMAIN').'/purchases';
         $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
 
-        $address = 
-            $order->address->address . ', ' . 
-            $order->address->street . ', ' . 
-            $order->address->city . ', ' . 
-            $order->address->postal_code . ', ' . 
-            $order->address->province->name .
-            $note;
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $phone = $order->client->user->userDetail->phone;
+            $email = $order->client->user->email;
+
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $phone = $order->shipping_phone;
+            $email = $order->billing->email;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
 
         $payment_method = 
             ($order->billing->pse === 0) ? 
@@ -189,16 +207,16 @@ class Client extends Model
 
         $data = [
             'address' => $address,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
-            'phone' => $order->client->user->userDetail->phone,
+            'user' => $user,
+            'phone' => $phone,
             'total' => $order->total,
             'payment_method' => $payment_method,
             'products' => $products,
             'link_send' => $link_send,
-            'link_purchases' => $link_purchases
+            'link_purchases' => $link_purchases,
+            'showButton' => $order->client ? true : false
         ];
         
-        $email = $order->client->user->email;
         $subject = 'Tu pedido en PARTYMAX se completó con éxito';
 
         try {
@@ -221,14 +239,21 @@ class Client extends Model
 
         $order =  Order::with(['client.user.userDetail'])->find($orderId); 
 
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+        }
+
         $data = [
             'orderId' => $order->id,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'user' => $user,
             'message' => $message,
             'payment_state_id' => $payment_state_id === 3 ? 'FALLIDA' : 'CANCELADA'
         ];
         
-        $email = $order->client->user->email;
         $subject = 'Tu pedido en PARTYMAX no se ha podido completar con éxito';
 
         try {

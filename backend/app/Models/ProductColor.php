@@ -33,8 +33,4 @@ class ProductColor extends Model
         return $this->belongsTo(Product::class, 'product_id', 'id')->withTrashed();
     }
 
-    public function cart() {
-        return $this->hasMany(ShoppingCart::class, 'product_color_id');
-    }
-
 }

@@ -183,17 +183,17 @@ const removeOrder = async () => {
                     :key="order.id"
                     style="height: 3.75rem;">
                     <td class="text-wrap">
-                      <div class="d-flex gap-x-3 align-center">
+                      <div class="d-flex gap-x-3 align-center my-1">
                         <VAvatar
                           v-if="order.product_color.images.length > 0"
-                          size="38"
+                          size="150"
                           variant="outlined"
                           :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
                           rounded="lg"
                         />
                         <VAvatar
                           v-else
-                          size="38"
+                          size="150"
                           variant="outlined"
                           :image="themeConfig.settings.urlStorage + order.product_color.product.image"
                           rounded="lg"
@@ -210,7 +210,7 @@ const removeOrder = async () => {
                       </div>
                     </td>
                     <td><span>${{ formatNumber(order.price) }}</span></td>
-                    <td><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
+                    <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
                     <td><span class="text-h6">${{ formatNumber(order.total) }}</span></td>
                   </tr>
                 </tbody>
@@ -439,7 +439,7 @@ const removeOrder = async () => {
                     Detalles del cliente
                 </div>
 
-                <div class="d-flex align-center">
+                <div class="d-flex align-center" v-if="order.client">
                   <VAvatar
                     class="me-3 d-print-none"
                     :variant="order.client.user.avatar ? 'outlined' : 'tonal'"
@@ -460,6 +460,22 @@ const removeOrder = async () => {
                   </div>
                 </div>
 
+                <div class="d-flex align-center" v-else>
+                  <VAvatar
+                    class="me-3 d-print-none"
+                    variant="tonal"
+                    size="38"
+                    >
+                    <span>{{ avatarText(order.billing.name) }}</span>
+                  </VAvatar>
+                  <div>
+                    <div class="text-body-1 font-weight-medium">
+                      {{ order.billing.name }} {{ order.billing.last_name }}
+                    </div>
+                    <span class="text-sm text-disabled d-print-none">Cliente no registrado</span>
+                  </div>
+                </div>
+
                 <div class="d-print-none">
                   <VAvatar
                     variant="tonal"
@@ -468,15 +484,16 @@ const removeOrder = async () => {
                   >
                     <VIcon icon="tabler-shopping-cart" />
                   </VAvatar>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">{{ total }} {{ total > 1 ? 'Pedidos' : 'Pedido' }}</span>
+                  <span v-if="order.client" class="text-body-1 font-weight-medium text-high-emphasis">{{ total }} {{ total > 1 ? 'Pedidos' : 'Pedido' }}</span>
+                  <span v-else class="text-body-1 font-weight-medium text-high-emphasis">1 Pedido</span>
                 </div>
 
                 <div class="d-flex flex-column gap-y-1">
                   <div class="d-flex justify-space-between align-center text-body-2 d-print-none">
                     <span class="text-body-1 text-high-emphasis font-weight-medium">Datos de contacto</span>
                   </div>
-                  <span>Email: {{ order.client.user.email }} </span>
-                  <span>Teléfono: {{ order.client.user.user_detail.phone }}</span>
+                  <span>Email: {{ order.client ? order.client.user.email : order.billing.email }} </span>
+                  <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing.phone}}</span>
                 </div>
               </VCardText>
             </VCard>
@@ -488,18 +505,26 @@ const removeOrder = async () => {
                   <div class="text-body-1 text-high-emphasis font-weight-medium">
                     Dirección de envío
                   </div>
-                  <div class="text-body-1 text-high-emphasis font-weight-medium">
+                  <div class="text-body-1 text-high-emphasis font-weight-medium text-success">
                     Envío Express: {{ order.shipping_express === 0 ? 'NO' : 'SI'}}
                   </div>
                 </div>
                 <div>
                   <h6 class="text-h6 me-2 mt-4 d-print-none">
-                    {{ order.address.type.name }}
+                    {{ order.address ? order.address.type.name : order.type.name }}
                   </h6>
-                  {{ order.address.address }} <br> 
-                  {{ order.address.street }} <br> 
-                  {{ order.address.city }} <br> 
-                  {{ order.address.postal_code }}
+                  <span v-if="order.address">
+                    {{ order.address.address }} <br> 
+                    {{ order.address.street }} <br> 
+                    {{ order.address.city }} <br> 
+                    {{ order.address.postal_code }}
+                  </span>
+                  <span v-else>
+                    {{ order.shipping_address }} <br> 
+                    {{ order.shipping_street }} <br> 
+                    {{ order.shipping_city }} <br> 
+                    {{ order.shipping_postal_code }}
+                  </span>
 
                   <span v-if="order.billing.note !== null">
                     <br>({{ order.billing.note }}).
@@ -639,7 +664,7 @@ const removeOrder = async () => {
 
     .layout-page-content,
     .v-row,
-    .v-col-md-9 {
+    .v-col-md-2, .v-col-md-4, .v-col-md-8, .v-col-md-10 {
       padding: 0;
       margin: 0;
     }
@@ -658,6 +683,7 @@ const removeOrder = async () => {
     }
 
     .v-card {
+      box-shadow: none !important;
 
       .print-row {
         flex-direction: row !important;

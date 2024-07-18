@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-use App\Models\ShoppingCart;
-use App\Models\Client;
-use App\Models\Product;
+use App\Models\ProductColor;
 
 class CartController extends Controller
 {
@@ -19,76 +17,37 @@ class CartController extends Controller
        
         try {
 
-            $cart = 
-                ShoppingCart::with([
-                                'color.color',
-                                'color.product.user.userDetail',
-                                'color.product.user.supplier',
-                                'color.images'
-                            ])
-                            ->where('client_id', $request->client_id)
-                            ->get()
-                            ->groupBy('client_id')
-                            ->map(function ($group) {
-                                return $group->map(function ($item) {
-                                    $product = $item->color;
-                                    $product->product = $item->color->product;
-                                    $product->user = $item->color->product->user;
-                                    $product->userDetail = $item->color->product->user->userDetail;
-                                    $product->supplier = $item->color->product->user->supplier;
-                                    $product->color = $item->color->color;
-                                    $product->images = $item->color->images;
-                                    $product->product_color_id = $item->product_color_id;
-                                    $product->quantity = $item->quantity;
-                                    $product->wholesale = $item->wholesale;
-                                    return $product;
-                                })->all();
-                            })
-                            ->values()
-                            ->all();
+            $productColorIds = explode(',', $request->product_color_id);
+            $quantities = explode(',', $request->quantity);
+            $sales = explode(',', $request->wholesale);
 
-            return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'cart' => (count($cart) === 0) ? [] : $cart[0]
-                ]
-            ], 200);
+            $cart = ProductColor::with([
+                        'color',
+                        'product.user.userDetail',
+                        'product.user.supplier',
+                        'images'
+                    ])
+                    ->whereIn('id', $productColorIds)
+                    ->get()
+                    ->map(function ($item) use ($productColorIds, $quantities) {
+                        $index = array_search($item->id, $productColorIds);
+                        $quantity = $quantities[$index] ?? 1;
+                        $wholesale = $sales[$index] ?? 0;
 
-        } catch (\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'database_error',
-                'exception' => $ex->getMessage()
-            ], 500);
-        }
-
-    }
-
-    public function add(Request $request): JsonResponse
-    {
-        try {
-            $cart = ShoppingCart::addCart($request);
-
-            return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'cart' => $cart,
-                    'count' => ShoppingCart::where('client_id', $request->client_id)->count()
-                ]
-            ], 200);
-        } catch (\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'database_error',
-                'exception' => $ex->getMessage()
-            ], 500);
-        }
-    }
-
-    public function delete(Request $request): JsonResponse
-    {
-        try {
-            $cart = ShoppingCart::deleteCart($request);
+                        $product = $item;
+                        $product->product = $item->product;
+                        $product->user = $item->product->user;
+                        $product->userDetail = $item->product->user->userDetail;
+                        $product->supplier = $item->product->user->supplier;
+                        $product->color = $item->color;
+                        $product->images = $item->images;
+                        $product->product_color_id = $item->id;
+                        $product->quantity = $quantity;
+                        $product->wholesale = $wholesale;
+                        return $product;
+                    })
+                    ->values()
+                    ->all();
 
             return response()->json([
                 'success' => true,
@@ -96,6 +55,7 @@ class CartController extends Controller
                     'cart' => $cart
                 ]
             ], 200);
+
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -103,39 +63,29 @@ class CartController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
-    }
 
-    public function deleteAll(Request $request): JsonResponse
-    {
-        try {
-            $cart = ShoppingCart::deleteAll($request);
-
-            return response()->json([
-                'success' => true,
-                'data' => [ 
-                    'cart' => $cart
-                ]
-            ], 200);
-        } catch (\Illuminate\Database\QueryException $ex) {
-            return response()->json([
-                'success' => false,
-                'message' => 'database_error',
-                'exception' => $ex->getMessage()
-            ], 500);
-        }
     }
 
     public function checkAvailability(Request $request): JsonResponse
     {
         try {
 
-            $cart = 
-                ShoppingCart::with(['color.product:id,stock'])
-                            ->where('client_id', $request->client_id)
-                            ->get(['product_color_id', 'quantity']);
+            $productColorIds = explode(',', $request->product_color_id);
+            $quantities = explode(',', $request->quantity);
+
+            $products = ProductColor::with(['product:id,stock'])
+                                    ->whereIn('id', $productColorIds)
+                                    ->get();
+
+            $cart = collect($products)->map(function ($productColor, $index) use ($quantities) {
+                return [
+                    'stock' => $productColor->product->stock,
+                    'quantity' => intval($quantities[$index])
+                ];
+            });
 
             $allAvailable = $cart->every(function ($item) {
-                return $item['color']['product']['stock'] >= $item['quantity'];
+                return $item['stock'] >= $item['quantity'];
             });
 
             return response()->json([

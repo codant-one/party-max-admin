@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 use App\Models\Order;
 use App\Models\Billing;
-use App\Models\ShoppingCart;
 use App\Models\Client;
 
 class PaymentController extends Controller
@@ -36,7 +35,8 @@ class PaymentController extends Controller
                     'merchantId' => env('PAYU_MERCHANT_ID'),
                     'accountId' => env('PAYU_ACCOUNT_ID'),
                     'responseUrl' => env('APP_DOMAIN').'/cart',
-                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation'
+                    'confirmationUrl' => env('APP_URL').'/api/payments/confirmation',
+                    'test' => env('PAYU_TEST_MODE')
                 ]
             ]);
 
@@ -261,8 +261,6 @@ class PaymentController extends Controller
         $order->update([
             'payment_state_id' => $payment_state_id
         ]);
-
-        ShoppingCart::deleteAll($request);
         
         $nequi = $request->payment_method_name === 'NEQUI' ? 1 : 0;
         $pse = is_null($request->pse_bank) ? 0 : 1;

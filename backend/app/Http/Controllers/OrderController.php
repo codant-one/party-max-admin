@@ -17,11 +17,6 @@ use App\Models\Product;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        //
-    }
-
     /**
      * Display a listing of the resource.
      */
@@ -118,7 +113,8 @@ class OrderController extends Controller
                 'shipping', 
                 'payment', 
                 'client.user.userDetail',
-                'histories'
+                'histories',
+                'type'
             ])->find($id);
 
             if (!$order)
@@ -243,19 +239,6 @@ class OrderController extends Controller
     {
 
         try {
-
-            // $ordersPending = Order::where([['client_id', $id], ['payment_state_id', 1]])->get();
-            
-            // foreach ($ordersPending as $item) {
-
-            //     $order = Order::find($item->id);
-
-            //     if($order) {
-            //         $order->update([
-            //             'payment_state_id' => 2
-            //         ]);  
-            //     }
-            // }
 
             $limit = $request->has('limit') ? $request->limit : 5;
 

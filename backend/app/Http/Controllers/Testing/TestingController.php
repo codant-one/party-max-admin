@@ -52,11 +52,17 @@ class TestingController extends Controller
         $message = 'Transacción rechazada por entidad financiera.';
         $payment_state_id = 3;
 
-        $order =  Order::with(['client.user.userDetail'])->find($orderId); 
+        $order =  Order::with(['client.user.userDetail', 'billing'])->find($orderId); 
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+        }
 
         $data = [
             'orderId' => $order->id,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'user' => $user,
             'message' => $message,
             'payment_state_id' => $payment_state_id === 3 ? 'FALLIDA' : 'CANCELADA'
         ];
@@ -81,13 +87,31 @@ class TestingController extends Controller
 
         $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';        
 
-        $address = 
-            $order->address->address . ', ' . 
-            $order->address->street . ', ' . 
-            $order->address->city . ', ' . 
-            $order->address->postal_code . ', ' . 
-            $order->address->province->name .
-            $note;
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $phone = $order->client->user->userDetail->phone;
+            $email = $order->client->user->email;
+
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $phone = $order->shipping_phone;
+            $email = $order->billing->email;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
 
         $payment_method = 
             ($order->billing->pse === 0) ? 
@@ -113,13 +137,14 @@ class TestingController extends Controller
         //dd($order);
         $data = [
             'address' => $address,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
-            'phone' => $order->client->user->userDetail->phone,
+            'user' => $user,
+            'phone' => $phone,
             'total' => $order->total,
             'payment_method' => $payment_method,
             'products' => $products,
             'link_send' => $link_send,
-            'link_purchases' => $link_purchases
+            'link_purchases' => $link_purchases,
+            'showButton' => $order->client ? true : false
         ];
 
         //dd($data);
@@ -176,7 +201,7 @@ class TestingController extends Controller
 
     public function sendOrder() {
 
-        $orderId = 10;
+        $orderId = 7;
         $shipping_state_id = 3;
         $reason = 'no quise';
 
@@ -192,13 +217,29 @@ class TestingController extends Controller
         $link_contact = env('APP_DOMAIN').'/about-us';
         $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
 
-        $address = 
-            $order->address->address . ', ' . 
-            $order->address->street . ', ' . 
-            $order->address->city . ', ' . 
-            $order->address->postal_code . ', ' . 
-            $order->address->province->name .
-            $note;
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
 
         $products = [];
 
@@ -240,7 +281,7 @@ class TestingController extends Controller
 
         $data = [
             'address' => $address,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'user' => $user,
             'products' => $products,
             'link' => $link,
             'link_contact' => $link_contact,

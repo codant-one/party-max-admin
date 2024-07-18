@@ -84,10 +84,6 @@ class Product extends Model
         parent::boot();
 
         static::deleting(function ($product) {
-            $product->colors()->each(function ($color) {
-                $color->cart()->delete();
-            });
-
             $product->productlike()->delete();
         });
     }

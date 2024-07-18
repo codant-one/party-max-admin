@@ -413,7 +413,7 @@ const downloadCSV = async () => {
                        
                         
                         <td class="text-wrap">
-                            <div class="d-flex align-center gap-x-3">
+                            <div class="d-flex align-center gap-x-3" v-if="order.client">
                                 <VAvatar
                                     :variant="order.client.user.avatar ? 'outlined' : 'tonal'"
                                     size="38"
@@ -430,6 +430,21 @@ const downloadCSV = async () => {
                                         {{ order.client.user.name }} {{ order.client.user.last_name }} 
                                     </span>
                                     <span class="text-sm text-disabled">{{ order.client.user.email }}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-center gap-x-3" v-else>
+                                <VAvatar
+                                    variant="tonal"
+                                    size="38"
+                                >
+                                    <span>{{ avatarText(order.billing.name) }}</span>
+                                </VAvatar>
+                                <div class="d-flex flex-column">
+                                    <span class="font-weight-medium text-success">
+                                        {{ order.billing.name }} {{ order.billing.last_name }} 
+                                    </span>
+                                    <span class="text-sm text-disabled">{{ order.billing.email }}</span>
+                                    <span class="text-sm text-secondary">Cliente no registrado</span>
                                 </div>
                             </div>
                         </td>

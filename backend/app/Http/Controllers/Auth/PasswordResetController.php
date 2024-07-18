@@ -40,7 +40,7 @@ class PasswordResetController extends Controller
         
         $email = $user->email;
         $domain = ($user->getRoleNames()[0] === 'Cliente') ? env('APP_DOMAIN') : env('APP_DOMAIN_ADMIN');
-        $url = $domain.'/reset-password?token='.$passwordReset['token'].'&user='.$email;
+        $url = $domain.'/clients/reset_password?token='.$passwordReset['token'].'&user='.$email;
         
         $info = [
             'subject' => 'Solicitud de cambio de contraseña',

@@ -52,6 +52,14 @@ class Order extends Model
         return $this->hasMany(ShippingHistory::class, 'order_id', 'id');
     }
 
+    public function province() {
+        return $this->belongsTo(Province::class, 'province_id', 'id');
+    }
+
+    public function type() {
+        return $this->belongsTo(AddressesType::class, 'addresses_type_id', 'id');
+    }
+
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
     $query->where('total', 'LIKE', '%' . $search . '%')
@@ -104,8 +112,8 @@ class Order extends Model
     public static function createOrder($request) {
 
         $order = self::create([
-            'client_id' => $request->client_id,
-            'address_id' => $request->address_id,
+            'client_id' => $request->client_id === null ? null : $request->client_id,
+            'address_id' => $request->client_id === null ? null : $request->address_id,
             'date' => now(),
             'sub_total' => $request->sub_total,
             'shipping_total' => $request->shipping_total,
@@ -114,6 +122,20 @@ class Order extends Model
             'total' => $request->total,
             'wholesale' => $request->wholesale 
         ]);
+
+        $addressFind = collect($request->addresses)->firstWhere('id', $request->address_id);
+        
+        if ($addressFind && $request->client_id === null) {
+            $order->update([
+                'province_id' => $addressFind['province_id'],
+                'addresses_type_id' => intval($addressFind['addresses_type_id']),
+                'shipping_phone' => $addressFind['phone'],
+                'shipping_address' => $addressFind['address'],
+                'shipping_street' => $addressFind['street'],
+                'shipping_city' => $addressFind['city'],
+                'shipping_postal_code' => $addressFind['postal_code']
+            ]);
+        }
 
         $prefix = $request->wholesale === 0 ? '03' : '05';
         //PRODUCCION $request->wholesale === 0 ? '03' : '05';
@@ -255,14 +277,29 @@ class Order extends Model
         $link_contact = env('APP_DOMAIN').'/about-us';
         $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
 
-        $address = 
-            $order->address->address . ', ' . 
-            $order->address->street . ', ' . 
-            $order->address->city . ', ' . 
-            $order->address->postal_code . ', ' . 
-            $order->address->province->name .
-            $note;
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
 
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
         $products = [];
 
         foreach ($order->details as $detail) {
@@ -303,7 +340,7 @@ class Order extends Model
 
         $data = [
             'address' => $address,
-            'user' => $order->client->user->name . ' ' . $order->client->user->last_name,
+            'user' => $user,
             'products' => $products,
             'link' => $link,
             'link_contact' => $link_contact,
@@ -312,8 +349,6 @@ class Order extends Model
             'reason' => $reason,
             'shipping_state_id' => $shipping_state_id
         ];
-        
-        $email = $order->client->user->email;
 
         try {
             \Mail::send(

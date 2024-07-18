@@ -25,16 +25,6 @@ class OrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => [
-                'required',
-				'integer',
-                'exists:App\Models\Client,id'
-            ],
-            'address_id' => [
-                'required',
-				'integer',
-                'exists:App\Models\Address,id'
-            ],
             'sub_total' => [
                 'numeric',
                 'required'
@@ -89,14 +79,6 @@ class OrderRequest extends FormRequest
     public function messages()
     {
         return [
-            'client_id.required' => 'El cliente es requerido.',
-            'client_id.integer' => 'El formato del Id del cliente debe ser entero.',
-            'client_id.exists' => 'El cliente ingresado no existe.',
-         
-            'address_id.required' => 'La dirección es requerida.',
-            'address_id.integer' => 'El Id de dirección debe ser entero.',
-            'address_id.exists' => 'La dirección ingresada no existe.',
-
             'subtotal.required' => 'El subtotal es requerido.',
             'subtotal.numeric' => 'El subtotal debe ser numérico.',
 

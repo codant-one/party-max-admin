@@ -78,6 +78,7 @@
                         </table>
                     </td>     
                 </tr>
+                @if($data['showButton'])
                 <tr>
                     <td align="center" style="padding:0;Margin:0;padding-bottom:20px;padding-left:15px;padding-right:15px">
                         <span  style="border-style:solid;border-color:#2CB543;background:#ff0090;border-width:0px 0px 2px 0px;display:block;border-radius:32px;width:auto;border-bottom-width:0px">
@@ -96,6 +97,7 @@
                         </span>
                     </td>
                 </tr>
+                @endif
             </table>
         </td>
     </tr>
