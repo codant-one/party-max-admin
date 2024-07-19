@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -23,6 +24,8 @@ class MiscellaneousController extends Controller
     {
         try {
 
+            Log::info($slug);
+            
             $category = Category::with(['banner1', 'banner2', 'banner3', 'banner4', 'children'])
                                 ->where('slug', $slug)
                                 ->first();

@@ -210,7 +210,10 @@ Route::apiResource('document-types', DocumentTypeController::class);
 
 Route::get('home', [HomeController::class, 'home']);
 
-Route::group(['prefix' => 'miscellaneous'], function () {
+Route::group([
+    'prefix' => 'miscellaneous',
+    'middleware' => 'throttle:10,1'
+    ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('products', [MiscellaneousController::class, 'products']);
