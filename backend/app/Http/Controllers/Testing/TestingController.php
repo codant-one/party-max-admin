@@ -151,6 +151,85 @@ class TestingController extends Controller
         return view('emails.payment.purchase_detail', compact('data'));
     }
 
+    public function infoOrder() {
+
+        $orderId = 16;
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
+
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';        
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $phone = $order->client->user->userDetail->phone;
+            $email = $order->client->user->email;
+
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $phone = $order->shipping_phone;
+            $email = $order->billing->email;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
+
+        $payment_method = 
+            ($order->billing->pse === 0) ? 
+                $order->billing->payment_method_name . ' terminada en ' . $order->billing->card_number: 
+                'PSE';
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        
+        }
+        //dd($order);
+        $data = [
+            'address' => $address,
+            'user' => $user,
+            'phone' => $phone,
+            'total' => $order->total,
+            'payment_method' => $payment_method,
+            'products' => $products,
+            'link_send' => $link_send,
+            'showButton' => $order->client ? true : false
+        ];
+
+        //dd($data);
+        return view('emails.payment.info_order', compact('data'));
+    }
+
     public function littleProductExistenceEmail() {
 
         $productId = 16;

@@ -235,6 +235,95 @@ class Client extends Model
         } 
     }
 
+    public static function sendInfo($orderId) {
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details.product_color.product', 
+                'address.province', 
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
+        $note = is_null($order->billing->note) ? '.' : '. (' . $order->billing->note . ').';
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $phone = $order->client->user->userDetail->phone;
+
+            $address = 
+                $order->address->address . ', ' . 
+                $order->address->street . ', ' . 
+                $order->address->city . ', ' . 
+                $order->address->postal_code . ', ' . 
+                $order->address->province->name .
+                $note;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $phone = $order->shipping_phone;
+
+            $address = 
+                $order->shipping_address . ', ' . 
+                $order->shipping_street . ', ' . 
+                $order->shipping_city . ', ' . 
+                $order->shipping_postal_code . ', ' . 
+                $order->province->name .
+                $note;
+        }
+
+        $payment_method = 
+            ($order->billing->pse === 0) ? 
+                $order->billing->payment_method_name . ' terminada en ' . $order->billing->card_number: 
+                'PSE';
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            array_push($products, $productInfo);
+        
+        }
+
+        $data = [
+            'address' => $address,
+            'user' => $user,
+            'phone' => $phone,
+            'total' => $order->total,
+            'payment_method' => $payment_method,
+            'products' => $products,
+            'link_send' => $link_send,
+            'showButton' => $order->client ? true : false
+        ];
+        
+        $email = env('MAIL_TO_CONTACT');
+        $subject = 'Tienes un nuevo pedido.';
+
+        try {
+            \Mail::send(
+                'emails.payment.info_order'
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
+    }
+
     public static function sendMailError($orderId, $payment_state_id, $message) {
 
         $order =  Order::with(['client.user.userDetail'])->find($orderId); 

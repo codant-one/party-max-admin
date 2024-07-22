@@ -234,7 +234,7 @@ class MiscellaneousController extends Controller
                             $q->where('slug', $category );
                          })->orderBy('order_id', 'asc');
             } else 
-                $query = $query->where('is_popular_blog', 1);
+                $query = $query->orderBy('is_popular_blog', 'DESC');
 
             if($search)
                 $query = $query->where('title', 'LIKE', '%' . $search . '%')

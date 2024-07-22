@@ -286,6 +286,7 @@ class PaymentController extends Controller
                 break;
             case 4: 
                 Client::sendMail($order->id);
+                Client::sendInfo($order->id);
                 break;           
         }          
                 
