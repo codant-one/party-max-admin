@@ -17,6 +17,7 @@ use App\Models\Tag;
 use App\Models\ProductLike;
 use App\Models\ProductTag;
 use App\Models\Color;
+use App\Models\Services;
 
 class MiscellaneousController extends Controller
 {
@@ -306,6 +307,113 @@ class MiscellaneousController extends Controller
                 'success' => true,
                 'data' => [
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),                 
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function services(Request $request): JsonResponse
+    {
+        try {
+
+            $limit = $request->has('limit') ? $request->limit : 12;
+
+            $query = Service::with([
+                                'user.userDetail', 
+                                'user.supplier', 
+                                'order'
+                            ])
+                            ->isFavorite()
+                            ->where('state_id', 3)
+                            ->applyFilters(
+                                $request->only([
+                                    'searchPublic',
+                                    'orderByField',
+                                    'orderBy',
+                                    'category',
+                                    'subcategory',
+                                    'min',
+                                    'max',
+                                    'sortBy',
+                                    'rating'
+                                ])
+                            );
+
+            $count = $query->count();
+                           
+            $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'services' => $services,
+                    'servicesTotalCount' => $count                    
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function serviceDetail($slug): JsonResponse
+    {
+        try {
+            $service = Service::with([
+                                'user.userDetail', 
+                                'user.supplier',
+                                'brand',  
+                                'images',
+                                'categories.category', 
+                                'tags.tag',
+                                'reviews.client.user'
+                              ])
+                              ->where('slug', $slug)
+                              ->first();
+
+            // $recommendations = 
+            //     Product::with(['user.userDetail', 'user.supplier'])
+            //            ->where('favourite', true)
+            //            ->orderBy('created_at', 'desc')
+            //            ->limit(5)
+            //            ->get();
+
+            // // Validate if the user is authenticated
+            // if (Auth::check()) {
+
+            //     $productTag = ProductTag::where('product_id', $product->id)->first();
+                    
+            //     if ($productTag) {
+            //         $tag_id = $productTag->tag_id;
+
+            //         $recommendations = 
+            //                 Product::with(['user.userDetail', 'user.supplier', 'tags'])
+            //                        ->whereHas('tags', function($query) use ($tag_id) {
+            //                             $query->where('tag_id', $tag_id);
+            //                        })
+            //                        ->orderBy('created_at', 'desc')
+            //                        ->limit(5)
+            //                        ->get();
+            //     }
+
+            // }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'service' => $service,
+                    // 'recommendations' => $recommendations,
                 ]
             ], 200);
 
