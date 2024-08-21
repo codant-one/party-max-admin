@@ -3,7 +3,7 @@
 import { themeConfig } from '@themeConfig'
 
 const props = defineProps({
-    product: {
+    service: {
         type: Object,
         required: true
     },
@@ -20,8 +20,8 @@ const emit = defineEmits([
     'download',
     'updateLink',
     'show',
-    'editProduct',
-    'deleteProduct'
+    'editService',
+    'deleteService'
 ])
 
 const id = ref('')
@@ -32,8 +32,6 @@ const title = ref('')
 const image = ref('')
 const store = ref(null)
 const state = ref(null)
-const in_stock = ref(null)
-const stock = ref(null)
 const price = ref('')
 const originalLink = ref('')
 const rating = ref(null)
@@ -47,25 +45,23 @@ const rol = ref(null)
 
 watchEffect(() => {
 
-    if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
-        id.value = props.product.id
-        favourite.value = props.product.favourite ?? -1
-        archived.value = props.product.archived ?? null
-        discarded.value = props.product.discarded ?? null
-        title.value = props.product.title ?? null
-        image.value = props.product.image === null ? '' : themeConfig.settings.urlStorage + props.product.image
-        store.value = props.product.user.user_detail.store_name ?? (props.product.user.supplier?.company_name ?? (props.product.user.name + ' ' + (props.product.user.last_name ?? '')))
-        state.value = props.product.state
-        in_stock.value = props.product.in_stock
-        stock.value = props.product.stock
-        price.value = props.product.price ?? null
-        originalLink.value = props.product.originalLink ?? null
-        rating.value = props.product.rating ?? -1
-        comments.value = props.product.comments ?? -1
-        sales.value = props.product.sales ?? -1
-        likes.value = props.product.likes ?? -1
-        selling_price.value = props.product.selling_price ?? -1
-        categories.value = props.product.categories
+    if (!(Object.entries(props.service).length === 0) && props.service.constructor === Object) {
+        id.value = props.service.id
+        favourite.value = props.service.favourite ?? -1
+        archived.value = props.service.archived ?? null
+        discarded.value = props.service.discarded ?? null
+        title.value = props.service.title ?? null
+        image.value = props.service.image === null ? '' : themeConfig.settings.urlStorage + props.service.image
+        store.value = props.service.user.user_detail.store_name ?? (props.service.user.supplier?.company_name ?? (props.service.user.name + ' ' + (props.service.user.last_name ?? '')))
+        state.value = props.service.state
+        price.value = props.service.price ?? null
+        originalLink.value = props.service.originalLink ?? null
+        rating.value = props.service.rating ?? -1
+        comments.value = props.service.comments ?? -1
+        sales.value = props.service.sales ?? -1
+        likes.value = props.service.likes ?? -1
+        selling_price.value = props.service.selling_price ?? -1
+        categories.value = props.service.categories
 
         rol.value = props.rol
     }
@@ -87,12 +83,12 @@ const show = (id) => {
     emit('show', id)
 }
 
-const editProduct = (id) => {
-    emit('editProduct', id)
+const editService = (id) => {
+    emit('editService', id)
 }
 
-const deleteProduct = (id) => {
-    emit('deleteProduct', id)
+const deleteService = (id) => {
+    emit('deleteService', id)
 }
 
 const updateLink = (text, id) => {
@@ -160,13 +156,13 @@ const colors = (id) => {
             <template #append class="d-flex align-end">
                 <div class="d-flex align-end me-n2">
                     <VBtn
-                        v-if="$can('editar','productos')"
+                        v-if="$can('editar','servicios')"
                         icon
                         color="default"
                         size="x-small"
                         variant="plain"
                         :disabled="state.id === 5"
-                        @click="editProduct(id)">
+                        @click="editService(id)">
                         <VTooltip
                             open-on-focus
                             location="top"
@@ -178,13 +174,13 @@ const colors = (id) => {
                             icon="tabler-edit"/>
                     </VBtn>
                     <VBtn
-                        v-if="$can('eliminar','productos')"
+                        v-if="$can('eliminar','servicios')"
                         icon
                         color="default"
                         size="x-small"
                         variant="plain"
                         :disabled="state.id === 5"
-                        @click="deleteProduct(id)">
+                        @click="deleteService(id)">
                         <VTooltip
                             open-on-focus
                             location="top"
@@ -334,24 +330,6 @@ const colors = (id) => {
                         />
                     </VCol>
                     <VCol cols="12" md="7">
-                        <div>En Stock: 
-                            <VBadge
-                                v-if="in_stock"
-                                :content="stock"
-                                bordered
-                                color="primary">
-                                <VIcon
-                                    size="25"
-                                    icon="mdi-cart"
-                                />
-                            </VBadge>
-                            <VIcon
-                                v-else
-                                size="25"
-                                icon="mdi-cart-off"
-                                class="me-1"
-                            />
-                        </div>
                         <div>Envios: 
                             <span v-if="selling_price >= 0">{{ selling_price }}</span>
                             <span v-else>

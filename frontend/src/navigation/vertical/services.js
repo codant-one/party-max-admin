@@ -1,40 +1,40 @@
 export default [
     { 
-      title: 'PRODUCTOS',
-      icon: { icon:'mdi-cart' },
+      title: 'SERVICIOS',
+      icon: { icon:'mdi-hand-heart-outline' },
       children:[
         { 
           title: 'Marcas', 
           icon: { icon: 'mdi-tag-faces' },
-          to: 'dashboard-products-brands', 
+          to: 'dashboard-services-brands', 
           action: 'ver', 
           subject: 'marcas', 
         },
         { 
           title: 'Tags', 
           icon: { icon: 'mdi-tag-multiple-outline' },
-          to: 'dashboard-products-tags', 
+          to: 'dashboard-services-tags', 
           action: 'ver', 
           subject: 'tag-productos', 
         },
         { 
-          title: 'Todos los Productos', 
+          title: 'Todos los Servicios', 
           icon: { icon: 'tabler-confetti' },
-          to: 'dashboard-products-products', 
+          to: 'dashboard-services-services', 
           action: 'ver' , 
           subject: 'productos', 
         },
         { 
           title: 'Pendientes', 
           icon: { icon: 'mdi-clock-time-two-outline' },
-          to: 'dashboard-products-pendings', 
+          to: 'dashboard-services-pendings', 
           action: 'ver' , 
           subject: 'productos-pendientes', 
         },
         { 
-          title: 'Ordenar Productos', 
+          title: 'Ordenar Servicios', 
           icon: { icon: 'mdi-sort' },
-          to: 'dashboard-products-orders', 
+          to: 'dashboard-services-orders', 
           action: 'ver' , 
           subject: 'ordenar-productos', 
         }

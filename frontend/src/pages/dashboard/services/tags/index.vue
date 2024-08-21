@@ -1,21 +1,21 @@
 <script setup>
 
-import { useBrandsStores } from '@/stores/useBrands'
+import { useTagsStores } from '@/stores/useTags'
 import { excelParser } from '@/plugins/csv/excelParser'
-import AddNewBrandDrawer from './AddNewBrandDrawer.vue' 
+import AddNewTagDrawer from './AddNewTagDrawer.vue' 
 
-const brandsStores = useBrandsStores()
+const tagsStores = useTagsStores()
 
-const brands = ref([])
+const tags = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalBrands = ref(0)
+const totalTags = ref(0)
 const isRequestOngoing = ref(true)
-const isAddNewBrandDrawerVisible = ref(false)
+const isAddNewTagDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
-const selectedBrand = ref({})
+const selectedTag = ref({})
 
 const advisor = ref({
   type: '',
@@ -25,10 +25,10 @@ const advisor = ref({
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = brands.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = brands.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = tags.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = tags.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalBrands.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalTags.value } registros`
 })
 
 // 👉 watching current page
@@ -36,8 +36,8 @@ watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
 
-    if (!isAddNewBrandDrawerVisible.value)
-        selectedBrand.value = {}
+    if (!isAddNewTagDrawerVisible.value)
+        selectedTag.value = {}
 })
 
 watchEffect(fetchData)
@@ -48,41 +48,41 @@ async function fetchData() {
     search: searchQuery.value,
     orderByField: 'id',
     orderBy: 'desc',
-    brand_type_id: 1,
+    tag_type_id: 3,
     limit: rowPerPage.value,
     page: currentPage.value
   }
 
   isRequestOngoing.value = true
 
-  await brandsStores.fetchBrands(data)
+  await tagsStores.fetchTags(data)
 
-  brands.value = brandsStores.getBrands
-  totalPages.value = brandsStores.last_page
-  totalBrands.value = brandsStores.brandsTotalCount
+  tags.value = tagsStores.getTags
+  totalPages.value = tagsStores.last_page
+  totalTags.value = tagsStores.tagsTotalCount
 
   isRequestOngoing.value = false
 }
 
-const editBrand = brandData => {
-    isAddNewBrandDrawerVisible.value = true
-    selectedBrand.value = { ...brandData }
+const editTag = tagData => {
+    isAddNewTagDrawerVisible.value = true
+    selectedTag.value = { ...tagData }
 }
 
 
-const showDeleteDialog = brandData => {
+const showDeleteDialog = tagData => {
   isConfirmDeleteDialogVisible.value = true
-  selectedBrand.value = { ...brandData }
+  selectedTag.value = { ...tagData }
 }
 
-const removeBrand = async () => {
+const removeTag = async () => {
   isConfirmDeleteDialogVisible.value = false
-  let res = await brandsStores.deleteBrand(selectedBrand.value.id)
-  selectedBrand.value = {}
+  let res = await tagsStores.deleteTag(selectedTag.value.id)
+  selectedTag.value = {}
 
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Marca eliminada!' : res.data.message,
+    message: res.data.success ? 'Tag eliminado!' : res.data.message,
     show: true
   }
 
@@ -99,27 +99,27 @@ const removeBrand = async () => {
   return true
 }
 
-const submitForm = async (brand, method) => {
+const submitForm = async (tag, method) => {
   isRequestOngoing.value = true
 
   if (method === 'update') {
-    brand.data.append('_method', 'PUT')
-    submitUpdate(brand)
+    tag.data.append('_method', 'PUT')
+    submitUpdate(tag)
     return
   }
 
-  submitCreate(brand.data)
+  submitCreate(tag.data)
 }
 
 
-const submitCreate = brandData => {
+const submitCreate = tagData => {
 
-    brandsStores.addBrand(brandData)
+    tagsStores.addTag(tagData)
         .then((res) => {
             if (res.data.success) {
                 advisor.value = {
                     type: 'success',
-                    message: 'Marca creada!',
+                    message: 'Tag creado!',
                     show: true
                 }
                 fetchData()
@@ -144,14 +144,14 @@ const submitCreate = brandData => {
     }, 3000)
 }
 
-const submitUpdate = brandData => {
+const submitUpdate = tagData => {
 
-    brandsStores.updateBrand(brandData)
+    tagsStores.updateTag(tagData)
         .then((res) => {
             if (res.data.success) {
                     advisor.value = {
                     type: 'success',
-                    message: 'Marca actualizada!',
+                    message: 'Tag actualizado!',
                     show: true
                 }
                 fetchData()
@@ -181,15 +181,15 @@ const downloadCSV = async () => {
   isRequestOngoing.value = true
 
   let data = { 
-    brand_type_id: 1,
+    tag_type_id: 3,
     limit: -1 
   }
 
-  await brandsStores.fetchBrands(data)
+  await tagsStores.fetchTags(data)
 
   let dataArray = [];
       
-  brandsStores.getBrands.forEach(element => {
+  tagsStores.getTags.forEach(element => {
     let data = {
       ID: element.id,
       NOMBRE: element.name
@@ -199,7 +199,7 @@ const downloadCSV = async () => {
   })
 
   excelParser()
-    .exportDataFromJSON(dataArray, "brands", "csv");
+    .exportDataFromJSON(dataArray, "product-tags", "csv");
 
   isRequestOngoing.value = false
 
@@ -276,10 +276,10 @@ const downloadCSV = async () => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','marcas')"
+                v-if="$can('crear','tag-productos')"
                 prepend-icon="tabler-plus"
-                @click="isAddNewBrandDrawerVisible = true">
-                  Agregar Marca
+                @click="isAddNewTagDrawerVisible = true">
+                  Agregar Tag
               </v-btn>
             </div>
           </v-card-text>
@@ -292,7 +292,7 @@ const downloadCSV = async () => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col" v-if="$can('editar', 'marcas') || $can('eliminar', 'marcas')">
+                <th scope="col" v-if="$can('editar', 'tag-productos') || $can('eliminar', 'tag-productos')">
                   ACCIONES
                 </th>
               </tr>
@@ -300,39 +300,39 @@ const downloadCSV = async () => {
             <!-- 👉 table body -->
             <tbody>
               <tr 
-                v-for="brand in brands"
-                :key="brand.id"
+                v-for="tag in tags"
+                :key="tag.id"
                 style="height: 3.75rem;">
 
-                <td> {{ brand.id }} </td>
-                <td class="text-wrap"> {{ brand.name }} </td>
+                <td> {{ tag.id }} </td>
+                <td class="text-wrap"> {{ tag.name }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'marcas') || $can('eliminar', 'marcas')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'tag-productos') || $can('eliminar', 'tag-productos')">      
                   <VBtn
-                    v-if="$can('editar', 'marcas')"
+                    v-if="$can('editar', 'tag-productos')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="editBrand(brand)">
+                    @click="editTag(tag)">
                     <VTooltip
                       open-on-focus
                       location="top"
                       activator="parent">
                       Editar
-                    </VTooltip>       
+                    </VTooltip>          
                     <VIcon
                         size="22"
                         icon="tabler-edit" />
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','marcas')"
+                    v-if="$can('eliminar','tag-productos')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="showDeleteDialog(brand)">
+                    @click="showDeleteDialog(tag)">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -347,7 +347,7 @@ const downloadCSV = async () => {
               </tr>
             </tbody>
             <!-- 👉 table footer  -->
-            <tfoot v-show="!brands.length">
+            <tfoot v-show="!tags.length">
               <tr>
                 <td
                   colspan="3"
@@ -376,11 +376,11 @@ const downloadCSV = async () => {
       </v-col>
     </v-row>
 
-    <!-- 👉 Add New Brand -->
-    <AddNewBrandDrawer
-      v-model:isDrawerOpen="isAddNewBrandDrawerVisible"
-      :brand="selectedBrand"
-      @brand-data="submitForm"/>
+    <!-- 👉 Add New Tag -->
+    <AddNewTagDrawer
+      v-model:isDrawerOpen="isAddNewTagDrawerVisible"
+      :tag="selectedTag"
+      @tag-data="submitForm"/>
 
     <!-- 👉 Confirm Delete -->
     <VDialog
@@ -392,10 +392,10 @@ const downloadCSV = async () => {
       <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar Marca">
+      <VCard title="Eliminar Tag">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar la marca de <strong>{{ selectedBrand.name }}</strong>?.
+          Está seguro de eliminar el Tag de <strong>{{ selectedTag.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -405,7 +405,7 @@ const downloadCSV = async () => {
             @click="isConfirmDeleteDialogVisible = false">
               Cancelar
           </VBtn>
-          <VBtn @click="removeBrand">
+          <VBtn @click="removeTag">
               Aceptar
           </VBtn>
         </VCardText>
@@ -428,5 +428,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: marcas
+    subject: tag-productos
 </route>

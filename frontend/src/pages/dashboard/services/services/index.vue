@@ -2,28 +2,28 @@
 
 import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
-import { useProductsStores } from '@/stores/useProducts'
+import { useServicesStores } from '@/stores/useServices'
 import { useCategoriesStores } from '@/stores/useCategories'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
-import detailsProduct from "@/components/products/detailsProduct.vue";
-import show from "@/components/products/show.vue";
+import detailsService from "@/components/services/detailsService.vue";
+import show from "@/components/services/show.vue";
 
-const productsStores = useProductsStores()
+const servicesStores = useServicesStores()
 const categoriesStores = useCategoriesStores()
 const cp = useClipboard()
 
-const myProductsList = ref([])
-const products = ref([])
+const myServicesList = ref([])
+const services = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalProducts = ref(0)
+const totalServices = ref(0)
 const isRequestOngoing = ref(true)
-const selectedProduct = ref({})
+const selectedService = ref({})
 
-const isProductDetailDialog = ref(false)
+const isServiceDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 
 const favourite = ref(null)
@@ -32,8 +32,6 @@ const discarded = ref(null)
 
 const selectedStatus = ref(3)
 const selectedCategory = ref()
-const selectedStock = ref()
-const selectedDetail = ref()
 
 const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
@@ -84,30 +82,7 @@ const status = ref([
   },
 ])
 
-
-const typesales = ref([
-  {
-    title: 'Venta Detal',
-    value: 1
-  },
-  {
-    title: 'Venta por mayor',
-    value: 2
-  }
-])
-
 const categories = ref([])
-
-const stockStatus = ref([
-  {
-    title: 'En Stock',
-    value: 1
-  },
-  {
-    title: 'Agotado',
-    value: 0
-  },
-])
 
 const advisor = ref({
   type: '',
@@ -117,10 +92,10 @@ const advisor = ref({
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = services.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = services.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalProducts.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalServices.value } registros`
 })
 
 // 👉 watching current page
@@ -145,8 +120,6 @@ async function fetchData() {
     archived: archived.value,
     discarded: discarded.value,
     state_id: selectedStatus.value,
-    in_stock: selectedStock.value,
-    type_sales: selectedDetail.value,
     category_id: selectedCategory.value,
     orderByField: 'id',
     orderBy: 'desc',
@@ -158,34 +131,32 @@ async function fetchData() {
   
   let info = { 
     limit: -1, 
-    category_type_id: 1
+    category_type_id: 2
   }
 
   await categoriesStores.fetchCategoriesOrder(info)
 
   categories.value = categoriesStores.getCategories
 
-  await productsStores.fetchProducts(data)
+  await servicesStores.fetchServices(data)
 
-  products.value =  []
-  myProductsList.value =  []
-  myProductsList.value = productsStores.getProducts
+  services.value =  []
+  myServicesList.value =  []
+  myServicesList.value = servicesStores.getServices
 
-  myProductsList.value.forEach(element =>
-    products.value.push({
+  myServicesList.value.forEach(element =>
+    services.value.push({
       id: element.id,
       favourite: element.favourite,
       discarded: element.discarded,
       user: element.user,
       state: element.state,
-      in_stock: element.in_stock,
-      stock: element.stock,
       archived: element.archived,            
       title: element.name,
       image: element.image,
-      price: element.price_for_sale,
-      originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+      price: element.price,
+      originalLink: themeConfig.settings.urlDomain + 'services/' + element.slug,
+      categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
@@ -194,8 +165,8 @@ async function fetchData() {
     })
   );
 
-  totalPages.value = productsStores.last_page
-  totalProducts.value = productsStores.productsTotalCount
+  totalPages.value = servicesStores.last_page
+  totalServices.value = servicesStores.servicesTotalCount
 
   userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
   rol.value = userData.value.roles[0].name
@@ -203,30 +174,30 @@ async function fetchData() {
   isRequestOngoing.value = false
 }
 
-const showStateDialog = (productData, id) => {
+const showStateDialog = (serviceData, id) => {
     isConfirmApproveDialogVisible.value = true
     state_id.value = id
-    selectedProduct.value = { ...productData }
+    selectedService.value = { ...serviceData }
 }
 
-const showDeleteDialog = productData => {
+const showDeleteDialog = serviceData => {
   isConfirmDeleteDialogVisible.value = true
-  selectedProduct.value = { ...productData }
+  selectedService.value = { ...serviceData }
 }
 
-const stateProduct = async state_id => {
+const stateService = async state_id => {
     isConfirmApproveDialogVisible.value = false
 
     let data = {
         state_id: state_id
     }
 
-    let res = await productsStores.updateState(data, selectedProduct.value.id)
-    selectedProduct.value = {}
+    let res = await servicesStores.updateState(data, selectedService.value.id)
+    selectedService.value = {}
 
     advisor.value = {
         type: res.data.success ? 'success' : 'error',
-        message: res.data.success ? 'Producto actualizado!' : res.data.message,
+        message: res.data.success ? 'Servicio actualizado!' : res.data.message,
         show: true
     }
 
@@ -244,13 +215,13 @@ const stateProduct = async state_id => {
 
 }
 
-const editProduct = id => {
-    router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
+const editService = id => {
+    router.push({ name : 'dashboard-services-services-edit-id', params: { id: id } })
 }
 
-const deleteProduct = id => {
+const deleteService = id => {
   isConfirmDeleteDialogVisible.value = true
-  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
+  selectedService.value = myServicesList.value.filter((element) => element.id === id )[0]
 }
 
 const updateLink = (data) => {
@@ -264,14 +235,14 @@ const updateLink = (data) => {
   else if(data.text === 'discarded')
       request = { discarded: data.value }
 
-  productsStores.updateLink(request, data.id)
+  servicesStores.updateLink(request, data.id)
       .then(response => {
 
           window.scrollTo(0, 0)
                   
           advisor.value.show = true
           advisor.value.type = 'success'
-          advisor.value.message = 'Producto actualizado!'
+          advisor.value.message = 'Servicio actualizado!'
 
           closeAdvisor()
           fetchData()
@@ -368,9 +339,9 @@ const download = async (img) => {
     closeAdvisor()
 }
 
-const showProduct = async (id) => {
-  isProductDetailDialog.value = true
-  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
+const showService = async (id) => {
+  isServiceDetailDialog.value = true
+  selectedService.value = myServicesList.value.filter((element) => element.id === id )[0]
 }
 
 const showAlert = function(alert) {
@@ -383,16 +354,16 @@ const closeDropdown = () => {
   document.getElementById("selectCategory").blur()
 }
 
-const removeProduct = async () => {
+const removeService = async () => {
   isConfirmDeleteDialogVisible.value = false
 
-  let res = await productsStores.deleteProduct({ ids: [selectedProduct.value.id] })
-  selectedProduct.value = {}
+  let res = await servicesStores.deleteService({ ids: [selectedService.value.id] })
+  selectedService.value = {}
   searchQuery.value = ''
   
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
-    message: res.data.success ? 'Producto eliminado!' : res.data.message,
+    message: res.data.success ? 'Servicio eliminado!' : res.data.message,
     show: true
   }
 
@@ -436,83 +407,12 @@ const removeProduct = async () => {
         </VCardText>
       </VCard>
     </VDialog>
-    <VCard v-if="products"
+    <VCard v-if="services"
       id="rol-list"
       title="Filtros">
 
       <VCardText>
         <VRow>
-          <VCol cols="12" :sm="rol === 'Proveedor' ? '12' : '10'">
-            <VTextField
-              v-model="searchQuery"
-              label="Buscar"
-              placeholder="Buscar"
-              density="compact"
-              clearable
-            />
-          </VCol>
-          <VCol cols="12" sm="2" v-if="rol !== 'Proveedor'">
-            <div class="d-flex justify-content-end flex-wrap gap-4">
-              <VBtn
-                @click="findArchived()"
-                icon
-                variant="text"
-                color="default"
-                size="x-small">
-                <VTooltip
-                  open-on-focus
-                  location="top"
-                  activator="parent">
-                  Archivados
-                </VTooltip>
-                <VIcon
-                  size="20"
-                  icon="tabler-building-store"
-                  class="me-1"
-                  :color="archived === 1 ? 'warning' : 'default'"
-                />
-              </VBtn>
-              <VBtn
-                @click="findFavourite()"
-                icon
-                variant="text"
-                color="default"
-                size="x-small">
-                <VTooltip
-                  open-on-focus
-                  location="top"
-                  activator="parent">
-                  Favoritos
-                </VTooltip>
-                <VIcon
-                  size="20"
-                  icon="tabler-star-filled"
-                  class="me-1"
-                  :color="favourite === 1 ? 'info' : 'default'"
-                />
-              </VBtn>
-              <VBtn
-                @click="findDiscarded()"
-                icon
-                variant="text"
-                color="default"
-                size="x-small">
-                <VTooltip
-                  open-on-focus
-                  location="top"
-                  activator="parent">
-                  Descartados
-                </VTooltip>
-                <VIcon
-                  size="20"
-                  icon="mdi-cart-remove"
-                  class="me-1"
-                  :color="discarded === 1 ? 'error' : 'default'"
-                />
-              </VBtn>
-            </div> 
-          </VCol>
-
           <!-- 👉 Select Status -->
           <VCol
             cols="12"
@@ -576,33 +476,77 @@ const removeProduct = async () => {
             </VAutocomplete>
           </VCol>
 
-          <!-- 👉 Select Stock Status -->
-          <VCol
-            cols="12"
-            sm="3"
-          >
-            <AppSelect
-              v-model="selectedStock"
-              placeholder="Stock"
-              :items="stockStatus"
+          <VCol cols="12" :sm="rol === 'Proveedor' ? '6' : '4'">
+            <VTextField
+              v-model="searchQuery"
+              label="Buscar"
+              placeholder="Buscar"
+              density="compact"
               clearable
-              clear-icon="tabler-x"
             />
           </VCol>
-
-          <!-- 👉 Select Detail  -->
-          <VCol
-            cols="12"
-            sm="3"
-          >
-            <AppSelect
-              v-model="selectedDetail"
-              placeholder="Tipo de venta"
-              :items="typesales"
-              clearable
-              clear-icon="tabler-x"
-            />
-          </VCol>
+          
+          <VCol cols="12" sm="2" v-if="rol !== 'Proveedor'">
+            <div class="d-flex justify-content-end flex-wrap gap-4">
+              <VBtn
+                @click="findArchived()"
+                icon
+                variant="text"
+                color="default"
+                size="x-small">
+                <VTooltip
+                  open-on-focus
+                  location="top"
+                  activator="parent">
+                  Archivados
+                </VTooltip>
+                <VIcon
+                  size="20"
+                  icon="tabler-building-store"
+                  class="me-1"
+                  :color="archived === 1 ? 'warning' : 'default'"
+                />
+              </VBtn>
+              <VBtn
+                @click="findFavourite()"
+                icon
+                variant="text"
+                color="default"
+                size="x-small">
+                <VTooltip
+                  open-on-focus
+                  location="top"
+                  activator="parent">
+                  Favoritos
+                </VTooltip>
+                <VIcon
+                  size="20"
+                  icon="tabler-star-filled"
+                  class="me-1"
+                  :color="favourite === 1 ? 'info' : 'default'"
+                />
+              </VBtn>
+              <VBtn
+                @click="findDiscarded()"
+                icon
+                variant="text"
+                color="default"
+                size="x-small">
+                <VTooltip
+                  open-on-focus
+                  location="top"
+                  activator="parent">
+                  Descartados
+                </VTooltip>
+                <VIcon
+                  size="20"
+                  icon="mdi-cart-remove"
+                  class="me-1"
+                  :color="discarded === 1 ? 'error' : 'default'"
+                />
+              </VBtn>
+            </div> 
+          </VCol>          
         </VRow>
       </VCardText>
 
@@ -624,10 +568,10 @@ const removeProduct = async () => {
         <VSpacer />
 
         <VBtn
-          v-if="$can('crear','productos')"
+          v-if="$can('crear','servicios')"
           prepend-icon="tabler-plus"
-          :to="{ name: 'dashboard-products-products-add' }">
-          Agregar Producto
+          :to="{ name: 'dashboard-services-services-add' }">
+          Agregar Servicio
         </VBtn>
       </VCardText>
 
@@ -661,30 +605,30 @@ const removeProduct = async () => {
           <!-- CATALOGO -->
           <VWindowItem>              
             <VCardText>
-              <VRow  class="gap-y-4">
+              <VRow class="gap-y-4">
                 <VCol
-                  v-for="product in products"
+                  v-for="service in services"
                   cols="12"
                   md="6"
                   sm="12"
                   class="ps-6">
-                  <detailsProduct
+                  <detailsService
                     :isShowComponent="true"
-                    :product="product"
+                    :service="service"
                     :rol="rol"
                     @alert="showAlert"
                     @copy="copy"
                     @open="open"
                     @download="download"
                     @updateLink="updateLink"
-                    @show="showProduct"
-                    @editProduct="editProduct"
-                    @deleteProduct="deleteProduct"
+                    @show="showService"
+                    @editService="editService"
+                    @deleteService="deleteService"
                   />
                 </VCol>
                 <VCol
                   cols="12" 
-                  v-show="!products.length"
+                  v-show="!services.length"
                   class="text-center">
                     Datos no disponibles
                 </VCol>
@@ -714,66 +658,57 @@ const removeProduct = async () => {
               <thead>
                 <tr class="text-no-wrap">
                   <th> #ID </th>
-                  <th> PRODUCTO </th>
-                  <th class="pe-4"> STOCK </th>
+                  <th> SERVICIO </th>
                   <th class="pe-4"> SKU </th>
                   <th class="pe-4"> PRECIO </th>
-                  <th class="pe-4"> QTY </th>
                   <th class="pe-4"> STATUS </th>
                   <th scope="pe-4" v-if="
-                    $can('aprobar', 'productos') || 
-                    $can('rechazar', 'productos') || 
-                    $can('editar', 'productos') || 
-                    $can('eliminar', 'productos')">
+                    $can('aprobar', 'servicios') || 
+                    $can('rechazar', 'servicios') || 
+                    $can('editar', 'servicios') || 
+                    $can('eliminar', 'servicios')">
                     ACCIONES
                   </th>
                 </tr>
             </thead>
             <tbody>
               <tr
-                v-for="product in myProductsList"
-                :key="product.id"
+                v-for="service in myServicesList"
+                :key="service.id"
                 style="height: 3.75rem;">
-                <td> {{ product.id }} </td>
+                <td> {{ service.id }} </td>
                 <td> 
                   <div class="d-flex align-center gap-x-2">
                     <VAvatar
-                      v-if="product.image"
+                      v-if="service.image"
                       size="38"
                       variant="outlined"
                       rounded
-                      :image="themeConfig.settings.urlStorage + product.image"
+                      :image="themeConfig.settings.urlStorage + service.image"
                     />
                     <div class="d-flex flex-column">
-                      <span class="text-body-1 font-weight-medium">{{ product.name }}</span>
-                      <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.name + ' ' + (product.user.last_name ?? '')) }}</span>
+                      <span class="text-body-1 font-weight-medium">{{ service.name }}</span>
+                      <span class="text-sm text-disabled">Tienda: {{ service.user.user_detail.store_name ?? (service.user.name + ' ' + (service.user.last_name ?? '')) }}</span>
                     </div>
                   </div>
                 </td>
-                <td>   
-                  <VSwitch 
-                      :model-value="product.in_stock === 1 ? true : false"
-                      readonly
-                  /> 
-                </td>
-                <td> {{ product.colors[0].sku }} </td>
-                <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
-                <td> {{ product.stock }} </td>
+                <td> {{ service.sku }} </td>
+                <td> {{ (parseFloat(service.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
                 <td> 
                   <VChip
-                    v-bind="resolveStatus(product.state_id)"
+                    v-bind="resolveStatus(service.state_id)"
                     density="default"
                     label
                   />
                 </td>
                 <td class="text-center" style="width: 5rem;" 
-                    v-if="$can('aprobar', 'productos') ||
-                    $can('rechazar', 'productos') || 
-                    $can('editar', 'productos') || 
-                    $can('eliminar', 'productos')">          
+                    v-if="$can('aprobar', 'servicios') ||
+                    $can('rechazar', 'servicios') || 
+                    $can('editar', 'servicios') || 
+                    $can('eliminar', 'servicios')">          
                   <VBtn
-                    v-if="$can('ver', 'productos')"
-                    @click="showProduct(product.id)"
+                    v-if="$can('ver', 'servicios')"
+                    @click="showService(service.id)"
                     icon
                     variant="text"
                     color="default"
@@ -791,12 +726,12 @@ const removeProduct = async () => {
                     />
                   </VBtn>          
                   <VBtn
-                    v-if="$can('aprobar', 'productos') && product.state_id === 4"
+                    v-if="$can('aprobar', 'servicios') && service.state_id === 4"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="showStateDialog(product, 3)">
+                    @click="showStateDialog(service, 3)">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -808,12 +743,12 @@ const removeProduct = async () => {
                       icon="mdi-cart-check" />
                   </VBtn>
                   <VBtn
-                    v-if="$can('rechazar', 'productos') && product.state_id === 4"
+                    v-if="$can('rechazar', 'servicios') && service.state_id === 4"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    @click="showStateDialog(product, 6)">
+                    @click="showStateDialog(service, 6)">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -825,13 +760,13 @@ const removeProduct = async () => {
                       icon="mdi-cart-off" />
                   </VBtn>
                   <VBtn
-                    v-if="$can('editar', 'productos') && product.state_id !== 4"
+                    v-if="$can('editar', 'servicios') && service.state_id !== 4"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    :disabled="product.state_id === 5"
-                    @click="editProduct(product.id)">
+                    :disabled="service.state_id === 5"
+                    @click="editService(service.id)">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -843,13 +778,13 @@ const removeProduct = async () => {
                       icon="tabler-edit" />
                   </VBtn>
                   <VBtn
-                    v-if="$can('eliminar','productos')"
+                    v-if="$can('eliminar','servicios')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
-                    :disabled="product.state_id === 5"
-                    @click="showDeleteDialog(product)">
+                    :disabled="service.state_id === 5"
+                    @click="showDeleteDialog(service)">
                     <VTooltip
                       open-on-focus
                       location="top"
@@ -864,7 +799,7 @@ const removeProduct = async () => {
               </tr>
             </tbody>
             <!-- 👉 table footer  -->
-            <tfoot v-show="!products.length">
+            <tfoot v-show="!services.length">
               <tr>
                 <td
                   colspan="8"
@@ -895,8 +830,8 @@ const removeProduct = async () => {
     </VCard>
 
     <show 
-      v-model:isDrawerOpen="isProductDetailDialog"
-      :product="selectedProduct"/>
+      v-model:isDrawerOpen="isServiceDetailDialog"
+      :service="selectedService"/>
 
     <!-- 👉 Confirm Delete -->
     <VDialog
@@ -908,10 +843,10 @@ const removeProduct = async () => {
       <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar Producto">
+      <VCard title="Eliminar Servicio">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar el producto de <strong>{{ selectedProduct.name }}</strong>?.
+          Está seguro de eliminar el servicio de <strong>{{ selectedService.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -921,7 +856,7 @@ const removeProduct = async () => {
             @click="isConfirmDeleteDialogVisible = false">
               Cancelar
           </VBtn>
-          <VBtn @click="removeProduct">
+          <VBtn @click="removeService">
               Aceptar
           </VBtn>
         </VCardText>
@@ -937,10 +872,10 @@ const removeProduct = async () => {
       <DialogCloseBtn @click="isConfirmApproveDialogVisible = !isConfirmApproveDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Producto'">
+      <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Servicio'">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el producto <strong>{{ selectedProduct.name }}</strong>?.
+          Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el servicio <strong>{{ selectedService.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -950,7 +885,7 @@ const removeProduct = async () => {
             @click="isConfirmApproveDialogVisible = false">
             Cancelar
           </VBtn>
-          <VBtn @click="stateProduct(state_id)">
+          <VBtn @click="stateService(state_id)">
             Aceptar
           </VBtn>
         </VCardText>
@@ -981,5 +916,5 @@ const removeProduct = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: productos
+    subject: servicios
 </route>

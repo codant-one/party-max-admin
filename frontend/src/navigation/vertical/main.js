@@ -27,6 +27,13 @@ export default [
         to: 'dashboard-admin-shipping', 
         action: 'ver' , 
         subject: 'envíos', 
+    },
+    { 
+        title: 'Categorías', 
+        icon: { icon: 'tabler-category' },
+        to: 'dashboard-categories', 
+        action: 'ver', 
+        subject: 'categorías', 
     }
 ]
   

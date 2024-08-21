@@ -8,7 +8,7 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  brand: {
+  tag: {
     type: Object,
     required: false,
   }
@@ -16,7 +16,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:isDrawerOpen',
-  'brandData',
+  'tagData',
 ])
 
 const isFormValid = ref(false)
@@ -27,17 +27,17 @@ const name = ref('')
 const isEdit = ref(false)
 
 const getTitle = computed(() => {
-  return isEdit.value ? 'Actualizar Marca': 'Agregar Marca'
+  return isEdit.value ? 'Actualizar Tag': 'Agregar Tag'
 })
 
 watchEffect(async() => {
 
     if (props.isDrawerOpen) {
 
-        if (!(Object.entries(props.brand).length === 0) && props.brand.constructor === Object) {
+        if (!(Object.entries(props.tag).length === 0) && props.tag.constructor === Object) {
             isEdit.value = true
-            id.value = props.brand.id
-            name.value = props.brand.name
+            id.value = props.tag.id
+            name.value = props.tag.name
         }
     }
 })
@@ -61,10 +61,10 @@ const onSubmit = () => {
       let formData = new FormData()
 
       formData.append('id', id.value)
-      formData.append('brand_type_id', 1)
+      formData.append('tag_type_id', 3)
       formData.append('name', name.value)
 
-      emit('brandData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
+      emit('tagData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
 
       closeNavigationDrawer()

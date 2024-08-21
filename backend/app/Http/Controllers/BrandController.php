@@ -30,14 +30,15 @@ class BrandController extends Controller
         try {
 
             $limit = $request->has('limit') ? $request->limit : 10;
-        
+            $brand_type_id = $request->has('brand_type_id') ? $request->brand_type_id : 1;
+
             $query = Brand::applyFilters(
                         $request->only([
                             'search',
                             'orderByField',
                             'orderBy'
                         ])
-                    );
+                    )->where('brand_type_id', $brand_type_id);
 
             $count = $query->applyFilters(
                         $request->only([
@@ -45,7 +46,8 @@ class BrandController extends Controller
                             'orderByField',
                             'orderBy'
                         ])
-                    )->count();
+                    )->where('brand_type_id', $brand_type_id)
+                    ->count();
 
             $brands = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 

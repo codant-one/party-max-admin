@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProductRequest;
-use App\Http\Requests\StatusProductRequest;
+use App\Http\Requests\ServiceRequest;
+use App\Http\Requests\StatusServiceRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
-use App\Models\Product;
+use App\Models\Service;
 use App\Models\Order;
 use App\Models\Supplier;
-use App\Models\ProductList;
+use App\Models\ServiceList;
 
-class ProductController extends Controller
+class ServiceController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(PermissionMiddleware::class . ':ver productos|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear productos|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar productos|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar productos|administrador')->only(['delete']);
+        $this->middleware(PermissionMiddleware::class . ':ver servicios|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear servicios|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar servicios|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar servicios|administrador')->only(['delete']);
     }
 
     /**
@@ -34,17 +34,14 @@ class ProductController extends Controller
 
             $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
         
-            $query = Product::with([
-                            'colors.categories.category', 
-                            'colors.images', 
-                            'colors.color', 
-                            'detail', 
+            $query = Service::with([
+                            'categories.category', 
+                            'images',
                             'user.userDetail',
                             'user.supplier',
                             'state',
                             'tags'
                         ])
-                        ->favorites()
                         ->order($request->category_id)
                         ->applyFilters(
                             $request->only([
@@ -55,8 +52,6 @@ class ProductController extends Controller
                                 'archived',
                                 'discarded',
                                 'state_id',
-                                'in_stock',
-                                'type_sales',
                                 'category_id',
                                 'supplierId'
                             ])
@@ -65,21 +60,13 @@ class ProductController extends Controller
             
             $count = $query->count();
             
-            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-
-            $data = [
-                'ordersTotalCount' => Order::count(),
-                'ordersClient' => Order::distinct('client_id')->count('client_id'),
-                'ordersSales' => Order::sum('total'),
-                'suppliersTotalCount' => Supplier::count()
-            ];
+            $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'products' => $products,
-                    'productsTotalCount' => $count,
-                    'data' => $data
+                    'services' => $services,
+                    'servicesTotalCount' => $count
                 ]
             ]);
 
@@ -95,34 +82,32 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProductRequest $request): JsonResponse
+    public function store(ServiceRequest $request): JsonResponse
     {
         try {
 
-            $product = Product::createProduct($request);
+            $service = Service::createService($request);
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
 
-                $path = 'products/main/';
+                $path = 'services/main/';
 
                 $file_data = uploadFile($image, $path);
 
-                $product->image = $file_data['filePath'];
-                $product->update();
+                $service->image = $file_data['filePath'];
+                $service->update();
             }
 
-            $order_id = Product::latest('order_id')->first()->order_id ?? null;
+            $order_id = Service::latest('order_id')->first()->order_id ?? 0;
 
-            if($order_id) {
-                $product->order_id = $order_id + 1;
-                $product->update();
-            }
+            $service->order_id = $order_id + 1;
+            $service->update();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'product' => Product::find($product->id)
+                    'service' => Service::find($service->id)
                 ]
                 
             ]);
@@ -143,26 +128,26 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::with([
-                'colors.categories.category', 
-                'colors.images', 
-                'detail', 
-                'user.userDetail', 
+            $service = Service::with([
+                'categories.category', 
+                'images',
+                'user.userDetail',
+                'user.supplier',
                 'state',
                 'tags'
             ])->find($id);
 
-            if (!$product)
+            if (!$service)
                 return response()->json([
                     'sucess' => false,
                     'message' => 'Not found',
-                    'message' => 'Producto no encontrado'
+                    'message' => 'Servicio no encontrado'
                 ], 404);
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'product' => $product
+                    'service' => $service
                 ]
             ]);
 
@@ -178,43 +163,43 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProductRequest $request, Product $product): JsonResponse
+    public function update(ServiceRequest $request, Service $service): JsonResponse
     {
         try {
 
-            $product = Product::with([
-                'colors.categories.category', 
-                'colors.images', 
-                'detail', 
-                'user', 
+            $service = Service::with([
+                'categories.category', 
+                'images',
+                'user.userDetail',
+                'user.supplier',
                 'state',
                 'tags'
-            ])->find($product->id);
+            ])->find($service->id);
 
-            if (!$product)
+            if (!$service)
                 return response()->json([
                     'sucess' => false,
                     'message' => 'Not found',
-                    'message' => 'Producto no encontrado'
+                    'message' => 'Servicio no encontrado'
                 ], 404);
 
-            $product = $product->updateProduct($request, $product);
+            $service = $service->updateService($request, $service);
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
 
-                $path = 'products/main/';
+                $path = 'services/main/';
 
-                $file_data = uploadFile($image, $path, $product->image);
+                $file_data = uploadFile($image, $path, $service->image);
 
-                $product->image = $file_data['filePath'];
-                $product->update();
+                $service->image = $file_data['filePath'];
+                $service->update();
             } 
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'product' => Product::find($product->id)
+                    'service' => Service::find($service->id)
                 ]               
             ]);
 
@@ -235,16 +220,16 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::find($request->ids);
+            $service = Service::find($request->ids);
 
-            if (!$product)
+            if (!$service)
                 return response()->json([
                     'sucess' => false,
                     'message' => 'Not found',
-                    'message' => 'Producto no encontrado'
+                    'message' => 'Servicio no encontrado'
                 ], 404);
 
-            Product::deleteProducts($request->ids);
+            Service::deleteServices($request->ids);
 
             return response()->json([
                 'success' => true
@@ -259,29 +244,29 @@ class ProductController extends Controller
         }
     }
 
-    public function updateStatus(StatusProductRequest $request, $id): JsonResponse
+    public function updateStatus(StatusServiceRequest $request, $id): JsonResponse
     {
         try {
 
-            $product = Product::find($id);
+            $service = Service::find($id);
         
-            if (!$product)
+            if (!$service)
                 return response()->json([
                     'success' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Producto no encontrado'
+                    'message' => 'Servicio no encontrado'
                 ], 404);
 
             $field = $request->has('favourite')
                      ? 'favourite'
                      : ($request->has('discarded') ? 'discarded' : ($request->has('archived') ? 'archived' : null));
 
-            $product->updateStatusProduct($field, $product); 
+            $service->updateStatusService($field, $service); 
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'product' => $product
+                    'service' => $service
                 ]
             ], 200);
 
@@ -301,7 +286,7 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
 
-                $path = 'products/';
+                $path = 'services/';
 
                 $file_data = uploadFile($image, $path);
 
@@ -325,21 +310,21 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::find($id);
+            $service = Service::find($id);
         
-            if (!$product)
+            if (!$service)
                 return response()->json([
                     'success' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Producto no encontrado'
+                    'message' => 'Servicio no encontrado'
                 ], 404);
 
-            $product->updateStatesProduct($request, $product); 
+            $service->updateStatesService($request, $service); 
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'product' => $product
+                    'service' => $service
                 ]
             ], 200);
 
@@ -357,25 +342,25 @@ class ProductController extends Controller
      */
     public function updateOrder(Request $request): JsonResponse
     { 
-        $countProducts = 1;
+        $countServices = 1;
 
-        foreach($request->all() as $productRequest){
+        foreach($request->all() as $serviceRequest){
 
-            if($productRequest['category_id'] != '')
-                ProductList::updateOrCreate(
+            if($serviceRequest['category_id'] != '')
+                ServiceList::updateOrCreate(
                     [ 
-                        'product_id' => $productRequest['id'],
-                        'category_id' => $productRequest['category_id']
+                        'service_id' => $serviceRequest['id'],
+                        'category_id' => $serviceRequest['category_id']
                     ],
-                    [ 'order_id' => $countProducts++ ]
+                    [ 'order_id' => $countServices++ ]
                 );
             else 
-                Product::updateOrCreate(
+                Service::updateOrCreate(
                     [ 
-                        'id' => $productRequest['id'],
-                        'name' => $productRequest['name']
+                        'id' => $serviceRequest['id'],
+                        'name' => $serviceRequest['name']
                     ],
-                    [ 'order_id' => $countProducts++ ]
+                    [ 'order_id' => $countServices++ ]
                 );
         }
 

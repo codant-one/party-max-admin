@@ -502,7 +502,7 @@ class Product extends Model
         $product->update([
             'user_id' => $user_id,
             'brand_id' => $request->brand_id,
-            'state_id' => 3,
+            'state_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? 4 : 3,
             'name' => $request->name,
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
@@ -547,22 +547,22 @@ class Product extends Model
         $product->update();
     }
 
-    public static function updateStatusProduct($request, $field, $product) {
+    public static function updateStatusProduct($field, $product) {
 
         $favourite = 0;
         $archived = 0;
         $discarded = 0;
 
         if($field === 'favourite'){
-            $favourite = ($request->input($field) === '1') ? 0 : 1;
+            $favourite = !$product->favourite;
             $archived = 0;
             $discarded = 0;
         } else if($field === 'archived'){
-            $archived = ($request->input($field) === '1') ? 0 : 1;
+            $archived = !$product->archived;
             $favourite = 0;
             $discarded = 0;
         } else {
-            $discarded = ($request->input($field) === '1') ? 0 : 1;
+            $discarded = !$product->discarded;
             $favourite = 0;
             $archived = 0;
         }

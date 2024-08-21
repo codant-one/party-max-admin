@@ -1,22 +1,21 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { useProductsStores } from '@/stores/useProducts'
+import { useServicesStores } from '@/stores/useServices'
 import { useCategoriesStores } from '@/stores/useCategories'
 import draggable from 'vuedraggable'
 
-const productsStores = useProductsStores()
+const servicesStores = useServicesStores()
 const categoriesStores = useCategoriesStores()
 
-const myProductsList = ref([])
-const products = ref([])
+const myServicesList = ref([])
+const services = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalProducts = ref(0)
+const totalServices = ref(0)
 const isRequestOngoing = ref(true)
-
 
 const selectedCategory = ref('')
 const categories = ref([])
@@ -47,10 +46,10 @@ const resolveStatus = statusMsg => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = (rowPerPage.value === 'Todos') ? 1 : products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = (rowPerPage.value === 'Todos') ? totalProducts.value : products.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = (rowPerPage.value === 'Todos') ? 1 : services.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = (rowPerPage.value === 'Todos') ? totalServices.value : services.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalProducts.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalServices.value } registros`
 })
 
 // 👉 watching current page
@@ -63,7 +62,7 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
-  products.value =  []
+  services.value =  []
 
   let data = {
     search: searchQuery.value,
@@ -79,19 +78,19 @@ async function fetchData() {
   
   let info = { 
     limit: -1, 
-    category_type_id: 1
+    category_type_id: 2
   }
 
   await categoriesStores.fetchCategoriesOrder(info)
 
   categories.value = categoriesStores.getCategories
 
-  await productsStores.fetchProducts(data)
+  await servicesStores.fetchServices(data)
 
-  myProductsList.value = productsStores.getProducts
+  myServicesList.value = servicesStores.getServices
 
-  myProductsList.value.forEach(element =>
-    products.value.push({
+  myServicesList.value.forEach(element =>
+    services.value.push({
       id: element.id,
       name: element.name,
       favourite: element.favourite,
@@ -99,16 +98,14 @@ async function fetchData() {
       user: element.user,
       state: element.state,
       state_id: element.state_id,
-      in_stock: element.in_stock,
-      stock: element.stock,
       archived: element.archived,            
       title: element.name,
       image: element.image,
-      price: element.price_for_sale,
-      sku: element.colors[0]?.sku ?? '--',
-      originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.name)))],// Utiliza map para extraer los nombres de las categorías
-      categories_id: [...new Set(element.colors.flatMap(color => color.categories.map(item => item.category.id)))],// Utiliza map para extraer los id de las categorías
+      price: element.price,
+      sku: element.sku,
+      originalLink: themeConfig.settings.urlDomain + 'services/' + element.slug,
+      categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+      categories_id: element.categories.map(item => item.category.id),// Utiliza map para extraer los id de las categorías
       rating: element.rating,//agregar mas adelante informacion
       comments: 0,//agregar mas adelante informacion
       sales: element.sales,//agregar mas adelante informacion
@@ -120,8 +117,8 @@ async function fetchData() {
     })
   );
 
-  totalPages.value = productsStores.last_page
-  totalProducts.value = productsStores.productsTotalCount
+  totalPages.value = servicesStores.last_page
+  totalServices.value = servicesStores.servicesTotalCount
 
   isRequestOngoing.value = false
 }
@@ -135,7 +132,7 @@ const onStart = async (e) => {
 }
 
 const onEnd = async (e) => {
-  productsStores.updateOrder(products.value)
+  servicesStores.updateOrder(services.value)
   fetchData()
 }
 
@@ -160,7 +157,7 @@ const onEnd = async (e) => {
         </VCardText>
       </VCard>
     </VDialog>
-    <VCard v-if="products">
+    <VCard v-if="services">
       <VCardText class="d-flex align-center flex-wrap gap-4">
         <div
           class="d-flex align-center"
@@ -225,18 +222,16 @@ const onEnd = async (e) => {
           <thead>
             <tr class="text-no-wrap">
               <th> #ORDEN ID </th>
-              <th> PRODUCTO </th>
-              <th class="pe-4"> STOCK </th>
+              <th> SERVICIO </th>
               <th class="pe-4"> SKU </th>
               <th class="pe-4"> CATEGORÍAS </th>
               <th class="pe-4"> PRECIO </th>
-              <th class="pe-4"> QTY </th>
               <th class="pe-4 text-end"> STATUS </th>
             </tr>
           </thead>
 
           <draggable 
-            v-model="products" 
+            v-model="services" 
             tag="tbody"
             item-key="id"
             @start="onStart"
@@ -261,12 +256,6 @@ const onEnd = async (e) => {
                     </div>
                   </div>
                 </td>
-                <td>   
-                  <VSwitch 
-                    :model-value="element.in_stock === 1 ? true : false"
-                    readonly
-                  /> 
-                </td>
                 <td> {{ element.sku }} </td>
                 <td style="width: 10px;">
                   <span 
@@ -285,7 +274,6 @@ const onEnd = async (e) => {
                   </span>
                 </td>  
                 <td> {{ (parseFloat(element.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
-                <td> {{ element.stock }} </td>
                 <td class="text-end"> 
                   <VChip
                     v-bind="resolveStatus(element.state_id)"
@@ -297,7 +285,7 @@ const onEnd = async (e) => {
             </template>
           </draggable>
           <!-- 👉 table footer  -->
-          <tfoot v-show="!products.length">
+          <tfoot v-show="!services.length">
             <tr>
               <td
                 colspan="8"
@@ -354,5 +342,5 @@ const onEnd = async (e) => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: ordenar-productos
+    subject: ordenar-servicios
 </route>

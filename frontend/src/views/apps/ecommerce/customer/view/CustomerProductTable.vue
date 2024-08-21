@@ -100,7 +100,7 @@ const resolveStatus = statusMsg => {
     if (statusMsg === 6)
         return {
             text: 'Rechazado',
-            color: 'info',
+            color: 'warning'
         }
 }
 

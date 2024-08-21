@@ -41,8 +41,8 @@ use App\Http\Controllers\{
     AddressController,
     DocumentTypeController,
     ProxyController,
-    ReviewController
-
+    ReviewController,
+    ServiceController
 };
 
 /*
@@ -97,6 +97,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('addresses', AddressController::class);
     Route::apiResource('reviews', ReviewController::class);
+    Route::apiResource('services', ServiceController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -138,6 +139,15 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
         Route::put('updateStates/{id}', [ProductController::class, 'updateStates']);
         Route::post('order_id', [ProductController::class, 'updateOrder']);
+    });
+
+     //Services
+     Route::group(['prefix' => 'services'], function () {
+        Route::post('delete', [ServiceController::class, 'delete']);
+        Route::post('upload-image', [ServiceController::class, 'uploadImage']);
+        Route::put('updateStatus/{id}', [ServiceController::class, 'updateStatus']);
+        Route::put('updateStates/{id}', [ServiceController::class, 'updateStates']);
+        Route::post('order_id', [ServiceController::class, 'updateOrder']);
     });
 
     //Faqs
@@ -222,6 +232,8 @@ Route::group([
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
+    Route::get('services', [MiscellaneousController::class, 'services']);
+    Route::get('services/{slug}', [MiscellaneousController::class, 'serviceDetail']);
 });
 
 //Shopping-Cart

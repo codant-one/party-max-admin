@@ -1,26 +1,21 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { formatNumber } from '@/@core/utils/formatters'
-import { useProductsStores } from '@/stores/useProducts'
+import { useServicesStores } from '@/stores/useServices'
 import { excelParser } from '@/plugins/csv/excelParser'
 import router from '@/router'
 
-const productsStores = useProductsStores()
-
+const servicesStores = useServicesStores()
 const isMobile = ref(false)
 
-const data = ref(null)
-const widgetData = ref([])
-
-const products = ref([])
+const services = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalProducts = ref(0)
+const totalServices = ref(0)
 const isRequestOngoing = ref(true)
-const selectedProduct = ref({})
+const selectedService = ref({})
 const isConfirmDeleteDialogVisible = ref(false)
 const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
@@ -33,10 +28,10 @@ const advisor = ref({
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = products.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
-  const lastIndex = products.value.length + (currentPage.value - 1) * rowPerPage.value
+  const firstIndex = services.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
+  const lastIndex = services.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalProducts.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalServices.value } registros`
 })
 
 // 👉 watching current page
@@ -49,7 +44,7 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
-    products.value =  []
+    services.value =  []
 
     let data = {
         search: searchQuery.value,
@@ -62,41 +57,14 @@ async function fetchData() {
 
     isRequestOngoing.value = true
 
-    await productsStores.fetchProducts(data)
+    await servicesStores.fetchServices(data)
 
-    products.value = productsStores.getProducts
+    services.value = servicesStores.getServices
 
-    totalPages.value = productsStores.last_page
-    totalProducts.value = productsStores.productsTotalCount
+    totalPages.value = servicesStores.last_page
+    totalServices.value = servicesStores.servicesTotalCount
 
-    data.value = productsStores.data
-
-    widgetData.value = [
-        {
-            title: 'Ventas',
-            value: '$' + formatNumber(data.value.ordersSales),
-            icon: 'tabler-home',
-            desc: data.value.ordersTotalCount + ' pedidos'
-        },
-        {
-            title: 'Clientes con Pedidos',
-            value: data.value.ordersClient,
-            icon: 'tabler-device-laptop',
-            desc: data.value.ordersTotalCount + ' pedidos'
-        },
-        {
-            title: 'Descuentos',
-            value: '$0.00',
-            icon: 'tabler-gift',
-            desc: '0 pedidos',
-        },
-        {
-            title: 'Proveedores',
-            value: data.value.suppliersTotalCount,
-            icon: 'tabler-wallet',
-            desc: ''
-        }
-    ]
+    data.value = servicesStores.data
 
     isRequestOngoing.value = false
 }
@@ -136,34 +104,30 @@ const resolveStatus = statusMsg => {
         }
 }
 
-const editProduct = data => {
-    router.push({ name : 'dashboard-products-products-edit-id', params: { id: data.id } })
-}
-
-const showDeleteDialog = productData => {
+const showDeleteDialog = serviceData => {
     isConfirmDeleteDialogVisible.value = true
-    selectedProduct.value = { ...productData }
+    selectedService.value = { ...serviceData }
 }
 
-const showStateDialog = (productData, id) => {
+const showStateDialog = (serviceData, id) => {
     isConfirmApproveDialogVisible.value = true
     state_id.value = id
-    selectedProduct.value = { ...productData }
+    selectedService.value = { ...serviceData }
 }
 
-const stateProduct = async state_id => {
+const stateService = async state_id => {
     isConfirmApproveDialogVisible.value = false
 
     let data = {
         state_id: state_id
     }
 
-    let res = await productsStores.updateState(data, selectedProduct.value.id)
-    selectedProduct.value = {}
+    let res = await servicesStores.updateState(data, selectedService.value.id)
+    selectedService.value = {}
 
     advisor.value = {
         type: res.data.success ? 'success' : 'error',
-        message: res.data.success ? 'Producto actualizado!' : res.data.message,
+        message: res.data.success ? 'Servicio actualizado!' : res.data.message,
         show: true
     }
 
@@ -181,15 +145,15 @@ const stateProduct = async state_id => {
 
 }
 
-const removeProduct = async () => {
+const removeService = async () => {
     isConfirmDeleteDialogVisible.value = false
 
-    let res = await productsStores.deleteProduct({ ids: [selectedProduct.value.id] })
-    selectedProduct.value = {}
+    let res = await servicesStores.deleteService({ ids: [selectedService.value.id] })
+    selectedService.value = {}
 
     advisor.value = {
         type: res.data.success ? 'success' : 'error',
-        message: res.data.success ? 'Producto eliminado!' : res.data.message,
+        message: res.data.success ? 'Servicio eliminado!' : res.data.message,
         show: true
     }
 
@@ -215,27 +179,25 @@ const downloadCSV = async () => {
         limit: -1 
     }
 
-    await productsStores.fetchProducts(data)
+    await servicesStores.fetchServices(data)
 
     let dataArray = [];
         
-    productsStores.getProducts.forEach(element => {
+    servicesStores.getServices.forEach(element => {
 
     let data = {
         ID: element.id,
-        PRODUCTO: element.name,
+        SERVICIO: element.name,
         TIENDA: element.user.user_detail.store_name ?? (element.user.supplier?.company_name ?? (element.user.name + ' ' + (element.user.last_name ?? ''))),
-        STOCK: element.in_stock === 0 ? 'NO' : 'SI',
-        SKU: element.colors[0].sku,
-        PRECIO: element.price_for_sale,
-        QTY:  element.stock
+        SKU: element.sku,
+        PRECIO: element.price
     }
             
     dataArray.push(data)
     })
 
     excelParser()
-    .exportDataFromJSON(dataArray, "pending-products", "csv");
+    .exportDataFromJSON(dataArray, "pending-services", "csv");
 
     isRequestOngoing.value = false
 
@@ -270,59 +232,9 @@ const downloadCSV = async () => {
           </VCard>
         </VDialog>
 
-        <!-- 👉 widgets -->
-        <VCard class="mb-6">
-            <VCardText>
-                <VRow>
-                    <template
-                        v-for="(data, id) in widgetData"
-                        :key="id" >
-                        <VCol cols="12" sm="6" md="3" class="px-6">
-                            <div 
-                                class="d-flex justify-space-between"
-                                :class="{ 'product-widget': isMobile && id < 3 }">
-                                <div class="d-flex flex-column gap-y-1">
-                                    <div class="text-body-1 font-weight-medium text-capitalize">
-                                        {{ data.title }}
-                                    </div>
-
-                                    <span class="text-h5 my-1">
-                                        {{ data.value }}
-                                    </span>
-
-                                    <div class="d-flex">
-                                        <div class="me-2 text-disabled text-no-wrap">
-                                            {{ data.desc }}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <VAvatar
-                                    variant="tonal"
-                                    rounded
-                                    size="38"
-                                >
-                                    <VIcon
-                                        :icon="data.icon"
-                                        size="28"
-                                    />
-                                </VAvatar>
-                            </div>
-                        </VCol>
-                        <VDivider
-                            v-if="!isMobile && id < 3"
-                            vertical
-                            inset
-                            length="95"
-                        />
-                    </template>
-                </VRow>
-            </VCardText>
-        </VCard>
-
-        <!-- 👉 products -->
+        <!-- 👉 services -->
         <VCard
-            title="Productos Pendientes"
+            title="Servicios Pendientes"
             class="mb-6" >
 
             <div class="d-flex flex-wrap gap-4 mx-5">
@@ -365,62 +277,53 @@ const downloadCSV = async () => {
                 <thead>
                     <tr class="text-no-wrap">
                         <th> #ID </th>
-                        <th> PRODUCTO </th>
-                        <th class="pe-4"> STOCK </th>
+                        <th> SERVICIO </th>
                         <th class="pe-4"> SKU </th>
                         <th class="pe-4"> PRECIO </th>
-                        <th class="pe-4"> QTY </th>
                         <th class="pe-4"> STATUS </th>
-                        <th scope="pe-4" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
+                        <th scope="pe-4" v-if="$can('aprobar', 'servicios') || $can('rechazar', 'servicios') || $can('eliminar', 'servicios')">
                             ACCIONES
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        v-for="product in products"
-                        :key="product.id"
+                        v-for="service in services"
+                        :key="service.id"
                         style="height: 3.75rem;">
-                        <td> {{ product.id }} </td>
+                        <td> {{ service.id }} </td>
                         <td> 
                             <div class="d-flex align-center gap-x-2">
                                 <VAvatar
-                                    v-if="product.image"
+                                    v-if="service.image"
                                     size="38"
-                                    :variant="product.image ? 'outlined' : 'tonal'"
+                                    :variant="service.image ? 'outlined' : 'tonal'"
                                     rounded
-                                    :image="themeConfig.settings.urlStorage + product.image"
+                                    :image="themeConfig.settings.urlStorage + service.image"
                                 />
                                 <div class="d-flex flex-column">
-                                    <span class="text-body-1 font-weight-medium text-uppercase">{{ product.name }}</span>
-                                    <span class="text-sm text-disabled">Tienda: {{ product.user.user_detail.store_name ?? (product.user.supplier?.company_name ?? (product.user.name + ' ' + (product.user.last_name ?? ''))) }}</span>
+                                    <span class="text-body-1 font-weight-medium text-uppercase">{{ service.name }}</span>
+                                    <span class="text-sm text-disabled">Tienda: {{ service.user.user_detail.store_name ?? (service.user.supplier?.company_name ?? (service.user.name + ' ' + (service.user.last_name ?? ''))) }}</span>
                                 </div>
                             </div>
                         </td>
-                        <td>   
-                            <VSwitch 
-                                :model-value="product.in_stock === 1 ? true : false"
-                                readonly
-                            /> 
-                        </td>
-                        <td> {{ product.colors[0].sku }} </td>
-                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
-                        <td> {{ product.stock }} </td>
+                        <td> {{ service.sku }} </td>
+                        <td> {{ (parseFloat(service.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
                         <td> 
                             <VChip
-                                v-bind="resolveStatus(product.state_id)"
+                                v-bind="resolveStatus(service.state_id)"
                                 density="default"
                                 label
                             />
                         </td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
+                        <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'servicios') || $can('rechazar', 'servicios') || $can('eliminar', 'servicios')">
                             <VBtn
-                                v-if="$can('aprobar', 'productos')"
+                                v-if="$can('aprobar', 'servicios')"
                                 icon
                                 size="x-small"
                                 color="default"
                                 variant="text"
-                                @click="showStateDialog(product, 3)">
+                                @click="showStateDialog(service, 3)">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
@@ -433,12 +336,12 @@ const downloadCSV = async () => {
                             </VBtn>
 
                             <VBtn
-                                v-if="$can('rechazar', 'productos')"
+                                v-if="$can('rechazar', 'servicios')"
                                 icon
                                 size="x-small"
                                 color="default"
                                 variant="text"
-                                @click="showStateDialog(product, 6)">
+                                @click="showStateDialog(service, 6)">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
@@ -451,12 +354,12 @@ const downloadCSV = async () => {
                             </VBtn>
 
                             <VBtn
-                                v-if="$can('eliminar','productos')"
+                                v-if="$can('eliminar','servicios')"
                                 icon
                                 size="x-small"
                                 color="default"
                                 variant="text"
-                                @click="showDeleteDialog(product)">
+                                @click="showDeleteDialog(service)">
                                 <VTooltip
                                     open-on-focus
                                     location="top"
@@ -471,7 +374,7 @@ const downloadCSV = async () => {
                     </tr>
                 </tbody>
                 <!-- 👉 table footer  -->
-                <tfoot v-show="!products.length">
+                <tfoot v-show="!services.length">
                     <tr>
                         <td
                         colspan="8"
@@ -508,10 +411,10 @@ const downloadCSV = async () => {
             <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
 
             <!-- Dialog Content -->
-            <VCard title="Eliminar Producto">
+            <VCard title="Eliminar Servicio">
                 <VDivider class="mt-4"/>
                 <VCardText>
-                    Está seguro de eliminar el producto <strong>{{ selectedProduct.name }}</strong>?.
+                    Está seguro de eliminar el servicio <strong>{{ selectedService.name }}</strong>?.
                 </VCardText>
 
                 <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -521,7 +424,7 @@ const downloadCSV = async () => {
                     @click="isConfirmDeleteDialogVisible = false">
                     Cancelar
                 </VBtn>
-                <VBtn @click="removeProduct">
+                <VBtn @click="removeService">
                     Aceptar
                 </VBtn>
                 </VCardText>
@@ -538,10 +441,10 @@ const downloadCSV = async () => {
             <DialogCloseBtn @click="isConfirmApproveDialogVisible = !isConfirmApproveDialogVisible" />
 
             <!-- Dialog Content -->
-            <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Producto'">
+            <VCard :title=" (state_id === 3 ? 'Aprobar ': 'Rechazar ') + 'Servicio'">
                 <VDivider class="mt-4"/>
                 <VCardText>
-                    Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el producto <strong>{{ selectedProduct.name }}</strong>?.
+                    Está seguro de {{ state_id === 3 ? 'aprobar': 'rechazar' }}  el servicio <strong>{{ selectedService.name }}</strong>?.
                 </VCardText>
 
                 <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -551,7 +454,7 @@ const downloadCSV = async () => {
                     @click="isConfirmApproveDialogVisible = false">
                     Cancelar
                 </VBtn>
-                <VBtn @click="stateProduct(state_id)">
+                <VBtn @click="stateService(state_id)">
                     Aceptar
                 </VBtn>
                 </VCardText>
@@ -582,7 +485,7 @@ const downloadCSV = async () => {
         }
     }
 
-    .product-widget {
+    .service-widget {
         border-block-end: 1px solid rgba(var(--v-theme-on-surface), var(--v-border-opacity));
         padding-block-end: 1rem;
     }
@@ -590,5 +493,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
     meta:
       action: ver
-      subject: productos-pendientes
+      subject: servicios-pendientes
 </route>

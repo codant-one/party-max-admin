@@ -61,7 +61,7 @@ const onSubmit = () => {
       let formData = new FormData()
 
       formData.append('id', id.value)
-      formData.append('brand_type_id', 1)
+      formData.append('brand_type_id', 2)
       formData.append('name', name.value)
 
       emit('brandData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')

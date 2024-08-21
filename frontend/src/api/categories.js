@@ -18,11 +18,11 @@ class Categories {
         return axios.post(`/categories/${data.id}`, data.data)
     }
 
-    delete(id){
+    delete(id) {
         return axios.post(`/categories/delete`, id)
     }
 
-    order(params){
+    order(params) {
         return axios.get(`/categories/list/order`, {params})
     }
     
