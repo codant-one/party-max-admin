@@ -86,6 +86,20 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="n2">
+                            <strong>Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de productos y servicios</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creación de categorías de productos y servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edición de categorías de productos y servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de productos y servicios</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">
@@ -227,7 +241,7 @@ const closeTreeDialog  = function(){
                         </ul>
                         <li class="tab n3">
                             <strong>Ver Tags de Productos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de tags de productos</code>
-                            </li>
+                        </li>
                         <ul class="tab">
                             <li class="tab n3">
                                 <strong>Crear Tags de Productos</strong>&emsp;/&emsp;<code>Permite la creación de tags de productos</code>
@@ -237,20 +251,6 @@ const closeTreeDialog  = function(){
                             </li>
                             <li class="tab n3">
                                 <strong>Eliminar Tags de Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de tags de productos</code>
-                            </li>
-                        </ul>
-                        <li class="tab n3">
-                            <strong>Ver Categorías</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de categorías de productos</code>
-                        </li>
-                        <ul class="tab">
-                            <li class="tab n3">
-                                <strong>Crear Categorías</strong>&emsp;/&emsp;<code>Permite la creación de categorías de productos</code>
-                            </li>
-                            <li class="tab n3">
-                                <strong>Editar Categorías</strong>&emsp;/&emsp;<code>Permite la edición de categorías de productos</code>
-                            </li>
-                            <li class="tab n3">
-                                <strong>Eliminar Categorías</strong>&emsp;/&emsp;<code>Permite la eliminación de categorías de productos</code>
                             </li>
                         </ul>
                         <li class="tab n3">
@@ -265,9 +265,6 @@ const closeTreeDialog  = function(){
                             </li>
                             <li class="tab n3">
                                 <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
-                            </li>
-                            <li class="tab n3">
-                                <strong>Ordenar Productos</strong>&emsp;/&emsp;<code>Permite ordenar productos</code>
                             </li>
                         </ul>
                         <li class="tab n3">
@@ -284,6 +281,71 @@ const closeTreeDialog  = function(){
                                 <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
                             </li>
                         </ul>
+                        <li class="tab n3">
+                            <strong>Ordenar Productos</strong>&emsp;/&emsp;<code>Permite ordenar productos</code>
+                        </li>
+                        <li class="n2">
+                            <strong>Servicios</strong>
+                        </li>
+                        <li class="tab n3">
+                            <strong>Ver Marcas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de marcas de servicios</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Marcas</strong>&emsp;/&emsp;<code>Permite la creación de marcas de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Marcas</strong>&emsp;/&emsp;<code>Permite la edición de marcas de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Marcas</strong>&emsp;/&emsp;<code>Permite la eliminación de marcas de servicios</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Tags de Servicios</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de tags de servicios</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Tags de Servicios</strong>&emsp;/&emsp;<code>Permite la creación de tags de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Tags de Servicios</strong>&emsp;/&emsp;<code>Permite la edición de tags de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Tags de Servicios</strong>&emsp;/&emsp;<code>Permite la eliminación de tags de servicios</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Servicios</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de servicios</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Servicios</strong>&emsp;/&emsp;<code>Permite la creación de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Servicios</strong>&emsp;/&emsp;<code>Permite la edición de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Servicios</strong>&emsp;/&emsp;<code>Permite la eliminación de servicios</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Servicios Pendientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de servicios pendientes</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Aprobar Servicios</strong>&emsp;/&emsp;<code>Permite la aprobación de servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Rechazar Servicios</strong>&emsp;/&emsp;<code>Permite rechazar servicios</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Servicios</strong>&emsp;/&emsp;<code>Permite la eliminación de servicios</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ordenar Servicios</strong>&emsp;/&emsp;<code>Permite ordenar servicios</code>
+                        </li>
                     </ul>
                 </ol>
             </VCardText>

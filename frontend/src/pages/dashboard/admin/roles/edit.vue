@@ -155,7 +155,7 @@ const onSubmitEdit = () =>{
                 ref="refFormEdit"
                 @submit.prevent="onSubmitEdit"
             >
-                <VCardText>
+                <VCardText class="pb-0">
                     <VRow>
                         <VCol cols="12">
                             <VTextField

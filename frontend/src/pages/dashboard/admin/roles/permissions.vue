@@ -168,6 +168,34 @@ const closeModal = function(){
                         />
                     </div>
                 </div>
+
+                <VCardTitle>
+                    Categorías
+                </VCardTitle>
+                    <div class="ml-5">
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver categorías"
+                                value="ver categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear categorías"
+                                value="crear categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar categorías"
+                                value="editar categorías"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar categorías"
+                                value="eliminar categorías"
+                            />
+                        </div>
+                    </div>
                 <VCardTitle>
                     Administracion  
                 </VCardTitle>
@@ -453,31 +481,6 @@ const closeModal = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
-                            Categorías
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver categorías"
-                                value="ver categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="crear categorías"
-                                value="crear categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="editar categorías"
-                                value="editar categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="eliminar categorías"
-                                value="eliminar categorías"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
                             Productos
                         </VLabel>
                         <div class="demo-space-x ml-5">
@@ -501,11 +504,6 @@ const closeModal = function(){
                                 label="eliminar productos"
                                 value="eliminar productos"
                             />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver ordenar-productos"
-                                value="ver ordenar-productos"
-                            />
                         </div>
                         <VLabel style="font-weight: bold;">
                             Productos Pendientes
@@ -525,6 +523,128 @@ const closeModal = function(){
                                 v-model="assignedPermissions"
                                 label="rechazar productos"
                                 value="rechazar productos"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Ordenar Productos
+                        </VLabel> 
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver ordenar-productos"
+                                value="ver ordenar-productos"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
+                <VCardTitle>
+                    Servicios  
+                </VCardTitle>
+                <VCardText class="pb-0">
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            Marcas
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver marcas-servicios"
+                                value="ver marcas-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear marcas-servicios"
+                                value="crear marcas-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar marcas-servicios"
+                                value="editar marcas-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar marcas-servicios"
+                                value="eliminar marcas-servicios"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Tag Servicios
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver tag-servicios"
+                                value="ver tag-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear tag-servicios"
+                                value="crear tag-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar tag-servicios"
+                                value="editar tag-servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar tag-servicios"
+                                value="eliminar tag-servicios"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Servicios
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver servicios"
+                                value="ver servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear servicios"
+                                value="crear servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar servicios"
+                                value="editar servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar servicios"
+                                value="eliminar servicios"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Servicios Pendientes
+                        </VLabel> 
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver servicios-pendientes"
+                                value="ver servicios-pendientes"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="aprobar servicios"
+                                value="aprobar servicios"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="rechazar servicios"
+                                value="rechazar servicios"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Ordenar Servicios
+                        </VLabel> 
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver ordenar-servicios"
+                                value="ver ordenar-servicios"
                             />
                         </div>
                     </div>

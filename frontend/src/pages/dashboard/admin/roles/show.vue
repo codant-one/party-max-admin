@@ -59,9 +59,9 @@ const closeRoleDetailDialog = function(){
         <DialogCloseBtn @click="closeRoleDetailDialog" />
 
         <!-- Dialog Content -->
-        <VCard title="Detalle Rol">
+        <VCard title="Detalle Rol" class="role">
             <VDivider class="mt-4"/>
-            <VCardText class="pb-0">
+            <VCardText>
                 <VRow>
                     <VCol cols="12" >
                         <VTextField
@@ -239,6 +239,37 @@ const closeRoleDetailDialog = function(){
                         />
                     </div>
                 </div>
+                <VCardTitle>
+                    Categorías
+                </VCardTitle>
+                    <div class="ml-5">
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver categorías"
+                                value="ver categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear categorías"
+                                value="crear categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar categorías"
+                                value="editar categorías"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar categorías"
+                                value="eliminar categorías"
+                                :readonly="readonly"
+                            />
+                        </div>
+                    </div>
                 <VCardTitle>
                     Administracion  
                 </VCardTitle>
@@ -481,8 +512,8 @@ const closeRoleDetailDialog = function(){
                         <div class="demo-space-x ml-5">
                             <VCheckbox
                                 v-model="permissions"
-                                label="ver página-faqs"
-                                value="ver página-faqs"
+                                label="ver página-blogs"
+                                value="ver página-blogs"
                                 :readonly="readonly"
                             />
                         </div>
@@ -563,35 +594,6 @@ const closeRoleDetailDialog = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
-                            Categorías
-                        </VLabel>
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver categorías"
-                                value="ver categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="crear categorías"
-                                value="crear categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="editar categorías"
-                                value="editar categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="eliminar categorías"
-                                value="eliminar categorías"
-                                :readonly="readonly"
-                            />
-                        </div>
-                        <VLabel style="font-weight: bold;">
                             Productos
                         </VLabel>
                         <div class="demo-space-x ml-5">
@@ -619,12 +621,6 @@ const closeRoleDetailDialog = function(){
                                 value="eliminar productos"
                                 :readonly="readonly"
                             />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver ordenar-productos"
-                                value="ver ordenar-productos"
-                                :readonly="readonly"
-                            />
                         </div>
                         <VLabel style="font-weight: bold;">
                             Productos Pendientes
@@ -649,6 +645,146 @@ const closeRoleDetailDialog = function(){
                                 :readonly="readonly"
                             />
                         </div>
+                        <VLabel style="font-weight: bold;">
+                            Ordenar Productos
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver ordenar-productos"
+                                value="ver ordenar-productos"
+                                :readonly="readonly"
+                            />
+                        </div>
+                    </div>
+                </VCardText>
+
+                <VCardTitle>
+                    Servicios  
+                </VCardTitle>
+                <VCardText class="pb-0">
+                    <div class="ml-5">
+                        <VLabel style="font-weight: bold;">
+                            Marcas
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver marcas-servicios"
+                                value="ver marcas-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear marcas-servicios"
+                                value="crear marcas-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar marcas-servicios"
+                                value="editar marcas-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar marcas-servicios"
+                                value="eliminar marcas-servicios"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Tag Servicios
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver tag-servicios"
+                                value="ver tag-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear tag-servicios"
+                                value="crear tag-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar tag-servicios"
+                                value="editar tag-servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar tag-servicios"
+                                value="eliminar tag-servicios"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Servicios
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver servicios"
+                                value="ver servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear servicios"
+                                value="crear servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar servicios"
+                                value="editar servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar servicios"
+                                value="eliminar servicios"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Servicios Pendientes
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver servicios-pendientes"
+                                value="ver servicios-pendientes"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="aprobar servicios"
+                                value="aprobar servicios"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="rechazar servicios"
+                                value="rechazar servicios"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Ordenar Sevicios
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver ordenar-servicios"
+                                value="ver ordenar-servicios"
+                                :readonly="readonly"
+                            />
+                        </div>
                     </div>
                 </VCardText>
             </VCardText>
@@ -662,3 +798,9 @@ const closeRoleDetailDialog = function(){
     </VDialog>
     </section>
 </template>
+
+<style lang="scss">
+    .v-dialog .v-overlay__content > .v-card .role {
+        overflow-y: hidden !important;
+    }
+</style>

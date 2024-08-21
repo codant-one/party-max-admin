@@ -16,10 +16,10 @@ class TagController extends Controller
 
     public function __construct()
     {
-        $this->middleware(PermissionMiddleware::class . ':ver tags|ver tag-blogs|ver tag-productos|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear tags|crear tag-blogs|crear tag-productos|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar tags|editar tag-blogs|editar tag-productos|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar tags|eliminar tag-blogs|eliminar tag-productos|administrador')->only(['destroy']);
+        $this->middleware(PermissionMiddleware::class . ':ver tags|ver tag-blogs|ver tag-productos|ver tag-servicios|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear tags|crear tag-blogs|crear tag-productos|crear tag-servicios|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar tags|editar tag-blogs|editar tag-productos|editar tag-servicios|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar tags|eliminar tag-blogs|eliminar tag-productos|eliminar tag-servicios|administrador')->only(['destroy']);
     }
 
     /**

@@ -16,10 +16,10 @@ class BrandController extends Controller
 
     public function __construct()
     {
-        $this->middleware(PermissionMiddleware::class . ':ver marcas|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear marcas|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar marcas|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar marcas|administrador')->only(['destroy']);
+        $this->middleware(PermissionMiddleware::class . ':ver marcas|ver marcas-servicios|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear marcas|crear marcas-servicios|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar marcas|editar marcas-servicios|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar marcas|eliminar marcas-servicios|administrador')->only(['destroy']);
     }
 
     /**

@@ -41,10 +41,5 @@ class ServicesSeeder extends Seeder
                 ServiceCategory::factory(['service_id' => $service->id])->create();
             }
         }
-
-        Permission::create(['name' => 'ver servicios']);
-        Permission::create(['name' => 'crear servicios']);
-        Permission::create(['name' => 'editar servicios']);
-        Permission::create(['name' => 'eliminar servicios']);
     }
 }
