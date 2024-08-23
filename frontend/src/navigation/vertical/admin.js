@@ -62,7 +62,39 @@ export default [
             subject: 'blogs',
           },
         ]
-      }
+      },
+      { 
+        title: 'Parámetros', 
+        icon: { icon: 'mdi-database-cog' },
+        action: 'ver',
+        subject: 'parámetros',
+        children: [
+          { 
+            title: 'Sabores', 
+            to: 'dashboard-admin-parameters-flavors', 
+            action: 'ver', 
+            subject: 'parámetros', 
+          },
+          { 
+            title: 'Rellenos', 
+            to: 'dashboard-admin-parameters-fillings', 
+            action: 'ver', 
+            subject: 'parámetros', 
+          },
+          { 
+            title: 'Tipo de tortas', 
+            to: 'dashboard-admin-parameters-cake-types',  
+            action: 'ver', 
+            subject: 'parámetros', 
+          },
+          { 
+            title: 'Tamaños de tortas', 
+            to: 'dashboard-admin-parameters-cake-sizes', 
+            action: 'ver', 
+            subject: 'parámetros', 
+          }
+        ]
+      },
     ],
   }
 ]

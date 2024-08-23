@@ -197,7 +197,7 @@ const closeModal = function(){
                         </div>
                     </div>
                 <VCardTitle>
-                    Administracion  
+                    Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">
                     <div class="ml-5">
@@ -385,6 +385,31 @@ const closeModal = function(){
                                     value="eliminar blogs"
                                 />
                             </div>
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Parámetros
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver parámetros"
+                                value="ver parámetros"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear parámetros"
+                                value="crear parámetros"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar parámetros"
+                                value="editar parámetros"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar parámetros"
+                                value="eliminar parámetros"
+                            />
                         </div>
                     </div>
                 </VCardText>

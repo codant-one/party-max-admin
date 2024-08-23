@@ -271,7 +271,7 @@ const closeRoleDetailDialog = function(){
                         </div>
                     </div>
                 <VCardTitle>
-                    Administracion  
+                    Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">
                     <div class="ml-5">
@@ -487,6 +487,35 @@ const closeRoleDetailDialog = function(){
                                     :readonly="readonly"
                                 />
                             </div>
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Parámetros
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver parámetros"
+                                value="ver parámetros"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear parámetros"
+                                value="crear parámetros"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar parámetros"
+                                value="editar parámetros"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar parámetros"
+                                value="eliminar parámetros"
+                                :readonly="readonly"
+                            />
                         </div>
                     </div>
                 </VCardText>

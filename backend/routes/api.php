@@ -42,7 +42,11 @@ use App\Http\Controllers\{
     DocumentTypeController,
     ProxyController,
     ReviewController,
-    ServiceController
+    ServiceController,
+    FlavorController,
+    FillingController,
+    CakeTypeController,
+    CakeSizeController
 };
 
 /*
@@ -98,6 +102,10 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('addresses', AddressController::class);
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('services', ServiceController::class);
+    Route::apiResource('flavors', FlavorController::class);    
+    Route::apiResource('fillings', FillingController::class);
+    Route::apiResource('cake-types', CakeTypeController::class);
+    Route::apiResource('cake-sizes', CakeSizeController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -202,7 +210,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [ReviewController::class, 'delete']);
         Route::get('/show/{id}', [ReviewController::class, 'reviewbyclient']);
     });
-    
+
     //Suppliers
     Route::group(['prefix' => 'suppliers'], function () {
         Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);

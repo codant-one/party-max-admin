@@ -210,6 +210,20 @@ const closeTreeDialog  = function(){
                                 </li>
                             </ul>
                         </ul> 
+                        <li class="tab n3">
+                            <strong>Parámetros</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de parámetros</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Parámetros</strong>&emsp;/&emsp;<code>Permite la creación de parámetros</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Parámetros</strong>&emsp;/&emsp;<code>Permite la edición de parámetros</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Parámetros</strong>&emsp;/&emsp;<code>Permite la eliminación de parámetros</code>
+                            </li>
+                        </ul>
                         <li class="n2">
                             <strong>Utilidades</strong>
                         </li>
