@@ -8,6 +8,7 @@ import { useCategoriesStores } from '@/stores/useCategories'
 import { useBrandsStores } from '@/stores/useBrands'
 import { useTagsStores } from '@/stores/useTags'
 import { useSuppliersStores } from '@/stores/useSuppliers'
+import { useMiscellaneousStores } from '@/stores/useMiscellaneous'
 import { QuillEditor } from '@vueup/vue-quill'
 import ImageUploader from 'quill-image-uploader'
 import FileInput from "@/components/common/FileInput.vue";
@@ -19,10 +20,22 @@ const categoriesStores = useCategoriesStores()
 const brandsStores = useBrandsStores() 
 const tagsStores = useTagsStores() 
 const suppliersStores = useSuppliersStores()
+const miscellaneousStores = useMiscellaneousStores()
 const route = useRoute()
 
 const emitter = inject("emitter")
 const isRequestOngoing = ref(true)
+
+const optionCounter = ref(1)
+const listCakeTypes = ref([])
+const listCakeSizes = ref([])
+const listSizesByTypes = ref([])
+const cake_type = ref([])
+const cake_type_id = ref([])
+const cake_size = ref([])
+const cake_size_id = ref([])
+const prices = ref([])
+const is_simple = ref([])
 
 const categories = ref([])
 const listBrands = ref([])
@@ -45,10 +58,11 @@ const user_id = ref(null)
 const name = ref(null)
 const single_description = ref(' ')
 const description = ref(' ')
-const price = ref('')
+const price = ref(null)
 const image = ref('')
 const avatar = ref('')
 const filename = ref([])
+const isCupcake = ref(false)
 
 const modules = {
   name: 'imageUploader',
@@ -75,6 +89,11 @@ const modules = {
   },
 }
 
+const loadData = () => {
+  listCakeTypes.value = miscellaneousStores.getData.cakeTypes
+  listCakeSizes.value = miscellaneousStores.getData.cakeSizes
+}
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -93,6 +112,8 @@ async function fetchData() {
       await categoriesStores.fetchCategoriesOrder(data)
       await brandsStores.fetchBrands(data)
       await tagsStores.fetchTags(data)
+      await miscellaneousStores.fetchDataCupcake();
+      loadData()
 
       categories.value = categoriesStores.getCategories
       listBrands.value = brandsStores.getBrands
@@ -111,7 +132,21 @@ async function fetchData() {
 
       sku.value = service.value.sku
       category_id.value = service.value.categories.map(item => item.category_id)
-    
+      selectCategory(category_id.value[0])
+
+      optionCounter.value = service.value.cupcakes.length
+      service.value.cupcakes.forEach(async function callback(value, index) { 
+        prices.value[index] = value.price
+        is_simple.value[index] = value.is_simple.toString()
+        cake_type.value[index] = value.cake_size.cake_type.name
+        cake_type_id.value[index] = value.cake_size.cake_type_id
+        selectCakeType(cake_type.value[index], index)
+        cake_size.value[index] = value.cake_size.name
+        cake_size_id.value[index] = value.cake_size.id
+      })
+
+     
+
       service.value.images.forEach(async function callback(value, index) { 
         const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + value.image);
         const blob = await response.blob();
@@ -222,6 +257,50 @@ const closeDropdown = (i) => {
   document.getElementById("selectCategory").blur()
 }
 
+const selectCategory = category => {
+  isCupcake.value = (category === 176) ? true : false
+}
+
+const selectCakeType = (cakeType, i) => {
+  if (cakeType) {
+    let _cakeType = listCakeTypes.value.find(item => item.name === cakeType)
+    cake_type.value[i] = _cakeType.name
+    cake_type_id.value[i] = _cakeType.id
+    cake_size.value[i] = ''
+    cake_size_id.value[i] = ''
+
+    listSizesByTypes.value = listCakeSizes.value.filter(item => item.cake_type_id === _cakeType.id)
+  }
+}
+
+const selectCakeSize = (cakeSize, i) => {
+  if (cakeSize) {
+    let _cakeSize = getCakeSizes.value.find(item => item.value === cakeSize)
+    cake_size_id.value[i] = _cakeSize.value
+  }
+}
+
+const getCakeSizes = computed(() => {
+  return listSizesByTypes.value.map((state) => {
+    return {
+      title: state.name,
+      value: state.id,
+    }
+  })
+})
+
+const removeType = id => {
+  if(optionCounter.value > 1) {
+    optionCounter.value--
+    cake_type.value.splice(id, 1)
+    cake_type_id.value.splice(id, 1)
+    cake_size.value.splice(id, 1)
+    cake_size_id.value.splice(id, 1)
+    is_simple.value.splice(id, 1)
+    prices.value.splice(id, 1)
+  }
+}
+
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -250,6 +329,12 @@ const onSubmit = () => {
             service_files.value.forEach(function callback(image, index) {
               formData.append('images[]', image.blob)
             });
+
+            //cupcakes
+            formData.append('isCupcake', isCupcake.value)
+            formData.append('cake_size_id', cake_size_id.value)
+            formData.append('is_simple', is_simple.value)
+            formData.append('prices', prices.value)
 
             formData.append('_method', 'PUT')
 
@@ -392,6 +477,111 @@ const onSubmit = () => {
             </VCardText>
           </VCard>
 
+          <VCard
+            title="Tipos"
+            class="mb-6"
+            :style="{
+              display: !isCupcake ? 'none' : 'block'
+            }"
+          >
+            <VCardText>
+              <template
+                v-for="i in optionCounter"
+                :key="i"
+              >
+                <VRow class="border-img mb-7">   
+                  <VCol
+                    cols="12"
+                    md="12"
+                    v-if="optionCounter > 1"
+                  >
+                    <!-- 👉 Item Actions -->
+                    <div class="d-flex">
+                      <VSpacer />
+                      <VBtn
+                        icon="tabler-x"
+                        variant="tonal"
+                        color="primary"
+                        size="x-small"
+                        @click="removeType(i-1)"
+                      />
+                    </div>
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VAutocomplete
+                      v-model="cake_type[i-1]"
+                      label="Tipo de tortas"
+                      :items="listCakeTypes"
+                      item-title="name"
+                      item-value="name"
+                      autocomplete="off"
+                      @update:model-value="selectCakeType(cake_type[i-1],i-1)"
+                      clearable
+                      :rules="!isCupcake ? [] : [requiredValidator]" />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VAutocomplete
+                      v-model="cake_size[i-1]"
+                      label="Tamaño de tortas"
+                      :items="getCakeSizes"
+                      autocomplete="off"
+                      clearable
+                      @update:model-value="selectCakeSize(cake_size[i-1],i-1)"
+                      :rules="!isCupcake ? [] : [requiredValidator]" />
+                  </VCol>
+                  <VCol 
+                    cols="12"
+                    md="6">
+                    <VRadioGroup
+                      v-model="is_simple[i-1]"
+                      inline
+                      :rules="!isCupcake ? [] : [requiredValidator]"
+                    >
+                      <div>
+                        <VRadio
+                          key="1"
+                          label="Diseño Sencillo"
+                          color="primary"
+                          value="1"
+                        />
+                        <VRadio
+                          key="2"
+                          label="Diseño Personalizado"
+                          color="primary"
+                          value="0"
+                        />
+                      </div>
+                    </VRadioGroup>
+                  </VCol>
+                  <VCol 
+                    cols="12"
+                    md="6">
+                    <VTextField
+                      v-model="prices[i-1]"
+                      prefix="COP"
+                      type="number"
+                      label="Costo"
+                      :rules="!isCupcake ? [] : [requiredValidator]"
+                    />
+                  </VCol>
+                </VRow>
+              </template>
+
+              <VBtn
+                class="mt-6"
+                @click="optionCounter++"
+              >
+                Agregar Tipo
+              </VBtn>
+            </VCardText>
+          </VCard>
+
           <FileInput 
             :images="service_files"
             @files="service_files" />
@@ -448,21 +638,27 @@ const onSubmit = () => {
                   :rules="[requiredValidator]"
                 />
 
+                <AppTextField
+                  v-model="sku"
+                  label="SKU"
+                  :rules="[requiredValidator]"
+                />   
+
                 <div class="app-select flex-grow-1">
                   <VLabel
                     class="mb-1 text-body-2 text-high-emphasis"
-                    text="Categorías"
+                    text="Categoría"
                   />
                   <VAutocomplete
                     id="selectCategory"
                     v-model="category_id"
                     autocomplete="off"
-                    multiple
                     :items="categories"
                     :item-title="item => item.name"
                     :item-value="item => item.id"
                     :rules="[requiredValidator]"
-                    :menu-props="{ maxHeight: '300px' }">
+                    :menu-props="{ maxHeight: '300px' }"
+                    @update:model-value="selectCategory">
                     <template v-slot:selection="{ item, index }">
                       <v-chip v-if="index < 2">
                         <span>{{ item.title }}</span>
@@ -508,19 +704,16 @@ const onSubmit = () => {
                   </VAutocomplete>
                 </div>
 
-                <AppTextField
+                <VTextField
                   v-model="price"
                   prefix="COP"
                   type="number"
                   label="Costo"
-                  :rules="[requiredValidator]"
-                />
-
-                <AppTextField
-                  v-model="sku"
-                  label="SKU"
-                  :rules="[requiredValidator]"
-                />                
+                  :rules="isCupcake ? [] : [requiredValidator]"
+                  :style="{
+                    display: isCupcake ? 'none' : 'block'
+                  }"
+                />             
               </div>
             </VCardText>
           </VCard>

@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
 use App\Models\ServiceTag;
+use App\Models\Cupcake;
 
 class Service extends Model
 {
@@ -56,6 +57,11 @@ class Service extends Model
     public function order()
     {
         return $this->hasMany(ServiceList::class, 'order_id','id');
+    }
+
+    public function cupcakes()
+    {
+        return $this->hasMany(Cupcake::class, 'service_id');
     }
     
     /**** Scopes ****/
@@ -225,6 +231,19 @@ class Service extends Model
         }
     }
 
+    public static function createCupcakes($service_id, $request) {
+        $cupcakes = Cupcake::where('service_id', $service_id)->delete();
+
+        foreach(explode(",", $request->cake_size_id) as $key => $cake_size_id) {
+            $cupcake = Cupcake::create([
+                'service_id' => $service_id,
+                'cake_size_id' => $cake_size_id,
+                'is_simple' => explode(",", $request->is_simple)[$key],
+                'price' => explode(",", $request->prices)[$key]
+            ]);
+        }
+    }
+
     public static function createService($request) {
  
         $user_id = 
@@ -241,14 +260,17 @@ class Service extends Model
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
-            'price' => $request->price            
+            'price' => $request->price === 'null' ? null : $request->price       
         ]);
 
         self::createServiceTags($service->id, $request);
         self::createServiceCategories($service->id, $request);
         self::createServiceImages($service->id, $request);
 
-        return $service;
+        if($request->isCupcake)
+            self::createCupcakes($service->id, $request);
+        
+            return $service;
     }
 
     public static function updateServiceTags($service_id, $request) {
@@ -315,12 +337,17 @@ class Service extends Model
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
-            'price' => $request->price
+            'price' => $request->price === 'null' ? null : $request->price 
         ]);
 
         self::updateServiceTags($service->id, $request);
         self::updateServiceCategories($service->id, $request);
         self::updateServiceImages($service->id, $request);
+
+        if($request->isCupcake)
+            self::createCupcakes($service->id, $request);
+        
+            return $service;
 
         return $service;
     }

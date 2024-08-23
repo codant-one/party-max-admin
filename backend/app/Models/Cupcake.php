@@ -11,4 +11,10 @@ class Cupcake extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    /**** Relationship ****/
+    public function cake_size()
+    {
+        return $this->belongsTo(CakeSize::class, 'cake_size_id','id');
+    }
 }

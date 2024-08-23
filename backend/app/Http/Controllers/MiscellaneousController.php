@@ -19,6 +19,10 @@ use App\Models\ProductTag;
 use App\Models\Color;
 use App\Models\Service;
 use App\Models\ServiceTag;
+use App\Models\Flavor;
+use App\Models\Filling;
+use App\Models\CakeType;
+use App\Models\CakeSize;
 
 class MiscellaneousController extends Controller
 {
@@ -329,7 +333,8 @@ class MiscellaneousController extends Controller
             $query = Service::with([
                                 'user.userDetail', 
                                 'user.supplier',
-                                'order'
+                                'order',
+                                'cupcakes.cake_size.cake_type'
                             ])
                             ->where('state_id', 3)
                             ->applyFilters(
@@ -376,13 +381,14 @@ class MiscellaneousController extends Controller
                                 'brand',  
                                 'images',
                                 'categories.category', 
-                                'tags.tag'
+                                'tags.tag',
+                                'cupcakes.cake_size.cake_type'
                               ])
                               ->where('slug', $slug)
                               ->first();
 
             $recommendations = 
-                Service::with(['user.userDetail', 'user.supplier'])
+                Service::with(['user.userDetail', 'user.supplier', 'cupcakes.cake_size.cake_type'])
                        ->where('favourite', true)
                        ->orderBy('created_at', 'desc')
                        ->limit(5)
@@ -397,7 +403,7 @@ class MiscellaneousController extends Controller
                     $tag_id = $serviceTag->tag_id;
 
                     $recommendations = 
-                        Service::with(['user.userDetail', 'user.supplier', 'tags'])
+                        Service::with(['user.userDetail', 'user.supplier', 'tags', 'cupcakes.cake_size.cake_type'])
                                ->whereHas('tags', function($query) use ($tag_id) {
                                     $query->where('tag_id', $tag_id);
                                })
@@ -413,6 +419,28 @@ class MiscellaneousController extends Controller
                 'data' => [
                     'service' => $service,
                     'recommendations' => $recommendations
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function cupcakes(Request $request): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'flavors' => Flavor::all(),
+                    'fillings' => Filling::all(),
+                    'cakeTypes' => CakeType::all(),
+                    'cakeSizes' => CakeSize::all()                 
                 ]
             ], 200);
 

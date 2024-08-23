@@ -134,7 +134,8 @@ class ServiceController extends Controller
                 'user.userDetail',
                 'user.supplier',
                 'state',
-                'tags'
+                'tags',
+                'cupcakes.cake_size.cake_type'
             ])->find($id);
 
             if (!$service)
