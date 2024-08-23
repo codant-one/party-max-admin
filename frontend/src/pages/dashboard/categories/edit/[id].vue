@@ -204,7 +204,7 @@ const onSubmit = () => {
                         error: false
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
 
                 } else {
@@ -214,7 +214,7 @@ const onSubmit = () => {
                         error: true
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
                 }
                 })
@@ -224,7 +224,7 @@ const onSubmit = () => {
                         error: true
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
                 })
 
@@ -378,8 +378,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
-                                            :menu-props="{ maxHeight: '300px' }"
-                                            :rules="[requiredValidator]">
+                                            :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
                                                     v-bind="props"
@@ -439,8 +438,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
-                                            :menu-props="{ maxHeight: '300px' }"
-                                            :rules="[requiredValidator]">
+                                            :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
                                                     v-bind="props"
@@ -500,8 +498,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
-                                            :menu-props="{ maxHeight: '300px' }"
-                                            :rules="[requiredValidator]">
+                                            :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
                                                     v-bind="props"
@@ -561,8 +558,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
-                                            :menu-props="{ maxHeight: '300px' }"
-                                            :rules="[requiredValidator]">
+                                            :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
                                                     v-bind="props"
@@ -617,7 +613,7 @@ const onSubmit = () => {
                                 color="default"
                                 variant="tonal"
                                 class="mb-2"
-                                :to="{ name: 'dashboard-products-categories' }">
+                                :to="{ name: 'dashboard-categories' }">
                                 Regresar
                             </v-btn>
                         </VCardText>

@@ -76,7 +76,7 @@ const onSubmit = () => {
                         error: false
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
 
                 } else {
@@ -86,7 +86,7 @@ const onSubmit = () => {
                         error: true
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
                 }
                 })
@@ -96,7 +96,7 @@ const onSubmit = () => {
                         error: true
                     }
 
-                    router.push({ name : 'dashboard-products-categories'})
+                    router.push({ name : 'dashboard-categories'})
                     emitter.emit('toast', data)
                 })
 
@@ -231,7 +231,7 @@ const onSubmit = () => {
                                 color="default"
                                 variant="tonal"
                                 class="mb-2"
-                                :to="{ name: 'dashboard-products-categories' }">
+                                :to="{ name: 'dashboard-categories' }">
                                 Regresar
                             </VBtn>
                         </VCardText>

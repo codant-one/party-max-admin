@@ -17,7 +17,8 @@ use App\Models\Tag;
 use App\Models\ProductLike;
 use App\Models\ProductTag;
 use App\Models\Color;
-use App\Models\Services;
+use App\Models\Service;
+use App\Models\ServiceTag;
 
 class MiscellaneousController extends Controller
 {
@@ -327,10 +328,9 @@ class MiscellaneousController extends Controller
 
             $query = Service::with([
                                 'user.userDetail', 
-                                'user.supplier', 
+                                'user.supplier',
                                 'order'
                             ])
-                            ->isFavorite()
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -376,44 +376,43 @@ class MiscellaneousController extends Controller
                                 'brand',  
                                 'images',
                                 'categories.category', 
-                                'tags.tag',
-                                'reviews.client.user'
+                                'tags.tag'
                               ])
                               ->where('slug', $slug)
                               ->first();
 
-            // $recommendations = 
-            //     Product::with(['user.userDetail', 'user.supplier'])
-            //            ->where('favourite', true)
-            //            ->orderBy('created_at', 'desc')
-            //            ->limit(5)
-            //            ->get();
+            $recommendations = 
+                Service::with(['user.userDetail', 'user.supplier'])
+                       ->where('favourite', true)
+                       ->orderBy('created_at', 'desc')
+                       ->limit(5)
+                       ->get();
 
-            // // Validate if the user is authenticated
-            // if (Auth::check()) {
+            // Validate if the user is authenticated
+            if (Auth::check()) {
 
-            //     $productTag = ProductTag::where('product_id', $product->id)->first();
+                $serviceTag = ServiceTag::where('service_id', $service->id)->first();
                     
-            //     if ($productTag) {
-            //         $tag_id = $productTag->tag_id;
+                if ($serviceTag) {
+                    $tag_id = $serviceTag->tag_id;
 
-            //         $recommendations = 
-            //                 Product::with(['user.userDetail', 'user.supplier', 'tags'])
-            //                        ->whereHas('tags', function($query) use ($tag_id) {
-            //                             $query->where('tag_id', $tag_id);
-            //                        })
-            //                        ->orderBy('created_at', 'desc')
-            //                        ->limit(5)
-            //                        ->get();
-            //     }
+                    $recommendations = 
+                        Service::with(['user.userDetail', 'user.supplier', 'tags'])
+                               ->whereHas('tags', function($query) use ($tag_id) {
+                                    $query->where('tag_id', $tag_id);
+                               })
+                               ->orderBy('created_at', 'desc')
+                               ->limit(5)
+                               ->get();
+                }
 
-            // }
+            }
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'service' => $service,
-                    // 'recommendations' => $recommendations,
+                    'recommendations' => $recommendations
                 ]
             ], 200);
 

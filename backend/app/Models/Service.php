@@ -23,7 +23,6 @@ class Service extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id','id');
@@ -53,6 +52,11 @@ class Service extends Model
     {
         return $this->hasMany(ServiceTag::class, 'service_id');
     }
+
+    public function order()
+    {
+        return $this->hasMany(ServiceList::class, 'order_id','id');
+    }
     
     /**** Scopes ****/
     public function scopeOrder($query, $categoryId = null)
@@ -78,21 +82,26 @@ class Service extends Model
         });
     }
 
+    public function scopeWhereCategorySlug($query, $search) {
+
+        $query->select('services.*')
+              ->join('service_lists as sl', 'sl.service_id', '=', 'services.id')
+              ->join('categories as c', 'c.id', '=', 'sl.category_id')
+              ->where('c.slug', 'LIKE', '%' . $search);
+    }
+
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
 
         if($filters->get('sortBy')) {            
             if($filters->get('sortBy') === 0) 
                 $query->orderByRaw('(IFNULL('. $orderByField .', services.id)) '. $orderBy);
             else {
-                $wholesalersActive = $filters->get('wholesalers') === 'true';
-                $orderByField = $wholesalersActive ? 'wholesale_price' : 'price_for_sale';
-
                 switch ($filters->get('sortBy')) {
                     case 1:
-                        $query->orderByRaw("CAST($orderByField AS DECIMAL(10,2)) ASC");
+                        $query->orderByRaw("CAST(price AS DECIMAL(10,2)) ASC");
                         break;
                     case 2:
-                        $query->orderByRaw("CAST($orderByField AS DECIMAL(10,2)) DESC");
+                        $query->orderByRaw("CAST(price AS DECIMAL(10,2)) DESC");
                         break;
                     case 3:
                         $query->orderBy('rating', 'desc');
@@ -157,14 +166,7 @@ class Service extends Model
         }
 
         if($filters->get('min') !== null && $filters->get('max') !== null) {
-            if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true')
-                $query->whereBetween(\DB::raw('CAST(wholesale_price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
-            else
-                $query->whereBetween(\DB::raw('CAST(price_for_sale AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
-        }
-
-        if ($filters->get('wholesalers') && $filters->get('wholesalers') === 'true') {
-            $query->whereNotNull('wholesale_price');
+            $query->whereBetween(\DB::raw('CAST(price AS DECIMAL(10,2))'),[$filters->get('min'), $filters->get('max')]);
         }
 
         if($filters->get('rating') !== null){

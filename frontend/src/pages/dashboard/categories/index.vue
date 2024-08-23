@@ -71,7 +71,7 @@ async function fetchData() {
 }
 
 const editCategory = categoryData => {
-  router.push({ name : 'dashboard-products-categories-edit-id', params: { id: categoryData.id } })
+  router.push({ name : 'dashboard-categories-edit-id', params: { id: categoryData.id } })
 }
 
 const openCategory = function (categoryData) {
@@ -189,7 +189,7 @@ const removeCategory = async () => {
               <v-btn
                 v-if="$can('crear','categorías')"
                 prepend-icon="tabler-plus"
-                :to="{ name: 'dashboard-products-categories-add' }">
+                :to="{ name: 'dashboard-categories-add' }">
                   Agregar Categoría
               </v-btn>
             </div>
