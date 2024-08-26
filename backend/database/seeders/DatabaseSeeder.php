@@ -51,7 +51,8 @@ class DatabaseSeeder extends Seeder
             OrdersPermissionSeeder::class,
 
             ServicesSeeder::class,
-            ServicePermissionSeeder::class
+            ServicePermissionsSeeder::class,
+            CupcakeSeeder::class
         ]);
 
     }

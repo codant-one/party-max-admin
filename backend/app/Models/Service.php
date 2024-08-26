@@ -267,7 +267,7 @@ class Service extends Model
         self::createServiceCategories($service->id, $request);
         self::createServiceImages($service->id, $request);
 
-        if($request->isCupcake)
+        if($request->isCupcake === 'true')
             self::createCupcakes($service->id, $request);
         
             return $service;
@@ -344,7 +344,7 @@ class Service extends Model
         self::updateServiceCategories($service->id, $request);
         self::updateServiceImages($service->id, $request);
 
-        if($request->isCupcake)
+        if($request->isCupcake === 'true')
             self::createCupcakes($service->id, $request);
         
             return $service;
