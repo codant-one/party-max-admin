@@ -40,7 +40,8 @@ class ServiceController extends Controller
                             'user.userDetail',
                             'user.supplier',
                             'state',
-                            'tags'
+                            'tags',
+                            'cupcakes.cake_size.cake_type'
                         ])
                         ->order($request->category_id)
                         ->applyFilters(

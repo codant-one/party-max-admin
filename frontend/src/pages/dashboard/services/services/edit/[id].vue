@@ -145,8 +145,6 @@ async function fetchData() {
         cake_size_id.value[index] = value.cake_size.id
       })
 
-     
-
       service.value.images.forEach(async function callback(value, index) { 
         const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + value.image);
         const blob = await response.blob();
