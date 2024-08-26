@@ -693,7 +693,7 @@ const removeService = async () => {
                   </div>
                 </td>
                 <td> {{ service.sku }} </td>
-                <td> {{ (parseFloat(service.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
+                <td> {{ (parseFloat(service.cupcakes.length > 0 ? service.cupcakes[0].price : service.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
                 <td> 
                   <VChip
                     v-bind="resolveStatus(service.state_id)"
