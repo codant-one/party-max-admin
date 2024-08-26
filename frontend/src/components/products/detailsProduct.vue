@@ -213,7 +213,7 @@ const colors = (id) => {
                     </VCol>
                     <VCol cols="12" md="7">
                         <VRow class="text-end pt-2">
-                            <VCol cols="12" class="text-center">
+                            <VCol :cols="rol !== 'Proveedor' ? '' : 12" class="text-center">
                                 <VBtn
                                     @click="show(id)"
                                     icon
