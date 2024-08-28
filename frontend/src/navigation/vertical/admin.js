@@ -64,7 +64,7 @@ export default [
         ]
       },
       { 
-        title: 'Parámetros', 
+        title: 'Atributos', 
         icon: { icon: 'mdi-database-cog' },
         action: 'ver',
         subject: 'parámetros',
@@ -90,6 +90,12 @@ export default [
           { 
             title: 'Tamaños de tortas', 
             to: 'dashboard-admin-parameters-cake-sizes', 
+            action: 'ver', 
+            subject: 'parámetros', 
+          },
+          { 
+            title: 'Colores', 
+            to: 'dashboard-admin-parameters-colors', 
             action: 'ver', 
             subject: 'parámetros', 
           }

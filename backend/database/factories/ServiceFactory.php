@@ -28,7 +28,7 @@ class ServiceFactory extends Factory
 
         return [
             'user_id' => 1,
-            'brand_id' => 6,
+            'brand_id' => 3,
             'state_id' => rand(3, 5),
             'name' => $name,
             'description' => $this->faker->sentence,
