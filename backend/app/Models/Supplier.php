@@ -70,6 +70,40 @@ class Supplier extends Model
                 }]);
     }
 
+    public function scopeRetailSales($query)
+    {
+        return  $query->addSelect(['retail_sales' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 0)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeWholesaleSales($query)
+    {
+        return  $query->addSelect(['wholesale_sales' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 1)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->whereHas('user', function ($q) use ($search) {
             $q->where(function ($query) use ($search) {

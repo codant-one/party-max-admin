@@ -206,6 +206,9 @@ const removeOrder = async () => {
                           <span class="text-sm text-disabled">
                             Color: {{ order.product_color.color.name }}
                           </span>
+                          <span class="text-sm text-disabled">
+                            Tienda: {{ order.product_color.product.user.user_detail.store_name ?? (order.product_color.product.user.supplier?.company_name ?? (order.product_color.product.user.name + ' ' + (order.product_color.product.user.last_name ?? ''))) }}
+                          </span>
                         </div>
                       </div>
                     </td>

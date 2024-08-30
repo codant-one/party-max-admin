@@ -66,7 +66,9 @@ class SupplierAccount extends Model
     {
         if($request->type_commission == 2) {//detal
             $supplierAccount->update([
-                'balance' => $request->balance
+                'balance' => $request->balance,
+                'retail_sales_amount' => $request->retail_sales_amount,
+                'wholesale_sales_amount' => $request->wholesale_sales_amount
             ]);      
         } else {//mayor
             $supplier = Supplier::find($supplierAccount->supplier_id);

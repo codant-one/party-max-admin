@@ -158,6 +158,8 @@ class SupplierController extends Controller
                                 ])
                                 ->productsCount()
                                 ->sales()
+                                ->retailSales()
+                                ->wholesaleSales()
                                 ->find($id);
 
             if (!$supplier)

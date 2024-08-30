@@ -52,6 +52,24 @@ async function fetchData() {
   if(Number(route.params.id)) {
     supplier.value = await suppliersStores.showSupplier(Number(route.params.id))
     online.value = supplier.value.user.online
+
+    let retail_sales = parseFloat(supplier.value.retail_sales ?? 0)
+    let wholesale_sales = parseFloat(supplier.value.wholesale_sales ?? 0)
+    let total_sales = retail_sales + wholesale_sales
+    let commission_retail = retail_sales * (parseFloat(supplier.value.commission ?? 0) / 100)
+    let commission_wholesale = wholesale_sales * (parseFloat(supplier.value.wholesale_commission ?? 0) / 100) 
+        
+    let total_balance = total_sales - commission_retail - commission_wholesale
+
+    let data = {
+        balance: total_balance,
+        retail_sales_amount: retail_sales - commission_retail,
+        wholesale_sales_amount: wholesale_sales - commission_wholesale,
+        type_commission: 2
+    }
+
+    let response = await suppliersStores.updateBalance(route.params.id, data)
+    supplier.value.account = response.data.data.supplierAccount
   }
 
   isRequestOngoing.value = false

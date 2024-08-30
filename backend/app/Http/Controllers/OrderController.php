@@ -105,7 +105,8 @@ class OrderController extends Controller
         try {
 
             $order = Order::with([
-                'details.product_color.product', 
+                'details.product_color.product.user.userDetail', 
+                'details.product_color.product.user.supplier', 
                 'details.product_color.color',
                 'details.product_color.images', 
                 'address.type', 

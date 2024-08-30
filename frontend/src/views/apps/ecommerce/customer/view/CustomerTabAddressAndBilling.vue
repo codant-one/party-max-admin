@@ -88,61 +88,40 @@ watchEffect(() => {
     selectedAddress.value = {}
 })
 
-const calculateBalance = () => {
-
-  total_balance.value = props.customerData.account.balance ?? 0;
-
-  if(props.customerData.account.retail_sales_amount !== null || props.customerData.account.wholesale_sales_amount !== null) {
-    const retail_sales = parseFloat(props.customerData.account.retail_sales_amount ?? 0)
-    const wholesale_sales = parseFloat(props.customerData.account.wholesale_sales_amount ?? 0)
-    const total_sales = retail_sales + wholesale_sales
-    const commission_retail = retail_sales * (parseFloat(props.customerData.commission ?? 0)/100)
-    const commission_wholesale = wholesale_sales * (parseFloat(props.customerData.wholesale_commission??0)/100) 
-    total_balance.value = total_sales - commission_retail - commission_wholesale
-  }
-
-  let data = {
-    balance: total_balance.value,
-    type_commission: 2
-  }
-
-  suppliersStores.updateBalance(route.params.id, data)
-}
-
 watchEffect(fetchData)
 
 async function fetchData() {
 
-  if(props.isSupplier && props.customerData.account !== null) {
-    type_account.value = props.customerData.account.type_account.toString()
+  if(Number(route.params.id)) {
+    if(props.isSupplier && props.customerData.account !== null) {
+      type_account.value = props.customerData.account.type_account.toString()
 
-    if(props.customerData.account.file_account) {
-      document.value = props.customerData.account.file_account.split('documents/')[1]
-      switch (document.value.split('.')[1]) {
-        case 'pdf':
-          icon_type.value = 'tabler-file-type-pdf'
-          break;
-        case 'docx':
-          icon_type.value = 'mdi-file-word'
-          break;
-        case 'doc':
-          icon_type.value = 'mdi-file-word'
-          break;
-        case 'jpg':
-          icon_type.value = 'tabler-file-type-jpg'
-          break;
-        default:
-          icon_type.value = 'tabler-file-type-png'
-          break;
+      if(props.customerData.account.file_account) {
+        document.value = props.customerData.account.file_account.split('documents/')[1]
+        switch (document.value.split('.')[1]) {
+          case 'pdf':
+            icon_type.value = 'tabler-file-type-pdf'
+            break;
+          case 'docx':
+            icon_type.value = 'mdi-file-word'
+            break;
+          case 'doc':
+            icon_type.value = 'mdi-file-word'
+            break;
+          case 'jpg':
+            icon_type.value = 'tabler-file-type-jpg'
+            break;
+          default:
+            icon_type.value = 'tabler-file-type-png'
+            break;
+        }
       }
     }
+
+    cant_commission.value = props.customerData.commission ?? 0
+    who_commission.value = props.customerData.wholesale_commission ?? 0
+    total_balance.value = props.customerData.account.balance
   }
-
-  cant_commission.value = props.customerData.commission ?? 0
-  who_commission.value = props.customerData.wholesale_commission ?? 0
-
-  calculateBalance()
-
 }
 
 const download = (file) => {
