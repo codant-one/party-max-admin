@@ -101,7 +101,7 @@ async function fetchData() {
       archived: element.archived,            
       title: element.name,
       image: element.image,
-      price: element.price,
+      price: element.cupcakes.length > 0 ? element.cupcakes[0].price : element.price,
       sku: element.sku,
       originalLink: themeConfig.settings.urlDomain + 'services/' + element.slug,
       categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías

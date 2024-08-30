@@ -478,7 +478,7 @@ const onSubmit = () => {
                       <div>
                         <VRadio
                           key="1"
-                          label="Diseño Sencillo"
+                          label="Diseño Estándar"
                           color="primary"
                           value="1"
                         />
