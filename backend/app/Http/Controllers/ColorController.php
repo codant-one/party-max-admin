@@ -1,32 +1,69 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\ColorRequest;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
+use Spatie\Permission\Middlewares\PermissionMiddleware;
+
 use App\Models\Color;
 
 class ColorController extends Controller
 {
-    /**
-    * Display a listing of the resource.
-    */
-    public function index(Request $request)
+    public function __construct()
     {
-        $colors = Color::all();
-
-        return response()->json([
-            'success' => true,
-            'data' => $colors
-        ], 200);
+        $this->middleware(PermissionMiddleware::class . ':ver atributos|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear atributos|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar atributos|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar atributos|administrador')->only(['destroy']);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      */
-    public function create()
+    public function index(Request $request): JsonResponse
     {
-        //
+        try {
+
+            $limit = $request->has('limit') ? $request->limit : 10;
+
+            $query = Color::applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    );
+
+            $count = $query->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                    )
+                    ->count();
+
+            $colors = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'colors' => $colors,
+                    'colorsTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -87,17 +124,9 @@ class ColorController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ColorRequest $request, string $id)
     {
         try {
 
@@ -160,6 +189,16 @@ class ColorController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function all()
+    {
+        $colors = Color::all();
+
+        return response()->json([
+            'success' => true,
+            'data' => $colors
+        ], 200);
     }
 
 }

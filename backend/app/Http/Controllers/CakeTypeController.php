@@ -15,10 +15,10 @@ class CakeTypeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(PermissionMiddleware::class . ':ver parámetros|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear parámetros|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar parámetros|administrador')->only(['update']);
-        $this->middleware(PermissionMiddleware::class . ':eliminar parámetros|administrador')->only(['destroy']);
+        $this->middleware(PermissionMiddleware::class . ':ver atributos|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear atributos|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar atributos|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar atributos|administrador')->only(['destroy']);
     }
 
     /**

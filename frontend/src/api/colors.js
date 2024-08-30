@@ -2,9 +2,10 @@ import axios from '@axios'
 
 class Colors {
 
-    get() {
-        return axios.get('colors')
+    get(params) {
+        return axios.get('colors', {params})
     }
+
     create(data) {
         return axios.post('/colors', data)
     }
@@ -13,8 +14,12 @@ class Colors {
         return axios.post(`/colors/${data.id}`, data.data)
     }
 
-    delete(id){
+    delete(id) {
         return axios.delete(`/colors/${id}`)
+    }
+
+    all() {
+        return axios.get('colors/color/all')
     }
 }
 

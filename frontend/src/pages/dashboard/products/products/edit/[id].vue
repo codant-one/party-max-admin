@@ -107,7 +107,7 @@ async function fetchData() {
         limit: -1 
       }
 
-      await colorsStores.fetchColors();
+      await colorsStores.all();
       await categoriesStores.fetchCategoriesOrder(data)
       await brandsStores.fetchBrands(data)
       await tagsStores.fetchTags(data)

@@ -106,6 +106,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('fillings', FillingController::class);
     Route::apiResource('cake-types', CakeTypeController::class);
     Route::apiResource('cake-sizes', CakeSizeController::class);
+    Route::apiResource('colors', ColorController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -222,16 +223,20 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
 //Public Endpoints
 Route::apiResource('countries', CountryController::class);
 Route::apiResource('provinces', ProvinceController::class);
-Route::apiResource('colors', ColorController::class);
 Route::apiResource('genders', GenderController::class);
 Route::apiResource('document-types', DocumentTypeController::class);
 
 Route::get('home', [HomeController::class, 'home']);
 
+//Colors
+Route::group(['prefix' => 'colors'], function () {
+    Route::get('color/all', [ColorController::class, 'all']);
+});
+
 Route::group([
     'prefix' => 'miscellaneous',
     'middleware' => 'throttle:10,1'
-    ], function () {
+], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('products', [MiscellaneousController::class, 'products']);

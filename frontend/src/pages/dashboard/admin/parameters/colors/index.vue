@@ -11,7 +11,7 @@ const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const totalcolors = ref(0)
+const totalColors = ref(0)
 const isRequestOngoing = ref(true)
 const isAddNewColorDrawerVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
@@ -28,7 +28,7 @@ const paginationData = computed(() => {
   const firstIndex = colors.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
   const lastIndex = colors.value.length + (currentPage.value - 1) * rowPerPage.value
 
-  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalcolors.value } registros`
+  return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalColors.value } registros`
 })
 
 // 👉 watching current page
@@ -58,7 +58,7 @@ async function fetchData() {
 
   colors.value = colorsStores.getColors
   totalPages.value = colorsStores.last_page
-  totalcolors.value = colorsStores.colorsTotalCount
+  totalColors.value = colorsStores.colorsTotalCount
 
   isRequestOngoing.value = false
 }
@@ -113,65 +113,65 @@ const submitForm = async (color, method) => {
 
 const submitCreate = colorData => {
 
-    colorsStores.addColor(colorData)
-        .then((res) => {
-            if (res.data.success) {
-                advisor.value = {
-                    type: 'success',
-                    message: 'Color creado!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
+  colorsStores.addColor(colorData)
+    .then((res) => {
+      if (res.data.success) {
+          advisor.value = {
+            type: 'success',
+            message: 'Color creado!',
+            show: true
+          }
+          fetchData()
+      }
+      isRequestOngoing.value = false
+    })
+    .catch((err) => {
+      advisor.value = {
+        type: 'error',
+        message: err.message,
+        show: true
+      }
+      isRequestOngoing.value = false
+    })
 
     setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
+      advisor.value = {
+        type: '',
+        message: '',
+        show: false
+      }
     }, 3000)
 }
 
 const submitUpdate = colorData => {
 
-    colorsStores.updateColor(colorData)
-        .then((res) => {
-            if (res.data.success) {
-                    advisor.value = {
-                    type: 'success',
-                    message: 'Color actualizado!',
-                    show: true
-                }
-                fetchData()
-            }
-            isRequestOngoing.value = false
-        })
-        .catch((err) => {
-            advisor.value = {
-                type: 'error',
-                message: err.message,
-                show: true
-            }
-            isRequestOngoing.value = false
-        })
+  colorsStores.updateColor(colorData)
+    .then((res) => {
+      if (res.data.success) {
+        advisor.value = {
+          type: 'success',
+          message: 'Color actualizado!',
+          show: true
+        }
+        fetchData()
+      }
+      isRequestOngoing.value = false
+    })
+    .catch((err) => {
+      advisor.value = {
+        type: 'error',
+        message: err.message,
+        show: true
+      }
+      isRequestOngoing.value = false
+    })
 
     setTimeout(() => {
-        advisor.value = {
-            type: '',
-            message: '',
-            show: false
-        }
+      advisor.value = {
+        type: '',
+        message: '',
+        show: false
+      }
     }, 3000)
 }
 
@@ -183,14 +183,16 @@ const downloadCSV = async () => {
     limit: -1 
   }
 
-  await colorsStores.fetchColors(data)
+  await colorsStores.fetchColor(data)
 
   let dataArray = [];
       
   colorsStores.getColors.forEach(element => {
     let data = {
       ID: element.id,
-      NOMBRE: element.name
+      NOMBRE: element.name,
+      COLOR: element.color,
+      ES_GRADIENTE: elemente.is_grandient ? 'SI' : 'NO'
     }
           
     dataArray.push(data)
@@ -274,10 +276,10 @@ const downloadCSV = async () => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','parámetros')"
+                v-if="$can('crear','atributos')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewColorDrawerVisible = true">
-                  Agregar Sabor
+                  Agregar Color
               </v-btn>
             </div>
           </v-card-text>
@@ -290,7 +292,9 @@ const downloadCSV = async () => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col" v-if="$can('editar', 'parámetros') || $can('eliminar', 'parámetros')">
+                <th scope="col"> COLOR </th>
+                <th scope="col"> GRADIENTE </th>
+                <th scope="col" v-if="$can('editar', 'atributos') || $can('eliminar', 'atributos')">
                   ACCIONES
                 </th>
               </tr>
@@ -304,10 +308,23 @@ const downloadCSV = async () => {
 
                 <td> {{ color.id }} </td>
                 <td class="text-wrap"> {{ color.name }} </td>
+                <td class="text-wrap">   
+                  <div 
+                    v-if="color.color"
+                   :style="{ 
+                      background: color.color, 
+                      width: '50px', 
+                      height: '50px',
+                      borderRadius: '10px',
+                      border: 'thin solid rgba(var(--v-border-color), var(--v-border-opacity))'
+                    }"
+                  />
+                </td>
+                <td class="text-wrap"> {{ color.is_gradient ? 'SI' : 'NO' }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'parámetros') || $can('eliminar', 'parámetros')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'atributos') || $can('eliminar', 'atributos')">      
                   <VBtn
-                    v-if="$can('editar', 'parámetros')"
+                    v-if="$can('editar', 'atributos')"
                     icon
                     size="x-small"
                     color="default"
@@ -325,7 +342,7 @@ const downloadCSV = async () => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','parámetros')"
+                    v-if="$can('eliminar','atributos')"
                     icon
                     size="x-small"
                     color="default"
@@ -348,7 +365,7 @@ const downloadCSV = async () => {
             <tfoot v-show="!colors.length">
               <tr>
                 <td
-                  colspan="3"
+                  colspan="5"
                   class="text-center">
                   Datos no disponibles
                 </td>
@@ -393,7 +410,7 @@ const downloadCSV = async () => {
       <VCard title="Eliminar Color">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar el color de <strong>{{ selectedColor.name }}</strong>?.
+          Está seguro de eliminar la color de <strong>{{ selectedColor.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -426,5 +443,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: parámetros
+    subject: atributos
 </route>

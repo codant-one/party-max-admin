@@ -294,7 +294,7 @@ const downloadCSV = async () => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','parámetros')"
+                v-if="$can('crear','atributos')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewCakeSizeDrawerVisible = true">
                   Agregar tamaño de torta
@@ -311,7 +311,7 @@ const downloadCSV = async () => {
                 <th scope="col"> #ID </th>
                 <th scope="col"> TIPO </th>
                 <th scope="col"> NOMBRE </th>
-                <th scope="col" v-if="$can('editar', 'parámetros') || $can('eliminar', 'parámetros')">
+                <th scope="col" v-if="$can('editar', 'atributos') || $can('eliminar', 'atributos')">
                   ACCIONES
                 </th>
               </tr>
@@ -327,9 +327,9 @@ const downloadCSV = async () => {
                 <td class="text-wrap"> {{ cakeSize.cake_type.name }} </td>
                 <td class="text-wrap"> {{ cakeSize.name }} </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'parámetros') || $can('eliminar', 'parámetros')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'atributos') || $can('eliminar', 'atributos')">      
                   <VBtn
-                    v-if="$can('editar', 'parámetros')"
+                    v-if="$can('editar', 'atributos')"
                     icon
                     size="x-small"
                     color="default"
@@ -347,7 +347,7 @@ const downloadCSV = async () => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','parámetros')"
+                    v-if="$can('eliminar','atributos')"
                     icon
                     size="x-small"
                     color="default"
@@ -450,5 +450,5 @@ const downloadCSV = async () => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: parámetros
+    subject: atributos
 </route>

@@ -489,31 +489,31 @@ const closeRoleDetailDialog = function(){
                             </div>
                         </div>
                         <VLabel style="font-weight: bold;">
-                            Parámetros
+                            Atributos
                         </VLabel>
                         <div class="demo-space-x ml-5">
                             <VCheckbox
                                 v-model="permissions"
-                                label="ver parámetros"
-                                value="ver parámetros"
+                                label="ver atributos"
+                                value="ver atributos"
                                 :readonly="readonly"
                             />
                             <VCheckbox
                                 v-model="permissions"
-                                label="crear parámetros"
-                                value="crear parámetros"
+                                label="crear atributos"
+                                value="crear atributos"
                                 :readonly="readonly"
                             />
                             <VCheckbox
                                 v-model="permissions"
-                                label="editar parámetros"
-                                value="editar parámetros"
+                                label="editar atributos"
+                                value="editar atributos"
                                 :readonly="readonly"
                             />
                             <VCheckbox
                                 v-model="permissions"
-                                label="eliminar parámetros"
-                                value="eliminar parámetros"
+                                label="eliminar atributos"
+                                value="eliminar atributos"
                                 :readonly="readonly"
                             />
                         </div>

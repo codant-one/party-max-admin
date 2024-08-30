@@ -17,12 +17,26 @@ export const useColorsStores = defineStore('colors', {
         setLoading(payload){
             this.loading = payload
         }, 
-        fetchColors(){
+        all(){
             this.setLoading(true)
 
-            return Colors.get()
+            return Colors.all()
                 .then((colors) => {
                     this.colors = colors.data.data
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                });
+        },
+        fetchColors(params){
+            this.setLoading(true)
+
+            return Colors.get(params)
+                .then((response) => {
+                    this.colors = response.data.data.colors.data
+                    this.last_page = response.data.data.colors.last_page
+                    this.colorsTotalCount = response.data.data.colorsTotalCount
                 })
                 .catch(error => Promise.reject(error))
                 .finally(() => {

@@ -181,10 +181,10 @@ class CupcakeSeeder extends Seeder
        
         CakeSize::insert($cakeSizes);
 
-        Permission::create(['name' => 'ver parámetros']);
-        Permission::create(['name' => 'crear parámetros']);
-        Permission::create(['name' => 'editar parámetros']);
-        Permission::create(['name' => 'eliminar parámetros']);
+        Permission::create(['name' => 'ver atributos']);
+        Permission::create(['name' => 'crear atributos']);
+        Permission::create(['name' => 'editar atributos']);
+        Permission::create(['name' => 'eliminar atributos']);
         
     }
 }

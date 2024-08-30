@@ -387,28 +387,28 @@ const closeModal = function(){
                             </div>
                         </div>
                         <VLabel style="font-weight: bold;">
-                            Parámetros
+                            Atributos
                         </VLabel>
                         <div class="demo-space-x ml-5">
                             <VCheckbox
                                 v-model="assignedPermissions"
-                                label="ver parámetros"
-                                value="ver parámetros"
+                                label="ver atributos"
+                                value="ver atributos"
                             />
                             <VCheckbox
                                 v-model="assignedPermissions"
-                                label="crear parámetros"
-                                value="crear parámetros"
+                                label="crear atributos"
+                                value="crear atributos"
                             />
                             <VCheckbox
                                 v-model="assignedPermissions"
-                                label="editar parámetros"
-                                value="editar parámetros"
+                                label="editar atributos"
+                                value="editar atributos"
                             />
                             <VCheckbox
                                 v-model="assignedPermissions"
-                                label="eliminar parámetros"
-                                value="eliminar parámetros"
+                                label="eliminar atributos"
+                                value="eliminar atributos"
                             />
                         </div>
                     </div>

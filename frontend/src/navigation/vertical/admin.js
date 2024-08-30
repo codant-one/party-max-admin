@@ -67,37 +67,37 @@ export default [
         title: 'Atributos', 
         icon: { icon: 'mdi-database-cog' },
         action: 'ver',
-        subject: 'parámetros',
+        subject: 'atributos',
         children: [
           { 
             title: 'Sabores', 
             to: 'dashboard-admin-parameters-flavors', 
             action: 'ver', 
-            subject: 'parámetros', 
+            subject: 'atributos', 
           },
           { 
             title: 'Rellenos', 
             to: 'dashboard-admin-parameters-fillings', 
             action: 'ver', 
-            subject: 'parámetros', 
+            subject: 'atributos', 
           },
           { 
             title: 'Tipo de tortas', 
             to: 'dashboard-admin-parameters-cake-types',  
             action: 'ver', 
-            subject: 'parámetros', 
+            subject: 'atributos', 
           },
           { 
             title: 'Tamaños de tortas', 
             to: 'dashboard-admin-parameters-cake-sizes', 
             action: 'ver', 
-            subject: 'parámetros', 
+            subject: 'atributos', 
           },
           { 
             title: 'Colores', 
             to: 'dashboard-admin-parameters-colors', 
             action: 'ver', 
-            subject: 'parámetros', 
+            subject: 'atributos', 
           }
         ]
       },

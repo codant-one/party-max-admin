@@ -211,17 +211,17 @@ const closeTreeDialog  = function(){
                             </ul>
                         </ul> 
                         <li class="tab n3">
-                            <strong>Parámetros</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de parámetros</code>
+                            <strong>Atributos</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de atributos</code>
                         </li>
                         <ul class="tab">
                             <li class="tab n3">
-                                <strong>Crear Parámetros</strong>&emsp;/&emsp;<code>Permite la creación de parámetros</code>
+                                <strong>Crear Atributos</strong>&emsp;/&emsp;<code>Permite la creación de atributos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Editar Parámetros</strong>&emsp;/&emsp;<code>Permite la edición de parámetros</code>
+                                <strong>Editar Atributos</strong>&emsp;/&emsp;<code>Permite la edición de atributos</code>
                             </li>
                             <li class="tab n3">
-                                <strong>Eliminar Parámetros</strong>&emsp;/&emsp;<code>Permite la eliminación de parámetros</code>
+                                <strong>Eliminar Atributos</strong>&emsp;/&emsp;<code>Permite la eliminación de atributos</code>
                             </li>
                         </ul>
                         <li class="n2">
