@@ -242,34 +242,47 @@ const closeRoleDetailDialog = function(){
                 <VCardTitle>
                     Categorías
                 </VCardTitle>
-                    <div class="ml-5">
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="permissions"
-                                label="ver categorías"
-                                value="ver categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="crear categorías"
-                                value="crear categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="editar categorías"
-                                value="editar categorías"
-                                :readonly="readonly"
-                            />
-                            <VCheckbox
-                                v-model="permissions"
-                                label="eliminar categorías"
-                                value="eliminar categorías"
-                                :readonly="readonly"
-                            />
-                        </div>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver categorías"
+                            value="ver categorías"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="crear categorías"
+                            value="crear categorías"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="editar categorías"
+                            value="editar categorías"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="eliminar categorías"
+                            value="eliminar categorías"
+                            :readonly="readonly"
+                        />
                     </div>
+                </div>
+                <VCardTitle>
+                    Calendario
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver calendario"
+                            value="ver calendario"
+                            :readonly="readonly"
+                        /> 
+                       </div>
+                </div>
                 <VCardTitle>
                     Administración  
                 </VCardTitle>

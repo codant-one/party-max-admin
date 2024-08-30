@@ -168,34 +168,45 @@ const closeModal = function(){
                         />
                     </div>
                 </div>
-
                 <VCardTitle>
                     Categorías
                 </VCardTitle>
-                    <div class="ml-5">
-                        <div class="demo-space-x ml-5">
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="ver categorías"
-                                value="ver categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="crear categorías"
-                                value="crear categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="editar categorías"
-                                value="editar categorías"
-                            />
-                            <VCheckbox
-                                v-model="assignedPermissions"
-                                label="eliminar categorías"
-                                value="eliminar categorías"
-                            />
-                        </div>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver categorías"
+                            value="ver categorías"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="crear categorías"
+                            value="crear categorías"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="editar categorías"
+                            value="editar categorías"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="eliminar categorías"
+                            value="eliminar categorías"
+                        />
                     </div>
+                </div>
+                <VCardTitle>
+                    Calendario
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver calendario"
+                            value="ver calendario"
+                        />
+                    </div>
+                </div>
                 <VCardTitle>
                     Administración  
                 </VCardTitle>

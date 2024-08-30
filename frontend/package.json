@@ -27,6 +27,7 @@
         "axios-mock-adapter": "^1.21.2",
         "chart.js": "^3.9.1",
         "date-fns": "^3.0.6",
+        "dayjs": "^1.11.13",
         "eslint-import-resolver-alias": "^1.1.2",
         "export-from-json": "^1.7.3",
         "html2pdf.js": "^0.10.1",

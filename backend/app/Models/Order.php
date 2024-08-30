@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\OrderDetail;
 use App\Models\ShippingState; 
@@ -72,6 +73,13 @@ class Order extends Model
 
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
+
+        if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
+            // $query->where('user_id', Auth::user()->id);
+            $query->whereHas('details.product_color.product', function ($q) {
+                $q->where('user_id', Auth::user()->id);
+            });
+        }
 
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
@@ -168,7 +176,7 @@ class Order extends Model
             'name' => $request->name,
             'last_name' => $request->last_name,
             'company' => $request->company,
-            'email' => $request->email,
+            'email' => strtolower($request->email),
             'phone' => $request->phone,
             'address' => $request->address,
             'street' => $request->street,

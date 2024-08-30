@@ -25,6 +25,10 @@ class Categories {
     order(params) {
         return axios.get(`/categories/list/order`, {params})
     }
+
+    events(){
+        return axios.get('/categories/events/all')
+    }
     
 }
 

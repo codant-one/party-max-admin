@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 use App\Models\Category;
+use App\Models\User;
+use App\Models\Service;
 
 class CategoryController extends Controller
 {
@@ -368,6 +370,43 @@ class CategoryController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function events(): JsonResponse
+    {
+        $users = User::pluck('id')->toArray();
+        $categories = Category::select('name')->where('category_type_id', 2)->get();
+        $services = Service::with(['categories.category'])->where('state_id', 3)->get();
+        $availableCalendars = [];
+        $selectedCalendars = [];
+        $availableServices = [];
+
+        foreach($categories as $category){
+
+            $available = [];
+            $available['label'] = $category['name'];
+
+            array_push($selectedCalendars, $category['name']);
+            array_push($availableCalendars, $available);
+        }
+
+        foreach($services as $service){
+
+            $available = [];
+            $available['id'] = $service['id'];
+            $available['name'] = $service['name'];
+            $available['category'] = $service['categories'][0]['category']['name'];
+
+            array_push($availableServices, $available);
+        }
+
+        return response()->json([
+            'success' => true,
+            'availableCalendars' => $availableCalendars,
+            'availableServices' => $availableServices,
+            'selectedCalendars' => $selectedCalendars,
+            'selectedUsers' => $users
+        ]);
     }
 
 }

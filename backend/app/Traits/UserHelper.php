@@ -69,7 +69,7 @@ trait UserHelper
             'name' => $request->name,
             'last_name' =>  $request->last_name,
             'username' => Str::slug($request->name . ' ' . $request->last_name),
-            'email' => $request->email,
+            'email' => strtolower($request->email),
             'password' => Hash::make($request->password)
         ]);
 
@@ -87,7 +87,7 @@ trait UserHelper
             'name' => $request->name,
             'last_name' =>  $request->last_name,
             'username' => Str::slug($request->name . ' ' . $request->last_name),
-            'email' => $request->email
+            'email' => strtolower($request->email)
         ]);
 
         //Si NO es cliente se evalua la existencia del Rol.

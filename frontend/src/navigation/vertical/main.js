@@ -34,6 +34,13 @@ export default [
         to: 'dashboard-categories', 
         action: 'ver', 
         subject: 'categorías', 
+    },
+    {
+        title: 'Calendario',
+        icon: { icon: 'tabler-calendar' },
+        to: 'dashboard-calendar',
+        action: 'ver',
+        subject: 'calendario',
     }
 ]
   

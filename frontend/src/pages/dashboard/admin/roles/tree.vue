@@ -100,6 +100,9 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="n2">
+                            <strong>Calendario</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de calendario</code>
+                        </li>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">

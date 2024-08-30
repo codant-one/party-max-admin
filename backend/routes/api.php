@@ -46,7 +46,8 @@ use App\Http\Controllers\{
     FlavorController,
     FillingController,
     CakeTypeController,
-    CakeSizeController
+    CakeSizeController,
+    EventController
 };
 
 /*
@@ -107,6 +108,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('cake-types', CakeTypeController::class);
     Route::apiResource('cake-sizes', CakeSizeController::class);
     Route::apiResource('colors', ColorController::class);
+    Route::apiResource('events', EventController::class);
 
     //Users
     Route::group(['prefix' => 'users'], function () {
@@ -139,6 +141,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
      Route::group(['prefix' => 'categories'], function () {
         Route::get('list/order', [CategoryController::class, 'order']);
         Route::post('delete', [CategoryController::class, 'delete']);
+        Route::get('/events/all', [CategoryController::class, 'events']);
     });
 
     //Products
@@ -216,6 +219,13 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::group(['prefix' => 'suppliers'], function () {
         Route::put('/updateCommission/{id}', [SupplierController::class, 'updateCommission']);
         Route::put('/updateBalance/{id}', [SupplierController::class, 'updateBalance']);
+    });
+
+    //Events
+    Route::group(['prefix' => 'events'], function () {
+        Route::get('/status/all', [EventController::class, 'events']);
+        Route::post('/delete/batch', [EventController::class, 'deleteBatch']);
+        Route::get('/users/all', [EventController::class, 'getUsers']);
     });
 
 });

@@ -399,7 +399,7 @@ class AuthController extends Controller
             $user = new User();
             $user->name = $request->name;
             $user->username =  Str::slug($request->name);
-            $user->email = $request->email;
+            $user->email = strtolower($request->email);
             $user->password = $hashedPassword;
             $user->save();
 
@@ -468,7 +468,7 @@ class AuthController extends Controller
             $info = [
                 'name' => $request->name,
                 'nit' => $request->nit,
-                'email_contact' => $request->email,
+                'email_contact' => strtolower($request->email),
                 'phone' => $request->phone,
                 'subject' => 'Un proveedor te ha contactado.',
                 'email' => 'emails.suppliers.send_info'

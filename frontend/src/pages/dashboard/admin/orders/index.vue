@@ -28,6 +28,9 @@ const wholesale = ref(null)
 const shipping_state_id = ref(null)
 const payment_state_id = ref(null)
 
+const rol = ref(null)
+const userData = ref(null)
+
 const references = ref([
   { title: 'Al mayor', value: 1 },
   { title: 'Al detal', value: 0 }
@@ -116,6 +119,9 @@ async function fetchData() {
             icon: 'tabler-wallet'
         }
     ]
+
+    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+    rol.value = userData.value.roles[0].name
 
     isRequestOngoing.value = false
 }
@@ -243,7 +249,7 @@ const downloadCSV = async () => {
             </VCard>
         </VDialog>
 
-        <VCard class="mb-6">
+        <VCard class="mb-6" v-if="rol !== 'Proveedor'">
             <!-- 👉 Widgets  -->
             <VCardText>
                 <VRow>
@@ -385,7 +391,7 @@ const downloadCSV = async () => {
                     <tr class="text-no-wrap">
                         <th> REFERENCIA </th>
                         <th> FECHA </th>
-                        <th class="pe-4"> CLIENTE </th>
+                        <th class="pe-4" v-if="rol !== 'Proveedor'"> CLIENTE </th>
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
                         <th class="pe-4"> ESTADO DEL PAGO </th>
                         <th class="pe-4"> MÉTODO </th>
@@ -412,7 +418,7 @@ const downloadCSV = async () => {
                         <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
                        
                         
-                        <td class="text-wrap">
+                        <td class="text-wrap" v-if="rol !== 'Proveedor'">
                             <div class="d-flex align-center gap-x-3" v-if="order.client">
                                 <VAvatar
                                     :variant="order.client.user.avatar ? 'outlined' : 'tonal'"

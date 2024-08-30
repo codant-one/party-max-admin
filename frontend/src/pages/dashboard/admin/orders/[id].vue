@@ -19,6 +19,9 @@ const isConfirmDeleteDialogVisible = ref(false)
 
 const isRequestOngoing = ref(true)
 
+const rol = ref(null)
+const userData = ref(null)
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -33,6 +36,9 @@ async function fetchData() {
 
     date.value = order.value.created_at
   }
+
+  userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+  rol.value = userData.value.roles[0].name
 
   isRequestOngoing.value = false
 }
@@ -113,7 +119,7 @@ const removeOrder = async () => {
       <div>
         <div class="d-flex gap-2 align-center mb-2 flex-wrap">
           <h4 class="text-h4 font-weight-medium">
-            Pedido ID #{{ route.params.id }}
+            Pedido #{{ order.reference_code }} 
           </h4>
           <div class="d-flex gap-x-2">
             <VChip
@@ -155,7 +161,7 @@ const removeOrder = async () => {
         id="invoice-detail"
       >
         <VRow>
-          <VCol cols="12" md="8">
+          <VCol cols="12" :md="rol !== 'Proveedor' ? '8' : '12'">
             <!-- 👉 Order Details -->
             <VCard class="mb-6 print-row">
               <VCardItem>
@@ -178,50 +184,49 @@ const removeOrder = async () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="order in order.details"
-                    :key="order.id"
-                    style="height: 3.75rem;">
-                    <td class="text-wrap">
-                      <div class="d-flex gap-x-3 align-center my-1">
-                        <VAvatar
-                          v-if="order.product_color.images.length > 0"
-                          size="150"
-                          variant="outlined"
-                          :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
-                          rounded="lg"
-                        />
-                        <VAvatar
-                          v-else
-                          size="150"
-                          variant="outlined"
-                          :image="themeConfig.settings.urlStorage + order.product_color.product.image"
-                          rounded="lg"
-                        />
-                        <div class="d-flex flex-column align-start">
-                          <span class="text-body-1 font-weight-medium">
-                            {{ order.product_color.product.name }}
-                          </span>
+                  <template v-for="order in order.details">
+                    <tr style="height: 3.75rem;" v-if="(order.product_color.product.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
+                      <td class="text-wrap">
+                        <div class="d-flex gap-x-3 align-center my-1">
+                          <VAvatar
+                            v-if="order.product_color.images.length > 0"
+                            size="150"
+                            variant="outlined"
+                            :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
+                            rounded="lg"
+                          />
+                          <VAvatar
+                            v-else
+                            size="150"
+                            variant="outlined"
+                            :image="themeConfig.settings.urlStorage + order.product_color.product.image"
+                            rounded="lg"
+                          />
+                          <div class="d-flex flex-column align-start">
+                            <span class="text-body-1 font-weight-medium">
+                              {{ order.product_color.product.name }}
+                            </span>
 
-                          <span class="text-sm text-disabled">
-                            Color: {{ order.product_color.color.name }}
-                          </span>
-                          <span class="text-sm text-disabled">
-                            Tienda: {{ order.product_color.product.user.user_detail.store_name ?? (order.product_color.product.user.supplier?.company_name ?? (order.product_color.product.user.name + ' ' + (order.product_color.product.user.last_name ?? ''))) }}
-                          </span>
+                            <span class="text-sm text-disabled">
+                              Color: {{ order.product_color.color.name }}
+                            </span>
+                            <span class="text-sm text-disabled">
+                              Tienda: {{ order.product_color.product.user.user_detail.store_name ?? (order.product_color.product.user.supplier?.company_name ?? (order.product_color.product.user.name + ' ' + (order.product_color.product.user.last_name ?? ''))) }}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td><span>${{ formatNumber(order.price) }}</span></td>
-                    <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
-                    <td><span class="text-h6">${{ formatNumber(order.total) }}</span></td>
-                  </tr>
+                      </td>
+                      <td><span>${{ formatNumber(order.price) }}</span></td>
+                      <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
+                      <td><span class="text-h6">${{ formatNumber(order.total) }}</span></td>
+                    </tr>
+                  </template>
                 </tbody>
               </v-table>
 
               <VDivider />
 
-              <VCardText>
+              <VCardText v-if="rol !== 'Proveedor'">
                 <div class="d-flex align-end flex-column">
                   <table class="text-high-emphasis">
                     <tbody>
@@ -278,7 +283,7 @@ const removeOrder = async () => {
                   >
                     <div class="d-flex justify-space-between align-center">
                       <div class="app-timeline-title">
-                        Se realizo el pedido (Pedido ID: #{{ route.params.id }})
+                        Se realizo el pedido (Pedido #{{ order.reference_code }})
                       </div>
                       <div class="app-timeline-meta">
                         {{  format(parseISO(order.created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
@@ -314,7 +319,7 @@ const removeOrder = async () => {
                   >
                     <div class="d-flex justify-space-between align-center">
                       <div class="app-timeline-title">
-                        Se realizo el pedido (Pedido ID: #{{ route.params.id }})
+                        Se realizo el pedido (Pedido #{{ order.reference_code }})
                       </div>
                       <div class="app-timeline-meta">
                         {{  format(parseISO(order.histories[0].created_at), 'MMMM d, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
@@ -434,7 +439,7 @@ const removeOrder = async () => {
             </VCard>
           </VCol>
 
-          <VCol cols="12" md="4" class="print-row">
+          <VCol cols="12" md="4" class="print-row" v-if="rol !== 'Proveedor'">
             <!-- 👉 Customer Details  -->
             <VCard class="mb-6">
               <VCardText class="d-flex flex-column gap-y-6">
