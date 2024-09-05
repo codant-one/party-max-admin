@@ -26,8 +26,6 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        Log::info($this->user);
-
         return [
             'name' => [
                 'required'
@@ -43,11 +41,6 @@ class UserRequest extends FormRequest
             'password' => [
                 ($this->user) ? 'nullable' : 'required'
             ],
-            // 'roles' => [
-            //     'required',
-            //     'array',
-            //     'exists:Spatie\Permission\Models\Role,name'
-            // ],
             'province_id' => [
                 'integer',
                 'required',

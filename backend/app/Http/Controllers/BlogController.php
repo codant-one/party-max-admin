@@ -96,12 +96,10 @@ class BlogController extends Controller
             $order_id = Blog::where('blog_category_id', $blog->blog_category_id)
                            ->latest('order_id')
                            ->first()
-                           ->order_id ?? null;
+                           ->order_id ?? 0;
 
-            if($order_id) {
-                $blog->order_id = $order_id + 1;
-                $blog->update();
-            }
+            $blog->order_id = $order_id + 1;
+            $blog->update();
 
             return response()->json([
                 'success' => true,

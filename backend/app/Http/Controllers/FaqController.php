@@ -84,12 +84,10 @@ class FaqController extends Controller
             $order_id = Faq::where('faq_category_id', $faq->faq_category_id)
                            ->latest('order_id')
                            ->first()
-                           ->order_id ?? null;
+                           ->order_id ?? 0;
 
-            if($order_id) {
-                $faq->order_id = $order_id + 1;
-                $faq->update();
-            }
+            $faq->order_id = $order_id + 1;
+            $faq->update();
 
             return response()->json([
                 'success' => true,

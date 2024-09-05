@@ -308,7 +308,7 @@ const downloadCSV = async () => {
                             </div>
                         </td>
                         <td> {{ service.sku }} </td>
-                        <td> {{ (parseFloat(service.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
+                        <td> {{ (parseFloat(service.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
                         <td> 
                             <VChip
                                 v-bind="resolveStatus(service.state_id)"

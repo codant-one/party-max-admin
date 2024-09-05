@@ -110,7 +110,6 @@ class PaymentController extends Controller
 
     public function confirmation(Request $request): JsonResponse
     {
-        Log::info($request->all()); //pruebas;
         $order = Order::where('reference_code', $request->reference_sale)->first();
 
         if (!$order)

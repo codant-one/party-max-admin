@@ -30,8 +30,6 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            Log::info($slug);
-            
             $category = Category::with(['banner1', 'banner2', 'banner3', 'banner4', 'children'])
                                 ->where('slug', $slug)
                                 ->first();

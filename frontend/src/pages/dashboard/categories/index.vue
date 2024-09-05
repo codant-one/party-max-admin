@@ -265,7 +265,7 @@ const removeCategory = async () => {
                 </td>
                 <!-- <td>
                   <h4 class="text-sm text-end">
-                    {{ (parseFloat(category.sum ?? 0)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
+                    {{ (parseFloat(category.sum ?? 0)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
                   </h4>
                 </td> -->
                 <!-- 👉 Acciones -->

@@ -201,7 +201,7 @@ const colors = (id) => {
                 <VRow>
                     <VCol cols="12" md="5">
                         <p class="mb-0 mt-3 font-weight-semibold" v-if="price !== null">
-                            {{ (parseFloat(price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}
+                            {{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
                         </p>
                         <span v-else>
                             <VIcon

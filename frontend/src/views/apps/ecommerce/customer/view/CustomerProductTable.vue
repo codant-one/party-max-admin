@@ -242,7 +242,7 @@ const editProduct = id => {
                             readonly
                         /> 
                     </td>
-                    <td class="px-2"> {{ product.colors[0].sku }} </td>
+                    <td class="px-2"> {{ product.colors[0]?.sku ?? '--' }} </td>
                     <td class="px-2"> {{ product.price_for_sale }} </td>
                     <td class="px-2"> {{ product.stock }} </td>
                     <td class="px-2"> 

@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
 use App\Models\ServiceTag;
+use App\Models\ServiceList;
 use App\Models\Cupcake;
 
 class Service extends Model
@@ -79,7 +80,8 @@ class Service extends Model
     }
 
     public function scopeWhereSearch($query, $search) {
-        $query->where('name', 'LIKE', '%' . $search . '%');
+        $query->where('name', 'LIKE', '%' . $search . '%')
+              ->orWhere('sku', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereCategory($query, $search) {
@@ -195,6 +197,26 @@ class Service extends Model
     }
 
     /**** Public methods ****/
+    public static function createServiceOrder($service_id) {
+        ServiceList::where('service_id', $service_id)->delete();
+        
+        $service = Service::with('categories')->find($service_id);
+        
+        foreach($service->categories as $key => $category) {
+            $order_id = 
+            ServiceList::where('category_id', $category->category_id)
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? 0;
+
+            ServiceList::create([
+                'service_id' => $service_id,
+                'category_id' => $category['category_id'],
+                'order_id' => $order_id ? $order_id + 1 : 1
+            ]);
+        }
+    }
+
     public static function createServiceTags($service_id, $request) {
         foreach(explode(",", $request->tag_id) as $tag_id) {
             ServiceTag::create([
@@ -266,6 +288,7 @@ class Service extends Model
         self::createServiceTags($service->id, $request);
         self::createServiceCategories($service->id, $request);
         self::createServiceImages($service->id, $request);
+        self::createServiceOrder($service->id);
 
         if($request->isCupcake === 'true')
             self::createCupcakes($service->id, $request);
@@ -343,6 +366,7 @@ class Service extends Model
         self::updateServiceTags($service->id, $request);
         self::updateServiceCategories($service->id, $request);
         self::updateServiceImages($service->id, $request);
+        self::createServiceOrder($service->id);
 
         if($request->isCupcake === 'true')
             self::createCupcakes($service->id, $request);

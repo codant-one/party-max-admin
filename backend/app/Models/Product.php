@@ -140,7 +140,10 @@ class Product extends Model
     }
 
     public function scopeWhereSearch($query, $search) {
-        $query->where('name', 'LIKE', '%' . $search . '%');
+        $query->where('name', 'LIKE', '%' . $search . '%')
+              ->orWhereHas('colors', function ($q) use ($search) {
+                $q->where('sku', 'LIKE', '%' . $search . '%');
+        });
     }
 
     public function scopeWhereSearchPublic($query, $search) {
@@ -325,7 +328,7 @@ class Product extends Model
                 ProductList::where('category_id', $category['category_id'])
                            ->latest('order_id')
                            ->first()
-                           ->order_id ?? null;
+                           ->order_id ?? 0;
 
             ProductList::create([
                 'product_id' => $product_id,

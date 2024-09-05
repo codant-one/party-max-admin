@@ -273,7 +273,7 @@ const onEnd = async (e) => {
                       </VChip>
                   </span>
                 </td>  
-                <td> {{ (parseFloat(element.price)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
+                <td> {{ (parseFloat(element.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
                 <td class="text-end"> 
                   <VChip
                     v-bind="resolveStatus(element.state_id)"

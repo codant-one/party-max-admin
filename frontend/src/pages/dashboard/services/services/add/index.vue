@@ -206,7 +206,7 @@ const closeDropdown = () => {
 }
 
 const selectCategory = category => {
-  isCupcake.value = (category === 176) ? true : false
+  isCupcake.value = category.find(item => item === 176) ? true : false
 }
 
 const selectCakeType = (cakeType, i) => {
@@ -586,6 +586,7 @@ const onSubmit = () => {
                     id="selectCategory"
                     v-model="category_id"
                     autocomplete="off"
+                    multiple
                     :items="categories"
                     :item-title="item => item.name"
                     :item-value="item => item.id"

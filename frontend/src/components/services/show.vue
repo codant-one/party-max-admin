@@ -194,7 +194,7 @@ const setThumbsSwiper = (swiper) => {
                                             <VCol cols="12">
                                                 <div>
                                                     <span class="font-weight-semibold"> Costo: </span>
-                                                    <span>COP {{ price }}</span>
+                                                    <span>{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
                                                 </div>
                                                 <div> 
                                                     <span class="font-weight-semibold"> Envios: </span>

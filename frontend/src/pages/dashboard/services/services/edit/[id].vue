@@ -132,7 +132,7 @@ async function fetchData() {
 
       sku.value = service.value.sku
       category_id.value = service.value.categories.map(item => item.category_id)
-      selectCategory(category_id.value[0])
+      selectCategory(category_id.value)
 
       optionCounter.value = service.value.cupcakes.length
       service.value.cupcakes.forEach(async function callback(value, index) { 
@@ -256,7 +256,7 @@ const closeDropdown = (i) => {
 }
 
 const selectCategory = category => {
-  isCupcake.value = (category === 176) ? true : false
+  isCupcake.value = category.find(item => item === 176) ? true : false
 }
 
 const selectCakeType = (cakeType, i) => {
@@ -651,6 +651,7 @@ const onSubmit = () => {
                     id="selectCategory"
                     v-model="category_id"
                     autocomplete="off"
+                    multiple
                     :items="categories"
                     :item-title="item => item.name"
                     :item-value="item => item.id"

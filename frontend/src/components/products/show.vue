@@ -45,6 +45,7 @@ const rating = ref(null)
 const price = ref('')
 const price_for_sale = ref('')
 const wholesale_price = ref('')
+const wholesale = ref(false)
 const stock = ref('')
 const width = ref('')
 const height = ref('')
@@ -92,6 +93,7 @@ watchEffect(() => {
             price.value = props.product.price
             price_for_sale.value = props.product.price_for_sale
             wholesale_price.value = props.product.wholesale_price
+            wholesale.value = props.product.wholesale
             stock.value = props.product.stock
             width.value = props.product.detail.width
             weigth.value = props.product.detail.weigth
@@ -264,15 +266,15 @@ const chanceRadio = (value) => {
                                             <VCol cols="12">
                                                 <div>
                                                     <span class="font-weight-semibold"> Costo: </span>
-                                                    <span>COP {{ price }}</span>
+                                                    <span>{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="font-weight-semibold"> Precio al detal: </span>
-                                                    <span>COP {{ price_for_sale }}</span>
+                                                    <span>{{ (parseFloat(price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
                                                 </div>
-                                                <div>
+                                                <div v-if="wholesale">
                                                     <span class="font-weight-semibold"> Precio al mayor: </span>
-                                                    <span>COP {{ wholesale_price }}</span>
+                                                    <span>{{ (parseFloat(wholesale_price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="font-weight-semibold"> Stock: </span>

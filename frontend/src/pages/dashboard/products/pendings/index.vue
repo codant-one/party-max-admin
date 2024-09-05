@@ -403,8 +403,8 @@ const downloadCSV = async () => {
                                 readonly
                             /> 
                         </td>
-                        <td> {{ product.colors[0].sku }} </td>
-                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-IN", { style: "currency", currency: 'COP' }) }}</td>
+                        <td> {{ product.colors[0]?.sku ?? '--' }} </td>
+                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
                         <td> {{ product.stock }} </td>
                         <td> 
                             <VChip

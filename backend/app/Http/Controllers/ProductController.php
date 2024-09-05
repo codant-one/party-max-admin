@@ -112,12 +112,10 @@ class ProductController extends Controller
                 $product->update();
             }
 
-            $order_id = Product::latest('order_id')->first()->order_id ?? null;
+            $order_id = Product::latest('order_id')->first()->order_id ?? 0;
 
-            if($order_id) {
-                $product->order_id = $order_id + 1;
-                $product->update();
-            }
+            $product->order_id = $order_id + 1;
+            $product->update();
 
             return response()->json([
                 'success' => true,
