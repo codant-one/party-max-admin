@@ -286,6 +286,7 @@ Route::get('testing', [TestingController::class , 'permissions'])->name('permiss
 Route::get('emails', [TestingController::class , 'emails'])->name('emails');
 Route::get('paymentSummaryEmail', [TestingController::class , 'paymentSummaryEmail'])->name('paymentSummaryEmail');
 Route::get('infoOrder', [TestingController::class , 'infoOrder'])->name('infoOrder');
+Route::get('productSale', [TestingController::class , 'productSale'])->name('productSale');
 Route::get('confirmationOrderPayU', [TestingController::class , 'confirmationOrderPayU'])->name('confirmationOrderPayU');
 Route::get('littleProductExistence', [TestingController::class , 'littleProductExistenceEmail'])->name('littleProductExistence');
 Route::get('outOfStockEmail', [TestingController::class , 'outOfStockEmail'])->name('outOfStockEmail');

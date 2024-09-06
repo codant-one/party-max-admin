@@ -244,4 +244,64 @@ class Supplier extends Model
         return $supplierAccount;
     }
 
+    public static function sendInfo($orderId) {
+
+        $order = 
+            Order::with([
+                'details.product_color.product.user', 
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $email = $detail->product_color->product->user->email;
+            $productInfo = [
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            if (!isset($products[$email])) {
+                $products[$email] = [];
+            }
+
+            $products[$email][] = $productInfo;
+        
+        }
+
+        ksort($products);     
+
+        foreach($products as $key => $item) {
+
+            $email = $key;
+            $subject = 'Tienes un nuevo pedido.';
+            $data = [
+                'total' => $order->total,
+                'products' => $item,
+                'link_send' => $link_send,
+                'showButton' => true
+            ];
+
+            try {
+                \Mail::send(
+                    'emails.payment.product_sale'
+                    , ['data' => $data]
+                    , function ($message) use ($email, $subject) {
+                        $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                        $message->to($email)->subject($subject);
+                });
+            } catch (\Exception $e){
+                $message = 'error';
+                $responseMail = $e->getMessage();
+
+                Log::info($message . ' ' . $responseMail);
+            } 
+        }
+    }
+
 }

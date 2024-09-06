@@ -305,7 +305,7 @@ class Client extends Model
             'showButton' => $order->client ? true : false
         ];
         
-        $email = env('MAIL_TO_CONTACT');
+        $email = env('MAIL_TO_INFO');
         $subject = 'Tienes un nuevo pedido.';
 
         try {

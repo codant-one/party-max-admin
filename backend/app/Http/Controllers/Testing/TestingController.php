@@ -151,6 +151,58 @@ class TestingController extends Controller
         return view('emails.payment.purchase_detail', compact('data'));
     }
 
+    public function productSale() {
+
+        $orderId = 15;
+
+        $order = 
+            Order::with([
+                'details.product_color.product.user'
+            ])->find($orderId); 
+
+        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
+
+        $products = [];
+
+        foreach ($order->details as $detail) {
+            $email = $detail->product_color->product->user->email;
+
+            $productInfo = [
+                'email' => $email,
+                'product_id' => $detail->product_color->product->id,
+                'product_name' => $detail->product_color->product->name,
+                'product_image' => asset('storage/' . $detail->product_color->product->image),
+                'color' => $detail->product_color->color->name,
+                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                'quantity' => $detail->quantity,
+                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+            ];
+            
+            if (!isset($products[$email])) {
+                $products[$email] = [];
+            }
+
+            $products[$email][] = $productInfo;
+        
+        }
+
+        ksort($products);
+       
+        // foreach($products as $key => $item) {
+        //     dd($item);
+        // }
+        // dd($products);
+
+        $data = [
+            'total' => $order->total,
+            'products' => $products[$email],
+            'link_send' => $link_send,
+            'showButton' => true
+        ];
+
+        return view('emails.payment.product_sale', compact('data'));
+    }
+
     public function infoOrder() {
 
         $orderId = 16;

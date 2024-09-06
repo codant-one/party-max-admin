@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\Billing;
 use App\Models\Client;
+use App\Models\Supplier;
 
 class PaymentController extends Controller
 {
@@ -286,6 +287,7 @@ class PaymentController extends Controller
             case 4: 
                 Client::sendMail($order->id);
                 Client::sendInfo($order->id);
+                Supplier::sendInfo($order->id);
                 break;           
         }          
                 
