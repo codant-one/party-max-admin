@@ -161,7 +161,6 @@ class TestingController extends Controller
             ])->find($orderId); 
 
         $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
-
         $products = [];
 
         foreach ($order->details as $detail) {
