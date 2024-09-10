@@ -4,6 +4,8 @@ import Categories from '@/api/categories'
 export const useEventsStore = defineStore('events', {
     state: () => ({
         events: {},
+        last_page: 1,
+        eventsTotalCount: 6,
         categories: {},
         loading: false,
         availableCalendars: [],
@@ -30,7 +32,6 @@ export const useEventsStore = defineStore('events', {
                     this.availableCalendars = response.data.availableCalendars
                     this.availableServices = response.data.availableServices
                     this.selectedCalendars = response.data.selectedCalendars
-                    this.selectedUsers = response.data.selectedUsers
                 })
                 .catch(error => console.log(error))
                 .finally(() => {

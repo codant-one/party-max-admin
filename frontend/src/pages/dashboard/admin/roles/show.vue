@@ -281,7 +281,13 @@ const closeRoleDetailDialog = function(){
                             value="ver calendario"
                             :readonly="readonly"
                         /> 
-                       </div>
+                        <VCheckbox
+                            v-model="permissions"
+                            label="eliminar calendario"
+                            value="eliminar calendario"
+                            :readonly="readonly"
+                        />
+                    </div>
                 </div>
                 <VCardTitle>
                     Administración  

@@ -277,6 +277,9 @@ Route::group(['prefix' => 'payments'], function () {
 
 //ORDERS
 Route::apiResource('orders', OrderController::class);
+Route::group(['prefix' => 'orders'], function () {
+    Route::post('upload/file', [OrderController::class, 'file']);
+});
 
 //PROXY
 Route::get('/proxy-image',[ProxyController::class, 'getImage']);

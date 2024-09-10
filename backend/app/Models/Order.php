@@ -17,6 +17,7 @@ use App\Models\Address;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\ShippingHistory;
+use App\Models\Event;
 
 class Order extends Model
 {
@@ -57,7 +58,7 @@ class Order extends Model
         return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
-    public function type() {
+    public function address_type() {
         return $this->belongsTo(AddressesType::class, 'addresses_type_id', 'id');
     }
 
@@ -75,8 +76,9 @@ class Order extends Model
         $filters = collect($filters);
 
         if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
-            // $query->where('user_id', Auth::user()->id);
             $query->whereHas('details.product_color.product', function ($q) {
+                $q->where('user_id', Auth::user()->id);
+            })->orWhereHas('details.service', function ($q) {
                 $q->where('user_id', Auth::user()->id);
             });
         }
@@ -99,6 +101,10 @@ class Order extends Model
 
         if ($filters->get('payment_state_id')) {
             $query->where('payment_state_id', $filters->get('payment_state_id'));
+        }
+
+        if ($filters->get('type') || $filters->get('type') === '0') {
+            $query->where('type', $filters->get('type'));
         }
 
         if ($filters->get('orderByField') || $filters->get('orderBy')) {
@@ -128,7 +134,8 @@ class Order extends Model
             'shipping_express' => $request->shipping_express,
             'tax' => $request->tax,
             'total' => $request->total,
-            'wholesale' => $request->wholesale 
+            'wholesale' => $request->wholesale,
+            'type' => $request->type
         ]);
 
         $addressFind = collect($request->addresses)->firstWhere('id', $request->address_id);
@@ -145,11 +152,18 @@ class Order extends Model
             ]);
         }
 
-        $prefix = $request->wholesale === 0 ? '03' : '05';
+        $prefix = $request->type === 0 ? ($request->wholesale === 0 ? '03' : '05') : '09';
         //PRODUCCION $request->wholesale === 0 ? '03' : '05';
         //STAGING $request->wholesale === 0 ? '00' : '99';
+        //SERVICES '09'
 
-        $reference_code = Order::where('wholesale', $request->wholesale)
+        if($request->type === 0 )
+            $reference_code = Order::where([['wholesale', $request->wholesale],['type', 0]])
+                           ->latest('reference_code')
+                           ->first()
+                           ->reference_code ?? $prefix.'0000000';
+        else 
+            $reference_code = Order::where('type', 1)
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.'0000000';
@@ -159,15 +173,43 @@ class Order extends Model
         ]);
 
         //Order_details
-        foreach ($request->product_color_id as $index => $productColorId) {
-            $detail = OrderDetail::create([
-                'order_id' => $order->id,
-                'product_color_id' => $productColorId,
-                'price' => $request->price[$index],
-                'quantity' => $request->quantity[$index],
-                'total' => $request->price[$index] * $request->quantity[$index],
-            ]);
-        }
+        if($request->type === 0 )
+            foreach ($request->product_color_id as $index => $productColorId) {
+                $detail = OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_color_id' => $productColorId,
+                    'price' => $request->price[$index],
+                    'quantity' => $request->quantity[$index],
+                    'total' => $request->price[$index] * $request->quantity[$index],
+                ]);
+            }
+        else 
+            foreach ($request->service_id as $index => $serviceId) {
+                $detail = OrderDetail::create([
+                    'order_id' => $order->id,
+                    'service_id' => $serviceId,
+                    'cake_size_id' => $request->cake_size_id[$index] === null ? null : $request->cake_size_id[$index],
+                    'flavor_id' => $request->flavor_id[$index] === null ? null : $request->flavor_id[$index],
+                    'filling_id' => $request->filling_id[$index] === null ? null : $request->filling_id[$index],
+                    'order_file_id' => $request->order_file_id[$index] === null ? null : $request->order_file_id[$index],
+                    'price' => $request->price[$index],
+                    'date' => $request->date[$index],
+                    'quantity' => $request->quantity[$index],
+                    'total' => $request->price[$index] * $request->quantity[$index],
+                ]);
+
+                $order_create = Order::with(['details.service.categories'])->find($order->id);
+
+                foreach($order_create->details as $key => $detail) {
+                    $event = new Event;
+                    $event->category_id = $detail->service->categories[0]->category_id;
+                    $event->order_detail_id = $detail->id;
+                    $event->title = $order_create->reference_code . '-' .$detail->id;
+                    $event->start_date = $detail->date;
+                    $event->end_date = $detail->date;
+                    $event->save();
+                }
+            }
 
         //Billing
         $billing = Billing::create([
@@ -275,6 +317,7 @@ class Order extends Model
 
         $order = 
             Order::with([
+                'province',
                 'billing', 
                 'details.product_color.product', 
                 'address.province', 

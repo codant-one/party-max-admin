@@ -1,14 +1,12 @@
 <script setup>
 
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import { VForm } from 'vuetify/components'
-import { useEventsStore } from '@/stores/useEvents'
+import { themeConfig } from '@themeConfig'
 import { ref } from "vue"
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
-import {
-  requiredValidator
-} from '@validators'
+dayjs.extend(customParseFormat);
 
 const props = defineProps({
   isDrawerOpen: {
@@ -28,10 +26,28 @@ const emit = defineEmits([
   'removeEvent',
 ])
 
-const store = useEventsStore()
 const refForm = ref()
 
-const guestsOptions = ref([])
+const resolveStatusPayment = payment_state_id => {
+  if (payment_state_id === 1)
+    return { color: 'error' }
+  if (payment_state_id === 2)
+    return { color: 'success' }
+  if (payment_state_id === 3)
+    return { color: 'success' }
+  if (payment_state_id === 4)
+    return { color: 'primary' }
+}
+
+const resolveStatusEvent = state_id => {
+  if (state_id === 4)
+    return { color: 'error' , name: 'Pendiente'}
+  if (state_id === 6)
+    return { color: 'success' , name: 'Rechazado'}
+  if (state_id === 7)
+    return { color: 'primary' , name: 'Entregado'}
+}
+
 const states = ref([
   {
     id: 4,
@@ -43,46 +59,78 @@ const states = ref([
   } 
 ])
 
-const listServicesByCategory = ref([])
+// 👉 Event
+const event = ref(JSON.parse(JSON.stringify(props.event)))
+const image = ref(null)
+const isCupcake = ref([])
+const flavor = ref(null)
+const filling = ref(null)
+const cake_size = ref(null)
+const quantity = ref(1)
+const date = ref(null)
+const user = ref(null)
+const address = ref(null)
+const email = ref(null)
+const phone = ref(null)
+const isFile = ref(false)
+const file = ref(false)
+const price = ref(false)
 
 watchEffect(fetchData)
 
 async function fetchData() {
 
-  guestsOptions.value = []
+  if(event.value.extendedProps.order_detail) {
+    console.log('event', event.value)
+    image.value = event.value.extendedProps.order_detail.service.image === null ? '' : themeConfig.settings.urlStorage + event.value.extendedProps.order_detail.service.image
+    date.value = event.value.extendedProps.order_detail.date
+    price.value = event.value.extendedProps.order_detail.total
 
-  await store.getUsers()
+    const note = event.value.extendedProps.order_detail.order.billing.note === null ? '.' : '. (' + event.value.extendedProps.order_detail.order.billing.note + ').'
+    
+    if(event.value.extendedProps.order_detail.order.client) {
 
-  store.getUsersArray.forEach(element =>{
-    guestsOptions.value.push({
-      id: element.id,
-      name: element.user_detail.store_name ?? (element.supplier?.company_name ?? (element.name + ' ' + (element.last_name ?? '')))
-    })
-  })
+      user.value = event.value.extendedProps.order_detail.order.client.user.name + ' ' + event.value.extendedProps.order_detail.order.client.user.last_name
+      email.value = event.value.extendedProps.order_detail.order.client.user.email
 
-}
+      address.value = 
+        event.value.extendedProps.order_detail.order.address.address + ', ' + 
+        event.value.extendedProps.order_detail.order.address.street + ', ' +
+        event.value.extendedProps.order_detail.order.address.city + ', ' +
+        event.value.extendedProps.order_detail.order.address.postal_code + ', ' +
+        event.value.extendedProps.order_detail.order.address.province.name +
+        note;
+        
+      phone.value = event.value.extendedProps.order_detail.order.address.phone
+    } else {
+      user.value =  event.value.extendedProps.order_detail.order.billing.name + ' ' +  event.value.extendedProps.order_detail.order.billing.last_name
+      email.value = event.value.extendedProps.order_detail.order.billing.email
 
-const getServices = computed(() => {
-  return listServicesByCategory.value.map((state) => {
-    return {
-      title: state.name,
-      value: state.id,
+      address.value = 
+        event.value.extendedProps.order_detail.order.shipping_address + ', ' + 
+        event.value.extendedProps.order_detail.order.shipping_street + ', ' + 
+        event.value.extendedProps.order_detail.order.shipping_city + ', ' + 
+        event.value.extendedProps.order_detail.order.shipping_postal_code + ', ' + 
+        event.value.extendedProps.order_detail.order.province.name +
+        note;
+
+      phone.value = event.value.extendedProps.order_detail.order.shipping_phone
     }
-  })
-})
 
-const selectCategory = (category) => {
-  if (category) {
-    listServicesByCategory.value = store.availableServices.filter(item => item.category === category)
+    isCupcake.value = event.value.extendedProps.order_detail.service.cupcakes.length > 0 ? true : false
+
+    if(isCupcake.value) {
+      flavor.value = event.value.extendedProps.order_detail.flavor.name
+      filling.value = event.value.extendedProps.order_detail.filling.name
+      cake_size.value = event.value.extendedProps.order_detail.cake_size.name
+      quantity.value = event.value.extendedProps.order_detail.quantity 
+
+      isFile.value = event.value.extendedProps.order_detail.order_file === null ? false : true
+      file.value = event.value.extendedProps.order_detail.order_file === null ? false : themeConfig.settings.urlStorage + event.value.extendedProps.order_detail.order_file.image
+    }
   }
+  
 }
-
-const copy = () =>{
-  event.value.extendedProps.description = event.value.title
-}
-
-// 👉 Event
-const event = ref(JSON.parse(JSON.stringify(props.event)))
 
 const resetEvent = async () => {
   event.value = JSON.parse(JSON.stringify(props.event))
@@ -105,24 +153,6 @@ const removeEvent = () => {
   emit('update:isDrawerOpen', false)
 }
 
-const handleSubmit = () => {
-
-  refForm.value?.validate().then(({ valid }) => {
-    if (valid) {
-      event.value.delta = 0
-      // If id exist on id => Update event
-      if ('id' in event.value) 
-        emit('updateEvent', event.value)
-      // Else => add new event
-      else
-        emit('addEvent', event.value)
-
-      // Close drawer
-      emit('update:isDrawerOpen', false)
-    }
-  })
-}
-
 // 👉 Form
 const onCancel = () => {
 
@@ -135,16 +165,6 @@ const onCancel = () => {
   })
 }
 
-const dateTimePickerConfig = computed(() => {
-  const config = {
-    dateFormat: 'Y-m-d'
-  }
-
-  if (event.value.start)
-    config.minDate = event.value.start
-  
-  return config
-})
 
 const dialogModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
@@ -154,24 +174,24 @@ const dialogModelValueUpdate = val => {
 
 <template>
   <VNavigationDrawer
+    v-if="event.extendedProps.order_detail"
+    :model-value="props.isDrawerOpen"
     temporary
     location="end"
-    :model-value="props.isDrawerOpen"
     width="420"
     class="scrollable-content"
     @update:model-value="dialogModelValueUpdate"
   >
     <!-- 👉 Header -->
     <div class="d-flex align-center pa-6 pb-1">
-      <h6 class="text-h6" v-if="$can('editar','calendario')">
-        {{ event.id ? 'Actualizar' : 'Agregar' }} Agenda
-      </h6>
-      <h6 class="text-h6" v-else>Agenda</h6>
+      <h3 class="text-h3">
+        Pedido #{{ event.title }}
+      </h3>
 
       <VSpacer />
 
       <VBtn
-        v-if="$can('eliminar','calendario')"
+        v-if="$can('eliminar', 'calendario')"
         v-show="event.id"
         icon
         variant="tonal"
@@ -202,63 +222,95 @@ const dialogModelValueUpdate = val => {
     </div>
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
-      <VCard flat>
+      <VCard flat class="px-2">
+        <VCardTitle>{{ event.extendedProps.order_detail.service.name }}</VCardTitle>
         <VCardText>
-          <!-- SECTION Form -->
-          <VForm
-            ref="refForm"
-            @submit.prevent="handleSubmit"
-          >
             <VRow>
-              <!-- 👉 Title -->
-              <VCol cols="12" md="11">
-                <VTextField
-                  v-model="event.title"
-                  label="Título"
-                  :rules="[requiredValidator]"
+              <!-- 👉 img -->
+              <VCol cols="12" md="12" class="px-1 py-0">
+                <VImg
+                  :src="image"
+                  :height="200"
+                  aspect-ratio="1/1"
+                  class="border-img"
+                  cover
                 />
               </VCol>
 
-              <VCol cols="12" md="1" class="px-0">
-                <VBtn
-                  icon
-                  size="x-small"
-                  color="secondary"
-                  variant="text">            
-                  <VIcon size="22" icon="tabler-copy" @click="copy()"/>
-                  <VTooltip activator="parent" location="top">
-                    Copiar
-                  </VTooltip>
-                </VBtn>
+              <VCol cols="12" md="12" class="px-1 py-0 d-flex flex-column" v-if="isCupcake">
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Sabor:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ flavor }}</span></div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Relleno:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ filling }}</span></div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Tamaño:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ cake_size }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Cantidad:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ quantity }} {{ quantity > 1 ? 'Unidades' : 'Unidad' }}</span>
+                </div>
               </VCol>
 
-              <!-- 👉 Category -->
-              <VCol cols="12">
-                <VAutocomplete
-                  v-model="event.extendedProps.calendar"
-                  label="Categorías"
-                  clearable
-                  :rules="[requiredValidator]"
-                  :items="store.availableCalendars"
-                  :item-title="item => item.label"
-                  :item-value="item => item.label"
-                  @update:model-value="selectCategory(event.extendedProps.calendar)"
-                />
+              <!-- 👉 details -->
+              <VCol cols="12" class="px-1 py-0">
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Fecha de entrega:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ dayjs(date, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD hh:mm A') }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Cliente:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ user }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Email:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ email }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Dirección:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ address }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Teléfono:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ phone }}</span>
+                </div>
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Precio:</span>
+                  <span class="text-h6 text-disabled ms-2">{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                </div>
+              </VCol>
+
+               <!-- 👉 img -->
+               <VCol cols="12" md="12" class="px-1 py-0" v-if="isCupcake && isFile">
+                  <span class="font-weight-medium text-primary text-h6">Archivo Personalizado:</span>
+                  <VImg
+                    :src="file"
+                    :height="200"
+                    aspect-ratio="1/1"
+                    class="border-img"
+                    cover
+                  />
               </VCol>
 
               <!-- 👉 Service -->
-              <VCol cols="12">
-                <VAutocomplete
-                  v-model="event.extendedProps.service_id"
-                  label="Servicios"
-                  clearable
-                  :rules="[requiredValidator]"
-                  :items="getServices"
-                />
+              <VCol cols="12" class="px-1 py-1">
+                <div>
+                  <span class="font-weight-medium text-primary text-h6">Estado del pago:</span>
+                  <VChip
+                    label
+                    class="ms-2"
+                    :color="resolveStatusPayment(event.extendedProps.order_detail.order.payment.id)?.color"
+                    >
+                    {{ event.extendedProps.order_detail.order.payment.name }}
+                  </VChip>
+                </div>
               </VCol>
 
               <!-- 👉 State -->
-              <VCol cols="12">
+              <VCol cols="12" class="px-1 py-1" v-if="event.extendedProps.order_detail.order.payment.id === 4 && event.extendedProps.state_id === 4">
+                <span class="font-weight-medium text-primary text-h6">Estado del pedido:</span>
                 <VSelect
                   v-model="event.extendedProps.state_id"
                   label="Estado"
@@ -268,49 +320,18 @@ const dialogModelValueUpdate = val => {
                 />                
               </VCol>
 
-              <!-- 👉 End date -->
-              <VCol cols="12">
-                <AppDateTimePicker
-                  :key="JSON.stringify(dateTimePickerConfig)"
-                  v-model="event.end"
-                  :rules="[requiredValidator]"
-                  label="Fecha"
-                  :config="dateTimePickerConfig"
-                />
-              </VCol>
-
-              <!-- 👉 End date -->
-
-              <!-- 👉 Description -->
-              <VCol cols="12">
-                <VTextarea
-                  v-model="event.extendedProps.description"
-                  :counter="500"
-                  :rules="[v => (v || '' ).length <= 500 || 'Descripción: Máx. 500 caracteres.']"
-                  rows="6"
-                  label="Descripción"
-                />
-              </VCol>
-
-              <!-- 👉 Form buttons -->
-              <VCol cols="12">
-                <VBtn
-                  variant="tonal"
-                  color="secondary"
-                  class="me-3"
-                  @click="onCancel"
-                >
-                  Cancelar
-                </VBtn>
-                <VBtn
-                  v-if="$can('editar','calendario') && $can('crear','calendario')"
-                  type="submit"
-                >
-                  {{ event.id ? 'Actualizar' : 'Agregar' }}
-                </VBtn>
+              <VCol cols="12" class="px-1 py-0" v-else>
+                <span class="font-weight-medium text-primary text-h6">Estado del pedido:</span>
+                <VChip
+                    label
+                    class="ms-2"
+                    :color="resolveStatusEvent(event.extendedProps.state_id)?.color"
+                    >
+                    {{resolveStatusEvent(event.extendedProps.state_id)?.name}}
+                  </VChip>           
               </VCol>
             </VRow>
-          </VForm>
+        
         <!-- !SECTION -->
         </VCardText>
       </VCard>
@@ -319,6 +340,15 @@ const dialogModelValueUpdate = val => {
 </template>
 
 <style scoped>
+  .border-img {
+    border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    border-radius: 6px;
+  }
+
+  .border-img .v-img__img--contain {
+    padding: 10px;
+  }
+
   .p-0  {
     padding: 0 !important
   }

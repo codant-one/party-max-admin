@@ -37,15 +37,6 @@ class OrderRequest extends FormRequest
                 'numeric',
                 'required'
             ],
-            'product_color_id' => [
-                'array',
-                'required'
-            ],
-            'product_color_id.*' => [
-                'required',
-                'integer',
-                'exists:App\Models\ProductColor,id'
-            ],
             'price' => [
                 'array',
                 'required'
@@ -87,14 +78,7 @@ class OrderRequest extends FormRequest
 
             'tax.required' => 'El tax es requerido.',
             'tax.numeric' => 'El tax debe ser numérico.',
-
-            'product_color_id.required' => 'El Id Product_color es requerido.',
-            'product_color_id.array' => 'El Id Product_color debe ser array.',
-
-            'product_color_id.*.required' => 'El Id Product_color es requerido.',
-            'product_color_id.*.integer' => 'El Id Product_color debe ser entero.',
-            'product_color_id.*.exists' => 'El Id Product_color ingresado no existe.',
-
+            
             'price.required' => 'El Precio es requerido.',
             'price.array' => 'El Precio debe ser un array.',
 

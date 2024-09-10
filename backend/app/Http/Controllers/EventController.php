@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Models\Event;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Models\Order;
 
 class EventController extends Controller
 {
@@ -21,10 +22,7 @@ class EventController extends Controller
     {
         $this->middleware('jwt');
         $this->middleware(PermissionMiddleware::class . ':ver calendario|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':crear calendario|administrador')->only(['store']);
-        $this->middleware(PermissionMiddleware::class . ':editar calendario|administrador')->only(['update']);
         $this->middleware(PermissionMiddleware::class . ':eliminar calendario|administrador')->only(['destroy']);
-        $this->middleware(PermissionMiddleware::class . ':ver timeline-calendario|administrador')->only(['all']);
     }
 
     /**
@@ -42,7 +40,20 @@ class EventController extends Controller
             $names = explode(',', $request->calendars);
             $users = explode(',', $request->users);
 
-            $query = Event::with(['category', 'service'])
+            $query = Event::with([
+                            'category', 
+                            'order_detail.service.cupcakes',
+                            'order_detail.service.user',
+                            'order_detail.flavor',
+                            'order_detail.filling',
+                            'order_detail.cake_size',
+                            'order_detail.order_file',
+                            'order_detail.order.client.user.userDetail',
+                            'order_detail.order.billing', 
+                            'order_detail.order.address.province',
+                            'order_detail.order.province',
+                            'order_detail.order.payment'
+                          ])
                           ->whereHas('category', function ($query) use ($names){
                                 foreach ($names as $key => $name) {
                                     if($key === 0)
@@ -54,14 +65,18 @@ class EventController extends Controller
                            });
 
             if($isAdmin)
-                $events = $query->whereHas('service', function ($q) use ($users) {
-                    return $q->whereIn('user_id', $users)
-                             ->orderBy('user_id');
+                $events = $query->whereHas('order_detail', function ($q) use ($users) {
+                    $q->whereHas('service', function ($q) use ($users){
+                        return $q->whereIn('user_id', $users)
+                                 ->orderBy('user_id');
+                    });
                 })->get();
             else
-                $events = $query->whereHas('service', function ($q) {
-                    return $q->where('user_id', Auth()->user()->id)
-                             ->orderBy('user_id');
+                $events = $query->whereHas('order_detail', function ($q) {
+                    $q->whereHas('service', function ($q) {
+                        return $q->where('user_id', Auth()->user()->id)
+                                 ->orderBy('user_id');
+                    });
                 })->get();
 
             $data = [];
@@ -78,7 +93,7 @@ class EventController extends Controller
                     'extendedProps' => [
                         'state_id' => $event['state_id'],
                         'calendar' => $event['category']['name'],
-                        'service_id' => $event['service_id'],
+                        'order_detail' => $event['order_detail'],
                         'description' => $event['description'],
                     ]
                 ];
@@ -101,7 +116,7 @@ class EventController extends Controller
             ], 500);
         }
     }
-
+    
     public function events(Request $request): JsonResponse
     {   
         try {
@@ -113,7 +128,20 @@ class EventController extends Controller
 
             $names = explode(',', $request->calendars);
 
-            $query = Event::with(['category', 'service'])
+            $query = Event::with([
+                            'category', 
+                            'order_detail.service.cupcakes',
+                            'order_detail.service.user',
+                            'order_detail.flavor',
+                            'order_detail.filling',
+                            'order_detail.cake_size',
+                            'order_detail.order_file',
+                            'order_detail.order.client.user.userDetail',
+                            'order_detail.order.billing', 
+                            'order_detail.order.address.province',
+                            'order_detail.order.province',
+                            'order_detail.order.payment'
+                          ])
                           ->whereHas('category', function ($query) use ($names){
                                 foreach ($names as $key => $name) {
                                     if($key === 0)
@@ -138,7 +166,7 @@ class EventController extends Controller
                     'extendedProps' => [
                         'state_id' => $event['state_id'],
                         'calendar' => $event['category']['name'],
-                        'service_id' => $event['service_id'],
+                        'order_detail_id' => $event['order_detail_id'],
                         'description' => $event['description'],
                     ]
                 ];
@@ -182,7 +210,20 @@ class EventController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'event' => Event::with(['category', 'service'])->find($event->id)
+                    'event' => Event::with([
+                        'category', 
+                        'order_detail.service.cupcakes',
+                        'order_detail.service.user',
+                        'order_detail.flavor',
+                        'order_detail.filling',
+                        'order_detail.cake_size',
+                        'order_detail.order_file',
+                        'order_detail.order.client.user.userDetail',
+                        'order_detail.order.billing', 
+                        'order_detail.order.address.province',
+                        'order_detail.order.province',
+                        'order_detail.order.payment'
+                    ])->find($event->id)
                 ]
             ], 200);
         
@@ -202,7 +243,20 @@ class EventController extends Controller
     {
         try {
 
-            $event = Event::with(['category', 'service'])->find($id);
+            $event = Event::with([
+                'category', 
+                'order_detail.service.cupcakes',
+                'order_detail.service.user',
+                'order_detail.flavor',
+                'order_detail.filling',
+                'order_detail.cake_size',
+                'order_detail.order_file',
+                'order_detail.order.client.user.userDetail',
+                'order_detail.order.billing', 
+                'order_detail.order.address.province',
+                'order_detail.order.province',
+                'order_detail.order.payment'
+            ])->find($id);
         
             if (!$event)
                 return response()->json([
@@ -254,7 +308,20 @@ class EventController extends Controller
 
             $event->updateEvent($request, $event); 
 
-            $event = Event::with(['category', 'service'])->find($id);
+            $event = Event::with([
+                'category', 
+                'order_detail.service.cupcakes',
+                'order_detail.service.user',
+                'order_detail.flavor',
+                'order_detail.filling',
+                'order_detail.cake_size',
+                'order_detail.order_file',
+                'order_detail.order.client.user.userDetail',
+                'order_detail.order.billing', 
+                'order_detail.order.address.province',
+                'order_detail.order.province',
+                'order_detail.order.payment'
+            ])->find($id);
 
             $eventArray = [
                 'id' => $event['id'],
@@ -266,7 +333,7 @@ class EventController extends Controller
                 'extendedProps' => [
                     'state_id' => $event['state_id'],
                     'calendar' => $event['category']['name'],
-                    'service_id' => $event['service_id'],
+                    'order_detail_id' => $event['order_detail_id'],
                     'description' => $event['description'],
                 ]
             ];

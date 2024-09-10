@@ -42,7 +42,7 @@ async function fetchData() {
 
     await store.getUsers()
 
-    store.getUsersArray.forEach(element =>{
+    store.getUsersArray.forEach(element => {
         guestsOptions.value.push({
           id: element.id,
           name: element.user_detail.store_name ?? (element.supplier?.company_name ?? (element.name + ' ' + (element.last_name ?? '')))
@@ -116,7 +116,7 @@ const closeDropdown = () => {
                     location="start"
                     class="calendar-add-event-drawer"
                     :temporary="$vuetify.display.mdAndDown">
-                    <div style="margin: 1.4rem;">
+                    <!-- <div style="margin: 1.4rem;">
                       <VBtn
                         v-if="$can('crear','calendario')"
                         block
@@ -125,7 +125,7 @@ const closeDropdown = () => {
                         Agregar Agenda
                       </VBtn>
                     </div>
-                    <VDivider v-if="$can('administrador')" />
+                    <VDivider v-if="$can('administrador')" /> -->
                     <div class="d-flex align-center justify-center pa-2 mb-3">
                       <AppDateTimePicker
                         :model-value="new Date().toJSON().slice(0, 10)"

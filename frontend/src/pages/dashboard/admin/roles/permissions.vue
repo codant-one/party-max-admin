@@ -205,6 +205,11 @@ const closeModal = function(){
                             label="ver calendario"
                             value="ver calendario"
                         />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="eliminar calendario"
+                            value="eliminar calendario"
+                        />
                     </div>
                 </div>
                 <VCardTitle>

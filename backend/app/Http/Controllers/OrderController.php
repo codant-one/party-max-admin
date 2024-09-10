@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\OrderFileRequest;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Order;
 use App\Models\ProductColor;
 use App\Models\Product;
+use App\Models\OrderFile;
 
 class OrderController extends Controller
 {
@@ -26,7 +28,14 @@ class OrderController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
         
-            $query = Order::with(['details', 'address.type', 'billing', 'shipping', 'payment', 'client.user.userDetail'])
+            $query = Order::with([
+                            'details', 
+                            'address.type', 
+                            'billing', 
+                            'shipping', 
+                            'payment', 
+                            'client.user.userDetail'
+                        ])
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -35,7 +44,8 @@ class OrderController extends Controller
                                 'clientId',
                                 'wholesale',
                                 'shipping_state_id',
-                                'payment_state_id'
+                                'payment_state_id',
+                                'type'
                             ])
                         );
 
@@ -109,13 +119,21 @@ class OrderController extends Controller
                 'details.product_color.product.user.supplier', 
                 'details.product_color.color',
                 'details.product_color.images', 
+                'details.service.user.userDetail',
+                'details.service.user.supplier',
+                'details.service.images',
+                'details.service.cupcakes',
+                'details.cake_size',
+                'details.flavor',
+                'details.filling',
+                'details.order_file',
                 'address.type', 
                 'billing', 
                 'shipping', 
                 'payment', 
                 'client.user.userDetail',
                 'histories',
-                'type'
+                'address_type'
             ])->find($id);
 
             if (!$order)
@@ -403,6 +421,39 @@ class OrderController extends Controller
                 'success' => true,
                 'data' => [ 
                     'order' => $order
+                ]
+            ], 200);
+            
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    
+    }
+
+    public function file(OrderFileRequest $request): JsonResponse
+    {
+        try {
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'orders/';
+
+                $file_data = uploadFile($image, $path);
+
+                $order_file = new OrderFile;
+                $order_file->image = $file_data['filePath'];
+                $order_file->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'order_file' => $order_file
                 ]
             ], 200);
             

@@ -81,6 +81,41 @@ const back = () => {
   }
 }
 
+const download = async (img) => {
+
+  try {
+    const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + img);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+
+    link.setAttribute('download', 'image.jpg');
+
+    document.body.appendChild(link);
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+
+    let data = {
+      message: 'Descarga Exitosa!',
+      error: false 
+    }
+
+    emitter.emit('toast', data)
+
+  } catch (error) {
+
+    let data = {
+      message: 'Error al descargar la imagen:' + error,
+      error: true 
+    }
+
+    emitter.emit('toast', data)
+  }
+}
+
 const removeOrder = async () => {
   isConfirmDeleteDialogVisible.value = false
   let res = await ordersStores.deleteOrder(route.params.id)
@@ -161,7 +196,7 @@ const removeOrder = async () => {
         id="invoice-detail"
       >
         <VRow>
-          <VCol cols="12" :md="rol !== 'Proveedor' ? '8' : '12'">
+          <VCol cols="12" :md="(rol !== 'Proveedor' || order.type === 1) ? '8' : '12'">
             <!-- 👉 Order Details -->
             <VCard class="mb-6 print-row">
               <VCardItem>
@@ -177,49 +212,115 @@ const removeOrder = async () => {
               <v-table class="text-no-wrap order-preview-table">
                 <thead>
                   <tr class="text-no-wrap">
-                    <th class="font-weight-semibold"> PRODUCTO </th>
+                    <th class="font-weight-semibold"> {{ order.type === 0 ? 'PRODUCTO' : 'SERVICIO' }}</th>
                     <th class="font-weight-semibold"> PRECIO </th>
                     <th class="font-weight-semibold"> CANTIDAD </th>
                     <th class="font-weight-semibold"> TOTAL </th>   
                   </tr>
                 </thead>
                 <tbody>
-                  <template v-for="order in order.details">
-                    <tr style="height: 3.75rem;" v-if="(order.product_color.product.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
-                      <td class="text-wrap">
-                        <div class="d-flex gap-x-3 align-center my-1">
-                          <VAvatar
-                            v-if="order.product_color.images.length > 0"
-                            size="150"
-                            variant="outlined"
-                            :image="themeConfig.settings.urlStorage + order.product_color.images[0].image"
-                            rounded="lg"
-                          />
-                          <VAvatar
-                            v-else
-                            size="150"
-                            variant="outlined"
-                            :image="themeConfig.settings.urlStorage + order.product_color.product.image"
-                            rounded="lg"
-                          />
-                          <div class="d-flex flex-column align-start">
-                            <span class="text-body-1 font-weight-medium">
-                              {{ order.product_color.product.name }}
-                            </span>
+                  <template v-for="item in order.details">
+                    <template v-if="order.type === 0">
+                      <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
+                        <td class="text-wrap">
+                          <div class="d-flex gap-x-3 align-center my-1">
+                            <VAvatar
+                              v-if="item.product_color.images.length > 0"
+                              size="150"
+                              variant="outlined"
+                              :image="themeConfig.settings.urlStorage + item.product_color.images[0].image"
+                              rounded="lg"
+                            />
+                            <VAvatar
+                              v-else
+                              size="150"
+                              variant="outlined"
+                              :image="themeConfig.settings.urlStorage + item.product_color.product.image"
+                              rounded="lg"
+                            />
+                            <div class="d-flex flex-column align-start">
+                              <span class="text-body-1 font-weight-medium">
+                                {{ item.product_color.product.name }}
+                              </span>
 
-                            <span class="text-sm text-disabled">
-                              Color: {{ order.product_color.color.name }}
-                            </span>
-                            <span class="text-sm text-disabled">
-                              Tienda: {{ order.product_color.product.user.user_detail.store_name ?? (order.product_color.product.user.supplier?.company_name ?? (order.product_color.product.user.name + ' ' + (order.product_color.product.user.last_name ?? ''))) }}
-                            </span>
+                              <span class="text-sm text-disabled">
+                                Color: {{ item.product_color.color.name }}
+                              </span>
+                              <span class="text-sm text-disabled">
+                                Tienda: {{ item.product_color.product.user.user_detail.store_name ?? (item.product_color.product.user.supplier?.company_name ?? (item.product_color.product.user.name + ' ' + (item.product_color.product.user.last_name ?? ''))) }}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td><span>${{ formatNumber(order.price) }}</span></td>
-                      <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ order.quantity }}</span></td>
-                      <td><span class="text-h6">${{ formatNumber(order.total) }}</span></td>
-                    </tr>
+                        </td>
+                        <td><span>${{ formatNumber(item.price) }}</span></td>
+                        <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ item.quantity }}</span></td>
+                        <td><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
+                      </tr>
+                    </template>
+                    <template v-else>
+                      <tr style="height: 3.75rem;" v-if="(item.service.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
+                        <td class="text-wrap">
+                          <div class="d-flex gap-x-3 align-center my-1">
+                            <VAvatar
+                              v-if="item.service.images.length > 0"
+                              size="150"
+                              variant="outlined"
+                              :image="themeConfig.settings.urlStorage + item.service.images[0].image"
+                              rounded="lg"
+                            />
+                            <VAvatar
+                              v-else
+                              size="150"
+                              variant="outlined"
+                              :image="themeConfig.settings.urlStorage + item.service.image"
+                              rounded="lg"
+                            />
+                            <div class="d-flex flex-column align-start">
+                              <span class="text-body-1 font-weight-medium">
+                                {{ item.service.name }}
+                              </span>
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">
+                                Sabor: {{ item.flavor.name }}
+                              </span>
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">
+                                Relleno: {{ item.filling.name }}
+                              </span>
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">
+                                Tamaño: {{ item.cake_size.name }}
+                              </span>
+                              <span class="text-sm text-disabled">
+                                Tienda: {{ item.service.user.user_detail.store_name ?? (item.service.user.supplier?.company_name ?? (item.service.user.name + ' ' + (item.service.user.last_name ?? ''))) }}
+                              </span>
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0 && item.order_file !== null">
+                                Archivo: 
+                                <VBtn
+                                  @click="download(item.order_file.image)"
+                                  icon
+                                  variant="text"
+                                  color="default"
+                                  size="x-small">
+                                  <VTooltip
+                                    open-on-focus
+                                    location="top"
+                                    activator="parent">
+                                    Descargar imagen
+                                  </VTooltip>
+                                  <VIcon
+                                    size="20"
+                                    icon="tabler-photo"
+                                    class="me-1"
+                                  />
+                              </VBtn>
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span>${{ formatNumber(item.price) }}</span></td>
+                        <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ item.quantity }}</span></td>
+                        <td><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
+                      </tr>
+                    </template>
+                    
                   </template>
                 </tbody>
               </v-table>
@@ -265,7 +366,7 @@ const removeOrder = async () => {
             </VCard>
 
             <!-- 👉 Shipping Activity -->
-            <VCard title="Actividad de envío" class="d-print-none">
+            <VCard title="Actividad de envío" class="d-print-none" v-if="order.type === 0">
               <VCardText>
                 <VTimeline
                   v-if="order.payment.id !== 4"
@@ -439,7 +540,7 @@ const removeOrder = async () => {
             </VCard>
           </VCol>
 
-          <VCol cols="12" md="4" class="print-row" v-if="rol !== 'Proveedor'">
+          <VCol cols="12" md="4" class="print-row" v-if="rol !== 'Proveedor' || order.type === 1">
             <!-- 👉 Customer Details  -->
             <VCard class="mb-6">
               <VCardText class="d-flex flex-column gap-y-6">
@@ -519,7 +620,7 @@ const removeOrder = async () => {
                 </div>
                 <div>
                   <h6 class="text-h6 me-2 mt-4 d-print-none">
-                    {{ order.address ? order.address.type.name : order.type.name }}
+                    {{ order.address ? order.address.address_type.name : order.address_type.name }}
                   </h6>
                   <span v-if="order.address">
                     {{ order.address.address }} <br> 

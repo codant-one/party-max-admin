@@ -10,6 +10,7 @@ class CalendarSeeder extends Seeder
 {
     public function run()
     {
-        Permission::create(['name' => 'ver calendario']);        
+        Permission::create(['name' => 'ver calendario']); 
+        Permission::create(['name' => 'eliminar calendario']);        
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Category;
 use App\Models\State;
+use App\Models\Order;
 
 use Carbon\Carbon;
 
@@ -19,8 +20,8 @@ class Event extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
-    public function service() {
-        return $this->belongsTo(Service::class, 'service_id', 'id');
+    public function order_detail() {
+        return $this->belongsTo(OrderDetail::class, 'order_detail_id', 'id');
     }
 
     public function category() {
@@ -84,12 +85,12 @@ class Event extends Model
         $request->merge(['calendar' => $request->extendedProps['calendar']]);
         $request->merge(['description' => $request->extendedProps['description']]);
         $request->merge(['state_id' => $request->extendedProps['state_id']]);
-        $request->merge(['state_id' => $request->extendedProps['service_id']]);
+        $request->merge(['order_detail_id' => $request->extendedProps['order_detail_id']]);
 
         $request->request->remove('extendedProps.calendar');
         $request->request->remove('extendedProps.description');
         $request->request->remove('extendedProps.state_id');
-        $request->request->remove('extendedProps.service_id');
+        $request->request->remove('extendedProps.order_detail_id');
 
         return $request;
     }
@@ -126,5 +127,19 @@ class Event extends Model
         }
 
         return $query->paginate($limit);
+    }
+
+    /**** Public methods ****/
+    public static function updateState($state_id, $order_id) {
+ 
+        $order = Order::with(['details'])->find($order_id);
+
+        if($order->type === 1) {
+            foreach($order->details as $detail) {
+                $event = self::where('order_detail_id', $detail->id)->first();
+                $event->state_id = $state_id;
+                $event->update();
+            }
+        }
     }
 }

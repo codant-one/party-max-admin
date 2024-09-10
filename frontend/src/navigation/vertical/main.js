@@ -37,7 +37,7 @@ export default [
     },
     {
         title: 'Calendario',
-        icon: { icon: 'tabler-calendar' },
+        icon: { icon: 'mdi-calendar-multiselect' },
         to: 'dashboard-calendar',
         action: 'ver',
         subject: 'calendario',

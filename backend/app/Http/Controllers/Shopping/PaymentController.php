@@ -14,6 +14,7 @@ use App\Models\Order;
 use App\Models\Billing;
 use App\Models\Client;
 use App\Models\Supplier;
+use App\Models\Event;
 
 class PaymentController extends Controller
 {
@@ -120,7 +121,7 @@ class PaymentController extends Controller
                 'message' => 'Pedido no encontrada'
             ], 404);
  
-
+        $event_state_id = 4;
         $payment_state_id = 1;
         $payment_method_type = 2;
         $payment_method = '';
@@ -279,10 +280,12 @@ class PaymentController extends Controller
 
         switch ($payment_state_id) { //4: pagado, 3: fallido, 2: cancelado , 1: pendiente
             case 2: 
-                Client::sendMailError($order->id, 2, $message);    
+                Client::sendMailError($order->id, 2, $message);  
+                Event::updateState(6,$order->id);
                 break;
             case 3:
-                Client::sendMailError($order->id, 3, $message);  
+                Client::sendMailError($order->id, 3, $message);
+                Event::updateState(6,$order->id);  
                 break;
             case 4: 
                 Client::sendMail($order->id);

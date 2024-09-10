@@ -374,7 +374,6 @@ class CategoryController extends Controller
 
     public function events(): JsonResponse
     {
-        $users = User::pluck('id')->toArray();
         $categories = Category::select('name')->where('category_type_id', 2)->get();
         $services = Service::with(['categories.category'])->where('state_id', 3)->get();
         $availableCalendars = [];
@@ -404,8 +403,7 @@ class CategoryController extends Controller
             'success' => true,
             'availableCalendars' => $availableCalendars,
             'availableServices' => $availableServices,
-            'selectedCalendars' => $selectedCalendars,
-            'selectedUsers' => $users
+            'selectedCalendars' => $selectedCalendars
         ]);
     }
 

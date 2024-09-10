@@ -22,7 +22,7 @@ export const blankEvent = {
         */
     state_id: 4,
     calendar: undefined,
-    service_id: '',
+    order_detail: undefined,
     description: ''
   },
 }
@@ -39,7 +39,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
   // ℹ️ Extract event data from event API
   const extractEventDataFromEventApi = eventApi => {
 
-    const { id, title, start, end, extendedProps: { state_id, calendar, service_id, description }, allDay, delta } = eventApi
+    const { id, title, start, end, extendedProps: { state_id, calendar, order_detail, description }, allDay, delta } = eventApi
     
     return {
       id,
@@ -49,7 +49,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
       extendedProps: {
         state_id,
         calendar,
-        service_id,
+        order_detail,
         description
       },
       allDay,
@@ -291,114 +291,105 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
       year: 'numeric' // Mostrar el año (ej. 2023)
     },
     eventContent: function(info){
-      // if (info.view.type === 'listMonth' || info.view.type === 'dayGridDay') {
+      if (info.view.type === 'listMonth' || info.view.type === 'dayGridDay') {
         
-      //   let users = info.event.extendedProps.users;
-      //   let eventText = info.event.title;
-      //   let state_id = info.event.extendedProps.state_id
-      //   let state = ''
-      //   let color = ''
+        let user = info.event.extendedProps.order_detail.service.user;
+        let eventText = info.event.title;
+        let state_id = info.event.extendedProps.state_id
+        let price_ = info.event.extendedProps.order_detail.total
+        let state = ''
+        let color = ''
 
-        // switch (state_id) {
-        //   case 6:
-        //     state = 'Pendiente'
-        //     color = 'error'
-        //     break;
-        //   case 9:
-        //     state = 'En Progreso'
-        //     color = 'primary'
-        //     break;
-        //   case 7:
-        //     state = 'En Revisión'
-        //     color = 'warning'
-        //     break;
-        //   case 4:
-        //     state = 'Finalizado'
-        //     color = 'success'
-        //     break;
-        //   default:
-        //     state = 'Pendiente'
-        //     color = 'error'
-        // }
+        switch (state_id) {
+          case 4:
+            state = 'Pendiente'
+            color = 'error'
+            break;
+          case 6:
+            state = 'Rechazado'
+            color = 'success'
+            break;
+          case 7:
+            state = 'Entregado'
+            color = 'primary'
+            break;
+          default:
+            state = 'Pendiente'
+            color = 'error'
+        }
 
-        // let content = document.createElement('div');
-        // content.classList.add('event-content');
+        let content = document.createElement('div');
+        content.classList.add('event-content');
 
-        // let usersInfo = document.createElement('div');
-        // usersInfo.classList.add('users-content');
-        // usersInfo.classList.add('w-100');
+        let usersInfo = document.createElement('div');
+        usersInfo.classList.add('users-content');
+        usersInfo.classList.add('w-100');
         
-        // users.forEach(user => {
-        //   let eventImage = themeConfig.configuraciones.urlStorage + 'avatars/' + user.avatar
-        //   let image = document.createElement('img')
-        //   let textName = document.createElement('span')
-        //   let div = document.createElement('div')
-        //   let iconElement = document.querySelector('.icon-category-' + info.event.extendedProps.icon)
-        //   let sourceElementHTML = iconElement.outerHTML
-        //   let icon = document.createElement('div')
-        //   let textCategory = document.createElement('span')
-        //   let avatar = document.createElement('div')
-        //   let avatar__underlay = document.createElement('span')
-        //   let avatarName = document.createElement('span')
-        //   let spanState = document.createElement('span')
-        //   let divState = document.createElement('div')
+        let eventImage = themeConfig.settings.urlStorage + user.avatar
+        let image = document.createElement('img')
+        let textName = document.createElement('span')
+        let div = document.createElement('div')
+        let textEvent = document.createElement('span')
+        let price = document.createElement('span')
+        let avatar = document.createElement('div')
+        let avatar__underlay = document.createElement('span')
+        let avatarName = document.createElement('span')
+        let spanState = document.createElement('span')
+        let divState = document.createElement('div')
 
-        //   image.src = (user.avatar === null) ? '' : eventImage
-        //   image.classList.add('event-image')
+        image.src = (user.avatar === null) ? '' : eventImage
+        image.classList.add('event-image')
 
-        //   textName.textContent = user.name
-        //   textName.classList.add('user-text')
-
-        //   icon.innerHTML = sourceElementHTML
-        //   icon.classList.add('ms-2')
-        //   icon.classList.add('icon-content')
+        textName.textContent = user.name + ' ' + user.last_name
+        textName.classList.add('user-text')
           
-        //   avatar__underlay.classList.add('v-avatar__underlay')
-        //   avatarName.textContent = avatarText(user.name)
+        avatar__underlay.classList.add('v-avatar__underlay')
+        avatarName.textContent = avatarText(user.name + ' ' + user.last_name)
 
-        //   avatar.classList.add('v-avatar')
-        //   avatar.classList.add('v-avatar--density-default')
-        //   avatar.classList.add('v-avatar--variant-tonal')
-        //   avatar.classList.add('event-image')
-        //   avatar.appendChild(avatarName);
-        //   avatar.appendChild(avatar__underlay)
+        avatar.classList.add('v-avatar')
+        avatar.classList.add('v-avatar--density-default')
+        avatar.classList.add('v-avatar--variant-tonal')
+        avatar.classList.add('event-image')
+        avatar.appendChild(avatarName);
+        avatar.appendChild(avatar__underlay)
 
-        //   textCategory.textContent = eventText
+        textEvent.textContent = 'Pedido #' + eventText
+        textEvent.classList.add('w-50')
+        price.textContent = (parseFloat(price_)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' })
 
-        //   divState.classList.add('flex-grow-1')
+        divState.classList.add('flex-grow-1')
 
-        //   spanState.textContent = state
-        //   spanState.classList.add('v-chip')
-        //   spanState.classList.add('v-theme--light')
-        //   spanState.classList.add('bg-'+color)
-        //   spanState.classList.add('v-chip--density-default')
-        //   spanState.classList.add('v-chip--size-small')
-        //   spanState.classList.add('v-chip--variant-elevated')
-        //   spanState.classList.add('position-vchip')
-        //   spanState.classList.add('text-end')
+        spanState.textContent = state
+        spanState.classList.add('v-chip')
+        spanState.classList.add('v-theme--light')
+        spanState.classList.add('bg-'+color)
+        spanState.classList.add('v-chip--density-default')
+        spanState.classList.add('v-chip--size-small')
+        spanState.classList.add('v-chip--variant-elevated')
+        spanState.classList.add('position-vchip')
+        spanState.classList.add('text-end')
 
-        //   div.classList.add('user-content')
+        div.classList.add('user-content')
 
-        //   if(user.avatar === null)
-        //     div.appendChild(avatar)
-        //   else
-        //     div.appendChild(image)
+        if(user.avatar === null)
+          div.appendChild(avatar)
+        else
+          div.appendChild(image)
 
-        //   div.appendChild(textName)
-        //   div.appendChild(icon)
-        //   div.appendChild(textCategory)
-        //   div.appendChild(divState)
-        //   div.appendChild(spanState)
+        div.appendChild(textName)
+        div.appendChild(textEvent)
+        div.appendChild(price)
+        div.appendChild(divState)
+        div.appendChild(spanState)
 
-        //   usersInfo.appendChild(div)
-        // });
+        usersInfo.appendChild(div)
 
         // border-left: 5px solid rgb(var(--v-theme-error)) !important;
 
-        // content.appendChild(usersInfo)
+        content.appendChild(usersInfo)
 
-        // return { domNodes: [content] }
-      // }
+        return { domNodes: [content] }
+      }
     },
 
     events: fetchEvents,
@@ -432,8 +423,20 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
     eventClassNames(info) {
 
       let calendarEvent = info.event 
-      let colorName = calendarEvent._def.extendedProps.state_id === 4 ? 'error' : 'primary'
+      let colorName = 'error'
       let className = ''
+
+      switch(calendarEvent._def.extendedProps.state_id) {
+        case 4:
+          colorName = 'error'
+        break;
+        case 6:
+          colorName = 'success'
+        break;
+        case 7:
+          colorName = 'primary'
+        break;
+      }
 
       if (info.view.type === 'dayGridDay')
         className = [`day-setting`]

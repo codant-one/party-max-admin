@@ -27,6 +27,7 @@ const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
 const payment_state_id = ref(null)
+const type = ref(null)
 
 const rol = ref(null)
 const userData = ref(null)
@@ -34,6 +35,11 @@ const userData = ref(null)
 const references = ref([
   { title: 'Al mayor', value: 1 },
   { title: 'Al detal', value: 0 }
+])
+
+const types = ref([
+  { title: 'Producto', value: 0 },
+  { title: 'Servicio', value: 1 }
 ])
 
 const shippingStates = ref([
@@ -84,6 +90,7 @@ async function fetchData() {
         limit: rowPerPage.value,
         page: currentPage.value,
         wholesale: wholesale.value,
+        type: type.value,
         shipping_state_id: shipping_state_id.value,
         payment_state_id: payment_state_id.value
     }
@@ -311,7 +318,7 @@ const downloadCSV = async () => {
 
                     <VCol
                         cols="12"
-                        sm="4"
+                        sm="3"
                     >
                         <AppSelect
                             v-model="wholesale"
@@ -324,7 +331,7 @@ const downloadCSV = async () => {
 
                     <VCol
                         cols="12"
-                        sm="4"
+                        sm="3"
                     >
                         <AppSelect
                             v-model="shipping_state_id"
@@ -337,12 +344,24 @@ const downloadCSV = async () => {
 
                     <VCol
                         cols="12"
-                        sm="4"
+                        sm="3"
                     >
                         <AppSelect
                             v-model="payment_state_id"
                             placeholder="Estados de pagos"
                             :items="paymentStates"
+                            clearable
+                            clear-icon="tabler-x"
+                        />
+                    </VCol>
+                    <VCol
+                        cols="12"
+                        sm="3"
+                    >
+                        <AppSelect
+                            v-model="type"
+                            placeholder="Tipo"
+                            :items="types"
                             clearable
                             clear-icon="tabler-x"
                         />
@@ -391,6 +410,7 @@ const downloadCSV = async () => {
                     <tr class="text-no-wrap">
                         <th> REFERENCIA </th>
                         <th> FECHA </th>
+                        <th> TIPO </th>
                         <th class="pe-4" v-if="rol !== 'Proveedor'"> CLIENTE </th>
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
                         <th class="pe-4"> ESTADO DEL PAGO </th>
@@ -409,15 +429,21 @@ const downloadCSV = async () => {
                         <td class="name">
                             <span 
                                 class="font-weight-medium cursor-pointer" 
-                                :class="order.wholesale === 0 ? 'text-success': 'text-primary'" 
+                                :class="order.type === 0 ? (order.wholesale === 0 ? 'text-success': 'text-primary') : 'text-warning'" 
                                 @click="seeOrder(order)">
                                 {{ order.reference_code }} 
                             </span>
                         </td>
-                       
                         <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
-                       
-                        
+                        <td>
+                            <VChip
+                                variant="outlined"
+                                label
+                                :color="order.type === 0 ? 'info' : 'secondary'"
+                            >
+                            {{  order.type === 0 ? 'PRODUCTO' : 'SERVICIO' }} 
+                            </VChip>
+                        </td>
                         <td class="text-wrap" v-if="rol !== 'Proveedor'">
                             <div class="d-flex align-center gap-x-3" v-if="order.client">
                                 <VAvatar
@@ -458,9 +484,11 @@ const downloadCSV = async () => {
                             <li
                                 :class="`text-${resolveStatusShipping(order.shipping.id)?.color}`"
                                 class="font-weight-medium"
+                                v-if="order.type === 0"
                             >
                                 {{ order.shipping.name }}
                             </li>
+                            <span v-else>----------------------</span>
                         </td>
                         <td> 
                             <VChip
