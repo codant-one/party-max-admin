@@ -34,6 +34,7 @@ const go = (id) => {
   <VCard
     :title="props.title"
     :subtitle="props.subtitle"
+    :style="{ minHeight: '498px' }"
   >
     <VCardText>
       <VList class="card-list">
