@@ -50,73 +50,75 @@ async function fetchData() {
 
   data.value = dashboardStores.getData
 
-  const total = Number(data.value.supplier.account.balance ?? 0)
-  const retail_sales_amount = '$' + formatNumber(data.value.supplier.account.retail_sales_amount) ?? '0.00'
-  const wholesale_sales_amount = '$' + formatNumber(data.value.supplier.account.wholesale_sales_amount) ?? '0.00'
-  const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
-  const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
+  if(rol.value === 'Proveedor') {
+    const total = Number(data.value.supplier.account.balance ?? 0)
+    const retail_sales_amount = '$' + formatNumber(data.value.supplier.account.retail_sales_amount) ?? '0.00'
+    const wholesale_sales_amount = '$' + formatNumber(data.value.supplier.account.wholesale_sales_amount) ?? '0.00'
+    const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
+    const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
 
-  timeSpendingChartConfig.value = {
-    chart: {
-      height: 157,
-      width: 130,
-      parentHeightOffset: 0,
-      type: 'donut',
-    },
-    labels: [retail_sales_amount, wholesale_sales_amount],
-    colors: [
-      donutChartColors.donut.series1,
-      donutChartColors.donut.series2
-    ],
-    stroke: { width: 0 },
-    dataLabels: {
-      enabled: false,
-      formatter(val) {
-        return `${ Number.parseFloat(val).toFixed(1) }%`
+    timeSpendingChartConfig.value = {
+      chart: {
+        height: 157,
+        width: 130,
+        parentHeightOffset: 0,
+        type: 'donut',
       },
-    },
-    legend: { show: false },
-    tooltip: { 
-      enabled: true,
-      y: {
-        formatter: function (val) {
-          return `${Number.parseFloat(val).toFixed(1)}%`;  // Agregar '%' en el tooltip
+      labels: [retail_sales_amount, wholesale_sales_amount],
+      colors: [
+        donutChartColors.donut.series1,
+        donutChartColors.donut.series2
+      ],
+      stroke: { width: 0 },
+      dataLabels: {
+        enabled: false,
+        formatter(val) {
+          return `${ Number.parseFloat(val).toFixed(1) }%`
+        },
+      },
+      legend: { show: false },
+      tooltip: { 
+        enabled: true,
+        y: {
+          formatter: function (val) {
+            return `${Number.parseFloat(val).toFixed(1)}%`;  // Agregar '%' en el tooltip
+          }
         }
-      }
-    },
-    grid: { padding: { top: 0 } },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '75%',
-          labels: {
-            show: true,
-            value: {
-              fontSize: '15px',
-              color: 'rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity))',
-              fontWeight: 500,
-              offsetY: -15,
-              formatter(val) {
-                return `${ Number.parseFloat(val).toFixed(1) }%`
-              },
-            },
-            name: { offsetY: 20 },
-            total: {
+      },
+      grid: { padding: { top: 0 } },
+      plotOptions: {
+        pie: {
+          donut: {
+            size: '75%',
+            labels: {
               show: true,
-              fontSize: '10px',
-              label: 'Total',
-              color: 'rgba(var(--v-theme-on-background), var(--v-disabled-opacity))',
-              formatter() {
-                return '$'+ (formatNumber(data.value.supplier.account.balance) ?? '0.00')
+              value: {
+                fontSize: '15px',
+                color: 'rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity))',
+                fontWeight: 500,
+                offsetY: -15,
+                formatter(val) {
+                  return `${ Number.parseFloat(val).toFixed(1) }%`
+                },
+              },
+              name: { offsetY: 20 },
+              total: {
+                show: true,
+                fontSize: '10px',
+                label: 'Total',
+                color: 'rgba(var(--v-theme-on-background), var(--v-disabled-opacity))',
+                formatter() {
+                  return '$'+ (formatNumber(data.value.supplier.account.balance) ?? '0.00')
+                },
               },
             },
           },
         },
-      },
+      }
     }
-  }
 
-  timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale]
+    timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale]
+  }
 
   isRequestOngoing.value = false
 }
