@@ -75,14 +75,6 @@ class Order extends Model
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
 
-        if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
-            $query->whereHas('details.product_color.product', function ($q) {
-                $q->where('user_id', Auth::user()->id);
-            })->orWhereHas('details.service', function ($q) {
-                $q->where('user_id', Auth::user()->id);
-            });
-        }
-
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
         }
@@ -111,6 +103,14 @@ class Order extends Model
             $field = $filters->get('orderByField') ? $filters->get('orderByField') : 'order_id';
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
             $query->whereOrder($field, $orderBy);
+        }
+
+        if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
+            $query->whereHas('details.product_color.product', function ($q) {
+                $q->where('user_id', Auth::user()->id);
+            })->orWhereHas('details.service', function ($q) {
+                $q->where('user_id', Auth::user()->id);
+            });
         }
     }
 

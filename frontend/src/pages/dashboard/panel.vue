@@ -1,114 +1,151 @@
 <script setup>
 
+import { useDashboardStores } from '@/stores/useDashboard'
+import { formatNumber } from '@/@core/utils/formatters'
+
 import VueApexCharts from 'vue3-apexcharts'
 import Congratulations from "@/components/dashboard/Congratulations.vue";
 import Statistics from "@/components/dashboard/Statistics.vue";
 import Earning from "@/components/dashboard/Earning.vue";
 import Products from "@/components/dashboard/Products.vue";
+import Services from "@/components/dashboard/Services.vue";
 import Orders from "@/components/dashboard/Orders.vue";
 
+const dashboardStores = useDashboardStores()
+
 const userDataJ = ref('')
+const rol = ref(null)
 const name = ref('')
+const store = ref(null)
+const data = ref(null)
+
+const isRequestOngoing = ref(true)
 
 const donutChartColors = {
   donut: {
     series1: '#FF0090',
-    series2: '#ff66b8',
-    series3: '#ff80c4',
-    series4: '#ff99cf',
-    series5: '#ffbde0',
-    series6: '#ffdbee',
+    series2: '#ffdbee',
   },
 }
 
-const timeSpendingChartConfig = {
-  chart: {
-    height: 157,
-    width: 130,
-    parentHeightOffset: 0,
-    type: 'donut',
-  },
-  labels: [
-    '36h',
-    '56h',
-    '16h',
-    '32h',
-    '56h',
-    '16h',
-  ],
-  colors: [
-    donutChartColors.donut.series1,
-    donutChartColors.donut.series2,
-    donutChartColors.donut.series3,
-    donutChartColors.donut.series4,
-    donutChartColors.donut.series5,
-    donutChartColors.donut.series6,
-  ],
-  stroke: { width: 0 },
-  dataLabels: {
-    enabled: false,
-    formatter(val) {
-      return `${ Number.parseInt(val) }%`
-    },
-  },
-  legend: { show: false },
-  tooltip: { theme: false },
-  grid: { padding: { top: 0 } },
-  plotOptions: {
-    pie: {
-      donut: {
-        size: '75%',
-        labels: {
-          show: true,
-          value: {
-            fontSize: '1.5rem',
-            color: 'rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity))',
-            fontWeight: 500,
-            offsetY: -15,
-            formatter(val) {
-              return `${ Number.parseInt(val) }%`
-            },
-          },
-          name: { offsetY: 20 },
-          total: {
-            show: true,
-            fontSize: '.7rem',
-            label: 'Total',
-            color: 'rgba(var(--v-theme-on-background), var(--v-disabled-opacity))',
-            formatter() {
-              return '231h'
-            },
-          },
-        },
-      },
-    },
-  },
-}
+const timeSpendingChartConfig = ref(null)
+const timeSpendingChartSeries = ref(null)
 
-const timeSpendingChartSeries = [
-  23,
-  35,
-  10,
-  20,
-  35,
-  23,
-]
 
 watchEffect(fetchData)
 
 async function fetchData() {
 
-    const userData = localStorage.getItem('user_data')
+  isRequestOngoing.value = true
+
+  const userData = localStorage.getItem('user_data')
     
-    userDataJ.value = JSON.parse(userData)
-    name.value = userDataJ.value.name + " " + userDataJ.value.last_name
+  userDataJ.value = JSON.parse(userData)
+  name.value = userDataJ.value.name + " " + userDataJ.value.last_name
+  rol.value = userDataJ.value.roles[0].name
+    
+  store.value = userDataJ.value.user_details.store_name ?? (userDataJ.value.supplier?.company_name ?? null)
+
+  await dashboardStores.fetchData();
+
+  data.value = dashboardStores.getData
+
+  const total = Number(data.value.supplier.account.balance ?? 0)
+  const retail_sales_amount = '$' + formatNumber(data.value.supplier.account.retail_sales_amount) ?? '0.00'
+  const wholesale_sales_amount = '$' + formatNumber(data.value.supplier.account.wholesale_sales_amount) ?? '0.00'
+  const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
+  const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
+
+  timeSpendingChartConfig.value = {
+    chart: {
+      height: 157,
+      width: 130,
+      parentHeightOffset: 0,
+      type: 'donut',
+    },
+    labels: [retail_sales_amount, wholesale_sales_amount],
+    colors: [
+      donutChartColors.donut.series1,
+      donutChartColors.donut.series2
+    ],
+    stroke: { width: 0 },
+    dataLabels: {
+      enabled: false,
+      formatter(val) {
+        return `${ Number.parseFloat(val).toFixed(1) }%`
+      },
+    },
+    legend: { show: false },
+    tooltip: { 
+      enabled: true,
+      y: {
+        formatter: function (val) {
+          return `${Number.parseFloat(val).toFixed(1)}%`;  // Agregar '%' en el tooltip
+        }
+      }
+    },
+    grid: { padding: { top: 0 } },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '75%',
+          labels: {
+            show: true,
+            value: {
+              fontSize: '15px',
+              color: 'rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity))',
+              fontWeight: 500,
+              offsetY: -15,
+              formatter(val) {
+                return `${ Number.parseFloat(val).toFixed(1) }%`
+              },
+            },
+            name: { offsetY: 20 },
+            total: {
+              show: true,
+              fontSize: '10px',
+              label: 'Total',
+              color: 'rgba(var(--v-theme-on-background), var(--v-disabled-opacity))',
+              formatter() {
+                return '$'+ (formatNumber(data.value.supplier.account.balance) ?? '0.00')
+              },
+            },
+          },
+        },
+      },
+    }
+  }
+
+  timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale]
+
+  isRequestOngoing.value = false
 }
 
 </script>
 
 <template>
   <section>
-    <VRow class="py-6 px-md-6 px-2">
+    <VRow>
+      <VDialog
+        v-model="isRequestOngoing"
+        width="300"
+        persistent>
+        <VCard
+          color="primary"
+          width="300">
+          <VCardText class="pt-3">
+            Cargando
+            <VProgressLinear
+              indeterminate
+              color="white"
+              class="mb-0"
+             />
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </VRow>
+
+    <VRow class="py-6 px-md-6 px-2" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
         md="8"
@@ -123,15 +160,21 @@ async function fetchData() {
             class="mb-7 text-wrap"
             style="max-inline-size: 800px;"
           >
-            Tu progreso es impresionante. ¡Sigamos así y obtengamos muchas ventas!
+            <span v-if="store === null">
+              Tu progreso es impresionante. ¡Sigamos así y obtengamos muchas ventas!
+            </span>
+            <span v-else>
+              El progreso de <b>`{{ store }}`</b> es impresionante. ¡Sigamos así y obtengamos muchas ventas!
+            </span>
+          
           </div>
 
           <div class="d-flex justify-space-between flex-wrap gap-4 flex-column flex-md-row">
             <div
               v-for="{ title, value, icon, color } in [
-                { title: 'Horas vendidas', value: '34h', icon: 'mdi-laptop', color: 'primary' },
-                { title: 'Servicios prestados', value: '82%', icon: 'mdi-lightbulb', color: 'success' },
-                { title: 'Servicios completados', value: '14', icon: 'mdi-check-decagram-outline', color: 'error' },
+                { title: 'Comisión Detal', value: (data.supplier.commission ?? '0.00') + '%', icon: 'mdi-brightness-percent', color: 'primary' },
+                { title: 'Comisión Mayorista', value: (data.supplier.wholesale_commission ?? '0.00') + '%', icon: 'mdi-sack-percent', color: 'success' },
+                { title: 'Ventas Totales', value: 'COP ' + formatNumber(data.supplier.sales) ?? '0.00' , icon: 'mdi-check-decagram-outline', color: 'error' },
               ]"
               :key="title"
             >
@@ -166,6 +209,28 @@ async function fetchData() {
         <div class="d-flex justify-space-between align-center">
           <div class="d-flex flex-column ps-3">
             <h5 class="text-h5 text-high-emphasis mb-2 text-no-wrap">
+              Saldo total de la Cuenta
+            </h5>
+            <span class="mb-7">Crédito restante 
+              <span class="text-xs text-medium-emphasis">(Detal + Mayorista)</span>
+            </span>
+            <div class="text-h3 mb-2 text-primary">
+              COP  {{ formatNumber(data.supplier.account.balance) ?? '0.00' }}
+            </div>
+          </div>
+          <div>
+            <VueApexCharts
+              type="donut"
+              height="150"
+              width="150"
+              :options="timeSpendingChartConfig"
+              :series="timeSpendingChartSeries"
+            />
+          </div>
+        </div>
+        <!-- <div class="d-flex justify-space-between align-center">
+          <div class="d-flex flex-column ps-3">
+            <h5 class="text-h5 text-high-emphasis mb-2 text-no-wrap">
               Tiempo en Servicios
             </h5>
             <span class="mb-7">Reporte Semanal</span>
@@ -190,35 +255,36 @@ async function fetchData() {
               :series="timeSpendingChartSeries"
             />
           </div>
-        </div>
+        </div> -->
+
       </VCol>
     </VRow>
 
-    <VRow class="px-md-6 px-2 match-height">
-        <VCol
+    <VRow class="px-md-6 px-2 match-height" v-if="rol === 'Proveedor' && data">
+      <VCol
         cols="12"
-        md="7"
+        md="8"
         lg="8"
       >
-        <Statistics class="h-100" />
+        <Statistics class="h-100" :data="data"/>
       </VCol>
-
       <VCol
         cols="12"
-        md="5"
-        lg="4"
+        md="4"
+        lg="84"
       >
-        <Congratulations />
+        <Congratulations :data="data.deliveredShipping"/>
       </VCol>
     </VRow>
 
-    <VRow class="px-md-6 px-2">
+    <VRow class="px-md-6 px-2" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
         sm="6"
         lg="4"
       >
-        <Earning />
+        <!-- <Earning /> -->
+        <Services :services="data.services"/>
       </VCol>
 
       <VCol
@@ -226,7 +292,11 @@ async function fetchData() {
         sm="6"
         lg="4"
       >
-        <Products />
+        <Products 
+          title="Productos Populares"
+          subtitle="Top 6 productos más vendidos"
+          isPopular="1"
+          :products="data.products"/>
       </VCol>
 
       <VCol
@@ -234,7 +304,12 @@ async function fetchData() {
         sm="6"
         lg="4"
       >
-        <Orders />
+        <Products 
+          title="Productos Escasos"
+          subtitle="Top 6 productos con menos existencias"
+          isPopular="0"
+          :products="data.stock"/>
+        <!-- <Orders /> -->
       </VCol>
     </VRow>
 
@@ -244,6 +319,10 @@ async function fetchData() {
 <style lang="scss" scoped>
   .card-list {
     --v-card-list-gap: 30px;
+  }
+
+  .apexcharts-text:deep(.apexcharts-datalabel-value) {
+    font-size: 15px !important;
   }
 </style>
 

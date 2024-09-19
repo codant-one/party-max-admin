@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
+use App\Models\User;
 use App\Models\Order;
 use App\Models\ProductColor;
 use App\Models\Product;
@@ -62,6 +64,7 @@ class OrderController extends Controller
                 'outforDeliveryShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 2]])->count(),
                 'sentShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 3]])->count(),
                 'deliveredShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 4]])->count(),
+                'orderInfo' => User::productsCount()->ordersCount()->sales()->find(Auth::user()->id)
             ];
 
             return response()->json([

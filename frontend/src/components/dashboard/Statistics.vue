@@ -1,37 +1,47 @@
 <script setup>
+
+import { formatNumber } from '@/@core/utils/formatters'
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+})
+
 const statistics = [
   {
-    title: 'Ventas',
-    stats: '$2300.00',
+    title: 'Ventas al detal',
+    stats: '$ ' + formatNumber(props.data.supplier.account.retail_sales_amount) ?? '0.00',
     icon: 'tabler-chart-pie-2',
     color: 'primary',
   },
   {
-    title: 'Clientes',
-    stats: '8.549',
-    icon: 'tabler-users',
+    title: 'Ventas mayoristas',
+    stats: '$ ' + formatNumber(props.data.supplier.account.wholesale_sales_amount) ?? '0.00',
+    icon: 'tabler-chart-pie-filled',
     color: 'info',
   },
   {
     title: 'Productos',
-    stats: '1.423',
+    stats: props.data.productsCount,
     icon: 'tabler-shopping-cart',
     color: 'error',
   },
   {
-    title: 'Ganancias',
-    stats: '$9745.00',
-    icon: 'tabler-currency-dollar',
+    title: 'Servicios',
+    stats: props.data.serviceCount,
+    icon: 'mdi-hand-heart-outline',
     color: 'success',
-  },
+  }
 ]
 </script>
 
 <template>
   <VCard title="Estadísticas">
-    <template #append>
+    <!-- <template #append>
       <span class="text-sm text-disabled">En el mes</span>
-    </template>
+    </template> -->
 
     <VCardText class="pt-6">
       <VRow>
@@ -41,7 +51,7 @@ const statistics = [
           cols="6"
           md="3"
         >
-          <div class="d-flex align-center gap-4">
+          <div class="d-flex align-center gap-2">
             <VAvatar
               :color="item.color"
               variant="tonal"

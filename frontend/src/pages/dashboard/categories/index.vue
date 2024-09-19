@@ -205,7 +205,7 @@ const removeCategory = async () => {
                 <th> NOMBRE </th>
                 <th> SUBCATEGORÍA </th>
                 <th> TIPO </th>
-                <th class="text-end pe-4"> PRODUCTOS PUBLICADOS</th>
+                <th class="text-end pe-4" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> PRODUCTOS PUBLICADOS</th>
                 <!-- <th class="text-end pe-4"> GANANCIA TOTAL </th> -->
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
@@ -258,7 +258,7 @@ const removeCategory = async () => {
                 </td>
                 <td> {{ category.category?.name }} </td>
                 <td> {{ category.category_type?.name }} </td>
-                <td> 
+                <td v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> 
                   <h4 class="text-end">
                     {{ (category.product_count).toLocaleString() }}
                   </h4> 

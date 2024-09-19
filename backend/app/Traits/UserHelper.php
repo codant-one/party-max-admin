@@ -224,6 +224,7 @@ trait UserHelper
                         ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
                         ->join('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('o.payment_state_id', 4)
+                        ->whereNull('o.deleted_at')
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_pending' => function ($q){
                     $q->selectRaw('COUNT(DISTINCT o.id)')
@@ -233,6 +234,7 @@ trait UserHelper
                         ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
                         ->join('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('o.payment_state_id', 1)
+                        ->whereNull('o.deleted_at')
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_failed' => function ($q){
                     $q->selectRaw('COUNT(DISTINCT o.id)')
@@ -242,6 +244,7 @@ trait UserHelper
                         ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
                         ->join('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('o.payment_state_id', 3)
+                        ->whereNull('o.deleted_at')
                         ->whereColumn('u.id', 'users.id');
                 }])->addSelect(['order_count_canceled' => function ($q){
                     $q->selectRaw('COUNT(DISTINCT o.id)')
@@ -251,6 +254,7 @@ trait UserHelper
                         ->join('order_details as od', 'od.product_color_id', '=', 'pc.id')
                         ->join('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('o.payment_state_id', 2)
+                        ->whereNull('o.deleted_at')
                         ->whereColumn('u.id', 'users.id');
                 }]);
     }

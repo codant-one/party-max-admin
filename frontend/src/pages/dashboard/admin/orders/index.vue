@@ -83,6 +83,9 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
+    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+    rol.value = userData.value.roles[0].name
+
     let data = {
         search: searchQuery.value,
         orderByField: 'id',
@@ -104,31 +107,33 @@ async function fetchData() {
     totalOrders.value = ordersStores.ordersTotalCount
     payments.value = ordersStores.payments
 
+    const pending = rol.value === 'Proveedor' ? payments.value.orderInfo.order_count_pending : payments.value.pendingPayments 
+    const failed = rol.value === 'Proveedor' ? payments.value.orderInfo.order_count_failed : payments.value.failedPayments 
+    const success = rol.value === 'Proveedor' ? payments.value.orderInfo.order_count_payment : payments.value.successPayments 
+    const canceled = rol.value === 'Proveedor' ? payments.value.orderInfo.order_count_canceled : payments.value.canceledPayments 
+
     widgetData.value = [
         {
             title: 'Pagos Pendientes',
-            value: payments.value.pendingPayments,
+            value: pending,
             icon: 'tabler-calendar-stats'
         },
         {
             title: 'Pagos Fallidos',
-            value: payments.value.failedPayments,
+            value: failed,
             icon: 'tabler-circle-x'
         },
         {
             title: 'Pagos Completados',
-            value: payments.value.successPayments,
+            value: success,
             icon: 'tabler-checks'
         },
         {
             title: 'Pagos Cancelados',
-            value: payments.value.canceledPayments,
+            value: canceled,
             icon: 'tabler-wallet'
         }
     ]
-
-    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
-    rol.value = userData.value.roles[0].name
 
     isRequestOngoing.value = false
 }
@@ -256,7 +261,7 @@ const downloadCSV = async () => {
             </VCard>
         </VDialog>
 
-        <VCard class="mb-6" v-if="rol !== 'Proveedor'">
+        <VCard class="mb-6">
             <!-- 👉 Widgets  -->
             <VCardText>
                 <VRow>

@@ -20,7 +20,8 @@
                 'client' => $user->client,
                 'roles' => $rol,
                 'hash' => $user->password,
-                'full_profile' =>$user->full_profile,
+                'full_profile' => $user->full_profile,
+                'supplier' => $user->supplier
             );
 
             return $userData;

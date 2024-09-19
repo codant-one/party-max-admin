@@ -1,6 +1,14 @@
 <script setup>
 
+import router from '@/router'
 import congoImg from '@images/illustrations/congo-illustration.png'
+
+const props = defineProps({
+  data: {
+    type: Number,
+    required: false
+  }
+})
 
 const userDataJ = ref('')
 const name = ref('')
@@ -15,12 +23,16 @@ async function fetchData() {
     name.value = userDataJ.value.name
 }
 
+const go = () => {
+  router.push({ name : 'dashboard-admin-orders' })
+}
+
 </script>
 
 <template>
   <VCard>
     <VRow no-gutters>
-      <VCol cols="8">
+      <VCol cols="9">
         <VCardText>
           <h6 class="text-lg text-no-wrap font-weight-medium">
             Felicidades {{ name }}! 🎉
@@ -28,14 +40,14 @@ async function fetchData() {
           <p class="mb-2">
             Progreso de ventas
           </p>
-          <h4 class="text-h4 font-weight-medium text-primary mb-1">
-            $48.90
-          </h4>
-          <VBtn>Ver pedidos</VBtn>
+          <h5 class="text-h5 font-weight-medium text-primary mb-1">
+            Pedidos Entregrados: {{ props.data }}
+          </h5>
+          <VBtn @click="go()">Ver pedidos</VBtn>
         </VCardText>
       </VCol>
 
-      <VCol cols="4">
+      <VCol cols="3">
         <VCardText class="pb-0 px-0 position-relative h-100">
           <VImg
             :src="congoImg"
@@ -50,8 +62,8 @@ async function fetchData() {
 
 <style lang="scss" scoped>
     .congo-john-img {
-    position: absolute;
-    inset-block-end: 0;
-    inset-inline-end: 1.25rem;
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-end: 1.25rem;
     }
 </style>

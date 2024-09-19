@@ -47,7 +47,8 @@ use App\Http\Controllers\{
     FillingController,
     CakeTypeController,
     CakeSizeController,
-    EventController
+    EventController,
+    DashboardController
 };
 
 /*
@@ -109,6 +110,9 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('cake-sizes', CakeSizeController::class);
     Route::apiResource('colors', ColorController::class);
     Route::apiResource('events', EventController::class);
+
+    /* DASHBOARD */
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     //Users
     Route::group(['prefix' => 'users'], function () {

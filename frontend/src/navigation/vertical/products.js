@@ -25,6 +25,12 @@ export default [
           subject: 'productos', 
         },
         { 
+          title: 'Mis Productos', 
+          icon: { icon: 'mdi-cart-heart' },
+          to: 'dashboard-products-products-my-products', 
+          subject: 'administrador', 
+        },
+        { 
           title: 'Pendientes', 
           icon: { icon: 'mdi-clock-time-two-outline' },
           to: 'dashboard-products-pendings', 

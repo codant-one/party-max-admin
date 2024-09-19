@@ -85,10 +85,10 @@ async function fetchData() {
         orderCount.value.failed = response.order_count_failed
         orderCount.value.canceled = response.order_count_canceled
 
-        sales.value.today = response.sales_today
-        sales.value.last_7_days = response.sales_last_7_days
-        sales.value.last_30_days = response.sales_last_30_days
-        sales.value.year = response.sales_year
+        sales.value.today = response.sales_today ?? '0.00'
+        sales.value.last_7_days = response.sales_last_7_days ?? '0.00'
+        sales.value.last_30_days = response.sales_last_30_days ?? '0.00'
+        sales.value.year = response.sales_year ?? '0.00'
 
         resolve()
       }).catch(error => {})

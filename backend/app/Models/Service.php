@@ -65,6 +65,12 @@ class Service extends Model
         return $this->hasMany(Cupcake::class, 'service_id');
     }
     
+    // Relación con los detalles de las órdenes (order_details)
+    public function orderDetails()
+    {
+        return $this->hasManyThrough(OrderDetail::class, ProductColor::class, 'product_id', 'product_color_id');
+    }
+
     /**** Scopes ****/
     public function scopeOrder($query, $categoryId = null)
     {

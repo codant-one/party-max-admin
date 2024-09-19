@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
 use App\Models\Review;
+use App\Models\OrderDetail;
 
 class Product extends Model
 {
@@ -77,6 +78,12 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class, 'product_id','id');
+    }
+
+    // Relación con los detalles de las órdenes (order_details)
+    public function orderDetails()
+    {
+        return $this->hasManyThrough(OrderDetail::class, ProductColor::class, 'product_id', 'product_color_id');
     }
 
     protected static function boot()

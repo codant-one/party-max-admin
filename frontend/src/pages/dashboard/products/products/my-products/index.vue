@@ -6,7 +6,6 @@ import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
-import detailsProduct from "@/components/products/detailsProduct.vue";
 import show from "@/components/products/show.vue";
 
 const productsStores = useProductsStores()
@@ -37,7 +36,6 @@ const selectedDetail = ref()
 
 const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
-const currentTab = ref(0)
 
 const rol = ref(null)
 const userData = ref(null)
@@ -133,74 +131,75 @@ watchEffect(fetchData)
 
 async function fetchData() {
 
-  if(favourite.value === 0 && archived.value === 0 && discarded.value === 0) {
-    favourite.value = null
-    archived.value = null
-    discarded.value = null
-  }
+    userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
+    rol.value = userData.value.roles[0].name
 
-  let data = {
-    search: searchQuery.value,
-    favourite: favourite.value,
-    archived: archived.value,
-    discarded: discarded.value,
-    state_id: selectedStatus.value,
-    in_stock: selectedStock.value,
-    type_sales: selectedDetail.value,
-    category_id: selectedCategory.value,
-    orderByField: 'id',
-    orderBy: 'desc',
-    limit: rowPerPage.value,
-    page: currentPage.value
-  }
+    if(favourite.value === 0 && archived.value === 0 && discarded.value === 0) {
+        favourite.value = null
+        archived.value = null
+        discarded.value = null
+    }
 
-  isRequestOngoing.value = true
-  
-  let info = { 
-    limit: -1, 
-    category_type_id: 1
-  }
+    let data = {
+        search: searchQuery.value,
+        favourite: favourite.value,
+        archived: archived.value,
+        discarded: discarded.value,
+        state_id: selectedStatus.value,
+        in_stock: selectedStock.value,
+        type_sales: selectedDetail.value,
+        category_id: selectedCategory.value,
+        orderByField: 'id',
+        orderBy: 'desc',
+        limit: rowPerPage.value,
+        page: currentPage.value,
+        supplierId: userData.value.id
+    }
 
-  await categoriesStores.fetchCategoriesOrder(info)
+    isRequestOngoing.value = true
+    
+    let info = { 
+        limit: -1, 
+        category_type_id: 1
+    }
 
-  categories.value = categoriesStores.getCategories
+    await categoriesStores.fetchCategoriesOrder(info)
 
-  await productsStores.fetchProducts(data)
+    categories.value = categoriesStores.getCategories
 
-  products.value =  []
-  myProductsList.value =  []
-  myProductsList.value = productsStores.getProducts
+    await productsStores.fetchProducts(data)
 
-  myProductsList.value.forEach(element =>
-    products.value.push({
-      id: element.id,
-      favourite: element.favourite,
-      discarded: element.discarded,
-      user: element.user,
-      state: element.state,
-      in_stock: element.in_stock,
-      stock: element.stock,
-      archived: element.archived,            
-      title: element.name,
-      image: element.image,
-      price: element.price_for_sale,
-      originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
-      rating: element.rating,//agregar mas adelante informacion
-      comments: 0,//agregar mas adelante informacion
-      sales: element.sales,//agregar mas adelante informacion
-      selling_price: 0,//agregar mas adelante informacion,
-      likes: element.likes
-    })
-  );
+    products.value =  []
+    myProductsList.value =  []
+    myProductsList.value = productsStores.getProducts
 
-  totalPages.value = productsStores.last_page
-  totalProducts.value = productsStores.productsTotalCount
+    myProductsList.value.forEach(element =>
+        products.value.push({
+        id: element.id,
+        favourite: element.favourite,
+        discarded: element.discarded,
+        user: element.user,
+        state: element.state,
+        in_stock: element.in_stock,
+        stock: element.stock,
+        archived: element.archived,            
+        title: element.name,
+        image: element.image,
+        price: element.price_for_sale,
+        originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
+        categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+        rating: element.rating,//agregar mas adelante informacion
+        comments: 0,//agregar mas adelante informacion
+        sales: element.sales,//agregar mas adelante informacion
+        selling_price: 0,//agregar mas adelante informacion,
+        likes: element.likes
+        })
+    );
 
-  userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
-  rol.value = userData.value.roles[0].name
+    totalPages.value = productsStores.last_page
+    totalProducts.value = productsStores.productsTotalCount
 
-  isRequestOngoing.value = false
+    isRequestOngoing.value = false
 }
 
 const showStateDialog = (productData, id) => {
@@ -632,84 +631,8 @@ const removeProduct = async () => {
       </VCardText>
 
       <VDivider />
-
-      <VCardText class="pb-0">
-        <VTabs
-          v-model="currentTab"
-          grow
-          stacked
-          >
-          <VTab class="hover-icon">
-            <VIcon
-              icon="mdi-grid"
-              class="mb-2"
-            />
-              <span>ICONO</span>
-          </VTab>
-          <VTab>
-            <VIcon
-              icon="mdi-format-list-bulleted"
-              class="mb-2"
-            />
-            <span>LISTA</span>
-          </VTab>
-        </VTabs>
-      </VCardText>
             
       <VCardText class="px-0">   
-        <VWindow v-model="currentTab">
-          <!-- CATALOGO -->
-          <VWindowItem>              
-            <VCardText>
-              <VRow  class="gap-y-4">
-                <VCol
-                  v-for="product in products"
-                  cols="12"
-                  md="6"
-                  sm="12"
-                  class="ps-6">
-                  <detailsProduct
-                    :isShowComponent="true"
-                    :product="product"
-                    :rol="rol"
-                    @alert="showAlert"
-                    @copy="copy"
-                    @open="open"
-                    @download="download"
-                    @updateLink="updateLink"
-                    @show="showProduct"
-                    @editProduct="editProduct"
-                    @deleteProduct="deleteProduct"
-                  />
-                </VCol>
-                <VCol
-                  cols="12" 
-                  v-show="!products.length"
-                  class="text-center">
-                    Datos no disponibles
-                </VCol>
-              </VRow>
-            </VCardText>
-
-            <VDivider />
-
-            <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
-              <span class="text-sm text-disabled">
-                {{ paginationData }}
-              </span>
-
-              <VPagination
-                v-model="currentPage"
-                size="small"
-                :total-visible="5"
-                :length="totalPages"
-              />
-            </VCardText>
-
-          </VWindowItem>
-
-          <!-- LISTADO -->
-          <VWindowItem>
             <v-table class="text-no-wrap">
               <thead>
                 <tr class="text-no-wrap">
@@ -888,9 +811,6 @@ const removeProduct = async () => {
                 :total-visible="5"
                 :length="totalPages"/>
             </VCardText>
-
-          </VWindowItem>
-        </VWindow>
       </VCardText>
     </VCard>
 

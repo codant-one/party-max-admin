@@ -1,96 +1,88 @@
 <script setup>
-import amazonEchoDot from '@images/eCommerce/amazon-echo-dot.png'
-import appleWatch from '@images/eCommerce/apple-watch.png'
-import headphone from '@images/eCommerce/headphone.png'
-import iphone from '@images/eCommerce/iphone.png'
-import nike from '@images/eCommerce/nike.png'
-import sonyDualsense from '@images/eCommerce/sony-dualsense.png'
 
-const popularProducts = [
-  {
-    avatarImg: iphone,
-    title: 'Apple iPhone 13',
-    subtitle: 'SKU: FXZ-4567',
-    stats: '$999.29',
-  },
-  {
-    avatarImg: nike,
-    title: 'Nike Air Jordan',
-    subtitle: 'SKU: FXZ-3456',
-    stats: '$72.40',
-  },
-  {
-    avatarImg: headphone,
-    title: 'Beats Studio 2',
-    subtitle: 'SKU: FXZ-9485',
-    stats: '$99.00',
-  },
-  {
-    avatarImg: appleWatch,
-    title: 'Apple Watch Series 7',
-    subtitle: 'SKU: FXZ-2345',
-    stats: '$249.99',
-  },
-  {
-    avatarImg: amazonEchoDot,
-    title: 'Amazon Echo Dot',
-    subtitle: 'SKU: FXZ-8959',
-    stats: '$79.40',
-  },
-  {
-    avatarImg: sonyDualsense,
-    title: 'Play Station Console',
-    subtitle: 'SKU: FXZ-7892',
-    stats: '$129.48',
-  },
-]
+import { themeConfig } from '@themeConfig'
+import router from '@/router'
 
-const moreList = [
-  {
-    title: 'Refresh',
-    value: 'refresh',
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
   },
-  {
-    title: 'Download',
-    value: 'Download',
+  subtitle: {
+    type: String,
+    required: true
   },
-  {
-    title: 'View All',
-    value: 'View All',
+  isPopular: {
+    type: String,
+    required: true
   },
-]
+  products: {
+    type: Object,
+    required: true
+  }
+})
+
+const items = ref(props.products)
+
+const go = (id) => {
+  router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
+}
+
 </script>
 
 <template>
   <VCard
-    title="Productos Populares"
-    subtitle="Total de 10,4 mil clientes"
+    :title="props.title"
+    :subtitle="props.subtitle"
   >
     <VCardText>
       <VList class="card-list">
         <VListItem
-          v-for="product in popularProducts"
+          v-for="product in items"
           :key="product.title"
         >
           <template #prepend>
+            <VProgressCircular
+              v-if="isPopular === '0'"
+              v-model="product.stock_percentage"
+              :size="46"
+              class="me-4"
+              color="warning"
+            >
+              <span class="text-sm text-high-emphasis font-weight-medium">
+                {{ product.stock_percentage }}%
+              </span>
+            </VProgressCircular>
             <VAvatar
+              v-else
               size="46"
               rounded
-              :image="product.avatarImg"
+              :image="themeConfig.settings.urlStorage + product.image"
             />
           </template>
 
-          <VListItemTitle class="font-weight-medium">
-            {{ product.title }}
+          <VListItemTitle class="font-weight-medium" style="width: 230px;">
+            {{ product.name }}
           </VListItemTitle>
-          <VListItemSubtitle class="text-disabled">
-            {{ product.subtitle }}
+          <VListItemSubtitle class="text-disabled d-flex" style="width: 230px;">
+            SKU: {{ product.colors[0].sku }} 
+            <VSpacer />
+            <span v-if="isPopular === '0'">({{ product.stock }}/{{ product.wholesale_min }})</span>
           </VListItemSubtitle>
-
           <template #append>
-            <div class="d-flex align-center">
-              <span class="font-weight-medium text-medium-emphasis me-2">{{ product.stats }}</span>
-            </div>
+            <VBtn
+              v-if="isPopular === '0'"
+              variant="tonal"
+              color="default"
+              class="rounded-sm"
+              size="30"
+              @click="go(product.id)">
+              <VIcon
+                icon="tabler-chevron-right"
+                class="flip-in-rtl"
+              />
+            </VBtn>
+            <span v-else>({{ product.total_sold }})</span>
           </template>
         </VListItem>
       </VList>
