@@ -107,7 +107,7 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'deliveredShipping' => $deliveredShipping['order_count'],
+                    'deliveredShipping' => $deliveredShipping ? $deliveredShipping['order_count'] : 0,
                     'products' => $products,
                     'stock' => $productsWithLessStock,
                     'services' => $services,
