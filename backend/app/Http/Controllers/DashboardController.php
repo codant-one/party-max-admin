@@ -51,7 +51,7 @@ class DashboardController extends Controller
                 ->withCount([
                     'orderDetails as total_sold' => function (Builder $query) {
                         $query->join('orders as o', 'order_details.order_id', '=', 'o.id')
-                              ->where('o.shipping_state_id', 3); // Filtrar solo órdenes entregadas
+                              ->where('o.payment_state_id', 4); // Filtrar solo órdenes entregadas
                     }
                 ])
                 ->orderBy('total_sold', 'DESC')
@@ -79,7 +79,7 @@ class DashboardController extends Controller
                 ->withCount([
                     'orderDetails as total_sold' => function (Builder $query) {
                         $query->join('orders as o', 'order_details.order_id', '=', 'o.id')
-                              ->where('o.shipping_state_id', 3); // Filtrar solo órdenes entregadas
+                              ->where('o.payment_state_id', 4); // Filtrar solo órdenes entregadas
                     }
                 ])
                 ->orderBy('total_sold', 'DESC')
