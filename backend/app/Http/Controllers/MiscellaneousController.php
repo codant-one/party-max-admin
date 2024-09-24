@@ -30,17 +30,21 @@ class MiscellaneousController extends Controller
     {
         try {
 
+            $products = [];
+
             $category = Category::with(['banner1', 'banner2', 'banner3', 'banner4', 'children'])
                                 ->where('slug', $slug)
                                 ->first();
     
-            $products = Product::with(['user.userDetail', 'user.supplier', 'colors.categories'])
-                                ->whereHas('colors.categories', function($query) use ($category) {
-                                    $query->where('category_id', $category->id);
-                                })
-                               ->orderBy('created_at', 'desc')
-                               ->limit(5)
-                               ->get();
+            if($category)
+                $products = 
+                    Product::with(['user.userDetail', 'user.supplier', 'colors.categories'])
+                           ->whereHas('colors.categories', function($query) use ($category) {
+                                $query->where('category_id', $category->id);
+                           })
+                           ->orderBy('created_at', 'desc')
+                           ->limit(5)
+                           ->get();
 
             return response()->json([
                 'success' => true,
