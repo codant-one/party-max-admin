@@ -116,11 +116,11 @@ async function fetchData() {
             break;
         }
       }
-    }
 
-    cant_commission.value = props.customerData.commission ?? 0
-    who_commission.value = props.customerData.wholesale_commission ?? 0
-    total_balance.value = props.customerData.account.balance
+      cant_commission.value = props.customerData.commission ?? 0
+      who_commission.value = props.customerData.wholesale_commission ?? 0
+      total_balance.value = props.customerData.account.balance
+    }
   }
 }
 

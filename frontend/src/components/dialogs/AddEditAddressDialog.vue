@@ -86,19 +86,17 @@ const addressTypes = [
   {
     icon: {
       icon: 'mdi-home-city',
-      size: '40',
+      size: '50',
     },
     title: 'Hogar',
-    desc: 'Hora de entrega (7 a.m. - 9 p.m.)',
     value: '1',
   },
   {
     icon: {
       icon: 'mdi-office-building',
-      size: '40',
+      size: '50',
     },
     title: 'Oficina',
-    desc: 'Hora de entrega (10 a.m. - 6 p.m.)',
     value: '2',
   },
 ]
@@ -169,24 +167,19 @@ const getFlagCountry = country => {
 
     <VCard
       v-if="props.billingAddress"
-      class="pa-sm-8 pa-5"
+      class="pa-4"
     >
       <!-- 👉 Title -->
-      <VCardItem>
-        <VCardTitle class="text-h3 text-center">
-          {{ props.billingAddress.address ? 'Editar' : 'Agregar Nueva' }} Dirección
-        </VCardTitle>
-      </VCardItem>
-
+      <VCardTitle class="text-h3 text-center">
+        {{ props.billingAddress.address ? 'Editar' : 'Agregar Nueva' }} Dirección
+      </VCardTitle>
+      <VCardSubtitle class="text-center">
+        <span class="text-base">
+          Agregar nueva dirección para entrega
+        </span>
+      </VCardSubtitle>
       <VCardText>
         <!-- 👉 Subtitle -->
-        <VCardSubtitle class="text-center mb-6">
-          <span class="text-base">
-
-            Agregar nueva dirección para entrega
-          </span>
-        </VCardSubtitle>
-
         <div class="d-flex">
           <CustomRadiosWithIcon
             v-model:selected-radio="billingAddress.addresses_type_id"
@@ -207,6 +200,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="12"
+              class="py-1"
             >
               <AppTextField
                 v-model="billingAddress.title"
@@ -220,6 +214,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
             <VAutocomplete
                 v-model="billingAddress.country_id"
@@ -230,6 +225,7 @@ const getFlagCountry = country => {
                 item-value="name"
                 :menu-props="{ maxHeight: '200px' }"
                 @update:model-value="selectCountry"
+                readonly
                 >
                 <template
                     v-if="billingAddress.country_id"
@@ -249,6 +245,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
                 <VAutocomplete
                     v-model="billingAddress.province_id"
@@ -263,6 +260,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
               <AppTextField
                 v-model="billingAddress.city"
@@ -276,6 +274,7 @@ const getFlagCountry = country => {
              <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
                 <AppTextField
                 v-model="billingAddress.street"
@@ -285,7 +284,7 @@ const getFlagCountry = country => {
             </VCol>
 
             <!-- 👉 Billing Address -->
-            <VCol cols="12">
+            <VCol cols="12" class="py-1">
               <VTextarea
                 v-model="billingAddress.address"
                 rows="2"
@@ -299,6 +298,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
                 <AppTextField
                 v-model="billingAddress.phone"
@@ -312,6 +312,7 @@ const getFlagCountry = country => {
             <VCol
               cols="12"
               md="6"
+              class="py-1"
             >
               <AppTextField
                 v-model="billingAddress.postal_code"
@@ -320,10 +321,11 @@ const getFlagCountry = country => {
                 :rules="[requiredValidator, phoneValidator]"
               />
             </VCol>
-            <VCol cols="12" md="8"></VCol>
+            <VCol cols="12" md="8" class="py-1"></VCol>
             <VCol
               cols="12"
               md="4"
+              class="py-1"
             >
               <VCheckbox
                 v-model="billingAddress.default"
@@ -336,7 +338,7 @@ const getFlagCountry = country => {
             <!-- 👉 Submit and Cancel button -->
             <VCol
               cols="12"
-              class="text-center"
+              class="text-center py-1"
             >
               <VBtn
                 type="submit"
