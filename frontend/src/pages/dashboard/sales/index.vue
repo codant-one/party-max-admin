@@ -646,7 +646,7 @@ const removeProduct = async () => {
             </thead>
             <tbody>
                 <template  v-for="product in myProductsList" :key="product.id">
-                    <tr style="height: 3.75rem;" :style="{ background: product.stock === 0 ? '#FFC549' : '#FFFFFF' }">
+                    <tr style="height: 3.75rem;">
                         <td> {{ product.id }} </td>
                         <td> 
                         <div class="d-flex align-center gap-x-2">
