@@ -619,6 +619,15 @@ const removeProduct = async () => {
             :items="[10, 20, 30, 50]"
           />
         </div>
+
+        <VSpacer />
+
+        <VBtn
+          v-if="$can('crear','productos')"
+          prepend-icon="mdi-cart-arrow-up"
+          :to="{ name: 'dashboard-products-products-inventory-upload' }">
+          Cargar Productos
+        </VBtn>
       </VCardText>
 
       <VDivider />

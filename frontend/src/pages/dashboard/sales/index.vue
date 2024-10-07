@@ -22,6 +22,8 @@ const totalProducts = ref(0)
 const isRequestOngoing = ref(true)
 const selectedProduct = ref({})
 
+const date = ref('')
+
 const isProductDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 
@@ -197,6 +199,7 @@ async function fetchData() {
         })
     );
 
+    console.log('date', date.value)
     totalPages.value = productsStores.last_page
     totalProducts.value = productsStores.productsTotalCount
 
@@ -620,6 +623,14 @@ const removeProduct = async () => {
             :items="[10, 20, 30, 50]"
           />
         </div>
+
+        <VSpacer />
+
+        <AppDateTimePicker
+            v-model="date"
+            label="Rango de fecha"
+            :config="{ mode: 'range' }"
+        />
       </VCardText>
 
       <VDivider />
