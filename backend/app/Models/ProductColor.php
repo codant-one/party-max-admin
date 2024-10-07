@@ -33,4 +33,9 @@ class ProductColor extends Model
         return $this->belongsTo(Product::class, 'product_id', 'id')->withTrashed();
     }
 
+    public function orders()
+    {
+        return $this->hasMany(OrderDetail::class, 'product_color_id');
+    }
+
 }

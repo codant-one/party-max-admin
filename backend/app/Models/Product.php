@@ -96,6 +96,23 @@ class Product extends Model
     }
 
     /**** Scopes ****/
+    public function scopeSales($query)
+    {
+        return $query->addSelect(['count_sales' => function($q) {
+            $q->selectRaw('count(p.id)')
+              ->from('products as p')
+              ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+              ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
+              ->join('orders as o', 'o.id', '=', 'od.order_id')
+              ->whereColumn('product_id', 'products.id')
+              ->where([
+                ['user_id', Auth::id()],
+                ['payment_state_id', 4]
+              ]);
+        }]);
+   
+    }
+
     public function scopeIsFavorite($query)
     {
         return $query->addSelect(['is_favorite' => function($q) {
@@ -226,6 +243,10 @@ class Product extends Model
         
         if($filters->get('supplierId')) {
             $query->where('user_id', $filters->get('supplierId'));
+        }
+
+        if($filters->get('isSales')) {
+            $query->having('count_sales', '>', 0);
         }
 
         if ($filters->get('archived') !== null) {

@@ -41,6 +41,13 @@ export default [
         to: 'dashboard-calendar',
         action: 'ver',
         subject: 'calendario',
+    },
+    {
+        title: 'Ventas',
+        icon: { icon: 'mdi-cart-check' },
+        to: 'dashboard-sales',
+        action: 'ver',
+        subject: 'ventas',
     }
 ]
   

@@ -38,12 +38,14 @@ class ProductController extends Controller
                             'colors.categories.category', 
                             'colors.images', 
                             'colors.color', 
+                            'colors.orders', 
                             'detail', 
                             'user.userDetail',
                             'user.supplier',
                             'state',
                             'tags'
                         ])
+                        ->sales()
                         ->favorites()
                         ->order($request->category_id)
                         ->applyFilters(
@@ -58,7 +60,8 @@ class ProductController extends Controller
                                 'in_stock',
                                 'type_sales',
                                 'category_id',
-                                'supplierId'
+                                'supplierId',
+                                'isSales'
                             ])
                         )
                         ->withTrashed();

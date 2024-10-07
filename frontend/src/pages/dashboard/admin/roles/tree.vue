@@ -103,6 +103,9 @@ const closeTreeDialog  = function(){
                             <strong>Calendario</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de calendario</code>
                         </li>
                         <li class="n2">
+                            <strong>Ventas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de ventas</code>
+                        </li>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">
@@ -284,6 +287,9 @@ const closeTreeDialog  = function(){
                                 <strong>Eliminar Productos</strong>&emsp;/&emsp;<code>Permite la eliminación de productos</code>
                             </li>
                         </ul>
+                        <li class="tab n3">
+                            <strong>Inventario</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de inventario</code>
+                        </li>
                         <li class="tab n3">
                             <strong>Ver Productos Pendientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de productos pendientes</code>
                         </li>

@@ -213,6 +213,18 @@ const closeModal = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Ventas
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver ventas"
+                            value="ver ventas"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">
@@ -544,6 +556,16 @@ const closeModal = function(){
                                 v-model="assignedPermissions"
                                 label="eliminar productos"
                                 value="eliminar productos"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Inventario
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver inventario"
+                                value="ver inventario"
                             />
                         </div>
                         <VLabel style="font-weight: bold;">

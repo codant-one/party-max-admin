@@ -290,6 +290,19 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Ventas
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver ventas"
+                            value="ver ventas"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">
@@ -667,6 +680,17 @@ const closeRoleDetailDialog = function(){
                                 v-model="permissions"
                                 label="eliminar productos"
                                 value="eliminar productos"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Inventario
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver inventario"
+                                value="ver inventario"
                                 :readonly="readonly"
                             />
                         </div>

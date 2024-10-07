@@ -31,6 +31,13 @@ export default [
           subject: 'administrador', 
         },
         { 
+          title: 'Inventario', 
+          icon: { icon: 'mdi-cart-arrow-down' },
+          to: 'dashboard-products-products-inventory', 
+          action: 'ver' , 
+          subject: 'inventario',  
+        },
+        { 
           title: 'Pendientes', 
           icon: { icon: 'mdi-clock-time-two-outline' },
           to: 'dashboard-products-pendings', 
