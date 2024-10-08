@@ -22,7 +22,8 @@ const totalProducts = ref(0)
 const isRequestOngoing = ref(true)
 const selectedProduct = ref({})
 
-const date = ref('')
+const date = ref(null)
+const dateRangeArray = ref(null)
 
 const isProductDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
@@ -156,7 +157,8 @@ async function fetchData() {
         limit: rowPerPage.value,
         page: currentPage.value,
         supplierId: userData.value.id,
-        isSales: '1'
+        isSales: '1',
+        date: dateRangeArray.value
     }
 
     isRequestOngoing.value = true
@@ -199,12 +201,36 @@ async function fetchData() {
         })
     );
 
-    console.log('date', date.value)
     totalPages.value = productsStores.last_page
     totalProducts.value = productsStores.productsTotalCount
 
     isRequestOngoing.value = false
 }
+
+const changeDate = () => {
+
+    if(date.value !== null) {
+        dateRangeArray.value = date.value.split(' a ')
+        fetchData()
+    }
+}
+
+const startDateTimePickerConfig = computed(() => {
+  const config = {
+    dateFormat: 'Y-m-d'
+  }
+
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
+
+  config.mode = 'range'
+  config.maxDate = formattedDate
+
+  return config
+})
 
 const showStateDialog = (productData, id) => {
     isConfirmApproveDialogVisible.value = true
@@ -627,9 +653,11 @@ const removeProduct = async () => {
         <VSpacer />
 
         <AppDateTimePicker
+            :key="JSON.stringify(startDateTimePickerConfig)"
             v-model="date"
             label="Rango de fecha"
-            :config="{ mode: 'range' }"
+            :config="startDateTimePickerConfig"
+            @change="changeDate"
         />
       </VCardText>
 

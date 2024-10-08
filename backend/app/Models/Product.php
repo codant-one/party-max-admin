@@ -96,21 +96,27 @@ class Product extends Model
     }
 
     /**** Scopes ****/
-    public function scopeSales($query)
+    public function scopeSales($query, $date = null)
     {
-        return $query->addSelect(['count_sales' => function($q) {
+        return $query->addSelect(['count_sales' => function($q) use ($date) {
             $q->selectRaw('count(p.id)')
               ->from('products as p')
               ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
               ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
               ->join('orders as o', 'o.id', '=', 'od.order_id')
-              ->whereColumn('product_id', 'products.id')
+              ->whereColumn('p.id', 'products.id')
               ->where([
-                ['user_id', Auth::id()],
-                ['payment_state_id', 4]
+                ['p.user_id', Auth::id()],
+                ['o.payment_state_id', 4]
               ]);
+
+              if($date !== null) {
+                if(count($date) === 2)
+                    $q->whereBetween('o.date', $date);
+                else 
+                    $q->where('o.date', $date[0]);
+              }
         }]);
-   
     }
 
     public function scopeIsFavorite($query)

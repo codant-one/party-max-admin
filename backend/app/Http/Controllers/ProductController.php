@@ -45,7 +45,7 @@ class ProductController extends Controller
                             'state',
                             'tags'
                         ])
-                        ->sales()
+                        ->sales($request->date)
                         ->favorites()
                         ->order($request->category_id)
                         ->applyFilters(
