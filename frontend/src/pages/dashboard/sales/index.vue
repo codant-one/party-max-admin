@@ -658,6 +658,7 @@ const removeProduct = async () => {
             label="Rango de fecha"
             :config="startDateTimePickerConfig"
             @change="changeDate"
+            clearable
         />
       </VCardText>
 
