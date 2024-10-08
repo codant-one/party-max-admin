@@ -1,6 +1,7 @@
 <script setup>
 
 import { useDashboardStores } from '@/stores/useDashboard'
+import { useSuppliersStores } from '@/stores/useSuppliers'
 import { formatNumber } from '@/@core/utils/formatters'
 
 import VueApexCharts from 'vue3-apexcharts'
@@ -12,6 +13,7 @@ import Services from "@/components/dashboard/Services.vue";
 import Orders from "@/components/dashboard/Orders.vue";
 
 const dashboardStores = useDashboardStores()
+const suppliersStores = useSuppliersStores()
 
 const userDataJ = ref('')
 const rol = ref(null)
@@ -118,6 +120,27 @@ async function fetchData() {
     }
 
     timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale]
+
+    let retail_sales = parseFloat(data.value.supplier.retail_sales ?? 0)
+    let wholesale_sales = parseFloat(data.value.supplier.wholesale_sales ?? 0)
+    let total_sales = retail_sales + wholesale_sales
+    let commission_retail = retail_sales * (parseFloat(data.value.supplier.commission ?? 0) / 100)
+    let commission_wholesale = wholesale_sales * (parseFloat(data.value.supplier.wholesale_commission ?? 0) / 100) 
+        
+    let total_balance = total_sales - commission_retail - commission_wholesale
+
+    let data_ = {
+        balance: total_balance,
+        retail_sales_amount: retail_sales - commission_retail,
+        wholesale_sales_amount: wholesale_sales - commission_wholesale,
+        type_commission: 2
+    }
+
+    let response = await suppliersStores.updateBalance(data.value.supplier.id, data_)
+
+    data.value.supplier.account.balance = response.data.data.supplierAccount.balance
+    data.value.supplier.account.retail_sales_amount = response.data.data.supplierAccount.retail_sales_amount
+    data.value.supplier.account.wholesale_sales_amount = response.data.data.supplierAccount.wholesale_sales_amount
   }
 
   isRequestOngoing.value = false

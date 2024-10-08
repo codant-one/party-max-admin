@@ -102,7 +102,13 @@ class DashboardController extends Controller
                 ])
                 ->count();
 
-            $supplier = Supplier::with(['account'])->sales()->where('user_id', Auth::user()->id)->first();
+            $supplier = 
+                Supplier::with(['account'])
+                        ->sales()
+                        ->retailSales()
+                        ->wholesaleSales()
+                        ->where('user_id', Auth::user()->id)
+                        ->first();
         
             return response()->json([
                 'success' => true,

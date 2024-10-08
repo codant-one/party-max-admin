@@ -50,6 +50,7 @@ const statistics = [
           :key="item.title"
           cols="6"
           md="3"
+          class="pr-0"
         >
           <div class="d-flex align-center gap-2">
             <VAvatar
