@@ -48,7 +48,8 @@ use App\Http\Controllers\{
     CakeTypeController,
     CakeSizeController,
     EventController,
-    DashboardController
+    DashboardController,
+    ReferralController
 };
 
 /*
@@ -110,6 +111,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('cake-sizes', CakeSizeController::class);
     Route::apiResource('colors', ColorController::class);
     Route::apiResource('events', EventController::class);
+    Route::apiResource('referrals', ReferralController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -155,9 +157,10 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::put('updateStatus/{id}', [ProductController::class, 'updateStatus']);
         Route::put('updateStates/{id}', [ProductController::class, 'updateStates']);
         Route::post('order_id', [ProductController::class, 'updateOrder']);
+        Route::post('uploadProducts', [ProductController::class, 'uploadProducts']);
     });
 
-     //Services
+    //Services
      Route::group(['prefix' => 'services'], function () {
         Route::post('delete', [ServiceController::class, 'delete']);
         Route::post('upload-image', [ServiceController::class, 'uploadImage']);
@@ -183,7 +186,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('order_id', [BlogController::class, 'updateOrder']);
     });
 
-     //Blog-categories
+    //Blog-categories
     Route::group(['prefix' => 'blog-categories'], function () {
         Route::post('delete', [BlogCategoryController::class, 'delete']);
         Route::get('blogs/all', [BlogCategoryController::class, 'all']);
@@ -230,6 +233,14 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('/status/all', [EventController::class, 'events']);
         Route::post('/delete/batch', [EventController::class, 'deleteBatch']);
         Route::get('/users/all', [EventController::class, 'getUsers']);
+    });
+
+    //Referrals
+    Route::group(['prefix' => 'referrals'], function () {
+        Route::get('/products/all', [ReferralController::class, 'products']);
+        Route::get('/products/update', [ReferralController::class, 'updateProducts']);
+        Route::get('/products/user', [ReferralController::class, 'userDetails']);
+        Route::post('/products/upload', [ReferralController::class, 'uploadProducts']);
     });
 
 });

@@ -38,4 +38,9 @@ class ProductColor extends Model
         return $this->hasMany(OrderDetail::class, 'product_color_id');
     }
 
+    public function referral()
+    {
+        return $this->hasOne(ReferralDetail::class, 'product_color_id');
+    }
+
 }

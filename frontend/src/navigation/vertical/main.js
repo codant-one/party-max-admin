@@ -48,6 +48,13 @@ export default [
         to: 'dashboard-sales',
         action: 'ver',
         subject: 'ventas',
+    },
+    {
+        title: 'Remisiones',
+        icon: { icon: 'mdi-cart-arrow-right' },
+        to: 'dashboard-referrals',
+        action: 'ver',
+        subject: 'remisiones',
     }
 ]
   

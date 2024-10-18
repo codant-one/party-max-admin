@@ -1,338 +1,136 @@
 <script setup>
 
-import { inject } from "vue"
 import { themeConfig } from '@themeConfig'
+import { inject } from "vue"
 import { requiredValidator } from '@validators'
 import { useProductsStores } from '@/stores/useProducts'
-import { useColorsStores } from '@/stores/useColors'
-import { useCategoriesStores } from '@/stores/useCategories'
-import { useBrandsStores } from '@/stores/useBrands'
-import { useTagsStores } from '@/stores/useTags'
-import { useSuppliersStores } from '@/stores/useSuppliers'
-import { QuillEditor } from '@vueup/vue-quill'
-import ImageUploader from 'quill-image-uploader'
-import FileInput from "@/components/common/FileInput.vue";
 import router from '@/router'
+import xls from '@images/icons/file/xls.png'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const productsStores = useProductsStores()
-const colorsStores = useColorsStores()
-const categoriesStores = useCategoriesStores()
-const brandsStores = useBrandsStores() 
-const tagsStores = useTagsStores() 
-const suppliersStores = useSuppliersStores()
 
 const emitter = inject("emitter")
-const isRequestOngoing = ref(true)
-
-const optionCounter = ref(1)
-
-const categories = ref([])
-const listColors = ref([])
-const listBrands = ref([])
-const listTags = ref([])
-const listSuppliers = ref([])
 
 const isValid =  ref(null)
 const isFormValid = ref(false)
 const refForm = ref()
-const rol = ref(null)
-const userData = ref(null)
 
-const tag_id = ref()
-const color_id = ref([])
-const category_id = ref([])
-const sku = ref([])
-const product_files = ref([])
-const brand_id = ref()
-const user_id = ref(null)
-const name = ref(null)
-const single_description = ref(' ')
-const description = ref(' ')
-const price = ref('')
-const price_for_sale = ref('')
-const wholesale_price = ref('')
-const wholesale_min = ref(6)
-const wholesale = ref(false)
-const stock = ref('')
-const image = ref('')
-const avatar = ref('')
+const isRequestOngoing = ref(false)
 const filename = ref([])
-const width = ref([])
-const height = ref([])
-const deep = ref([])
-const weigth = ref([])
-const material = ref([])
-const estimated_delivery_time = ref([])
+const file = ref(null)
+const name = ref(null)
 
-const modules = {
-  name: 'imageUploader',
-  module: ImageUploader,
-  options: {
-    upload: file => {
-    
-      return new Promise((resolve, reject) => {
-        
-        const formData = new FormData()
-              
-        formData.append("image", file)
-
-        axios.post('/products/upload-image', formData)
-          .then(res => {
-            resolve(themeConfig.settings.urlStorage + res.data.url)
-          })
-          .catch(err => {
-            reject("Upload failed")
-            console.error("Error:", err)
-          })
-      })
-    },
-  },
-}
-
-
-watchEffect(fetchData)
-
-async function fetchData() {
-
-  isRequestOngoing.value = true
-
-  let data = { 
-    tag_type_id: 1,
-    category_type_id: 1,
-    limit: -1 
-  }
-
-  await colorsStores.all();
-  await categoriesStores.fetchCategoriesOrder(data)
-  await brandsStores.fetchBrands(data)
-  await tagsStores.fetchTags(data)
-
-  listColors.value = colorsStores.getColors
-  categories.value = categoriesStores.getCategories
-  listBrands.value = brandsStores.getBrands
-  listTags.value = tagsStores.getTags
- 
-  userData.value = JSON.parse(localStorage.getItem('user_data') || 'null')
-  rol.value = userData.value.roles[0].name
-
-  if(rol.value !== 'Proveedor') {
-    await suppliersStores.fetchSuppliers(data)
-    listSuppliers.value = suppliersStores.getSuppliers
-  }
-
-  isRequestOngoing.value = false
-}
-
-const getSuppliers = computed(() => {
-  return listSuppliers.value.map((supplier) => {
-    return {
-      title: supplier.company_name,
-      value: supplier.user.id,
-    }
-  })
+const advisor = ref({
+  type: '',
+  message: '',
+  show: false
 })
 
-const onImageSelected = event => {
-  const file = event.target.files[0]
+const download = async(data) => {
+  try {
+    const link = document.createElement('a');
+    link.href = themeConfig.settings.urlPublic + 'files/example.xlsx'
 
-  if (!file) return
-  // image.value = file
+    link.target = '_blank'
+    document.body.appendChild(link);
+    link.click();
 
-  URL.createObjectURL(file)
+    link.parentNode.removeChild(link);
 
-  resizeImage(file, 400, 400, 0.9)
-    .then(async blob => {
-        image.value = blob
-        let r = await blobToBase64(blob)
-        avatar.value = 'data:image/jpeg;base64,' + r
-    })
-}
+    advisor.value.type = 'success'
+    advisor.value.show = true
+    advisor.value.message = 'Descarga Exitosa!'
 
-const resizeImage = function(file, maxWidth, maxHeight, quality) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-
-    img.src = URL.createObjectURL(file)
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-
-      let width = img.width
-      let height = img.height
-
-      if (maxWidth && width > maxWidth) {
-        height *= maxWidth / width
-        width = maxWidth
-      }
-
-      if (maxHeight && height > maxHeight) {
-        width *= maxHeight / height
-        height = maxHeight
-      }
-
-      canvas.width = width
-      canvas.height = height
-
-      ctx.drawImage(img, 0, 0, width, height)
-
-      canvas.toBlob(blob => {
-        resolve(blob)
-      }, file.type, quality)
+    } catch (error) {
+      advisor.value.type = 'error'
+      advisor.value.show = true
+      advisor.value.message = 'Error al descargar el documento:' + error
     }
-    img.onerror = error => {
-      reject(error)
-    }
-  })
+
+    setTimeout(() => {
+        advisor.value.show = false
+        advisor.value.type = ''
+        advisor.value.message = ''
+    }, 5000)
 }
 
-const blobToBase64 = blob => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.readAsDataURL(blob)
-    reader.onload = () => {
-      resolve(reader.result.split(',')[1])
-    }
-    reader.onerror = error => {
-      reject(error)
-    }
-  })
-}
-
-const closeDropdown = (i) => { 
-  document.getElementById("selectCategory_"+i).blur()
-}
-
-const getFiles = (files, i) => {
-  product_files.value[i-1] = files
-}
-
-const removeColor = id => {
-  if(optionCounter.value > 1) {
-    optionCounter.value--
-    category_id.value.splice(id, 1)
-    color_id.value.splice(id, 1)
-    sku.value.splice(id, 1)
-    product_files.value.splice(id, 1)
-  }
+const uploadFile = (event) => {
+  file.value = event.target.files ? event.target.files[0] : null;
+  if ( file.value)
+    name.value =  file.value.name
 }
 
 const onSubmit = () => {
 
-  // refForm.value?.validate().then(({ valid }) => {
-  //     isValid.value = valid
-  //     if (valid) {
+  refForm.value?.validate().then(({ valid }) => {
+    isValid.value = valid
+    if (valid) {
+      isRequestOngoing.value = true
 
-  //         let formData = new FormData()
+      let formData = new FormData()
 
-  //         //product
-  //         formData.append('user_id', user_id.value ?? 0)
-  //         formData.append('brand_id', brand_id.value)
-  //         formData.append('name', name.value)
-  //         formData.append('single_description', single_description.value)
-  //         formData.append('description', description.value)
-  //         formData.append('price', price.value)
-  //         formData.append('price_for_sale', price_for_sale.value)
-  //         formData.append('wholesale', wholesale.value ? 1 : 0)
-  //         formData.append('wholesale_price', wholesale_price.value)
-  //         formData.append('wholesale_min', wholesale_min.value)
-  //         formData.append('stock', stock.value)
-  //         formData.append('image', image.value)
+      formData.append('file', file.value)
 
-  //         //product_details
-  //         formData.append('width', width.value)
-  //         formData.append('height', height.value)
-  //         formData.append('deep', deep.value)
-  //         formData.append('weigth', weigth.value)
-  //         formData.append('material', material.value)
+      productsStores.uploadProducts(formData)
+        .then((res) => {
+          if (res.data.success) {
 
-  //         //product_tags
-  //         formData.append('tag_id', tag_id.value)
+              let data = {
+                message: 'Productos Cargados!',
+                error: false
+              }
 
-  //         //product_categories
-  //         formData.append('category_id', JSON.stringify(category_id.value))
+              router.push({ name : 'dashboard-products-products-referrals'})
+              emitter.emit('toast', data)
 
-  //         //product_images
-  //         formData.append('color_id', color_id.value)
-  //         formData.append('sku', sku.value)
-  //         formData.append('product_files', product_files.value)
+          } else {
 
-  //         product_files.value.forEach(function callback(value, index) {
-  //           value.forEach(function callback(image, i) {
-  //             formData.append('images_'+index+'[]', image.blob)
-  //           });
-  //         });
+              let data = {
+                message: 'ERROR',
+                error: true
+              }
 
-  //         productsStores.addProduct(formData)
-  //           .then((res) => {
-  //             if (res.data.success) {
+              router.push({ name : 'dashboard-products-products-referrals'})
+              emitter.emit('toast', data)
+          }
+        })
+        .catch((err) => {
+          let data = {
+            message: err,
+            error: true
+          }
 
-  //                 let data = {
-  //                     message: 'Producto Creado!',
-  //                     error: false
-  //                 }
+          router.push({ name : 'dashboard-products-products-referrals'})
+          emitter.emit('toast', data)
+        })
 
-  //                 router.push({ name : 'dashboard-products-products'})
-  //                 emitter.emit('toast', data)
-
-  //             } else {
-
-  //                 let data = {
-  //                     message: 'ERROR',
-  //                     error: true
-  //                 }
-
-  //                 router.push({ name : 'dashboard-products-products'})
-  //                 emitter.emit('toast', data)
-  //             }
-  //           })
-  //           .catch((err) => {
-  //                 let data = {
-  //                     message: err,
-  //                     error: true
-  //                 }
-
-  //                 router.push({ name : 'dashboard-products-products'})
-  //                 emitter.emit('toast', data)
-  //           })
-
-  //     }
-  // })
+      }
+  })
 }
 </script>
 
 <template>
   <section>
     <VRow>
-      <VDialog
-        v-model="isRequestOngoing"
-        width="300"
-        persistent>
-        <VCard
-          color="primary"
-          width="300">
-          <VCardText class="pt-3">
-            Cargando
-            <VProgressLinear
-              indeterminate
-              color="white"
-              class="mb-0"
-             />
-          </VCardText>
-        </VCard>
-      </VDialog>
+      <VCol cols="12">
+        <VAlert
+          v-if="advisor.show"
+          :type="advisor.type"
+          class="mb-6">
+            {{ advisor.message }}
+        </VAlert>
+      </VCol>
     </VRow>
     <VForm
       ref="refForm"
       v-model="isFormValid"
       @submit.prevent="onSubmit">
-      <div class="d-flex mt-5 flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
+      <div class="d-flex mt-3 flex-wrap justify-start justify-sm-space-between gap-y-4 gap-x-6 mb-6">
         <div class="d-flex flex-column justify-center">
           <h4 class="text-h4 font-weight-medium">
             Añadir items a tus productos 😃🌟
           </h4>
-          <span>Recarga tu fiesta de productos 🎉</span>
         </div>
 
         <div class="d-flex gap-4 align-center flex-wrap">
@@ -353,26 +151,174 @@ const onSubmit = () => {
       </div>
 
       <VRow>
-        <VCol md="8">
-        
-
-         
-          
+        <VCol md="9">
+          <VTimeline
+            align="start"
+            side="end"
+            truncate-line="start"
+            :density="$vuetify.display.smAndDown ? 'compact' : 'default'"
+          >
+            <VTimelineItem fill-dot size="small">
+              <template #icon>
+                <div class="v-timeline-avatar-wrapper rounded-circle">
+                  <VAvatar
+                    size="32"
+                    color="error"
+                    variant="tonal"
+                  >
+                    <VIcon
+                      icon="mdi-file-document-alert"
+                      size="20"
+                    />
+                  </VAvatar>
+                </div>
+              </template>
+              <VCard class="mt-n4">
+                <VCardItem class="pb-2">
+                  <VCardTitle>Descargar documento</VCardTitle>
+                </VCardItem>
+                <VCardText>
+                  <p class="app-timeline-text mb-3">
+                    Para asegurar una carga exitosa de tus productos y evitar errores durante el procesamiento de datos, 
+                    te recomendamos descargar y utilizar el documento de ejemplo como referencia.
+                  </p>
+                  <div class="d-inline-flex align-items-center timeline-chip">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                      text="Descargar">
+                      <template v-slot:activator="{ props }">
+                        <VChip 
+                          :label="false"
+                          :prepend-avatar="xls"
+                          pill
+                          size="large" 
+                          rounded="sm"
+                          class="cursor-pointer"
+                          @click="download()">                     
+                          <span class="app-timeline-text font-weight-medium">
+                            example.xlsx
+                          </span>
+                        </VChip>
+                      </template>
+                    </VTooltip>
+                  </div>                
+                </VCardText>
+              </VCard>
+            </VTimelineItem>
+            <VTimelineItem fill-dot size="small">
+              <template #icon>
+                <div class="v-timeline-avatar-wrapper rounded-circle">
+                  <VAvatar
+                    size="32"
+                    color="success"
+                    variant="tonal"
+                  >
+                    <VIcon
+                      size="20"
+                      icon="mdi-file-upload-outline"
+                    />
+                  </VAvatar>
+                </div>
+              </template>
+              <VCard class="mt-n4">
+                <VCardItem class="pb-2">
+                  <VCardTitle>Cargar documento</VCardTitle>
+                </VCardItem>
+                <VCardText>
+                  <p class="mb-3">
+                    Sube tu documento con la información precisa de tus productos (SKU) y la cantidad que deseas actualizar.
+                  </p>
+                  <div class="d-flex gap-4 flex-wrap">
+                    <VFileInput
+                      v-model="filename"
+                      label="example.xls"
+                      accept=".xls, .xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                      prepend-icon="mdi-microsoft-excel"
+                      clearable
+                      @change="uploadFile"
+                      :rules="[requiredValidator]"
+                    />
+                  </div>
+                </VCardText>
+              </VCard>
+            </VTimelineItem>
+            <VTimelineItem fill-dot size="small" class="last">
+              <template #icon>
+                <div class="v-timeline-avatar-wrapper rounded-circle">
+                  <VAvatar
+                    size="32"
+                    color="primary"
+                    variant="tonal"
+                  >
+                    <VIcon
+                      size="18"
+                      icon="mdi-file-document-check"
+                    />
+                  </VAvatar>
+                </div>
+              </template>
+              <VCard class="mt-n4">
+                <VCardItem class="pb-2">
+                  <VCardTitle>¡Empieza la diversión! </VCardTitle>
+                </VCardItem>
+                <VCardText>
+                  <p class="mb-3">
+                    Haz clic en el botón 'Cargar' a tu derecha para subir los productos al inventario y espera a que el proceso se complete. 
+                    Recuerda que, una vez cargados, deberás esperar su aprobación antes de que estén disponibles en tu tienda.
+                  </p>
+                  <div class="d-inline-flex align-items-center timeline-chip" v-if="isRequestOngoing">
+                    <img
+                      :src="xls"
+                      height="20"
+                      class="me-2"
+                      alt="img"
+                    >
+                    <span class="app-timeline-text font-weight-medium">
+                      {{name}}
+                    </span>
+                  </div>
+                  <div class="d-flex gap-2 align-center" v-if="isRequestOngoing">
+                    <div class="flex-grow-1">
+                      <VProgressLinear
+                        indeterminate
+                        color="primary"
+                      />
+                    </div>
+                  </div>
+                </VCardText>
+              </VCard>
+            </VTimelineItem>
+          </VTimeline>
         </VCol>
 
-        <VCol
-          md="4"
-          cols="12"
-        >
-
-        
-        </VCol>
+        <VCol md="3" cols="12"></VCol>
       </VRow>
     </VForm>
   </section>
 </template>
 
 <style lang="scss">
+
+  .last {
+    .v-timeline-item__body {
+      padding-bottom: 0 !important;
+    }
+  }
+
+  .v-chip--pill.v-chip.v-chip--size-large {
+    .v-avatar--start {
+      border-radius: 0 !important;
+    }
+  }
+
+  .v-timeline {
+    .v-timeline-divider__inner-dot {
+      background: white !important;
+    }
+  }
+
   .inventory-card{
     .v-radio-group,
     .v-checkbox {

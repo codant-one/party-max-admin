@@ -38,6 +38,13 @@ export default [
           subject: 'inventario',  
         },
         { 
+          title: 'Stock pendientes', 
+          icon: { icon: 'mdi-cart-arrow-up' },
+          to: 'dashboard-products-products-referrals', 
+          action: 'ver' , 
+          subject: 'stock',  
+        },
+        { 
           title: 'Pendientes', 
           icon: { icon: 'mdi-clock-time-two-outline' },
           to: 'dashboard-products-pendings', 

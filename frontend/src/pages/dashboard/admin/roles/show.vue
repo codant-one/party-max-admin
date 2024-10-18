@@ -303,6 +303,25 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Remisiones
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver remisiones"
+                            value="ver remisiones"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="editar remisiones"
+                            value="editar remisiones"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">
@@ -691,6 +710,23 @@ const closeRoleDetailDialog = function(){
                                 v-model="permissions"
                                 label="ver inventario"
                                 value="ver inventario"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Stock
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver stock"
+                                value="ver stock"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar stock"
+                                value="editar stock"
                                 :readonly="readonly"
                             />
                         </div>

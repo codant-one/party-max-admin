@@ -33,6 +33,10 @@ class Products {
     updateOrder(data) {
         return axios.post('/products/order_id', data)
     }
+
+    uploadProducts(data) {
+        return axios.post('/products/uploadProducts', data)
+    }
 }
 
 const products = new Products();

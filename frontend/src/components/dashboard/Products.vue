@@ -36,6 +36,26 @@ const go = (id) => {
     :subtitle="props.subtitle"
     :style="{ minHeight: '498px' }"
   >
+  <template #append  v-if="isPopular === '0'">
+    <VBtn
+      :to="{ name: 'dashboard-products-products-inventory' }"
+      icon
+      variant="text"
+      color="default"
+      size="x-small">
+      <VTooltip
+        open-on-focus
+        location="top"
+        activator="parent">
+        Abrir
+      </VTooltip>
+      <VIcon
+        size="20"
+        icon="mdi-open-in-new"
+        class="me-1"
+      />
+    </VBtn>
+  </template>
     <VCardText>
       <VList class="card-list">
         <VListItem

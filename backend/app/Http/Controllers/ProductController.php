@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\StatusProductRequest;
+use App\Imports\ProductImport;
+
+use Maatwebsite\Excel\Facades\Excel;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,6 +17,7 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\Supplier;
 use App\Models\ProductList;
+use App\Models\Referral;
 
 class ProductController extends Controller
 {
@@ -383,5 +387,27 @@ class ProductController extends Controller
         return response()->json([
             'success' => 1
         ]);
+    }
+
+    /**
+     * upload products
+     */
+    public function uploadProducts(Request $request): JsonResponse
+    { 
+        
+        try {
+
+            Excel::import(new ProductImport, $request->file('file'));
+
+            return response()->json([
+                'success' => true
+            ], 200);
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 }

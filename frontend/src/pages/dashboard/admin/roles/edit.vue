@@ -180,7 +180,7 @@ const onSubmitEdit = () =>{
                             </VBtn>
                         </VCol>
                     </VRow>
-                    <VCardText class="d-flex justify-end gap-3 flex-wrap">
+                    <VCardText class="d-flex justify-end gap-3 flex-wrap px-0">
                         <VBtn
                             color="secondary"
                             variant="tonal"

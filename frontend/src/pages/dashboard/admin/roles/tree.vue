@@ -106,6 +106,14 @@ const closeTreeDialog  = function(){
                             <strong>Ventas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de ventas</code>
                         </li>
                         <li class="n2">
+                            <strong>Remisiones</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de remisiones</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Editar remisiones</strong>&emsp;/&emsp;<code>Permite la actualización de las remisiones</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">
@@ -290,6 +298,14 @@ const closeTreeDialog  = function(){
                         <li class="tab n3">
                             <strong>Inventario</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de inventario</code>
                         </li>
+                        <li class="tab n3">
+                            <strong>Stock pendientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de stock pendientes</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Editar Stock</strong>&emsp;/&emsp;<code>Permite la edición de stock de productos pendientes por aprobar</code>
+                            </li>
+                        </ul>
                         <li class="tab n3">
                             <strong>Ver Productos Pendientes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de productos pendientes</code>
                         </li>

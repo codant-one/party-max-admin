@@ -129,6 +129,18 @@ export const useProductsStores = defineStore('products', {
                 .finally(() => {
                     this.setLoading(false)
                 })
+        },
+        uploadProducts(data){
+            this.setLoading(true)
+            
+            return Products.uploadProducts(data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
         }
     }
 })
