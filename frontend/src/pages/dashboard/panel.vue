@@ -59,13 +59,6 @@ async function fetchData() {
     const percentage_retail = total === 0 ? 0 : (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
     const percentage_wholesale = total === 0 ? 0 : (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
 
-    console.log('data', data.value.supplier)
-    console.log('total', total)
-    console.log('data.value.supplier.account.retail_sales_amount', data.value.supplier.account.retail_sales_amount)
-    console.log('Number(data.value.supplier.account.retail_sales_amount ?? 0)', Number(data.value.supplier.account.retail_sales_amount ?? 0))
-    console.log('(Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)', (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100))
-    console.log('(Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total', (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total)
-    console.log('percentage_retail', percentage_retail)
     timeSpendingChartConfig.value = {
       chart: {
         height: 157,
@@ -247,7 +240,7 @@ async function fetchData() {
               <span class="text-xs text-medium-emphasis">(Detal + Mayorista)</span>
             </span>
             <div class="text-h3 mb-2 text-primary">
-              COP  {{ formatNumber(data.supplier.account.balance) ?? '0.00' }}
+              COP  {{ formatNumber(data.supplier.account.balance ?? '0.00') }}
             </div>
           </div>
           <div>
