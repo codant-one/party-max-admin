@@ -60,6 +60,7 @@ async function fetchData() {
     const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
 
     console.log('data', data.value.supplier)
+    console.log('percentage_retail', percentage_retail)
     timeSpendingChartConfig.value = {
       chart: {
         height: 157,
@@ -111,7 +112,7 @@ async function fetchData() {
                 label: 'Total',
                 color: 'rgba(var(--v-theme-on-background), var(--v-disabled-opacity))',
                 formatter() {
-                  return '$'+ (formatNumber(data.value.supplier.account.balance) ?? '0.00')
+                  return '$'+ (formatNumber(data.value.supplier.account.balance ?? '0.00'))
                 },
               },
             },
