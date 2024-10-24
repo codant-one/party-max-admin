@@ -56,8 +56,8 @@ async function fetchData() {
     const total = Number(data.value.supplier.account.balance ?? 0)
     const retail_sales_amount = '$' + formatNumber(data.value.supplier.account.retail_sales_amount) ?? '0.00'
     const wholesale_sales_amount = '$' + formatNumber(data.value.supplier.account.wholesale_sales_amount) ?? '0.00'
-    const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
-    const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
+    const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total ?? '0.00'
+    const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total  ?? '0.00'
 
     console.log('data', data.value.supplier)
     console.log('percentage_retail', percentage_retail)
