@@ -59,6 +59,7 @@ async function fetchData() {
     const percentage_retail = (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
     const percentage_wholesale = (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
 
+    console.log('data', data.value.supplier)
     timeSpendingChartConfig.value = {
       chart: {
         height: 157,
