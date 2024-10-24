@@ -143,6 +143,7 @@ async function fetchData() {
     data.value.supplier.account.wholesale_sales_amount = response.data.data.supplierAccount.wholesale_sales_amount
   }
 
+  console.log('data')
   isRequestOngoing.value = false
 }
 
