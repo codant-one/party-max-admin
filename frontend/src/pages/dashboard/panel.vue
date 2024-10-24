@@ -143,7 +143,6 @@ async function fetchData() {
     data.value.supplier.account.wholesale_sales_amount = response.data.data.supplierAccount.wholesale_sales_amount
   }
 
-  console.log('data', data.value.supplier)
   isRequestOngoing.value = false
 }
 
@@ -200,7 +199,7 @@ async function fetchData() {
               v-for="{ title, value, icon, color } in [
                 { title: 'Comisión Detal', value: (data.supplier.commission ?? '0.00') + '%', icon: 'mdi-brightness-percent', color: 'primary' },
                 { title: 'Comisión Mayorista', value: (data.supplier.wholesale_commission ?? '0.00') + '%', icon: 'mdi-sack-percent', color: 'success' },
-                { title: 'Ventas Totales', value: 'COP ' + formatNumber(data.supplier.sales) ?? '0.00' , icon: 'mdi-check-decagram-outline', color: 'error' },
+                { title: 'Ventas Totales', value: 'COP ' + formatNumber(data.supplier.sales ?? '0.00') , icon: 'mdi-check-decagram-outline', color: 'error' },
               ]"
               :key="title"
             >
