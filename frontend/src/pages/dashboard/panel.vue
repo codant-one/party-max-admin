@@ -240,7 +240,7 @@ async function fetchData() {
               <span class="text-xs text-medium-emphasis">(Detal + Mayorista)</span>
             </span>
             <div class="text-h3 mb-2 text-primary">
-              COP  {{ formatNumber(data.supplier.account.balance ?? '0.00') }}
+              COP {{ formatNumber(data.supplier.account.balance.toString() ?? '0.00') }}
             </div>
           </div>
           <div>
