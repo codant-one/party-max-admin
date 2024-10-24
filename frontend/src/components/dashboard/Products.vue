@@ -68,9 +68,9 @@ const go = (id) => {
               v-model="product.stock_percentage"
               :size="46"
               class="me-4"
-              color="warning"
+              :color="product.stock_percentage > 50 ? 'info' : 'warning'"
             >
-              <span class="text-sm text-high-emphasis font-weight-medium">
+              <span class="text-xs text-high-emphasis font-weight-medium">
                 {{ product.stock_percentage }}%
               </span>
             </VProgressCircular>

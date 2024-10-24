@@ -61,7 +61,7 @@ class DashboardController extends Controller
             $productsWithLessStock = 
                 Product::with(['colors.color'])
                 ->withTrashed()
-                ->selectRaw('*, FORMAT((stock / NULLIF(wholesale_min, 0)) * 100, 1) as stock_percentage')
+                ->selectRaw('*, CASE WHEN stock <= 6 THEN FORMAT((stock / NULLIF(wholesale_min, 0)) * 100, 1) ELSE 100.0 END as stock_percentage')
                 ->where([
                     ['user_id', Auth::user()->id],
                     ['state_id', 3]
