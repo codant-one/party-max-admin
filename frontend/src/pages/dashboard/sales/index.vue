@@ -777,7 +777,7 @@ const removeProduct = async () => {
                             size="22"
                             icon="mdi-cart-off" />
                         </VBtn>
-                        <VBtn
+                        <!-- <VBtn
                             v-if="$can('editar', 'productos') && product.state_id !== 4"
                             icon
                             size="x-small"
@@ -794,8 +794,8 @@ const removeProduct = async () => {
                             <VIcon
                             size="22"
                             icon="tabler-edit" />
-                        </VBtn>
-                        <VBtn
+                        </VBtn> -->
+                        <!-- <VBtn
                             v-if="$can('eliminar','productos')"
                             icon
                             size="x-small"
@@ -812,7 +812,7 @@ const removeProduct = async () => {
                             <VIcon
                             size="22"
                             icon="tabler-trash" />
-                        </VBtn>
+                        </VBtn> -->
                         </td>
                     </tr>
                 </template>

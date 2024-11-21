@@ -12,27 +12,31 @@ const props = defineProps({
 const statistics = [
   {
     title: 'Ventas al detal',
+    comission: '(' + (props.data.supplier.commission ?? '0.00') + '%)',
     stats: '$ ' + formatNumber(props.data.supplier.account.retail_sales_amount) ?? '0.00',
     icon: 'tabler-chart-pie-2',
     color: 'primary',
   },
   {
-    title: 'Ventas mayoristas',
+    title: 'Ventas al mayor',
+    comission: '(' + (props.data.supplier.wholesale_commission ?? '0.00') + '%)',
     stats: '$ ' + formatNumber(props.data.supplier.account.wholesale_sales_amount) ?? '0.00',
     icon: 'tabler-chart-pie-filled',
-    color: 'info',
+    color: 'success',
   },
   {
     title: 'Productos',
+    comission: '',
     stats: props.data.productsCount,
     icon: 'tabler-shopping-cart',
     color: 'error',
   },
   {
     title: 'Servicios',
+    comission: '',
     stats: props.data.serviceCount,
     icon: 'mdi-hand-heart-outline',
-    color: 'success',
+    color: 'info',
   }
 ]
 </script>
@@ -44,7 +48,7 @@ const statistics = [
     </template> -->
 
     <VCardText class="pt-6">
-      <VRow>
+      <VRow class="px-0">
         <VCol
           v-for="item in statistics"
           :key="item.title"
@@ -63,9 +67,14 @@ const statistics = [
 
             <div class="d-flex flex-column">
               <span class="text-h5 font-weight-medium">{{ item.stats }}</span>
-              <span class="text-sm">
-                {{ item.title }}
-              </span>
+              <span class="d-flex">
+                <span class="text-sm me-1">
+                  {{ item.title }}
+                </span>    
+                <span class="text-xs" :class="'text-'+item.color">
+                  {{ item.comission }}
+                </span>  
+              </span>         
             </div>
           </div>
         </VCol>

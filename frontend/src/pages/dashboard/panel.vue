@@ -170,7 +170,7 @@ async function fetchData() {
       </VDialog>
     </VRow>
 
-    <VRow class="py-6 px-md-6 px-2" v-if="rol === 'Proveedor' && data">
+    <VRow class="py-6 px-md-0 px-2" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
         md="8"
@@ -285,7 +285,7 @@ async function fetchData() {
       </VCol>
     </VRow>
 
-    <VRow class="px-md-6 px-2 match-height" v-if="rol === 'Proveedor' && data">
+    <VRow class="px-md-0 px-2 match-height" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
         md="8"
@@ -302,7 +302,7 @@ async function fetchData() {
       </VCol>
     </VRow>
 
-    <VRow class="px-md-6 px-2" v-if="rol === 'Proveedor' && data">
+    <VRow class="px-md-0 px-2" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
         sm="6"
