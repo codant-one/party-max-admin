@@ -56,7 +56,7 @@ const statistics = [
           md="3"
           class="pr-0"
         >
-          <div class="d-flex align-center gap-2">
+          <div class="d-flex align-center gap-1">
             <VAvatar
               :color="item.color"
               variant="tonal"
