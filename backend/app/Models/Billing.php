@@ -13,4 +13,8 @@ class Billing extends Model
 
     protected $guarded = [];
 
+    /**** Relationship ****/
+    public function document_type() {
+        return $this->belongsTo(DocumentType::class, 'document_type_id', 'id');
+    }
 }

@@ -131,7 +131,7 @@ class OrderController extends Controller
                 'details.filling',
                 'details.order_file',
                 'address.type', 
-                'billing', 
+                'billing.document_type', 
                 'shipping', 
                 'payment', 
                 'client.user.userDetail',

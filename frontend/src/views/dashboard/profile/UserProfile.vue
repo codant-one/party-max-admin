@@ -3,6 +3,7 @@
 import { avatarText } from '@/@core/utils/formatters'
 import { emailValidator, requiredValidator, phoneValidator } from '@/@core/utils/validators'
 import { useProfileStores } from '@/stores/useProfile'
+import { useDocumentTypesStores } from '@/stores/useDocumentTypes'
 
 const props = defineProps({
   countries: {
@@ -32,10 +33,12 @@ const emit = defineEmits([
 ])
 
 const profileStores = useProfileStores()
+const documentTypesStores = useDocumentTypesStores()
 
 const listCountries = ref(props.countries)
 const listProvinces = ref(props.provinces)
 const listProvincesByCountry = ref([])
+const documentTypes = ref([])
 
 const refVForm = ref()
 const isUserEditDialog = ref(false)
@@ -48,7 +51,10 @@ const username = ref('')
 const last_name = ref('')
 const phone = ref('')
 const address = ref('')
+const type_document = ref('')
 const document = ref('')
+const document_type_id = ref('')
+const document_typeOld_id = ref('')
 const provinceOld_id = ref('')
 const province_id = ref('')
 const province = ref('')
@@ -108,17 +114,32 @@ async function fetchData() {
     phone.value = userData.value.user_details?.phone
     address.value = userData.value.user_details?.address
     document.value = userData.value.user_details?.document
+    document_type_id.value = userData.value.user_details?.document_type_id
+    document_typeOld_id.value = userData.value.user_details?.document.name
+    type_document.value = userData.value.user_details?.document_type.name
     countryOld_id.value = userData.value.user_details?.province.country.name
     country_id.value = userData.value.user_details?.province.country.name
     province.value = userData.value.user_details?.province.name
     country.value = userData.value.user_details?.province.country.name
     roles.value = userData.value.roles
 
+    await documentTypesStores.fetchDocumentTypes()
+    documentTypes.value = documentTypesStores.getDocumentTypes
+
     selectCountry(countryOld_id.value)
 
     province_id.value = userData.value.user_details?.province.name
     provinceOld_id.value = userData.value.user_details?.province_id
 }
+
+const getDocumentTypes = computed(() => {
+    return documentTypes.value.map((documentType) => {
+        return {
+        title: '(' + documentType.code + ') - ' + documentType.name,
+        value: documentType.id,
+        }
+    })
+})
 
 const resetAvatar = () => {
   avatar.value = null
@@ -139,6 +160,7 @@ const onSubmit = () =>{
             formData.append('phone', phone.value)
             formData.append('address', address.value)
             formData.append('document', document.value === null ? '' : document.value)
+            formData.append('document_type_id',  Number.isInteger(document_type_id.value) ? document_type_id.value : document_typeOld_id.value )
             formData.append('province_id', (Number.isInteger(province_id.value)) ? province_id.value : provinceOld_id.value)
             formData.append('image', avatarOld.value)
 
@@ -323,6 +345,14 @@ const getFlagCountry = country => {
                 </VListItemTitle>
                 <VListItemTitle>
                   <h6 class="text-base font-weight-semibold">
+                    Tipo de documento:
+                    <span class="text-body-2">
+                      {{ type_document }}
+                    </span>
+                  </h6>
+                </VListItemTitle>
+                <VListItemTitle>
+                  <h6 class="text-base font-weight-semibold">
                     Documento:
                     <span class="text-body-2">
                       {{ document }}
@@ -456,7 +486,7 @@ const getFlagCountry = country => {
                     readonly
                   />
                 </VCol>
-                <VCol
+                <!-- <VCol
                   cols="12"
                   md="6"
                 >
@@ -465,7 +495,7 @@ const getFlagCountry = country => {
                     label="Username"
                     :rules="[requiredValidator]"
                   />
-                </VCol>
+                </VCol> -->
                 <VCol
                   cols="12"
                   md="6"
@@ -477,16 +507,30 @@ const getFlagCountry = country => {
                     :rules="[requiredValidator, phoneValidator]"
                   />
                 </VCol>
+
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <VAutocomplete
+                    v-model="document_type_id"
+                    label="Tipo de Documento"
+                    :rules="[requiredValidator]"
+                    :items="getDocumentTypes"
+                    :menu-props="{ maxHeight: '200px' }"
+                  /> 
+                </VCol>
+
                 <VCol
                   cols="12"
                   md="6"
                 >
                   <VTextField
-                    v-model="address"
-                    label="Direccion"
-                    :rules="[requiredValidator]"
+                    v-model="document"
+                    label="Documento"
                   />
                 </VCol>
+               
                 <VCol
                   cols="12"
                   md="6"
@@ -519,7 +563,7 @@ const getFlagCountry = country => {
                 >
                   <VAutocomplete
                     v-model="province_id"
-                    label="Estado3"
+                    label="Estado"
                     :rules="[requiredValidator]"
                     :items="getProvinces"
                     :menu-props="{ maxHeight: '200px' }"
@@ -527,11 +571,13 @@ const getFlagCountry = country => {
                 </VCol>
                 <VCol
                   cols="12"
-                  md="6"
+                  md="12"
                 >
-                  <VTextField
-                    v-model="document"
-                    label="Documento"
+                  <VTextarea
+                    v-model="address"
+                    row="2"
+                    label="Direccion"
+                    :rules="[requiredValidator]"
                   />
                 </VCol>
 

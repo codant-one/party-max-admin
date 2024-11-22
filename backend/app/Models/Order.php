@@ -215,6 +215,8 @@ class Order extends Model
         $billing = Billing::create([
             'order_id' => $order->id,
             'province_id' => $request->province_id,
+            'document_type_id' => $request->document_type_id,
+            'document' => $request->document,
             'name' => $request->name,
             'last_name' => $request->last_name,
             'company' => $request->company,

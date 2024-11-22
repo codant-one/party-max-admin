@@ -583,7 +583,7 @@ class UsersController extends Controller
                 $user->update();
             } 
 
-            $userData = getUserData($user->load(['userDetail.province.country']));
+            $userData = getUserData($user->load(['userDetail.province.country', 'userDetail.document_type']));
 
             return response()->json([
                 'success' => true,
@@ -881,7 +881,7 @@ class UsersController extends Controller
                 } 
             }
 
-            $userData = getUserData($user->load(['userDetail.province.country']));
+            $userData = getUserData($user->load(['userDetail.province.country', 'userDetail.document_type']));
 
             return response()->json([
                 'success' => true,

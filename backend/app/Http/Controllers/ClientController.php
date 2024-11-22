@@ -150,6 +150,7 @@ class ClientController extends Controller
 
             $client = Client::with([
                                 'user.userDetail.province.country',
+                                'user.userDetail.document_type',
                                 'user.favorites', 
                                 'gender', 
                                 'addresses.type', 

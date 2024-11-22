@@ -239,7 +239,7 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="n2">
-                            <strong>Utilidades</strong>
+                            <strong>Capacitación</strong>
                         </li>
                         <li class="tab n3">
                             <strong>Ver FAQ's</strong>&emsp;/&emsp;<code>Acceso de solo lectura a la página-faqs</code>

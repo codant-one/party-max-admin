@@ -1,6 +1,13 @@
 export default [
     { heading: 'Módulos' },
     {
+        title: 'Ventas',
+        icon: { icon: 'mdi-cart-check' },
+        to: 'dashboard-sales',
+        action: 'ver',
+        subject: 'ventas',
+    },
+    {
         title: 'Proveedores', 
         icon: { icon: 'mdi-account-tie' },
         to: 'dashboard-admin-suppliers', 
@@ -41,13 +48,6 @@ export default [
         to: 'dashboard-calendar',
         action: 'ver',
         subject: 'calendario',
-    },
-    {
-        title: 'Ventas',
-        icon: { icon: 'mdi-cart-check' },
-        to: 'dashboard-sales',
-        action: 'ver',
-        subject: 'ventas',
     },
     {
         title: 'Remisiones',

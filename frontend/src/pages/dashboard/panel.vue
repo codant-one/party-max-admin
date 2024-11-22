@@ -234,7 +234,7 @@ async function fetchData() {
         <div class="d-flex justify-space-between align-center">
           <div class="d-flex flex-column ps-3">
             <h5 class="text-h5 text-high-emphasis mb-2 text-no-wrap">
-              Saldo total de la Cuenta
+              Ventas por cobrar
             </h5>
             <span class="mb-7">Crédito restante 
               <span class="text-xs text-medium-emphasis">(Detal + Mayorista)</span>

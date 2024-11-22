@@ -16,6 +16,7 @@ class UserDetails extends Model
         'province_id',
         'phone',
         'address',
+        'document_type_id',
         'document',
         'store_name'
     ];
@@ -29,12 +30,17 @@ class UserDetails extends Model
         return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
+    public function document_type() {
+        return $this->belongsTo(DocumentType::class, 'document_type_id', 'id');
+    }
+
      /**** Public methods ****/
     public static function updateOrCreateUser($request, $user) {
         $userD = UserDetails::updateOrCreate(
             [    'user_id' => $user->id ],
             [
                 'province_id' => $request->province_id,
+                'document_type_id' => $request->document_type_id,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'document' => $request->document,
@@ -61,6 +67,7 @@ class UserDetails extends Model
             [    'user_id' => $user->id ],
             [
                 'province_id' => $request->province_id,
+                'document_type_id' => $request->document_type_id,
                 'address' => $request->address,
                 'document' => $request->document
             ]
