@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductTag;
 use App\Models\ProductLike;
+use App\Models\HomeImage;
 
 class HomeController extends Controller
 {
@@ -103,6 +104,69 @@ class HomeController extends Controller
                 'success' => true,
                 'data' => $data
             ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function index(Request $request): JsonResponse
+    {
+        
+        try {
+
+            $limit = $request->has('limit') ? $request->limit : 10;
+
+            $query = HomeImage::query(); 
+
+            $homeimages = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+            $count = $query->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'homeimages' => $homeimages,
+                    'homeimagesTotalCount' => $count
+                ]
+            ]);
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+              ], 500);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+
+            $home_image = HomeImage::createHomeImage($request);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'home_images/';
+
+                $file_data = uploadFile($image, $path);
+
+                $home_image->image = $file_data['filePath'];
+                $home_image->update();
+            } 
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'home_image' => HomeImage::find($home_image->id)
+                ]
+            ]);
 
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([

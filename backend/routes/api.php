@@ -112,6 +112,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('colors', ColorController::class);
     Route::apiResource('events', EventController::class);
     Route::apiResource('referrals', ReferralController::class);
+    Route::apiResource('home-images', HomeController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');

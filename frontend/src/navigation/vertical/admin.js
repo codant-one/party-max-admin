@@ -18,6 +18,13 @@ export default [
         subject: 'roles', 
       },
       {
+        title: 'Imágenes Home',
+        icon: { icon: 'mdi-image-multiple' },
+        to: 'dashboard-admin-images-home', 
+        action: 'ver' , 
+        subject: 'images-home', 
+      },
+      {
         title: "FAQ's",
         icon: { icon: 'tabler-help-hexagon' },
         action: 'ver',
