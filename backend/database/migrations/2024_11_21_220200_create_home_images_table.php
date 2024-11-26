@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('home_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('order_id')->nullable();
             $table->tinyInteger('is_slider');
             $table->string('image')->nullable();
             $table->string('url');

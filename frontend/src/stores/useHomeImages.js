@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
-import HomeImages from '@/api/homeimage'
+import HomeImages from '@/api/home-image'
 
-export const useHomeImagesStores = defineStore('homeimages', {
+export const useHomeImagesStores = defineStore('home-images', {
     state: () => ({
-        homeimages: {},
+        homeImages: {},
         loading: false,
         last_page: 1,
-        homeimagesTotalCount: 6
+        homeImagesTotalCount: 6
     }),
     getters:{
         getHomeImages(){
-            return this.homeimages
+            return this.homeImages
         }
     },
     actions: {
@@ -22,9 +22,9 @@ export const useHomeImagesStores = defineStore('homeimages', {
             
             return HomeImages.get(params)
                 .then((response) => {
-                    this.homeimages = response.data.data.homeimages.data
-                    this.last_page = response.data.data.homeimages.last_page
-                    this.homeimagesTotalCount = response.data.data.homeimagesTotalCount
+                    this.homeImages = response.data.data.homeImages.data
+                    this.last_page = response.data.data.homeImages.last_page
+                    this.homeImagesTotalCount = response.data.data.homeImagesTotalCount
                 })
                 .catch(error => console.log(error))
                 .finally(() => {
@@ -32,12 +32,12 @@ export const useHomeImagesStores = defineStore('homeimages', {
                 })
             
         },
-        addHomeImages(data) {
+        addHomeImage(data) {
             this.setLoading(true)
 
             return HomeImages.create(data)
                 .then((response) => {
-                    this.homeimages.push(response.data.data.homeimages)
+                    this.homeImages.push(response.data.data.homeImages)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -45,6 +45,35 @@ export const useHomeImagesStores = defineStore('homeimages', {
                     this.setLoading(false)
                 })
             
+        },
+        updateHomeImage(data) {
+            this.setLoading(true)
+            
+            return HomeImages.update(data)
+                .then((response) => {
+                    let pos = this.homeImages.findIndex((item) => item.id === response.data.data.homeImage.id)
+                    this.homeImages[pos] = response.data.data.homeImage
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+         
+        },
+        deleteHomeImage(id) {
+            this.setLoading(true)
+
+            return HomeImages.delete(id)
+                .then((response) => {
+                    let index = this.homeImages.findIndex((item) => item.id === id)
+                    this.homeImages.splice(index, 1)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })  
         },
         showHomeImage(id) {
             this.setLoading(true)
@@ -65,7 +94,7 @@ export const useHomeImagesStores = defineStore('homeimages', {
             
             return HomeImages.order(params)
                 .then((response) => {
-                    this.homeimages = response.data.data.homeimages
+                    this.homeImages = response.data.data.homeImages
                 })
                 .catch(error => console.log(error))
                 .finally(() => {
@@ -73,5 +102,17 @@ export const useHomeImagesStores = defineStore('homeimages', {
                 })
             
         },
+        updateOrder(data){
+            this.setLoading(true)
+            
+            return HomeImages.updateOrder(data)
+                .then((response) => {
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+        }
     }
 })

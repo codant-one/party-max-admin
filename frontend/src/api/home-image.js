@@ -7,7 +7,7 @@ class HomeImages {
     }
 
     create(data) {
-        return axios.post('home-images', data)
+        return axios.post('/home-images', data)
     }
 
     show(id) {
@@ -22,12 +22,12 @@ class HomeImages {
         return axios.post(`/home-images/delete`, id)
     }
 
-    order(params) {
-        return axios.get(`/home-images/list/order`, {params})
+    updateOrder(data) {
+        return axios.post('/home-images/order_id',data)
     }
     
 }
 
-const homeimages = new HomeImages();
+const homeImages = new HomeImages();
 
-export default homeimages;
+export default homeImages;

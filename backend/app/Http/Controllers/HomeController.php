@@ -100,6 +100,8 @@ class HomeController extends Controller
             $data['mostSold']['latestProducts'] = $latestProducts;
             $data['mostSold']['bestSellers'] = $bestSellers;
     
+            $data['images'] = HomeImage::all();
+
             return response()->json([
                 'success' => true,
                 'data' => $data
@@ -122,17 +124,31 @@ class HomeController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = HomeImage::query(); 
+            $query = HomeImage::applyFilters(
+                        $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy',
+                                'is_slider'
+                            ])
+                    );   
 
-            $homeimages = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            $count = $query->applyFilters(
+                        $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy',
+                                'is_slider'
+                            ])
+                    )->count();
 
-            $count = $query->count();
+            $homeImages = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'homeimages' => $homeimages,
-                    'homeimagesTotalCount' => $count
+                    'homeImages' => $homeImages,
+                    'homeImagesTotalCount' => $count
                 ]
             ]);
         } catch (\Illuminate\Database\QueryException $ex) {
@@ -148,23 +164,31 @@ class HomeController extends Controller
     {
         try {
 
-            $home_image = HomeImage::createHomeImage($request);
+            $homeImage = HomeImage::createHomeImage($request);
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
 
-                $path = 'home_images/';
+                $path = 'home/';
 
                 $file_data = uploadFile($image, $path);
 
-                $home_image->image = $file_data['filePath'];
-                $home_image->update();
+                $homeImage->image = $file_data['filePath'];
+                $homeImage->update();
             } 
+
+            $order_id = HomeImage::where('is_slider', $homeImage->is_slider)
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? 0;
+
+            $homeImage->order_id = $order_id + 1;
+            $homeImage->update();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'home_image' => HomeImage::find($home_image->id)
+                    'homeImages' => HomeImage::find($homeImage->id)
                 ]
             ]);
 
@@ -177,5 +201,101 @@ class HomeController extends Controller
         }
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $homeImage = HomeImage::find($id);
+
+            if (!$homeImage)
+                return response()->json([
+                    'sucess' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Imagen no encontrado'
+                ], 404);
+
+            $homeImage = $homeImage->updateHomeImage($request, $homeImage);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'home/';
+
+                $file_data = uploadFile($image, $path, $homeImage->image);
+
+                $homeImage->image = $file_data['filePath'];
+                $homeImage->update();
+            } 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'homeImage' => HomeImage::find($homeImage->id)
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function delete(Request $request): JsonResponse
+    {
+        try {
+
+            $homeImage = HomeImage::find($request->ids);
+        
+            if (!$homeImage)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Imagen no encontrada'
+                ], 404);
+            
+            HomeImage::deleteHomeImage($request->ids);
+
+            return response()->json([
+                'success' => true
+            ]);
+            
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
     
+     /**
+     * update the order_id.
+     */
+    public function updateOrder(Request $request): JsonResponse
+    { 
+        $countImages = 1;
+
+        foreach($request->all() as $imageRequest){
+            HomeImage::updateOrCreate(
+                [ 
+                    'id' => $imageRequest['id'],
+                    'is_slider' => $imageRequest['is_slider']
+                ],
+                [ 'order_id' => $countImages++ ]
+            );
+        }
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
 }

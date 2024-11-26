@@ -18,8 +18,8 @@ export default [
         subject: 'roles', 
       },
       {
-        title: 'Imágenes Home',
-        icon: { icon: 'mdi-image-multiple' },
+        title: 'Home',
+        icon: { icon: 'mdi-application-cog-outline' },
         to: 'dashboard-admin-images-home', 
         action: 'ver' , 
         subject: 'images-home', 

@@ -193,6 +193,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('blogs/all', [BlogCategoryController::class, 'all']);
     });
 
+    //Blog-categories
+    Route::group(['prefix' => 'home-images'], function () {
+        Route::post('delete', [HomeController::class, 'delete']);
+        Route::post('order_id', [HomeController::class, 'updateOrder']);
+    });
+
     //Profile
     Route::group(['prefix' => 'profile'], function () {
        Route::post('/', [ClientController::class, 'profile']);
