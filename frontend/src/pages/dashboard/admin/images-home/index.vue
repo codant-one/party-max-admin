@@ -129,6 +129,10 @@ const onEnd = async (e) => {
   fetchData()
 }
 
+const openLink = function (homeImageData) {
+  window.open(homeImageData.url)
+}
+
 const submitForm = async (homeImage, method) => {
   isRequestOngoing.value = true
 
@@ -334,6 +338,24 @@ const submitUpdate = homeImageData => {
                 </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'home-imagenes') || $can('eliminar', 'home-imagenes')">      
+                  <VBtn
+                    icon
+                    variant="text"
+                    color="default"
+                    size="x-small">  
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent"
+                      >
+                      Abrir
+                    </VTooltip>
+                    <VIcon
+                      icon="mdi-open-in-new"
+                      :size="22"
+                      @click="openLink(element)"
+                      />
+                  </VBtn>
                   <VBtn
                     v-if="$can('editar', 'home-images')"
                     icon
