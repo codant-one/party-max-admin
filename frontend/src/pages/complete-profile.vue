@@ -8,6 +8,7 @@ import { useAuthStores } from '@/stores/useAuth'
 import { useProfileStores } from '@/stores/useProfile'
 import { useCountriesStores } from '@/stores/useCountries'
 import { useProvincesStores } from '@/stores/useProvinces'
+import { useDocumentTypesStores } from '@/stores/useDocumentTypes'
 
 const router = useRouter()
 const ability = useAppAbility()
@@ -15,10 +16,12 @@ const countriesStores = useCountriesStores()
 const provincesStores = useProvincesStores()
 const authStores = useAuthStores()
 const profileStores = useProfileStores()
+const documentTypesStores = useDocumentTypesStores()
 
 const listCountries = ref([])
 const listProvinces = ref([])
 const listProvincesByCountry = ref([])
+const documentTypes = ref([])
 
 const refVForm = ref()
 const user_id = ref('')
@@ -27,6 +30,9 @@ const username = ref('')
 const name = ref('')
 const last_name = ref('')
 const phone = ref('')
+const document = ref('')
+const document_type_id = ref('')
+const document_typeOld_id = ref('')
 const address = ref('')
 const province_id = ref('')
 const provinceOld_id = ref('')
@@ -65,13 +71,16 @@ watchEffect(fetchData)
 async function fetchData() {
 
     let data = JSON.parse(localStorage.getItem('user_data') || 'null')
-    
+
     user_id.value = data.id
     email.value = data.email
     username.value = data.username
     name.value = data.name
     last_name.value = data.last_name
     phone.value = data.user_details?.phone
+    document.value = data.user_details?.document
+    document_type_id.value = data.user_details?.document_type_id
+    document_typeOld_id.value = data.user_details?.document_type.name
     address.value = data.user_details?.address
     province_id.value = data.user_details?.province.name
     provinceOld_id.value = data.user_details?.province_id
@@ -79,8 +88,20 @@ async function fetchData() {
     country_id.value = data.user_details?.province.country.name
 
     avatarOld.value = data.user_details?.avatar
+
+    await documentTypesStores.fetchDocumentTypes()
+    documentTypes.value = documentTypesStores.getDocumentTypes
     
 }
+
+const getDocumentTypes = computed(() => {
+    return documentTypes.value.map((documentType) => {
+        return {
+        title: '(' + documentType.code + ') - ' + documentType.name,
+        value: documentType.id,
+        }
+    })
+})
 
 const loadCountries = () => {
   listCountries.value = countriesStores.getCountries
@@ -138,6 +159,8 @@ const onSubmit = () =>{
       formData.append('name', name.value)
       formData.append('last_name', last_name.value)
       formData.append('phone', phone.value)
+      formData.append('document', document.value)
+      formData.append('document_type_id',  Number.isInteger(document_type_id.value) ? document_type_id.value : document_typeOld_id.value )
       formData.append('address', address.value)
       formData.append('province_id', Number.isInteger(province_id.value) ? province_id.value : provinceOld_id.value),
       formData.append('image', avatarOld.value)
@@ -381,9 +404,21 @@ const getFlagCountry = country => {
                 cols="12"
                 md="6"
               >
+                <VAutocomplete
+                  v-model="document_type_id"
+                  label="Tipo de Documento"
+                  :rules="[requiredValidator]"
+                  :items="getDocumentTypes"
+                  :menu-props="{ maxHeight: '200px' }"
+                /> 
+              </VCol>
+              <VCol
+                md="6"
+                cols="12"
+              >
                 <VTextField
-                  v-model="address"
-                  label="Dirección"
+                  v-model="document"
+                  label="Documento"
                   :rules="[requiredValidator]"
                 />
               </VCol>
@@ -419,21 +454,26 @@ const getFlagCountry = country => {
                 md="6"
               >
               <v-autocomplete
-                    v-model="province_id"
-                    label="Estado"
-                    :rules="[requiredValidator]"
-                    :items="getProvinces"
-                    :menu-props="{ maxHeight: '200px' }"
-                  />
-                
-              </VCol>
-              <VCol
-                cols="12"
-                md="6"
-              >
+                v-model="province_id"
+                label="Estado"
+                :rules="[requiredValidator]"
+                :items="getProvinces"
+                :menu-props="{ maxHeight: '200px' }"
+                />
                 
               </VCol>
 
+              <VCol
+                cols="12"
+                md="12"
+              >
+                <VTextarea
+                  v-model="address"
+                  label="Dirección"
+                  row="2"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
               <!-- 👉 Form Actions -->
               <VCol cols="12" md="6"></VCol>
               <VCol

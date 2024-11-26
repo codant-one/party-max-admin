@@ -1,6 +1,6 @@
 export default [
     { 
-      title: 'UTILIDADES',
+      title: 'CAPACITACIÓN',
       icon: { icon:'tabler-settings' },
       children:[      
         {

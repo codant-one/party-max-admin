@@ -203,6 +203,14 @@ const getFlagCountry = country => {
               </VListItemTitle>
               <VListItemTitle>
                 <h6 class="text-base font-weight-semibold">
+                  Tipo de documento:
+                  <span class="text-body-2">
+                    {{ props.customerData.user.user_detail.document_type?.name }}
+                  </span>
+                </h6>
+              </VListItemTitle>
+              <VListItemTitle>
+                <h6 class="text-base font-weight-semibold">
                   Documento:
                   <span class="text-body-2">
                     {{ props.customerData.user.user_detail.document }}

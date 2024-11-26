@@ -150,7 +150,8 @@ class SupplierController extends Controller
         try {
 
             $supplier = Supplier::with([
-                                    'user.userDetail.province.country', 
+                                    'user.userDetail.province.country',
+                                    'user.userDetail.document_type', 
                                     'user.products', 
                                     'gender', 
                                     'document.type', 

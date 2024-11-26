@@ -31,6 +31,7 @@ async function fetchData() {
   if(Number(route.params.id)) {
     const response = await ordersStores.showOrder(Number(route.params.id))
 
+    console.log('response.order', response.order)
     order.value = response.order
     total.value = response.ordersTotalCount
 
@@ -601,6 +602,8 @@ const removeOrder = async () => {
                   <div class="d-flex justify-space-between align-center text-body-2 d-print-none">
                     <span class="text-body-1 text-high-emphasis font-weight-medium">Datos de contacto</span>
                   </div>
+                  <span>Tipo de documento: {{ order.billing.document_type?.name }} </span>
+                  <span>Documento: {{ order.billing.document }} </span>
                   <span>Email: {{ order.client ? order.client.user.email : order.billing.email }} </span>
                   <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing.phone}}</span>
                 </div>

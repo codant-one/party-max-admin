@@ -571,7 +571,7 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </VCardText>
                 <VCardTitle>
-                    Utilidades  
+                    Capacitación  
                 </VCardTitle>
                 <VCardText class="pb-0">
                     <div class="ml-5">
