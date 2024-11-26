@@ -429,7 +429,7 @@ const getFlagCountry = country => {
                 <div class="d-flex flex-wrap gap-2">
                   <VFileInput                          
                     label="Avatar"
-                    accept="image/png, image/jpeg, image/bmp"
+                    accept="image/png, image/jpeg, image/bmp, image/webp"
                     placeholder="Avatar"
                     prepend-icon="tabler-camera"
                     @change="$emit('onImageSelected', $event)"

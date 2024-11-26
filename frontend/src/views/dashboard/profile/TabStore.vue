@@ -274,7 +274,7 @@ const onSubmit = () => {
                                     v-model="filename1"
                                     label="Banner"
                                     class="mb-2"
-                                    accept="image/png, image/jpeg, image/bmp"
+                                    accept="image/png, image/jpeg, image/bmp, image/webp"
                                     prepend-icon="tabler-camera"
                                     @change="onImageSelected"
                                 />
@@ -285,7 +285,7 @@ const onSubmit = () => {
                                     v-model="filename2"
                                     label="Logo"
                                     class="mb-2"
-                                    accept="image/png, image/jpeg, image/bmp"
+                                    accept="image/png, image/jpeg, image/bmp, image/webp"
                                     prepend-icon="tabler-camera"
                                     @change="onImageSelected2"
                                 />

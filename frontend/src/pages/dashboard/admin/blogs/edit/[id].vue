@@ -375,7 +375,7 @@ const capitalizedLabel = label => {
                         v-model="filename"
                         label="Imagen"
                         class="mb-2"
-                        accept="image/png, image/jpeg, image/bmp"
+                        accept="image/png, image/jpeg, image/bmp, image/webp"
                         prepend-icon="tabler-camera"
                         @change="onImageSelected"
                         @click:clear="avatar = avatarOld"
