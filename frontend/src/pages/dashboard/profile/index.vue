@@ -159,7 +159,7 @@ const onImageSelected = event => {
 
   URL.createObjectURL(file)
 
-  resizeImage(file, 400, 400, 0.9)
+  resizeImage(file, 1200, 1200, 1)
     .then(async blob => {
       avatarOld.value = blob
       let r = await blobToBase64(blob)

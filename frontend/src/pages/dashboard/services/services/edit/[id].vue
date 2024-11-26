@@ -152,7 +152,7 @@ async function fetchData() {
             
         URL.createObjectURL(file)
 
-        const blog = await resizeImage(file, 400, 400, 0.9)
+        const blog = await resizeImage(file, 1200, 1200, 1)
 
         service_files.value.push({
           file,
@@ -192,7 +192,7 @@ const onImageSelected = event => {
 
   URL.createObjectURL(file)
 
-  resizeImage(file, 400, 400, 0.9)
+  resizeImage(file, 1200, 1200, 1)
     .then(async blob => {
         image.value = blob
         let r = await blobToBase64(blob)
