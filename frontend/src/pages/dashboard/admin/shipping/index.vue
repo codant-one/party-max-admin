@@ -8,10 +8,6 @@ import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import { requiredValidator } from '@validators'
 import router from '@/router'
-import mastercard from '@images/cards/mastercard.png'
-import visa from '@images/cards/visa.png'
-import pse from '@images/cards/pse.png'
-import nequi from '@images/cards/nequi.png'
 
 const ordersStores = useOrdersStores()
 
@@ -29,6 +25,13 @@ const shipping_state_id = ref(null)
 const id = ref(null)
 const reason = ref(null)
 const refVForm = ref()
+
+const type = ref(null)
+
+const types = ref([
+  { title: 'Producto', value: 0 },
+  { title: 'Servicio', value: 1 }
+])
 
 const shippingStates = ref([
   { title: 'Listo para enviar', value: 1 },
@@ -87,6 +90,7 @@ async function fetchData() {
         limit: rowPerPage.value,
         page: currentPage.value,
         wholesale: wholesale.value,
+        type: type.value,
         shipping_state_id: shipping_state_id.value,
         payment_state_id: 4
     }
@@ -189,13 +193,14 @@ const downloadCSV = async () => {
     ordersStores.getOrders.forEach(element => {
 
         let data = {
-        REFERENCIA: element.reference_code ?? '',
+            REFERENCIA: element.reference_code ?? '',
         FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
-        CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
-        CORREO: element.client.user.email,
+        TIPO: element.type === 0 ? 'PRODUCTO' : 'SERVICIO',
+        CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing.name + ' ' + (element.billing.last_name ?? '') + ' (no registrado)',
+        CORREO: element.client ? element.client.user.email : element.billing.email,
         ESTADO_ENVIO: element.shipping.name,
         ESTADO_PAGO: element.payment.name,
-        MONTO: formatNumber(element.total)
+        MONTO: formatNumber(element.sub_total)
         }
           
         dataArray.push(data)
@@ -325,13 +330,14 @@ const downloadCSV = async () => {
                     </VCol>
                     <VCol
                         cols="12"
-                        sm="4">
-                        <!-- 👉 Search  -->
-                        <AppTextField
-                            v-model="searchQuery"
-                            placeholder="Buscar"
-                            density="compact"
+                        sm="4"
+                    >
+                        <AppSelect
+                            v-model="type"
+                            placeholder="Tipo"
+                            :items="types"
                             clearable
+                            clear-icon="tabler-x"
                         />
                     </VCol>
                     <VCol
@@ -339,7 +345,7 @@ const downloadCSV = async () => {
                         sm="12"
                         class="d-flex flex-wrap gap-4">
 
-                        <VSpacer />
+                       
 
                         <div class="d-flex gap-4 flex-wrap align-center">
                             <AppSelect
@@ -356,6 +362,13 @@ const downloadCSV = async () => {
                                 Exportar
                             </VBtn>
                         </div>
+                        <VSpacer />
+                        <AppTextField
+                            v-model="searchQuery"
+                            placeholder="Buscar"
+                            density="compact"
+                            clearable
+                        />
                     </VCol>
                 </VRow>
             </VCardText>
@@ -369,10 +382,11 @@ const downloadCSV = async () => {
                     <tr class="text-no-wrap">
                         <th> REFERENCIA </th>
                         <th> FECHA </th>
+                        <th> TIPO </th>
                         <th class="pe-4"> CLIENTE </th>
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
                         <th class="pe-4"> ESTADO DEL PAGO </th>
-                        <th class="pe-4"> MÉTODO </th>
+                        <th class="pe-4"> PRECIO </th>
                         <th scope="pe-4" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
                             ACCIONES
                         </th>
@@ -386,14 +400,21 @@ const downloadCSV = async () => {
                         <td class="name">
                             <span 
                                 class="font-weight-medium cursor-pointer" 
-                                :class="order.wholesale === 0 ? 'text-success': 'text-primary'" 
+                                :class="order.type === 0 ? (order.wholesale === 0 ? 'text-success': 'text-primary') : 'text-warning'" 
                                 @click="seeOrder(order)">
                                 {{ order.reference_code }} 
                             </span>
                         </td>
-                       
                         <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
-                        
+                        <td>
+                            <VChip
+                                variant="outlined"
+                                label
+                                :color="order.type === 0 ? 'info' : 'secondary'"
+                            >
+                            {{  order.type === 0 ? 'PRODUCTO' : 'SERVICIO' }} 
+                            </VChip>
+                        </td>
                         <td class="text-wrap">
                             <div class="d-flex align-center gap-x-3" v-if="order.client">
                                 <VAvatar
@@ -441,42 +462,7 @@ const downloadCSV = async () => {
                         <td> 
                             <VChip label color="info">{{ order.payment.name }}</VChip>
                         </td>
-                        <td :class="order.billing?.pse ? 'px-0' : ''">
-                            <div class="d-flex align-start px-0" v-if="order.billing?.nequi === 1">
-                                <VImg
-                                    :src="nequi"
-                                    height="65"
-                                    max-width="65"
-                                    min-width="65"
-                                />
-                            </div>
-                            <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
-                                <VImg
-                                    :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
-                                    height="40"
-                                    max-width="40"
-                                    min-width="40"
-                                />
-                                <!-- <div class="mt-2">
-                                    <VIcon
-                                        icon="tabler-dots"
-                                        class="mt-1"
-                                    />
-                                    <span class="mt-2">
-                                        {{ order.billing.card_number.replaceAll('*', '').trim() }}
-                                    </span>
-                                </div> -->
-                            </div>
-                            <div class="d-flex align-start px-0" v-if="order.billing?.pse === 1">
-                                <VImg
-                                    :src="pse"
-                                    height="65"
-                                    max-width="65"
-                                    min-width="65"
-                                />
-                            </div>
-                            
-                        </td>
+                        <td>${{ formatNumber(order.sub_total) }}</td>
                         <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
                             <VBtn
                                 v-if="$can('ver', 'envíos')"

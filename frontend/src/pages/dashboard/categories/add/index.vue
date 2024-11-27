@@ -50,6 +50,20 @@ const closeDropdown = () => {
   document.getElementById("selectCategory").blur()
 }
 
+const addTag = (event) => {
+    const newTag = event.target.value.trim();
+      
+    if (newTag && !selectedTags.value.includes(newTag)) {
+        selectedTags.value.push(newTag);
+        
+        if (!existingTags.value.includes(newTag)) {
+          existingTags.value.push(newTag);
+        }
+        
+       event.target.value = '';
+    }
+}
+
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -211,16 +225,16 @@ const onSubmit = () => {
                                     </VAutocomplete>
                                 </VCol>
                                 <VCol cols="12"  md="12">
-                                    <v-combobox
-                                    v-model="selectedTags"
-                                    :items="existingTags"
-                                    label="Ingresa Palabras Claves"
-                                    multiple
-                                    chips
-                                    deletable-chips
-                                    clearable
-                                    @keydown.enter.prevent="addTag"
-                                    ></v-combobox>  
+                                    <VCombobox
+                                        v-model="selectedTags"
+                                        :items="existingTags"
+                                        label="Ingresa Palabras Claves"
+                                        multiple
+                                        chips
+                                        deletable-chips
+                                        clearable
+                                        @keydown.enter.prevent="addTag"
+                                    /> 
                                 </VCol>
 
                             </VRow>

@@ -163,7 +163,7 @@ class Category extends Model
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
             'slug' => $slug,
-            'keywords' => $request->keywords
+            'keywords' => $request->keywords === 'null' ? null : $request->keywords
         ]);
 
         return $category;
@@ -177,7 +177,7 @@ class Category extends Model
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
             'slug' => $slug,
-            'keywords' => $request->keywords
+            'keywords' => $request->keywords === 'null' ? null : $request->keywords
         ]);
 
         if(!($request->is_category)){

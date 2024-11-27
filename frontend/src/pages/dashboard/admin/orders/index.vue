@@ -8,10 +8,6 @@ import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
 import Toaster from "@/components/common/Toaster.vue";
-import mastercard from '@images/cards/mastercard.png'
-import visa from '@images/cards/visa.png'
-import pse from '@images/cards/pse.png'
-import nequi from '@images/cards/nequi.png'
 
 const ordersStores = useOrdersStores()
 
@@ -212,11 +208,12 @@ const downloadCSV = async () => {
     let data = {
       REFERENCIA: element.reference_code ?? '',
       FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
-      CLIENTE: element.client.user.name + ' ' + (element.client.user.last_name ?? ''),
-      CORREO: element.client.user.email,
+      TIPO: element.type === 0 ? 'PRODUCTO' : 'SERVICIO',
+      CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing.name + ' ' + (element.billing.last_name ?? '') + ' (no registrado)',
+      CORREO: element.client ? element.client.user.email : element.billing.email,
       ESTADO_ENVIO: element.shipping.name,
       ESTADO_PAGO: element.payment.name,
-      MONTO: formatNumber(element.total)
+      MONTO: formatNumber(element.sub_total)
     }
           
     dataArray.push(data)
@@ -419,7 +416,7 @@ const downloadCSV = async () => {
                         <th class="pe-4" v-if="rol !== 'Proveedor'"> CLIENTE </th>
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
                         <th class="pe-4"> ESTADO DEL PAGO </th>
-                        <th class="pe-4"> MÉTODO </th>
+                        <th class="pe-4"> PRECIO </th>
                   
                         <th scope="pe-4" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             ACCIONES
@@ -503,42 +500,7 @@ const downloadCSV = async () => {
                             {{ order.payment.name }}
                             </VChip>
                         </td>
-                        <td :class="order.billing?.pse ? 'px-0' : ''">
-                            <div class="d-flex align-start px-0" v-if="order.billing?.nequi === 1">
-                                <VImg
-                                    :src="nequi"
-                                    height="65"
-                                    max-width="65"
-                                    min-width="65"
-                                />
-                            </div>
-                            <div class="d-flex align-start gap-x-2" v-if="order.billing?.pse === 0 && order.billing?.card_number">
-                                <VImg
-                                    :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
-                                    height="40"
-                                    max-width="40"
-                                    min-width="40"
-                                />
-                                <!-- <div class="mt-2">
-                                    <VIcon
-                                        icon="tabler-dots"
-                                        class="mt-1"
-                                    />
-                                    <span class="mt-2">
-                                        {{ order.billing.card_number.replaceAll('*', '').trim() }}
-                                    </span>
-                                </div> -->
-                            </div>
-                            <div class="d-flex align-start px-0" v-if="order.billing?.pse === 1">
-                                <VImg
-                                    :src="pse"
-                                    height="65"
-                                    max-width="65"
-                                    min-width="65"
-                                />
-                            </div>
-                            
-                        </td>
+                        <td>${{ formatNumber(order.sub_total) }}</td>
                         <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             <VBtn
                                 v-if="$can('ver', 'pedidos')"

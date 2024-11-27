@@ -6,6 +6,10 @@ import { format, parseISO } from 'date-fns';
 import { avatarText } from '@/@core/utils/formatters'
 import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
+import mastercard from '@images/cards/mastercard.png'
+import visa from '@images/cards/visa.png'
+import pse from '@images/cards/pse.png'
+import nequi from '@images/cards/nequi.png'
 import router from '@/router'
 
 const route = useRoute()
@@ -31,7 +35,6 @@ async function fetchData() {
   if(Number(route.params.id)) {
     const response = await ordersStores.showOrder(Number(route.params.id))
 
-    console.log('response.order', response.order)
     order.value = response.order
     total.value = response.ordersTotalCount
 
@@ -197,9 +200,9 @@ const removeOrder = async () => {
         id="invoice-detail"
       >
         <VRow>
-          <VCol cols="12" :md="(rol !== 'Proveedor' || order.type === 1) ? '8' : '12'">
+          <VCol cols="12" :md="(rol !== 'Proveedor' || order.type === 1) ? '8' : '12'" class="print-row print-order-2">
             <!-- 👉 Order Details -->
-            <VCard class="mb-6 print-row">
+            <VCard class="mb-6">
               <VCardItem>
                 <template #title>
                   <h5 class="text-h5">
@@ -227,6 +230,7 @@ const removeOrder = async () => {
                           <div class="d-flex gap-x-3 align-center my-1">
                             <VAvatar
                               v-if="item.product_color.images.length > 0"
+                              class="avatar-dynamic"
                               size="150"
                               variant="outlined"
                               :image="themeConfig.settings.urlStorage + item.product_color.images[0].image"
@@ -234,6 +238,7 @@ const removeOrder = async () => {
                             />
                             <VAvatar
                               v-else
+                              class="avatar-dynamic"
                               size="150"
                               variant="outlined"
                               :image="themeConfig.settings.urlStorage + item.product_color.product.image"
@@ -541,9 +546,9 @@ const removeOrder = async () => {
             </VCard>
           </VCol>
 
-          <VCol cols="12" md="4" class="print-row" v-if="rol !== 'Proveedor' || order.type === 1">
+          <VCol cols="12" md="4" class="print-row print-order-1" v-if="rol !== 'Proveedor' || order.type === 1">
             <!-- 👉 Customer Details  -->
-            <VCard class="mb-6">
+            <VCard class="mb-6 client-details">
               <VCardText class="d-flex flex-column gap-y-6">
                 <div class="text-body-1 text-high-emphasis font-weight-medium">
                     Detalles del cliente
@@ -646,7 +651,33 @@ const removeOrder = async () => {
             </VCard>
 
             <!-- 👉 Billing Address -->
-            <VCard>
+            <VCard title="Dirección de Facturación">
+              <template #append>
+                <div v-if="order.billing.pse === 0 && order.billing?.card_number">
+                  <VImg
+                      :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
+                      height="50"
+                      max-width="50"
+                      min-width="50"
+                    />
+                </div>
+                <div v-if="order.billing.nequi === 1">
+                  <VImg
+                      :src="nequi"
+                      height="50"
+                      max-width="50"
+                      min-width="50"
+                    />
+                </div>
+                <div v-if="order.billing.pse === 1">
+                  <VImg
+                      :src="pse"
+                      height="50"
+                      max-width="50"
+                      min-width="50"
+                    />
+                </div>
+              </template>
               <VCardText>
                 <div class="d-flex align-center justify-space-between">
                   <div class="text-body-1 text-high-emphasis font-weight-medium">
@@ -662,7 +693,6 @@ const removeOrder = async () => {
                   {{ order.billing.city }} <br> 
                   {{ order.billing.postal_code }}
                 </div>
-
                 <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                     {{ order.billing.payment_method_name }}
@@ -766,6 +796,28 @@ const removeOrder = async () => {
     .v-theme--dark {
       --v-theme-surface: 255, 255, 255;
       --v-theme-on-surface: 94, 86, 105;
+    }
+
+    .avatar-dynamic {
+      width: 50px !important;
+      height: 50px !important;
+    }
+
+    .print-order-1 {
+      order: 1 !important;
+    }
+
+    .print-order-2 {
+      order: 2 !important;
+    }
+
+    .print-row .v-card {
+      border-top: 1px solid #999999;
+      border-radius: 0 !important;
+      margin: 0 !important;
+    }
+    .print-row .v-card.client-details {
+      border: none !important;
     }
 
     body {
