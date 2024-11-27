@@ -24,7 +24,8 @@ const categoryTypes = ref([
   {id: 1, name: 'Productos'},
   {id: 2, name: 'Servicios'},
 ])
-
+const selectedTags = ref([])
+const existingTags = ref([])
 const isValid =  ref(null)
 
 watchEffect(fetchData)
@@ -63,6 +64,7 @@ const onSubmit = () => {
             formData.append('banner_3', banners.value[2] ?? null)
             formData.append('banner_4', banners.value[3] ?? null)
             formData.append('name', name.value)
+            formData.append('keywords', selectedTags.value)
             formData.append('category_type_id', category_type_id.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
             formData.append('category_id', category_id.value)
@@ -208,6 +210,19 @@ const onSubmit = () => {
                                         </template>
                                     </VAutocomplete>
                                 </VCol>
+                                <VCol cols="12"  md="12">
+                                    <v-combobox
+                                    v-model="selectedTags"
+                                    :items="existingTags"
+                                    label="Ingresa Palabras Claves"
+                                    multiple
+                                    chips
+                                    deletable-chips
+                                    clearable
+                                    @keydown.enter.prevent="addTag"
+                                    ></v-combobox>  
+                                </VCol>
+
                             </VRow>
                         </VCardText>
                     </VCard>

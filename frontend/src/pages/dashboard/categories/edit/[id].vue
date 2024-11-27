@@ -22,6 +22,8 @@ const emitter = inject("emitter")
 
 const name = ref('')
 const category_id = ref()
+const selectedTags = ref([])
+const existingTags = ref([])
 const banner_category_id = ref()
 const banner2_category_id = ref()
 const banner3_category_id = ref()
@@ -61,6 +63,7 @@ async function fetchData() {
 
         name.value = category.value.name
         category_type_id.value = category.value.category_type_id
+        selectedTags.value = category.value.keywords.split(',')
 
         avatars.value[0] = category.value.banner === null ? '' : themeConfig.settings.urlStorage + category.value.banner
         avatarsOld.value[0] = category.value.banner === null ? '' : themeConfig.settings.urlStorage + category.value.banner
@@ -181,6 +184,7 @@ const onSubmit = () => {
             formData.append('banner_4', banners.value[3] ?? null)
             formData.append('icon_subcategory', banners.value[4] ?? null)
             formData.append('name', name.value)
+            formData.append('keywords', selectedTags.value)
             formData.append('category_type_id', category_type_id.value)
             formData.append('is_category', (typeof category_id.value === 'undefined' || category_id.value === null) ? 0 : 1)
             formData.append('category_id', category_id.value)
@@ -327,6 +331,18 @@ const onSubmit = () => {
                                             </v-list-item>
                                         </template>
                                     </VAutocomplete>
+                                </VCol>
+                                <VCol cols="12"  md="12">
+                                    <v-combobox
+                                    v-model="selectedTags"
+                                    :items="existingTags"
+                                    label="Ingresa Palabras Claves"
+                                    multiple
+                                    chips
+                                    deletable-chips
+                                    clearable
+                                    @keydown.enter.prevent="addTag"
+                                    ></v-combobox>  
                                 </VCol>
                                 <VCol cols="12" md="6" v-if="category_id !== null">
                                     <VFileInput
