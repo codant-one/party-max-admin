@@ -269,6 +269,7 @@ const removeOrder = async () => {
                           <div class="d-flex gap-x-3 align-center my-1">
                             <VAvatar
                               v-if="item.service.images.length > 0"
+                              class="avatar-dynamic"
                               size="150"
                               variant="outlined"
                               :image="themeConfig.settings.urlStorage + item.service.images[0].image"
@@ -276,6 +277,7 @@ const removeOrder = async () => {
                             />
                             <VAvatar
                               v-else
+                              class="avatar-dynamic"
                               size="150"
                               variant="outlined"
                               :image="themeConfig.settings.urlStorage + item.service.image"
