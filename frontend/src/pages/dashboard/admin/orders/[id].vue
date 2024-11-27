@@ -651,7 +651,7 @@ const removeOrder = async () => {
             </VCard>
 
             <!-- 👉 Billing Address -->
-            <VCard title="Dirección de Facturación">
+            <VCard title="Dirección de Facturación" class="billing">
               <template #append>
                 <div v-if="order.billing.pse === 0 && order.billing?.card_number">
                   <VImg
@@ -679,20 +679,15 @@ const removeOrder = async () => {
                 </div>
               </template>
               <VCardText>
-                <div class="d-flex align-center justify-space-between">
-                  <div class="text-body-1 text-high-emphasis font-weight-medium">
-                    Dirección de Facturación
-                  </div>
-                </div>
-                <h6 class="text-h6 me-2 mt-4" v-if="order.billing.company">
+                <h6 class="text-h6 me-2" v-if="order.billing.company">
                   {{ order.billing.company }}
                 </h6>
-                <div>
+                <span>
                   {{ order.billing.address }} <br> 
                   {{ order.billing.street }} <br> 
                   {{ order.billing.city }} <br> 
                   {{ order.billing.postal_code }}
-                </div>
+                </span>
                 <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
                     {{ order.billing.payment_method_name }}
@@ -788,6 +783,11 @@ const removeOrder = async () => {
   </div>
 </template>
 <style lang="scss">
+
+  .v-card.billing .v-card-item {
+    padding-bottom: 0 !important
+  }
+
   .order-preview-table {
     --v-table-row-height: 44px !important;
   }
