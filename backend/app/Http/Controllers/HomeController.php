@@ -177,6 +177,17 @@ class HomeController extends Controller
                 $homeImage->update();
             } 
 
+            if ($request->hasFile('mobile')) {
+                $image = $request->file('mobile');
+
+                $path = 'home/';
+
+                $file_data = uploadFile($image, $path);
+
+                $homeImage->mobile = $file_data['filePath'];
+                $homeImage->update();
+            } 
+
             $order_id = HomeImage::where('is_slider', $homeImage->is_slider)
                            ->latest('order_id')
                            ->first()
@@ -227,6 +238,17 @@ class HomeController extends Controller
                 $file_data = uploadFile($image, $path, $homeImage->image);
 
                 $homeImage->image = $file_data['filePath'];
+                $homeImage->update();
+            } 
+
+            if ($request->hasFile('mobile')) {
+                $image = $request->file('mobile');
+
+                $path = 'home/';
+
+                $file_data = uploadFile($image, $path, $homeImage->mobile);
+
+                $homeImage->mobile = $file_data['filePath'];
                 $homeImage->update();
             } 
 

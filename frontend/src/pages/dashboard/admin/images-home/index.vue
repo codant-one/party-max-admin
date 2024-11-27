@@ -300,7 +300,8 @@ const submitUpdate = homeImageData => {
                 <th scope="col"> #ORDEN ID </th>
                 <th scope="col"> SLIDER </th>
                 <th scope="col"> URL </th>
-                <th scope="col" class="w-100px"> IMAGEN </th>
+                <th scope="col" class="w-100px"> DESKTOP </th>
+                <th scope="col" class="w-100px"> MOBILE </th>
                 <th scope="col" v-if="$can('editar', 'home-imagenes') || $can('eliminar', 'home-imagenes')">
                   ACCIONES
                 </th>
@@ -333,6 +334,13 @@ const submitUpdate = homeImageData => {
                   <VImg
                     v-if="element.image !== null"
                     :src="themeConfig.settings.urlStorage + element.image"
+                    :height="50"
+                  />
+                </td>
+                <td>
+                  <VImg
+                    v-if="element.mobile !== null"
+                    :src="themeConfig.settings.urlStorage + element.mobile"
                     :height="50"
                   />
                 </td>
