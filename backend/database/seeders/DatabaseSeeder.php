@@ -56,7 +56,8 @@ class DatabaseSeeder extends Seeder
             CalendarSeeder::class,
 
             InventaryPermissionSeeder::class,
-            ReferralPermissionSeeder::class
+            ReferralPermissionSeeder::class,
+            HomeImagePermissionsSeeder::class
         ]);
 
     }

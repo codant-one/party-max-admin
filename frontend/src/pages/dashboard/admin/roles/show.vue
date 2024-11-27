@@ -385,6 +385,35 @@ const closeRoleDetailDialog = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
+                            Home imágenes
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver home-imágenes"
+                                value="ver home-imágenes"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear home-imágenes"
+                                value="crear home-imágenes"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar home-imágenes"
+                                value="editar home-imágenes"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar home-imágenes"
+                                value="eliminar home-imágenes"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
                             FAQ's
                         </VLabel>
                         <div class="ml-5">

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
+use Spatie\Permission\Middlewares\PermissionMiddleware;
+
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
@@ -15,6 +17,14 @@ use App\Models\HomeImage;
 
 class HomeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(PermissionMiddleware::class . ':ver home-imágenes|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':crear home-imágenes|administrador')->only(['store']);
+        $this->middleware(PermissionMiddleware::class . ':editar home-imágenes|administrador')->only(['update']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar home-imágenes|administrador')->only(['destroy']);
+    }
+
     public function home(): JsonResponse
     {
         try {

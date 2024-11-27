@@ -22,7 +22,7 @@ export default [
         icon: { icon: 'mdi-application-cog-outline' },
         to: 'dashboard-admin-images-home', 
         action: 'ver' , 
-        subject: 'images-home', 
+        subject: 'home-imágenes', 
       },
       {
         title: "FAQ's",

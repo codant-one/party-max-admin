@@ -283,7 +283,7 @@ const submitUpdate = homeImageData => {
 
               <!-- 👉 Add user button -->
               <v-btn
-                v-if="$can('crear','home-imagenes')"
+                v-if="$can('crear','home-imágenes')"
                 prepend-icon="tabler-plus"
                 @click="isAddNewHomeImageDrawerVisible = true">
                   Agregar Imagen
@@ -302,7 +302,7 @@ const submitUpdate = homeImageData => {
                 <th scope="col"> URL </th>
                 <th scope="col" class="w-100px"> DESKTOP </th>
                 <th scope="col" class="w-100px"> MOBILE </th>
-                <th scope="col" v-if="$can('editar', 'home-imagenes') || $can('eliminar', 'home-imagenes')">
+                <th scope="col" v-if="$can('editar', 'home-imágenes') || $can('eliminar', 'home-imágenes')">
                   ACCIONES
                 </th>
               </tr>
@@ -345,7 +345,7 @@ const submitUpdate = homeImageData => {
                   />
                 </td>
                 <!-- 👉 Acciones -->
-                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'home-imagenes') || $can('eliminar', 'home-imagenes')">      
+                <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'home-imágenes') || $can('eliminar', 'home-imágenes')">      
                   <VBtn
                     icon
                     variant="text"
@@ -365,7 +365,7 @@ const submitUpdate = homeImageData => {
                       />
                   </VBtn>
                   <VBtn
-                    v-if="$can('editar', 'home-images')"
+                    v-if="$can('editar', 'home-imágenes')"
                     icon
                     size="x-small"
                     color="default"
@@ -383,7 +383,7 @@ const submitUpdate = homeImageData => {
                   </VBtn>
 
                   <VBtn
-                    v-if="$can('eliminar','home-images')"
+                    v-if="$can('eliminar','home-imágenes')"
                     icon
                     size="x-small"
                     color="default"
@@ -494,5 +494,5 @@ const submitUpdate = homeImageData => {
 <route lang="yaml">
   meta:
     action: ver
-    subject: home-imagenes
+    subject: home-imágenes
 </route>

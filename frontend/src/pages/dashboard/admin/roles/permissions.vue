@@ -297,6 +297,31 @@ const closeModal = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
+                            Home imágenes
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver home-imágenes"
+                                value="ver home-imágenes"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear home-imágenes"
+                                value="crear home-imágenes"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar home-imágenes"
+                                value="editar home-imágenes"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar home-imágenes"
+                                value="eliminar home-imágenes"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
                             FAQ's
                         </VLabel>
                         <div class="ml-5">

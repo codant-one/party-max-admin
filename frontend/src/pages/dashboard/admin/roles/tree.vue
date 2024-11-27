@@ -145,6 +145,20 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="tab n3">
+                            <strong>Ver Home Imágenes</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de imágenes de home</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Home Imágenes</strong>&emsp;/&emsp;<code>Permite la creación de imágenes de home</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Home Imágenes</strong>&emsp;/&emsp;<code>Permite la edición de imágenes de home</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Home Imágenes</strong>&emsp;/&emsp;<code>Permite la eliminación imágenes de home</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
                             <strong>FAQ's</strong>
                         </li>
                         <ul class="tab">
