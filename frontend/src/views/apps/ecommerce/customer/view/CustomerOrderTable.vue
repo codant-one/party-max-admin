@@ -210,7 +210,7 @@ const resolveStatusPayment = payment_state_id => {
       <tfoot v-show="!orders.length">
         <tr>
           <td
-            colspan="5"
+            colspan="6"
             class="text-center">
             Datos no disponibles
           </td>

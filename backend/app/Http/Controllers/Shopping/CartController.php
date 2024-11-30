@@ -17,96 +17,79 @@ class CartController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-       
         try {
-
             $cart = [];
+            $types = array_filter(explode(',', $request->type), 'strlen');
 
-            if($request->type === '0') {
-                $productColorIds = explode(',', $request->product_color_id);
-                $quantities = explode(',', $request->quantity);
-                $wholesale = $request->wholesale;
+            foreach ($types as $index => $type) {
+                if ($type === '0') {
+                    $productColorId = explode(',', $request->product_color_id)[$index] ?? null;
+                    $quantity = explode(',', $request->quantity)[$index] ?? 1;
+                    $wholesale = explode(',', $request->wholesale)[$index] ?? 0;
 
-                $cart = ProductColor::with([
-                            'color',
-                            'product.user.userDetail',
-                            'product.user.supplier',
-                            'images'
-                        ])
-                        ->whereIn('id', $productColorIds)
-                        ->get()
-                        ->map(function ($item) use ($productColorIds, $quantities, $wholesale) {
-                            $index = array_search($item->id, $productColorIds);
-                            $quantity = $quantities[$index] ?? 1;
+                    if (!$productColorId) {
+                        continue;
+                    }
 
-                            $product = $item;
-                            $product->product = $item->product;
-                            $product->user = $item->product->user;
-                            $product->userDetail = $item->product->user->userDetail;
-                            $product->supplier = $item->product->user->supplier;
-                            $product->color = $item->color;
-                            $product->images = $item->images;
-                            $product->product_color_id = $item->id;
-                            $product->quantity = $quantity;
-                            $product->wholesale = (int)$wholesale;
-                            return $product;
-                        })
-                        ->values()
-                        ->all();
-            } else if($request->type === '1') {
-                $servicesIds = explode(',', $request->service_id);
-                $cakeSizeIds = explode(',', $request->cake_size_id);
-                $quantities = explode(',', $request->quantity);
-                $dateIds = explode(',', $request->date);
-                $flavorIds = explode(',', $request->flavor_id);
-                $fillingIds = explode(',', $request->filling_id);
-                $orderFileIds = explode(',', $request->order_file_id);
+                    $product = ProductColor::with([
+                        'color',
+                        'product.user.userDetail',
+                        'product.user.supplier',
+                        'images'
+                    ])->find($productColorId);
+            
+                    $product->product = $product->product;
+                    $product->user = $product->product->user;
+                    $product->user_detail = $product->product->user->userDetail;
+                    $product->supplier = $product->product->user->supplier;
+                    $product->product_color_id = $productColorId;
+                    $product->quantity = $quantity;
+                    $product->wholesale = (int)$wholesale;
+                    $product->type = (int)$type;
 
-                $cart = Service::with([
-                            'images',
-                            'user.userDetail',
-                            'user.supplier',
-                            'cupcakes.cake_size.cake_type'
-                        ])
-                        ->whereIn('id', $servicesIds)
-                        ->get()
-                        ->map(function ($item) use ($cakeSizeIds, $dateIds, $servicesIds, $quantities, $flavorIds, $fillingIds, $orderFileIds) {
-                            $index = array_search($item->id, $servicesIds);
-                            $cake_size_id = $cakeSizeIds[$index] === 0 ? null : $cakeSizeIds[$index];
-                            $quantity = $quantities[$index] ?? 1;
-                            $date = $dateIds[$index];
-                            $flavor_id = $flavorIds[$index] ?? 0;
-                            $filling_id = $fillingIds[$index] ?? 0;
-                            $order_file_id = $orderFileIds[$index] ?? 0;
+                    $cart[] = $product;
 
-                            $flavor = ($flavor_id > 0) ? Flavor::find($flavor_id) : null;
-                            $filling = ($filling_id > 0) ? Filling::find($filling_id) : null;
+                } elseif ($type === '1') {
+                    $serviceId = explode(',', $request->service_id)[$index] ?? null;
+                    $cakeSizeId = explode(',', $request->cake_size_id)[$index] ?? null;
+                    $quantity = explode(',', $request->quantity)[$index] ?? 1;
+                    $date = explode(',', $request->date)[$index] ?? null;
+                    $flavorId = explode(',', $request->flavor_id)[$index] ?? 0;
+                    $fillingId = explode(',', $request->filling_id)[$index] ?? 0;
+                    $orderFileId = explode(',', $request->order_file_id)[$index] ?? 0;
+                    $flavor = $flavorId > 0 ? Flavor::find($flavorId) : null;
+                    $filling = $fillingId > 0 ? Filling::find($fillingId) : null;
 
-                            $product = $item;
-                            $product->user = $item->user;
-                            $product->userDetail = $item->user->userDetail;
-                            $product->supplier = $item->user->supplier;
-                            $product->images = $item->images;
-                            $product->cake_size_id = (int)$cake_size_id;
-                            $product->date = $date;
-                            $product->quantity = $quantity;
-                            $product->flavor = ($flavor_id > 0) ? $flavor: null;
-                            $product->filling = ($filling_id > 0) ? $filling : null;
-                            $product->order_file_id = (int)$order_file_id;
-                            return $product;
-                        })
-                        ->values()
-                        ->all();
+                    if (!$serviceId) {
+                        continue;
+                    }
+
+                    $service = Service::with([
+                        'images',
+                        'user.userDetail',
+                        'user.supplier',
+                        'cupcakes.cake_size.cake_type'
+                    ])->find($serviceId);
+
+                    $service->user_detail = $service->user->userDetail;
+                    $service->cake_size_id = (int)$cakeSizeId;
+                    $service->date = $date;
+                    $service->quantity = $quantity;
+                    $service->flavor = $flavor;
+                    $service->filling = $filling;
+                    $service->order_file_id = $orderFileId;
+                    $service->type = (int)$type;
+
+                    $cart[] = $service;
+                }
             }
 
             return response()->json([
                 'success' => true,
-                'data' => [ 
-                    'cart' => $cart,
-                    'type' => (int)$request->type
-                ]
+                'data' => [
+                    'cart' => $cart
+                ],
             ], 200);
-
         } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -114,7 +97,6 @@ class CartController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
-
     }
 
     public function checkAvailability(Request $request): JsonResponse

@@ -216,7 +216,7 @@ const removeOrder = async () => {
               <v-table class="text-no-wrap order-preview-table">
                 <thead>
                   <tr class="text-no-wrap">
-                    <th class="font-weight-semibold"> {{ order.type === 0 ? 'PRODUCTO' : 'SERVICIO' }}</th>
+                    <th class="font-weight-semibold"> PRODUCTO</th>
                     <th class="font-weight-semibold"> PRECIO </th>
                     <th class="font-weight-semibold"> CANTIDAD </th>
                     <th class="font-weight-semibold"> TOTAL </th>   
@@ -224,7 +224,7 @@ const removeOrder = async () => {
                 </thead>
                 <tbody>
                   <template v-for="item in order.details">
-                    <template v-if="order.type === 0">
+                    <template v-if="item.product_color_id !== null">
                       <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
                         <td class="text-wrap">
                           <div class="d-flex gap-x-3 align-center my-1">

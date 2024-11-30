@@ -30,7 +30,8 @@ const type = ref(null)
 
 const types = ref([
   { title: 'Producto', value: 0 },
-  { title: 'Servicio', value: 1 }
+  { title: 'Servicio', value: 1 },
+  { title: 'Mixto', value: 2 }
 ])
 
 const shippingStates = ref([
@@ -50,6 +51,41 @@ const advisor = ref({
     message: '',
     show: false
 })
+
+const resolveType = order => {
+
+    let type = {}
+
+    switch (order.type) {
+        case 0:
+            type.text = 'PRODUCTO'
+            type.color = 'info'
+        break;
+        case 1:
+            type.text = 'SERVICIO'
+            type.color = 'error'
+            break;
+        case 2:
+            type.text = 'MIXTO'
+            type.color = 'secondary'
+        break;
+        default:
+            type.text = 'PRODUCTO'
+            type.color = 'info'
+    }
+
+    return type;
+
+}
+
+const resolveOrders = data => {
+    if (data.type === 0)
+    return data.wholesale === 0 ? 'text-success': 'text-primary'
+    if (data.type === 1)
+    return  'text-error' 
+    if (data.type === 2)
+    return  'text-secondary' 
+}
 
 const resolveStatusShipping = shipping_state_id => {
   if (shipping_state_id === 1)
@@ -194,13 +230,13 @@ const downloadCSV = async () => {
 
         let data = {
             REFERENCIA: element.reference_code ?? '',
-        FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
-        TIPO: element.type === 0 ? 'PRODUCTO' : 'SERVICIO',
-        CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing.name + ' ' + (element.billing.last_name ?? '') + ' (no registrado)',
-        CORREO: element.client ? element.client.user.email : element.billing.email,
-        ESTADO_ENVIO: element.shipping.name,
-        ESTADO_PAGO: element.payment.name,
-        MONTO: formatNumber(element.sub_total)
+            FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
+            TIPO: resolveType(element).text,
+            CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing.name + ' ' + (element.billing.last_name ?? '') + ' (no registrado)',
+            CORREO: element.client ? element.client.user.email : element.billing.email,
+            ESTADO_ENVIO: element.shipping.name,
+            ESTADO_PAGO: element.payment.name,
+            MONTO: formatNumber(element.sub_total)
         }
           
         dataArray.push(data)
@@ -400,7 +436,7 @@ const downloadCSV = async () => {
                         <td class="name">
                             <span 
                                 class="font-weight-medium cursor-pointer" 
-                                :class="order.type === 0 ? (order.wholesale === 0 ? 'text-success': 'text-primary') : 'text-warning'" 
+                                :class="resolveOrders(order)" 
                                 @click="seeOrder(order)">
                                 {{ order.reference_code }} 
                             </span>
@@ -410,9 +446,9 @@ const downloadCSV = async () => {
                             <VChip
                                 variant="outlined"
                                 label
-                                :color="order.type === 0 ? 'info' : 'secondary'"
+                                :color="resolveType(order).color"
                             >
-                            {{  order.type === 0 ? 'PRODUCTO' : 'SERVICIO' }} 
+                            {{  resolveType(order).text }}
                             </VChip>
                         </td>
                         <td class="text-wrap">

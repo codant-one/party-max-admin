@@ -151,11 +151,20 @@ class Order extends Model
                 'shipping_postal_code' => $addressFind['postal_code']
             ]);
         }
-
-        $prefix = $request->type === 0 ? ($request->wholesale === 0 ? '03' : '05') : '09';
-        //PRODUCCION $request->wholesale === 0 ? '03' : '05';
-        //STAGING $request->wholesale === 0 ? '00' : '99';
-        //SERVICES '09'
+        
+        switch (intval($request->type)) {
+            case 0: //products
+                $prefix = ($request->wholesale === 0 ? '03' : '05');
+            break;
+            case 1: //services
+                $prefix = '09';
+            break;
+            case 2: //mixto
+                $prefix = '01';
+            break;
+            default:
+                $prefix = ($request->wholesale === 0 ? '03' : '05');
+        }
 
         if($request->type === 0 )
             $reference_code = Order::where([['wholesale', $request->wholesale],['type', 0]])
@@ -163,7 +172,7 @@ class Order extends Model
                            ->first()
                            ->reference_code ?? $prefix.'0000000';
         else 
-            $reference_code = Order::where('type', 1)
+            $reference_code = Order::where('type', $request->type)
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.'0000000';
@@ -173,34 +182,35 @@ class Order extends Model
         ]);
 
         //Order_details
-        if($request->type === 0 )
-            foreach ($request->product_color_id as $index => $productColorId) {
-                $detail = OrderDetail::create([
-                    'order_id' => $order->id,
-                    'product_color_id' => $productColorId,
-                    'price' => $request->price[$index],
-                    'quantity' => $request->quantity[$index],
-                    'total' => $request->price[$index] * $request->quantity[$index],
-                ]);
-            }
-        else 
-            foreach ($request->service_id as $index => $serviceId) {
-                $detail = OrderDetail::create([
-                    'order_id' => $order->id,
-                    'service_id' => $serviceId,
-                    'cake_size_id' => $request->cake_size_id[$index] === null ? null : $request->cake_size_id[$index],
-                    'flavor_id' => $request->flavor_id[$index] === null ? null : $request->flavor_id[$index],
-                    'filling_id' => $request->filling_id[$index] === null ? null : $request->filling_id[$index],
-                    'order_file_id' => $request->order_file_id[$index] === null ? null : $request->order_file_id[$index],
-                    'price' => $request->price[$index],
-                    'date' => $request->date[$index],
-                    'quantity' => $request->quantity[$index],
-                    'total' => $request->price[$index] * $request->quantity[$index],
-                ]);
+        foreach ($request->product_color_id as $index => $productColorId) {
+            $detail = OrderDetail::create([
+                'order_id' => $order->id,
+                'product_color_id' => $productColorId,
+                'price' => $request->price_product[$index],
+                'quantity' => $request->quantity_product[$index],
+                'total' => $request->price_product[$index] * $request->quantity_product[$index],
+            ]);
+        }
 
-                $order_create = Order::with(['details.service.categories'])->find($order->id);
+        foreach ($request->service_id as $index => $serviceId) {
+            $detail = OrderDetail::create([
+                'order_id' => $order->id,
+                'service_id' => $serviceId,
+                'cake_size_id' => $request->cake_size_id[$index] === null ? null : $request->cake_size_id[$index],
+                'flavor_id' => $request->flavor_id[$index] === null ? null : $request->flavor_id[$index],
+                'filling_id' => $request->filling_id[$index] === null ? null : $request->filling_id[$index],
+                'order_file_id' => $request->order_file_id[$index] === null ? null : $request->order_file_id[$index],
+                'price' => $request->price_service[$index],
+                'date' => $request->date[$index],
+                'quantity' => $request->quantity_service[$index],
+                'total' => $request->price_service[$index] * $request->quantity_service[$index],
+            ]);
 
-                foreach($order_create->details as $key => $detail) {
+
+            $order_create = Order::with(['details.service.categories'])->find($order->id);
+
+            foreach($order_create->details as $key => $detail) {
+                if(!is_null($detail->service)) {
                     $event = new Event;
                     $event->category_id = $detail->service->categories[0]->category_id;
                     $event->order_detail_id = $detail->id;
@@ -210,6 +220,7 @@ class Order extends Model
                     $event->save();
                 }
             }
+        }
 
         //Billing
         $billing = Billing::create([

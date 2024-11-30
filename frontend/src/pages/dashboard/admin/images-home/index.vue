@@ -302,7 +302,7 @@ const submitUpdate = homeImageData => {
                 <th scope="col"> URL </th>
                 <th scope="col" class="w-100px"> DESKTOP </th>
                 <th scope="col" class="w-100px"> MOBILE </th>
-                <th scope="col" v-if="$can('editar', 'home-imágenes') || $can('eliminar', 'home-imágenes')">
+                <th scope="col" class="text-end" v-if="$can('editar', 'home-imágenes') || $can('eliminar', 'home-imágenes')">
                   ACCIONES
                 </th>
               </tr>
@@ -407,7 +407,7 @@ const submitUpdate = homeImageData => {
             <tfoot v-show="!homeImages.length">
               <tr>
                 <td
-                  colspan="5"
+                  colspan="6"
                   class="text-center">
                   Datos no disponibles
                 </td>

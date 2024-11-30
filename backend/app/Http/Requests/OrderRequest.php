@@ -37,22 +37,6 @@ class OrderRequest extends FormRequest
                 'numeric',
                 'required'
             ],
-            'price' => [
-                'array',
-                'required'
-            ],
-            'price.*' => [
-                'required',
-                'numeric'
-            ],
-            'quantity' => [
-                'array',
-                'required'
-            ],
-            'quantity.*' => [
-                'required',
-                'numeric'
-            ],
             'province_id' => [
                 'required',
                 'integer',
@@ -79,18 +63,6 @@ class OrderRequest extends FormRequest
             'tax.required' => 'El tax es requerido.',
             'tax.numeric' => 'El tax debe ser numérico.',
             
-            'price.required' => 'El Precio es requerido.',
-            'price.array' => 'El Precio debe ser un array.',
-
-            'price.*.required' => 'El precio es requerido.',
-            'price.*.numeric' => 'El precio debe ser numérico.',
-
-            'quantity.required' => 'La cantidad es requerida.',
-            'quantity.array' => 'La cantidad debe ser un array.',
-
-            'quantity.*.required' => 'La cantidad es requerida.',
-            'quantity.*.numeric' => 'La cantidad debe ser numérico.',
-
             'province_id.required' => 'La provincia es requerida.',
             'province_id.integer' => 'El formato de provincia debe ser entero.',
             'province_id.exists' => 'La provincia ingresada no existe.',
