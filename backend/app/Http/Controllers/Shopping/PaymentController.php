@@ -304,7 +304,7 @@ class PaymentController extends Controller
         ], 200);
     }
 
-    private function generateLog($order, array $response){
+    private function generateLog($order, $response){
         
         if (!file_exists(storage_path('logs/payments'))) {
             mkdir(storage_path('logs/payments'), 0755, true);
