@@ -68,7 +68,6 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
 
     store.fetchEvents()
       .then(res => {
-        console.log('res',res)
         successCallback(res.map(e => ({
           ...e,
     

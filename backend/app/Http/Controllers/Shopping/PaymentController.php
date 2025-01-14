@@ -118,7 +118,7 @@ class PaymentController extends Controller
             return response()->json([
                 'sucess' => false,
                 'feedback' => 'not_found',
-                'message' => 'Pedido no encontrada'
+                'message' => 'Pedido no encontrado'
             ], 404);
  
         $event_state_id = 4;
@@ -293,9 +293,30 @@ class PaymentController extends Controller
                 Supplier::sendInfo($order->id);
                 break;           
         }          
-                
+               
+        generateLog($order, $request);
+
         return response()->json([
             'success' => true
         ], 200);
+    }
+
+    private function generateLog($order, $request){
+        
+        if (!file_exists(storage_path('logs/payment'))) {
+            mkdir(storage_path('logs/payment'), 0755, true);
+        }
+
+        $logPath = storage_path("logs/payment/{$order->reference_code}.log");
+
+        $log = Log::build([
+            'driver' => 'single',
+            'path' => $logPath,
+            'level' => 'debug',
+        ]);
+
+        $log->info('Iniciando flujo de compra.');
+        $log->info('Usuario seleccionó un producto.');
+        $log->error('Ocurrió un error en el flujo de compra.');
     }
 }
