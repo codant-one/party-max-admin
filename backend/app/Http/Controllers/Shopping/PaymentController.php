@@ -315,7 +315,11 @@ class PaymentController extends Controller
             'level' => 'debug',
         ]);
 
+        $responseContent = $request->getContent();
+
+        parse_str($responseContent, $responseArray);
+
         $log->info('Date:'. now());
-        $log->info('PayU response: '. $request);
+        $log->info('PayU response: '. $responseArray);
     }
 }
