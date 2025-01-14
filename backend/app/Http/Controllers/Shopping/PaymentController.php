@@ -303,11 +303,11 @@ class PaymentController extends Controller
 
     private function generateLog($order, $request){
         
-        if (!file_exists(storage_path('logs/payment'))) {
-            mkdir(storage_path('logs/payment'), 0755, true);
+        if (!file_exists(storage_path('logs/payments'))) {
+            mkdir(storage_path('logs/payments'), 0755, true);
         }
 
-        $logPath = storage_path("logs/payment/{$order->reference_code}.log");
+        $logPath = storage_path("logs/payments/{$order->reference_code}.log");
 
         $log = Log::build([
             'driver' => 'single',
