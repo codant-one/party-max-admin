@@ -294,7 +294,7 @@ class PaymentController extends Controller
                 break;           
         }          
                
-        generateLog($order, $request);
+        $this->generateLog($order, $request);
 
         return response()->json([
             'success' => true
