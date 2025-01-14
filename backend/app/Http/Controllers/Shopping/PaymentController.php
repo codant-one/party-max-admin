@@ -320,6 +320,8 @@ class PaymentController extends Controller
         parse_str($responseContent, $responseArray);
 
         $log->info('Date:'. now());
-        $log->info('PayU response: '. $responseArray);
+        $log->info('PayU response1: '. $responseArray);
+        $log->info('PayU response2: ' . json_encode($responseArray, JSON_PRETTY_PRINT));
+        $log->info('PayU response2: ' . json_decode($responseContent, true));
     }
 }
