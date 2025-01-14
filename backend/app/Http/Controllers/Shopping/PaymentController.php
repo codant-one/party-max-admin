@@ -319,6 +319,6 @@ class PaymentController extends Controller
         ]);
 
         $log->info('Date:'. now());
-        $log->info('PayU response: ' . json_encode($response));
+        $log->info('PayU response: ' . $response);
     }
 }
