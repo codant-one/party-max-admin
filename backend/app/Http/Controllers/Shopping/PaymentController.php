@@ -301,7 +301,7 @@ class PaymentController extends Controller
         ], 200);
     }
 
-    private function generateLog($order, $request){
+    private function generateLog($order, Request $request){
         
         if (!file_exists(storage_path('logs/payments'))) {
             mkdir(storage_path('logs/payments'), 0755, true);
@@ -315,13 +315,7 @@ class PaymentController extends Controller
             'level' => 'debug',
         ]);
 
-        $responseContent = $request->getContent();
-
-        parse_str($responseContent, $responseArray);
-
         $log->info('Date:'. now());
-        $log->info('PayU response1: '. $responseArray);
-        $log->info('PayU response2: ' . json_encode($responseArray, JSON_PRETTY_PRINT));
-        $log->info('PayU response2: ' . json_decode($responseContent, true));
+        $log->info('PayU response: ' . json_encode($request));
     }
 }
