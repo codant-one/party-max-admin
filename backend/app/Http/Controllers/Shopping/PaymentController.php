@@ -315,8 +315,7 @@ class PaymentController extends Controller
             'level' => 'debug',
         ]);
 
-        $log->info('Iniciando flujo de compra.');
-        $log->info('Usuario seleccionó un producto.');
-        $log->error('Ocurrió un error en el flujo de compra.');
+        $log->info('Date:'. now());
+        $log->info('PayU response: '. $request);
     }
 }
