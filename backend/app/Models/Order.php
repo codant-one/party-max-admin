@@ -296,7 +296,7 @@ class Order extends Model
         
         $productDetails = $orderDetails->map(function ($detail) {
             return [
-                'product_id' => $detail->product_color->product_id,
+                'product_id' => $detail->product_color ? $detail->product_color->product_id : 0,
                 'quantity' => $detail->quantity,
                 'total' => $detail->total
             ];
