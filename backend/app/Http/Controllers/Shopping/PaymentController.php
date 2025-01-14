@@ -294,14 +294,17 @@ class PaymentController extends Controller
                 break;           
         }          
                
-        $this->generateLog($order, $request);
+        $responseContent = $request->getContent();
+        parse_str($responseContent, $responseArray);
+
+        $this->generateLog($order, $responseContent);
 
         return response()->json([
             'success' => true
         ], 200);
     }
 
-    private function generateLog($order, Request $request){
+    private function generateLog($order, $response){
         
         if (!file_exists(storage_path('logs/payments'))) {
             mkdir(storage_path('logs/payments'), 0755, true);
@@ -316,6 +319,6 @@ class PaymentController extends Controller
         ]);
 
         $log->info('Date:'. now());
-        $log->info('PayU response: ' . json_encode($request));
+        $log->info('PayU response: ' . json_encode($response));
     }
 }
