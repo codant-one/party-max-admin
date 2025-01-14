@@ -297,14 +297,14 @@ class PaymentController extends Controller
         $responseContent = $request->getContent();
         parse_str($responseContent, $responseArray);
 
-        $this->generateLog($order, $responseContent);
+        $this->generateLog($order, $responseArray);
 
         return response()->json([
             'success' => true
         ], 200);
     }
 
-    private function generateLog($order, $response){
+    private function generateLog($order, array $response){
         
         if (!file_exists(storage_path('logs/payments'))) {
             mkdir(storage_path('logs/payments'), 0755, true);
