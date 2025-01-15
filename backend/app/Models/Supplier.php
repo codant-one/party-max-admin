@@ -286,9 +286,9 @@ class Supplier extends Model
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
                     'service_image' => asset('storage/' . $detail->service->image),
-                    'flavor' => $detail->flavor->name,
-                    'filling' => $detail->filling->name,
-                    'cake_size' => $detail->cake_size->name,
+                    'flavor' => $detail->flavor ? $detail->flavor->name : null,
+                    'filling' => $detail->filling ? $detail->filling->name : null,
+                    'cake_size' => $detail->cake_size ? $detail->cake_size->name : null,
                     'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
                     'quantity' => $detail->quantity,
                     'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'

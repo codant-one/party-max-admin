@@ -54,15 +54,21 @@
                                             <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
                                                 {{ $service['service_name'] }}
                                             </span>
+                                            @if($service['flavor'])
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 Sabor: {{ $service['flavor'] }}
                                             </span>
+                                            @endif
+                                            @if($service['filling'])
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 Relleno: {{ $service['filling'] }}
                                             </span>
+                                            @endif
+                                            @if($service['cake_size'])
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 Tamaño: {{ $service['cake_size'] }}
                                             </span>
+                                            @endif
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 {{ $service['quantity'] }} {{ $service['text_quantity']}}
                                             </span>
