@@ -72,12 +72,16 @@ class TestingController extends Controller
 
     public function paymentSummaryEmail() {
 
-        $orderId = 7;
+        $orderId = 58;
 
         $order = 
             Order::with([
                 'billing', 
                 'details.product_color.product', 
+                'details.service',
+                'details.cake_size',
+                'details.flavor',
+                'details.filling',
                 'address.province', 
                 'client.user.userDetail'
             ])->find($orderId); 
@@ -119,22 +123,39 @@ class TestingController extends Controller
                 'PSE';
 
         $products = [];
+        $services = [];
 
         foreach ($order->details as $detail) {
-            $productInfo = [
-                'product_id' => $detail->product_color->product->id,
-                'product_name' => $detail->product_color->product->name,
-                'product_image' => asset('storage/' . $detail->product_color->product->image),
-                'color' => $detail->product_color->color->name,
-                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
-                'quantity' => $detail->quantity,
-                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
-            ];
-            
-            array_push($products, $productInfo);
+            if($detail->product_color) {
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => $detail->product_color->color->name,
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($products, $productInfo);
+            } else {
+                $serviceInfo = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => $detail->flavor->name,
+                    'filling' => $detail->filling->name,
+                    'cake_size' => $detail->cake_size->name,
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($services, $serviceInfo);
+            }
         
         }
-        //dd($order);
+        // dd($order);
         $data = [
             'address' => $address,
             'user' => $user,
@@ -142,6 +163,7 @@ class TestingController extends Controller
             'total' => $order->total,
             'payment_method' => $payment_method,
             'products' => $products,
+            'services' => $services,
             'link_send' => $link_send,
             'link_purchases' => $link_purchases,
             'showButton' => $order->client ? true : false
