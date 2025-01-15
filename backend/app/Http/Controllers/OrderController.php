@@ -267,6 +267,10 @@ class OrderController extends Controller
             $query = Order::with([
                                 'details.product_color.product', 
                                 'details.product_color.color', 
+                                'details.service',
+                                'details.cake_size',
+                                'details.flavor',
+                                'details.filling',
                                 'shipping', 
                                 'payment'
                             ])
@@ -296,20 +300,36 @@ class OrderController extends Controller
                     'order_date' => $order->date,
                     'shipping' => $order->shipping,
                     'payment' => $order->payment,
-                    'products' => []
+                    'products' => [],
+                    'services' => []
                 ];
             
                 foreach ($order->details as $detail) {
-                    $productInfo = [
-                        'product_id' => $detail->product_color->product->id,
-                        'product_name' => $detail->product_color->product->name,
-                        'product_image' => $detail->product_color->product->image,
-                        'color' => $detail->product_color->color->name,
-                        'slug'=> $detail->product_color->product->slug,
-                        'quantity' => $detail->quantity
-                    ];
-            
-                    $orderInfo['products'][] = $productInfo;
+                    if($detail->product_color) {
+                        $productInfo = [
+                            'product_id' => $detail->product_color->product->id,
+                            'product_name' => $detail->product_color->product->name,
+                            'product_image' => $detail->product_color->product->image,
+                            'color' => $detail->product_color->color->name,
+                            'slug'=> $detail->product_color->product->slug,
+                            'quantity' => $detail->quantity
+                        ];
+                
+                        $orderInfo['products'][] = $productInfo;
+                    } else {
+                        $serviceInfo = [
+                            'service_id' => $detail->service->id,
+                            'service_name' => $detail->service->name,
+                            'service_image' => $detail->service->image,
+                            'flavor' => $detail->flavor ? $detail->flavor->name : null,
+                            'filling' => $detail->filling ? $detail->filling->name : null,
+                            'cake_size' => $detail->cake_size ? $detail->cake_size->name : null,
+                            'slug' => $detail->service->slug,
+                            'quantity' => $detail->quantity,
+                        ];
+
+                        $orderInfo['services'][] = $serviceInfo;
+                    }
                 }
             
                 $orderData[] = $orderInfo;
@@ -340,6 +360,10 @@ class OrderController extends Controller
             $orders = Order::with([
                                 'details.product_color.product.reviews', 
                                 'details.product_color.color',
+                                'details.service',
+                                'details.cake_size',
+                                'details.flavor',
+                                'details.filling',
                                 'shipping', 
                                 'payment', 
                                 'billing',
@@ -365,25 +389,42 @@ class OrderController extends Controller
                     'address' => $order->address,
                     'histories' => $order->histories,
                     'updated_at' => $order->updated_at,
-                    'products' => []
+                    'products' => [],
+                    'services' => []
                 ];
             
                 foreach ($order->details as $detail) {
                    
-                    $review = 
-                        $detail->product_color->product->reviews->firstWhere('client_id', $order->client_id);
-                    
-                    $productInfo = [
-                        'product_id' => $detail->product_color->product->id,
-                        'product_name' => $detail->product_color->product->name,
-                        'product_image' => $detail->product_color->product->image,
-                        'color' => $detail->product_color->color->name,
-                        'slug' => $detail->product_color->product->slug,
-                        'quantity' => $detail->quantity,
-                        'rating' => $review ? $review->rating : 0
-                    ];
-            
-                    $orderInfo['products'][] = $productInfo;
+                    if($detail->product_color) {
+                        $review = 
+                            $detail->product_color->product->reviews->firstWhere('client_id', $order->client_id);
+                        
+                        $productInfo = [
+                            'product_id' => $detail->product_color->product->id,
+                            'product_name' => $detail->product_color->product->name,
+                            'product_image' => $detail->product_color->product->image,
+                            'color' => $detail->product_color->color->name,
+                            'slug' => $detail->product_color->product->slug,
+                            'quantity' => $detail->quantity,
+                            'rating' => $review ? $review->rating : 0
+                        ];
+                
+                        $orderInfo['products'][] = $productInfo;
+                    } else {
+                        $serviceInfo = [
+                            'service_id' => $detail->service->id,
+                            'service_name' => $detail->service->name,
+                            'service_image' => $detail->service->image,
+                            'flavor' => $detail->flavor ? $detail->flavor->name : null,
+                            'filling' => $detail->filling ? $detail->filling->name : null,
+                            'cake_size' => $detail->cake_size ? $detail->cake_size->name : null,
+                            'slug' => $detail->service->slug,
+                            'quantity' => $detail->quantity,
+                            'rating' => 0
+                        ];
+
+                        $orderInfo['services'][] = $serviceInfo;
+                    }
                 }
             
                 $orderData[] = $orderInfo;
