@@ -81,7 +81,6 @@ watchEffect(fetchData)
 async function fetchData() {
 
   if(event.value.extendedProps.order_detail) {
-    console.log('event', event.value)
     image.value = event.value.extendedProps.order_detail.service.image === null ? '' : themeConfig.settings.urlStorage + event.value.extendedProps.order_detail.service.image
     date.value = event.value.extendedProps.order_detail.date
     price.value = event.value.extendedProps.order_detail.total
@@ -165,6 +164,13 @@ const onCancel = () => {
   })
 }
 
+const onStateChange = (newState) => {
+  event.value.extendedProps.state_id = newState
+
+  emit('updateEvent', event.value)
+  
+  onCancel();
+}
 
 const dialogModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
@@ -190,7 +196,7 @@ const dialogModelValueUpdate = val => {
 
       <VSpacer />
 
-      <VBtn
+      <!-- <VBtn
         v-if="$can('eliminar', 'calendario')"
         v-show="event.id"
         icon
@@ -204,7 +210,7 @@ const dialogModelValueUpdate = val => {
           size="18"
           icon="tabler-trash"
         />
-      </VBtn>
+      </VBtn> -->
 
       <VBtn
         variant="tonal"
@@ -317,6 +323,7 @@ const dialogModelValueUpdate = val => {
                   :items="states"
                   item-value="id"
                   item-title="name"
+                  @update:modelValue="onStateChange"
                 />                
               </VCol>
 

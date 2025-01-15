@@ -379,6 +379,7 @@ class OrderController extends Controller
 
                 $orderInfo = [
                     'order_id' => $order->id,
+                    'type' => $order->type,
                     'order_date' => $order->date,
                     'subtotal' => $order->sub_total,
                     'shipping_cost' => $order->shipping_total,

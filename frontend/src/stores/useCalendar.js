@@ -150,7 +150,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
       .then((res) => {
         advisor.value = {
           type: 'success',
-          message: 'Tarea creada con éxito!',
+          message: 'Pedido creado con éxito!',
           show: true
         }
         refetchEvents()
@@ -192,7 +192,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
 
         advisor.value = {
           type: 'success',
-          message: 'Tarea actualizada con éxito!',
+          message: 'Pedido actualizado con éxito!',
           show: true
         }
 
@@ -224,7 +224,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
 
         advisor.value = {
           type: 'success',
-          message: 'Tarea eliminada con éxito!',
+          message: 'Pedido eliminado con éxito!',
           show: true
         }
       })

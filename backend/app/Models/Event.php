@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\State;
 use App\Models\Order;
+use App\Models\OrderDetail;
 
 use Carbon\Carbon;
 
@@ -55,18 +56,15 @@ class Event extends Model
     public static function updateEvent($request, $event) {
 
         $request = self::prepareRequest($request);
-        $category_id = Category::where('name', $request->calendar)->first()->id;
 
         $event->update([
-            'category_id' => $category_id,
-            'default_date' => $request->default_date,
-            'state_id' => $request->state_id,
-            'title' => $request->title,
-            'all_day' =>  1,
-            'start_date' => $request->start,
-            'end_date' => $request->end,
-            'description' => $request->description
+            'state_id' => $request->state_id
         ]);
+
+        $order_detail = OrderDetail::find($request->order_detail_id);
+        $order = Order::find($order_detail->order_id);
+        $order->shipping_state_id = 3;
+        $order->save();
 
         return $event;
     }
@@ -85,12 +83,12 @@ class Event extends Model
         $request->merge(['calendar' => $request->extendedProps['calendar']]);
         $request->merge(['description' => $request->extendedProps['description']]);
         $request->merge(['state_id' => $request->extendedProps['state_id']]);
-        $request->merge(['order_detail_id' => $request->extendedProps['order_detail_id']]);
+        $request->merge(['order_detail_id' => $request->extendedProps['order_detail']['id']]);
 
         $request->request->remove('extendedProps.calendar');
         $request->request->remove('extendedProps.description');
         $request->request->remove('extendedProps.state_id');
-        $request->request->remove('extendedProps.order_detail_id');
+        $request->request->remove('extendedProps.order_detail');
 
         return $request;
     }
@@ -127,19 +125,5 @@ class Event extends Model
         }
 
         return $query->paginate($limit);
-    }
-
-    /**** Public methods ****/
-    public static function updateState($state_id, $order_id) {
- 
-        $order = Order::with(['details'])->find($order_id);
-
-        if($order->type === 1) {
-            foreach($order->details as $detail) {
-                $event = self::where('order_detail_id', $detail->id)->first();
-                $event->state_id = $state_id;
-                $event->update();
-            }
-        }
     }
 }

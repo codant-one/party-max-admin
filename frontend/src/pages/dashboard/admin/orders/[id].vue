@@ -374,7 +374,7 @@ const removeOrder = async () => {
             </VCard>
 
             <!-- 👉 Shipping Activity -->
-            <VCard title="Actividad de envío" class="d-print-none" v-if="order.type === 0">
+            <VCard title="Actividad de envío" class="d-print-none" v-if="order.type !== 1">
               <VCardText>
                 <VTimeline
                   v-if="order.payment.id !== 4"

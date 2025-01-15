@@ -404,7 +404,7 @@ class TestingController extends Controller
 
     public function sendOrder() {
 
-        $orderId = 7;
+        $orderId = 60;
         $shipping_state_id = 3;
         $reason = 'no quise';
 
@@ -412,6 +412,10 @@ class TestingController extends Controller
             Order::with([
                 'billing', 
                 'details.product_color.product', 
+                'details.service',
+                'details.cake_size',
+                'details.flavor',
+                'details.filling',
                 'address.province', 
                 'client.user.userDetail'
             ])->find($orderId); 
@@ -445,19 +449,22 @@ class TestingController extends Controller
         }
 
         $products = [];
+        $services = [];
 
         foreach ($order->details as $detail) {
-            $productInfo = [
-                'product_id' => $detail->product_color->product->id,
-                'product_name' => $detail->product_color->product->name,
-                'product_image' => asset('storage/' . $detail->product_color->product->image),
-                'color' => $detail->product_color->color->name,
-                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
-                'quantity' => $detail->quantity,
-                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
-            ];
-            
-            array_push($products, $productInfo);
+            if($detail->product_color) {
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => $detail->product_color->color->name,
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($products, $productInfo);
+            }
         }
 
         switch ($shipping_state_id) {

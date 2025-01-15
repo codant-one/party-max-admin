@@ -30,7 +30,6 @@ const type = ref(null)
 
 const types = ref([
   { title: 'Producto', value: 0 },
-  { title: 'Servicio', value: 1 },
   { title: 'Mixto', value: 2 }
 ])
 
@@ -429,147 +428,148 @@ const downloadCSV = async () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="order in orders"
+                    <template v-for="order in orders"
                         :key="order.id"
                         style="height: 3.75rem;">
-                        <td class="name">
-                            <span 
-                                class="font-weight-medium cursor-pointer" 
-                                :class="resolveOrders(order)" 
-                                @click="seeOrder(order)">
-                                {{ order.reference_code }} 
-                            </span>
-                        </td>
-                        <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
-                        <td>
-                            <VChip
-                                variant="outlined"
-                                label
-                                :color="resolveType(order).color"
-                            >
-                            {{  resolveType(order).text }}
-                            </VChip>
-                        </td>
-                        <td class="text-wrap">
-                            <div class="d-flex align-center gap-x-3" v-if="order.client">
-                                <VAvatar
-                                    :variant="order.client.user.avatar ? 'outlined' : 'tonal'"
-                                    size="38"
+                        <tr v-if="order.type !== 1">
+                            <td class="name">
+                                <span 
+                                    class="font-weight-medium cursor-pointer" 
+                                    :class="resolveOrders(order)" 
+                                    @click="seeOrder(order)">
+                                    {{ order.reference_code }} 
+                                </span>
+                            </td>
+                            <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>    
+                            <td>
+                                <VChip
+                                    variant="outlined"
+                                    label
+                                    :color="resolveType(order).color"
                                 >
-                                    <VImg
-                                        v-if="order.client.user.avatar"
-                                        style="border-radius: 50%;"
-                                        :src="themeConfig.settings.urlStorage + order.client.user.avatar"
-                                    />
-                                        <span v-else>{{ avatarText(order.client.user.name) }}</span>
-                                </VAvatar>
-                                <div class="d-flex flex-column">
-                                    <span class="font-weight-medium cursor-pointer text-primary" @click="seeClient(order.client)">
-                                        {{ order.client.user.name }} {{ order.client.user.last_name }} 
-                                    </span>
-                                    <span class="text-sm text-disabled">{{ order.client.user.email }}</span>
+                                {{  resolveType(order).text }}
+                                </VChip>
+                            </td>
+                            <td class="text-wrap">
+                                <div class="d-flex align-center gap-x-3" v-if="order.client">
+                                    <VAvatar
+                                        :variant="order.client.user.avatar ? 'outlined' : 'tonal'"
+                                        size="38"
+                                    >
+                                        <VImg
+                                            v-if="order.client.user.avatar"
+                                            style="border-radius: 50%;"
+                                            :src="themeConfig.settings.urlStorage + order.client.user.avatar"
+                                        />
+                                            <span v-else>{{ avatarText(order.client.user.name) }}</span>
+                                    </VAvatar>
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-medium cursor-pointer text-primary" @click="seeClient(order.client)">
+                                            {{ order.client.user.name }} {{ order.client.user.last_name }} 
+                                        </span>
+                                        <span class="text-sm text-disabled">{{ order.client.user.email }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex align-center gap-x-3" v-else>
-                                <VAvatar
-                                    variant="tonal"
-                                    size="38"
+                                <div class="d-flex align-center gap-x-3" v-else>
+                                    <VAvatar
+                                        variant="tonal"
+                                        size="38"
+                                    >
+                                        <span>{{ avatarText(order.billing.name) }}</span>
+                                    </VAvatar>
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-medium text-success">
+                                            {{ order.billing.name }} {{ order.billing.last_name }} 
+                                        </span>
+                                        <span class="text-sm text-disabled">{{ order.billing.email }}</span>
+                                        <span class="text-sm text-secondary">Cliente no registrado</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td> 
+                                <li
+                                    :class="`text-${resolveStatusShipping(order.shipping.id)?.color}`"
+                                    class="font-weight-medium"
                                 >
-                                    <span>{{ avatarText(order.billing.name) }}</span>
-                                </VAvatar>
-                                <div class="d-flex flex-column">
-                                    <span class="font-weight-medium text-success">
-                                        {{ order.billing.name }} {{ order.billing.last_name }} 
-                                    </span>
-                                    <span class="text-sm text-disabled">{{ order.billing.email }}</span>
-                                    <span class="text-sm text-secondary">Cliente no registrado</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td> 
-                            <li
-                                :class="`text-${resolveStatusShipping(order.shipping.id)?.color}`"
-                                class="font-weight-medium"
-                            >
-                                {{ order.shipping.name }}
-                            </li>
-                        </td>
-                        <td> 
-                            <VChip label color="info">{{ order.payment.name }}</VChip>
-                        </td>
-                        <td>${{ formatNumber(order.sub_total) }}</td>
-                        <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
-                            <VBtn
-                                v-if="$can('ver', 'envíos')"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="seeOrder(order)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Ver
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="tabler-eye" />
-                            </VBtn>
-                            <VBtn
-                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="showSendDialog(order, 2)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    No enviar
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-truck-remove-outline" />
-                            </VBtn>
-                            <VBtn
-                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="showSendDialog(order, 4)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Enviar
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-truck-fast-outline" />
-                            </VBtn>
-                            <VBtn
-                                v-if="$can('editar', 'envíos') && order.shipping_state_id === 4"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="showSendDialog(order, 3)">
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent">
-                                    Entregar
-                                </VTooltip>      
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-truck-check-outline" />
-                            </VBtn>
-                        </td>
-                    </tr>
+                                    {{ order.shipping.name }}
+                                </li>
+                            </td>
+                            <td> 
+                                <VChip label color="info">{{ order.payment.name }}</VChip>
+                            </td>
+                            <td>${{ formatNumber(order.sub_total) }}</td>
+                            <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'envíos') || $can('editar', 'envíos')">
+                                <VBtn
+                                    v-if="$can('ver', 'envíos')"
+                                    icon
+                                    size="x-small"
+                                    color="default"
+                                    variant="text"
+                                    @click="seeOrder(order)">
+                                    <VTooltip
+                                        open-on-focus
+                                        location="top"
+                                        activator="parent">
+                                        Ver
+                                    </VTooltip>      
+                                    <VIcon
+                                        size="22"
+                                        icon="tabler-eye" />
+                                </VBtn>
+                                <VBtn
+                                    v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
+                                    icon
+                                    size="x-small"
+                                    color="default"
+                                    variant="text"
+                                    @click="showSendDialog(order, 2)">
+                                    <VTooltip
+                                        open-on-focus
+                                        location="top"
+                                        activator="parent">
+                                        No enviar
+                                    </VTooltip>      
+                                    <VIcon
+                                        size="22"
+                                        icon="mdi-truck-remove-outline" />
+                                </VBtn>
+                                <VBtn
+                                    v-if="$can('editar', 'envíos') && order.shipping_state_id === 1"
+                                    icon
+                                    size="x-small"
+                                    color="default"
+                                    variant="text"
+                                    @click="showSendDialog(order, 4)">
+                                    <VTooltip
+                                        open-on-focus
+                                        location="top"
+                                        activator="parent">
+                                        Enviar
+                                    </VTooltip>      
+                                    <VIcon
+                                        size="22"
+                                        icon="mdi-truck-fast-outline" />
+                                </VBtn>
+                                <VBtn
+                                    v-if="$can('editar', 'envíos') && order.shipping_state_id === 4"
+                                    icon
+                                    size="x-small"
+                                    color="default"
+                                    variant="text"
+                                    @click="showSendDialog(order, 3)">
+                                    <VTooltip
+                                        open-on-focus
+                                        location="top"
+                                        activator="parent">
+                                        Entregar
+                                    </VTooltip>      
+                                    <VIcon
+                                        size="22"
+                                        icon="mdi-truck-check-outline" />
+                                </VBtn>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
                 <!-- 👉 table footer  -->
                 <tfoot v-show="!orders.length">
