@@ -175,40 +175,68 @@ class TestingController extends Controller
 
     public function productSale() {
 
-        $orderId = 15;
+        $orderId = 58;
 
         $order = 
             Order::with([
-                'details.product_color.product.user'
+                'details.product_color.product.user',
+                'details.service',
+                'details.cake_size',
+                'details.flavor',
+                'details.filling',
             ])->find($orderId); 
 
-        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
+        $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;      
         $products = [];
+        $services = [];
 
         foreach ($order->details as $detail) {
-            $email = $detail->product_color->product->user->email;
 
-            $productInfo = [
-                'email' => $email,
-                'product_id' => $detail->product_color->product->id,
-                'product_name' => $detail->product_color->product->name,
-                'product_image' => asset('storage/' . $detail->product_color->product->image),
-                'color' => $detail->product_color->color->name,
-                'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
-                'quantity' => $detail->quantity,
-                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
-            ];
-            
-            if (!isset($products[$email])) {
-                $products[$email] = [];
+            if($detail->product_color) {
+                $email = $detail->product_color->product->user->email;
+
+                $productInfo = [
+                    'email' => $email,
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => $detail->product_color->color->name,
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                if (!isset($products[$email])) {
+                    $products[$email] = [];
+                }
+
+                $products[$email][] = $productInfo;
+            } else {
+                $email = $detail->service->user->email;
+
+                $serviceInfo = [
+                    'email' => $email,
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => $detail->flavor->name,
+                    'filling' => $detail->filling->name,
+                    'cake_size' => $detail->cake_size->name,
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+
+                if (!isset($services[$email])) {
+                    $services[$email] = [];
+                }
+
+                $services[$email][] = $serviceInfo;
             }
-
-            $products[$email][] = $productInfo;
-        
         }
 
         ksort($products);
-       
+        ksort($services);
         // foreach($products as $key => $item) {
         //     dd($item);
         // }
@@ -216,7 +244,8 @@ class TestingController extends Controller
 
         $data = [
             'total' => $order->total,
-            'products' => $products[$email],
+            'products' => count($products) > 0 ? $products[$email] : [],
+            'services' => count($services) > 0 ? $services[$email] : [],
             'link_send' => $link_send,
             'showButton' => true
         ];

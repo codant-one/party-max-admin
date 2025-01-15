@@ -250,32 +250,61 @@ class Supplier extends Model
         $order = 
             Order::with([
                 'details.product_color.product.user', 
+                'details.service',
+                'details.cake_size',
+                'details.flavor',
+                'details.filling',
             ])->find($orderId); 
 
         $link_send = env('APP_DOMAIN_ADMIN').'/dashboard/admin/orders/'.$orderId;
         $products = [];
+        $services = [];
 
         foreach ($order->details as $detail) {
-            $email = $detail->product_color->product->user->email;
-            $productInfo = [
-                'product_id' => $detail->product_color->product->id,
-                'product_name' => $detail->product_color->product->name,
-                'product_image' => asset('storage/' . $detail->product_color->product->image),
-                'color' => $detail->product_color->color->name,
-                'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
-                'quantity' => $detail->quantity,
-                'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
-            ];
-            
-            if (!isset($products[$email])) {
-                $products[$email] = [];
-            }
+            if($detail->product_color) {
+                $email = $detail->product_color->product->user->email;
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => $detail->product_color->color->name,
+                    'slug' => env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                if (!isset($products[$email])) {
+                    $products[$email] = [];
+                }
 
-            $products[$email][] = $productInfo;
+                $products[$email][] = $productInfo;
+            } else {
+                $email = $detail->service->user->email;
+
+                $serviceInfo = [
+                    'email' => $email,
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => $detail->flavor->name,
+                    'filling' => $detail->filling->name,
+                    'cake_size' => $detail->cake_size->name,
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+
+                if (!isset($services[$email])) {
+                    $services[$email] = [];
+                }
+
+                $services[$email][] = $serviceInfo;
+            }
         
         }
 
         ksort($products);     
+        ksort($services);
 
         foreach($products as $key => $item) {
 
@@ -284,6 +313,33 @@ class Supplier extends Model
             $data = [
                 'total' => $order->total,
                 'products' => $item,
+                'link_send' => $link_send,
+                'showButton' => true
+            ];
+
+            try {
+                \Mail::send(
+                    'emails.payment.product_sale'
+                    , ['data' => $data]
+                    , function ($message) use ($email, $subject) {
+                        $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                        $message->to($email)->subject($subject);
+                });
+            } catch (\Exception $e){
+                $message = 'error';
+                $responseMail = $e->getMessage();
+
+                Log::info($message . ' ' . $responseMail);
+            } 
+        }
+
+        foreach($services as $key => $item) {
+
+            $email = $key;
+            $subject = 'Tienes un nuevo pedido.';
+            $data = [
+                'total' => $order->total,
+                'services' => $item,
                 'link_send' => $link_send,
                 'showButton' => true
             ];
