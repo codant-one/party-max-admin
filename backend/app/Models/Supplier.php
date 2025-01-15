@@ -313,6 +313,7 @@ class Supplier extends Model
             $data = [
                 'total' => $order->total,
                 'products' => $item,
+                'services' => [],
                 'link_send' => $link_send,
                 'showButton' => true
             ];
@@ -339,6 +340,7 @@ class Supplier extends Model
             $subject = 'Tienes un nuevo pedido.';
             $data = [
                 'total' => $order->total,
+                'products' => [],
                 'services' => $item,
                 'link_send' => $link_send,
                 'showButton' => true
