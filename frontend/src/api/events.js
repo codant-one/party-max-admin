@@ -34,8 +34,12 @@ class Events {
         return axios.post(`/events/delete/batch`, { params })
     }
 
-    getUsers(){
+    getUsers() {
         return axios.get('/events/users/all')
+    }
+
+    getPendings() {
+        return axios.get('/events/pendings/all')
     }
 }
 

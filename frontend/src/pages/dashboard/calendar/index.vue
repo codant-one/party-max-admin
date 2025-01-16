@@ -40,6 +40,7 @@ async function fetchData() {
 
     guestsOptions.value = []
 
+    await store.getPendings()
     await store.getUsers()
 
     store.getUsersArray.forEach(element => {

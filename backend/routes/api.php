@@ -240,6 +240,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('/status/all', [EventController::class, 'events']);
         Route::post('/delete/batch', [EventController::class, 'deleteBatch']);
         Route::get('/users/all', [EventController::class, 'getUsers']);
+        Route::get('/pendings/all', [EventController::class, 'getPendings']);
     });
 
     //Referrals

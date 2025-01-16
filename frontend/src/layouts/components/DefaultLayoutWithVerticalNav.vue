@@ -1,7 +1,9 @@
 <script setup>
+
 import Footer from '@/layouts/components/Footer.vue'
 import navItems from '@/navigation/vertical'
 import { useThemeConfig } from '@core/composable/useThemeConfig'
+import { useEventsStore } from '@/stores/useEvents'
 
 // Components
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
@@ -12,6 +14,23 @@ import { VerticalNavLayout } from '@layouts'
 
 const { appRouteTransition, isLessThanOverlayNavBreakpoint } = useThemeConfig()
 const { width: windowWidth } = useWindowSize()
+
+const isTooltipVisible = ref(false)
+const eventsStore = useEventsStore()
+const countServices = ref(0)
+
+watch(() => 
+  eventsStore.getCount, async (value) => {
+    countServices.value = value
+  }
+);
+
+watchEffect(fetchData)
+
+async function fetchData() {
+  countServices.value = await eventsStore.getPendings()
+}
+
 </script>
 
 <template>
@@ -39,6 +58,44 @@ const { width: windowWidth } = useWindowSize()
         <NavbarThemeSwitcher />
 
         <VSpacer />
+                  
+        <VTooltip
+          :model-value="isTooltipVisible"
+          location="top"
+          v-if="$can('ver', 'servicios')"
+        >
+          <template #activator="{ props }">
+            <VBadge
+              color="primary"
+              :content="countServices" 
+              class="me-2" 
+              v-if="countServices > 0">
+              <VBtn
+                v-bind="props"
+                variant="outlined"
+                color="success"
+                size="small"
+                icon="tabler-bell"
+                :to="{ name: 'dashboard-calendar' }"
+                >
+                <VIcon size="24" icon="tabler-bell" />
+              </VBtn>
+            </VBadge>
+            <VBtn
+              v-bind="props"
+              variant="outlined"
+              color="success"
+              size="small"
+              icon="tabler-bell"
+              class="me-2" 
+              :to="{ name: 'dashboard-calendar' }"
+              v-else
+              >
+              <VIcon size="24" icon="tabler-bell" />
+            </VBtn>
+          </template>
+          <span>Servicios</span>
+        </VTooltip>       
 
         <UserProfile />
       </div>

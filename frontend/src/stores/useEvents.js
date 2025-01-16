@@ -14,11 +14,15 @@ export const useEventsStore = defineStore('events', {
         selectedUsers: [],
         isAdmin: false,
         idAdmin: 0,
-        users: []
+        users: [],
+        count: 0
     }),
     getters:{
         getUsersArray(){
             return this.users
+        },
+        getCount() {
+            return this.count
         }
     },
     actions: {        
@@ -95,6 +99,7 @@ export const useEventsStore = defineStore('events', {
                 .then((response) => {
                     let pos = this.events.findIndex((item) => item.id === response.data.data.event.id)
                     this.events[pos] = response.data.data.event
+                    this.count = response.data.data.count
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -168,6 +173,19 @@ export const useEventsStore = defineStore('events', {
             return Events.getUsers()
               .then(response => {
                 this.users = response.data.users
+              })
+              .catch(error => console.log(error))
+              .finally(() => {
+                this.setLoading(false)
+              })
+        },
+        getPendings(){
+            this.setLoading(true)
+      
+            return Events.getPendings()
+              .then(response => {
+                this.count = response.data.count
+                return Promise.resolve(response.data.count)
               })
               .catch(error => console.log(error))
               .finally(() => {

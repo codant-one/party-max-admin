@@ -338,10 +338,27 @@ class EventController extends Controller
                 ]
             ];
 
+            $user = Auth()->user();
+            $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $isAdmin = in_array('administrador', $permissions);
+            $idAdmin = ($isAdmin) ? $user->id : 0;
+
+            if($isAdmin)
+                $count = Event::where('state_id', 4)->count();
+            else
+                $count = Event::where('state_id', 4)
+                    ->whereHas('order_detail', function ($q) {
+                        $q->whereHas('service', function ($q) {
+                            return $q->where('user_id', Auth()->user()->id)
+                                     ->orderBy('user_id');
+                        });
+                    })->count();
+
             return response()->json([
                 'success' => true,
                 'data' => [ 
-                    'event' => $eventArray
+                    'event' => $eventArray,
+                    'count' => $count
                 ]
             ], 200);
 
@@ -407,6 +424,30 @@ class EventController extends Controller
         return response()->json([
             'success' => true,
             'users' => $availableUsers
+        ]);
+    }
+
+    public function getPendings(): JsonResponse
+    {
+        $user = Auth()->user();
+        $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+        $isAdmin = in_array('administrador', $permissions);
+        $idAdmin = ($isAdmin) ? $user->id : 0;
+
+        if($isAdmin)
+            $count = Event::where('state_id', 4)->count();
+        else
+            $count = Event::where('state_id', 4)
+                ->whereHas('order_detail', function ($q) {
+                    $q->whereHas('service', function ($q) {
+                        return $q->where('user_id', Auth()->user()->id)
+                                 ->orderBy('user_id');
+                    });
+                })->count();
+
+        return response()->json([
+            'success' => true,
+            'count' => $count
         ]);
     }
 }
