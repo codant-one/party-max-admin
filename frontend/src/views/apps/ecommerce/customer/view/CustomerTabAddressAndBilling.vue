@@ -9,9 +9,11 @@ const refForm = ref()
 const isFormValid = ref(false)
 const cant_commission = ref(0)
 const who_commission = ref(0)
+const ser_commission = ref(0)
 const total_balance = ref(0)
 const settings = ref(0)
 const who_settings = ref(0)
+const ser_settings = ref(0)
 const route = useRoute()
 const suppliersStores = useSuppliersStores()
 
@@ -119,6 +121,7 @@ async function fetchData() {
 
       cant_commission.value = props.customerData.commission ?? 0
       who_commission.value = props.customerData.wholesale_commission ?? 0
+      ser_commission.value = props.customerData.service_commission ?? 0
       total_balance.value = props.customerData.account.balance
     }
   }
@@ -228,6 +231,41 @@ const addWhocommission = () => {
   who_settings.value = 0;
 }
 
+const addSercommission = () => {
+  refForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) {
+      let data = {
+        service_commission: ser_commission.value,
+        type_commission: 2
+      }
+
+      suppliersStores.updateCommission(route.params.id, data)
+        .then(async response => {
+          window.scrollTo(0, 0)
+          advisor.value.show = true
+          advisor.value.type = 'success'
+          advisor.value.message = 'Comisión actualizada!'
+                    
+          emit('alert', advisor)
+          emit('updateBalance')
+
+          setTimeout(() => {
+            advisor.value.show = false
+            advisor.value.type = ''
+            advisor.value.message = ''
+            emit('alert', advisor)
+          }, 5000)
+
+          let res = await suppliersStores.updateBalance(route.params.id, data)
+          total_balance.value = res.data.data.supplierAccount.balance
+      })
+    }
+  })
+
+  ser_settings.value = 0;
+}
+
+
 const changeSettings = () => {
   settings.value = settings.value === 1 ? 0 : 1;
 }
@@ -235,6 +273,11 @@ const changeSettings = () => {
 const changeWhosettings = () => {
   who_settings.value = who_settings.value === 1 ? 0 : 1;
 }
+
+const changeSersettings = () => {
+  ser_settings.value = ser_settings.value === 1 ? 0 : 1;
+}
+
 
 </script>
 
@@ -291,7 +334,7 @@ const changeWhosettings = () => {
             </div>
           </div>
 
-          <div class="ms-5 iconsAddress">
+          <div class="ms-5 iconsButton">
             <VBtn
               icon
               variant="text"
@@ -416,8 +459,8 @@ const changeWhosettings = () => {
                         </h6>
                       </VListItemTitle>
                       <VListItemTitle>
-                        <h6 class="text-base font-weight-semibold mt-10">
-                          Saldo:
+                        <h6 class="text-base font-weight-semibold mt-10 mb-3">
+                          Saldo a pagar:
                           <span class="text-body-2">
                             COP {{ formatNumber(total_balance) ?? '0.00' }}
                           </span>
@@ -440,6 +483,14 @@ const changeWhosettings = () => {
                         </h6>
                       </VListItemTitle>
                       <VListItemTitle>
+                        <h6 class="text-base font-weight-semibold">
+                          Por Servicios:
+                          <span class="text-body-2">
+                            COP {{ formatNumber(props.customerData.account?.service_sales_amount) ?? '0.00' }}
+                          </span>
+                        </h6>
+                      </VListItemTitle>
+                      <VListItemTitle>
                         <VForm
                           ref="refForm"
                           v-model="isFormValid"
@@ -447,7 +498,7 @@ const changeWhosettings = () => {
                         >
                           <VRow no-gutters>
                             <VCol cols="6" md="3">
-                              <div class="d-flex align-center">
+                              <div class="d-flex align-center iconsButton">
                                 <label class="text-primary font-weight-bold">Comisión Detal PartyMax: {{ formatNumber(cant_commission) }}%</label>
                                 <VBtn 
                                   icon="mdi-pencil"
@@ -484,7 +535,7 @@ const changeWhosettings = () => {
                         >
                           <VRow no-gutters>
                             <VCol cols="6" md="3">
-                              <div class="d-flex align-center">
+                              <div class="d-flex align-center iconsButton">
                                 <label class="text-primary font-weight-bold">Comisión Mayorista PartyMax: {{ formatNumber(who_commission) }}%</label>
                                 <VBtn 
                                   icon="mdi-pencil"
@@ -513,6 +564,43 @@ const changeWhosettings = () => {
                           </VRow>
                         </VForm>
                       </VListItemTitle>  
+                      <VListItemTitle>
+                        <VForm
+                          ref="refForm"
+                          v-model="isFormValid"
+                          @submit.prevent="addSercommission"
+                        >
+                          <VRow no-gutters>
+                            <VCol cols="6" md="3">
+                              <div class="d-flex align-center iconsButton">
+                                <label class="text-primary font-weight-bold">Comisión Servicios PartyMax: {{ formatNumber(ser_commission) }}%</label>
+                                <VBtn 
+                                  icon="mdi-pencil"
+                                  variant="text"
+                                  size="small"
+                                  @click="changeSersettings" 
+                                />
+                              </div>
+                              <div  v-if="ser_settings === 1">
+                                  <VTextField
+                                    v-model="ser_commission"
+                                    :rules="[requiredValidator]"
+                                    type="number"
+                                    min= 0
+                                    max= 100
+                                    label="Comisión Servicios"
+                                    style="margin-top: 10px"
+                                  />
+
+                                  <VBtn type="submit" style="margin-top:20px">
+                                    Actualizar       
+                                  </VBtn>
+                              </div>
+                              
+                            </VCol>
+                          </VRow>
+                        </VForm>
+                      </VListItemTitle> 
                     </VListItem>
                   </VList>
                 </VCol>
@@ -531,8 +619,8 @@ const changeWhosettings = () => {
 </template>
 
 <style>
-  .iconsAddress .v-btn--icon.v-btn--density-default {
+  .iconsButton .v-btn--icon.v-btn--density-default {
     width: calc(var(--v-btn-height) + 0px) !important;
-    height: calc(var(--v-btn-height) + 0px) !important;
+    height: 25px !important;
   }
 </style>

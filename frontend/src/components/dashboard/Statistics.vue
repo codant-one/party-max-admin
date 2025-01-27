@@ -25,6 +25,20 @@ const statistics = [
     color: 'success',
   },
   {
+    title: 'Ventas servicios',
+    comission: '(' + (props.data.supplier.service_commission ?? '0.00') + '%)',
+    stats: '$ ' + formatNumber(props.data.supplier.account.service_sales_amount) ?? '0.00',
+    icon: 'tabler-chart-bubble',
+    color: 'error',
+  },
+  {
+    title: 'Total',
+    comission: '(sin comisión)',
+    stats: '$ ' + formatNumber(Number(props.data.supplier.sales) + Number(props.data.supplier.services)) ?? '0.00',
+    icon: 'mdi-poll',
+    color: 'secondary',
+  },
+  {
     title: 'Productos',
     comission: '',
     stats: props.data.productsCount,
@@ -53,7 +67,7 @@ const statistics = [
           v-for="item in statistics"
           :key="item.title"
           cols="6"
-          md="3"
+          md="2"
           class="pr-0"
         >
           <div class="d-flex align-center gap-1">

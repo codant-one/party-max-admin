@@ -26,7 +26,8 @@ const isRequestOngoing = ref(true)
 const donutChartColors = {
   donut: {
     series1: '#FF0090',
-    series2: '#ffdbee',
+    series2: '#FF80C0',
+    series3: '#B20066',
   },
 }
 
@@ -56,8 +57,10 @@ async function fetchData() {
     const total = Number(data.value.supplier.account.balance ?? 0)
     const retail_sales_amount = '$' + formatNumber(data.value.supplier.account.retail_sales_amount) ?? '0.00'
     const wholesale_sales_amount = '$' + formatNumber(data.value.supplier.account.wholesale_sales_amount) ?? '0.00'
+    const service_sales_amount = '$' + formatNumber(data.value.supplier.account.service_sales_amount) ?? '0.00'
     const percentage_retail = total === 0 ? 0 : (Number(data.value.supplier.account.retail_sales_amount ?? 0) * 100)/total
     const percentage_wholesale = total === 0 ? 0 : (Number(data.value.supplier.account.wholesale_sales_amount ?? 0) * 100)/total
+    const percentage_service = total === 0 ? 0 : (Number(data.value.supplier.account.service_sales_amount ?? 0) * 100)/total
 
     timeSpendingChartConfig.value = {
       chart: {
@@ -66,10 +69,11 @@ async function fetchData() {
         parentHeightOffset: 0,
         type: 'donut',
       },
-      labels: [retail_sales_amount, wholesale_sales_amount],
+      labels: [retail_sales_amount, wholesale_sales_amount, service_sales_amount],
       colors: [
         donutChartColors.donut.series1,
-        donutChartColors.donut.series2
+        donutChartColors.donut.series2,
+        donutChartColors.donut.series3
       ],
       stroke: { width: 0 },
       dataLabels: {
@@ -119,20 +123,22 @@ async function fetchData() {
       }
     }
 
-    timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale]
+    timeSpendingChartSeries.value = [percentage_retail, percentage_wholesale, percentage_service]
 
     let retail_sales = parseFloat(data.value.supplier.retail_sales ?? 0)
     let wholesale_sales = parseFloat(data.value.supplier.wholesale_sales ?? 0)
-    let total_sales = retail_sales + wholesale_sales
+    let services_sales = parseFloat(data.value.supplier.services ?? 0)
+    let total_sales = retail_sales + wholesale_sales + services_sales
     let commission_retail = retail_sales * (parseFloat(data.value.supplier.commission ?? 0) / 100)
     let commission_wholesale = wholesale_sales * (parseFloat(data.value.supplier.wholesale_commission ?? 0) / 100) 
-        
-    let total_balance = total_sales - commission_retail - commission_wholesale
+    let commission_service = services_sales * (parseFloat(data.value.supplier.service_commission ?? 0) / 100) 
+    let total_balance = total_sales - commission_retail - commission_wholesale - commission_service
 
     let data_ = {
         balance: total_balance,
         retail_sales_amount: retail_sales - commission_retail,
         wholesale_sales_amount: wholesale_sales - commission_wholesale,
+        service_sales_amount: services_sales - commission_service,
         type_commission: 2
     }
 
@@ -199,7 +205,7 @@ async function fetchData() {
               v-for="{ title, value, icon, color } in [
                 { title: 'Comisión Detal', value: (data.supplier.commission ?? '0.00') + '%', icon: 'mdi-brightness-percent', color: 'primary' },
                 { title: 'Comisión Mayorista', value: (data.supplier.wholesale_commission ?? '0.00') + '%', icon: 'mdi-sack-percent', color: 'success' },
-                { title: 'Ventas Totales', value: 'COP ' + formatNumber(data.supplier.sales ?? '0.00') , icon: 'mdi-check-decagram-outline', color: 'error' },
+                { title: 'Comisión Servicios', value: (data.supplier.service_commission ?? '0.00') + '%', icon: 'mdi-ticket-percent', color: 'error' },
               ]"
               :key="title"
             >
@@ -236,9 +242,8 @@ async function fetchData() {
             <h5 class="text-h5 text-high-emphasis mb-2 text-no-wrap">
               Ventas por cobrar
             </h5>
-            <span class="mb-7">Crédito restante 
-              <span class="text-xs text-medium-emphasis">(Detal + Mayorista)</span>
-            </span>
+            <span>Crédito restante</span>
+            <span class="text-xs text-medium-emphasis mb-7">(Detal + Mayorista + Servicios)</span>
             <div class="text-h3 mb-2 text-primary">
               COP {{ formatNumber(data.supplier.account.balance.toString() ?? '0.00') }}
             </div>
@@ -288,18 +293,18 @@ async function fetchData() {
     <VRow class="px-md-0 px-2 match-height" v-if="rol === 'Proveedor' && data">
       <VCol
         cols="12"
-        md="8"
-        lg="8"
+        md="12"
+        lg="12"
       >
         <Statistics class="h-100" :data="data"/>
       </VCol>
-      <VCol
+      <!-- <VCol
         cols="12"
         md="4"
-        lg="84"
+        lg="8"
       >
         <Congratulations :data="data.deliveredShipping"/>
-      </VCol>
+      </VCol> -->
     </VRow>
 
     <VRow class="px-md-0 px-2" v-if="rol === 'Proveedor' && data">

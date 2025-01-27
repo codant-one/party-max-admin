@@ -55,16 +55,19 @@ async function fetchData() {
 
     let retail_sales = parseFloat(supplier.value.retail_sales ?? 0)
     let wholesale_sales = parseFloat(supplier.value.wholesale_sales ?? 0)
-    let total_sales = retail_sales + wholesale_sales
+    let services_sales = parseFloat(supplier.value.services ?? 0)
+    let total_sales = retail_sales + wholesale_sales + services_sales
     let commission_retail = retail_sales * (parseFloat(supplier.value.commission ?? 0) / 100)
     let commission_wholesale = wholesale_sales * (parseFloat(supplier.value.wholesale_commission ?? 0) / 100) 
-        
-    let total_balance = total_sales - commission_retail - commission_wholesale
+    let commission_service = services_sales * (parseFloat(supplier.value.service_commission ?? 0) / 100) 
+
+    let total_balance = total_sales - commission_retail - commission_wholesale - commission_service
 
     let data = {
         balance: total_balance,
         retail_sales_amount: retail_sales - commission_retail,
         wholesale_sales_amount: wholesale_sales - commission_wholesale,
+        service_sales_amount: services_sales - commission_service,
         type_commission: 2
     }
 

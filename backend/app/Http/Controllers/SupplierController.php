@@ -43,6 +43,7 @@ class SupplierController extends Controller
             $query = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])
                         ->productsCount()
                         ->sales()
+                        ->services()
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -159,6 +160,7 @@ class SupplierController extends Controller
                                 ])
                                 ->productsCount()
                                 ->sales()
+                                ->services()
                                 ->retailSales()
                                 ->wholesaleSales()
                                 ->find($id);

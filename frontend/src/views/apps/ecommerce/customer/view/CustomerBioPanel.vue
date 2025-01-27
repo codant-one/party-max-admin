@@ -25,6 +25,7 @@ const listCountries = ref([])
 const valueCount = ref(null)
 const valueText = ref(null)
 const icon = ref('tabler-shopping-cart')
+const sales = ref(null)
 
 watchEffect(fetchData)
 
@@ -39,6 +40,7 @@ async function fetchData() {
     valueCount.value = props.customerData.product_count ?? 0
     valueText.value = 'Publicados'
     icon.value = 'tabler-building-store'
+    sales.value = Number(props.customerData.sales) + Number(props.customerData.services)
   }
 
   loadCountries()
@@ -116,7 +118,7 @@ const getFlagCountry = country => {
                 <VIcon icon="tabler-currency-dollar" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(props.customerData.sales) ?? '0.00' }}</span>
+                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(sales) ?? '0.00' }}</span>
                 <span class="text-body-2">Ventas Totales</span>
               </div>
             </div>

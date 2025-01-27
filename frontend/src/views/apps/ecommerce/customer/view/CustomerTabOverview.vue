@@ -71,11 +71,11 @@ async function fetchData() {
             <VAvatar
               variant="tonal"
               color="success"
-              icon="tabler-gift-card"
+              icon="tabler-currency-dollar"
               rounded
             />
             <h4 class="text-h4">
-              Plan
+              Detalle de ventas
             </h4>
             <div>
               <VChip
@@ -83,10 +83,10 @@ async function fetchData() {
                 class="mb-2"
                 label
               >
-                Platinum Miembro
+                Productos + Servicios
               </VChip>
               <p class="mb-0 text-base text-disabled">
-                3000 puntos para el siguiente nivel
+                COP {{ formatNumber(props.customerData.sales) ?? '0.00' }} + COP {{ formatNumber(props.customerData.services) ?? '0.00' }}
               </p>
             </div>
           </VCardText>

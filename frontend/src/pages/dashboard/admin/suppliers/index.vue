@@ -133,7 +133,8 @@ const downloadCSV = async () => {
       DOCUMENTO: (element.document === null) ? '' : (element.document?.type.code + ': ' + element.document?.main_document),
       PAÍS:  element.user.user_detail.province.country.name,
       PRODUCTOS_PUBLICADOS:  element.product_count,
-      TOTAL_VENTAS:  formatNumber(element.sales) ?? '0.00'
+      TOTAL_VENTAS:  formatNumber(element.sales) ?? '0.00',
+      TOTAL_SERVICES:  formatNumber(element.services) ?? '0.00'
     }
 
     dataArray.push(data)
@@ -248,8 +249,9 @@ const getFlagCountry = country => {
                 <th scope="col"> EMPRESA </th>
                 <th scope="col"> CONTACTO </th>
                 <th scope="col"> PAÍS </th>
-                <th scope="col"> PRODUCTOS PUBLICADOS </th>
+                <th scope="col"> PROD. PUBLICADOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
+                <th scope="col"> TOTAL SERVICIOS </th>
                 <th scope="col" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">
                   ACCIONES
                 </th>
@@ -310,6 +312,11 @@ const getFlagCountry = country => {
                 <td>
                   <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
                     ${{ formatNumber(supplier.sales) ?? '0.00' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
+                    ${{ formatNumber(supplier.services) ?? '0.00' }}
                   </span>
                 </td>
                 <!-- 👉 Acciones -->

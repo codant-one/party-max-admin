@@ -55,6 +55,21 @@ class Supplier extends Model
                 }]);
     }
 
+    public function scopeServices($query)
+    {
+        return  $query->addSelect(['services' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('services as se', 'se.user_id', '=', 'u.id')
+                        ->leftJoin('order_details as od', 'od.service_id', '=', 'se.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('se.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
     public function scopeSales($query)
     {
         return  $query->addSelect(['sales' => function ($q){
@@ -219,6 +234,10 @@ class Supplier extends Model
         } elseif($request->type_commission == 1) {
             $supplier->update([
                 'wholesale_commission' => $request->wholesale_commission
+            ]);      
+        } elseif($request->type_commission == 2) {
+            $supplier->update([
+                'service_commission' => $request->service_commission
             ]);      
         }
 

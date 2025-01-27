@@ -105,6 +105,7 @@ class DashboardController extends Controller
             $supplier = 
                 Supplier::with(['account'])
                         ->sales()
+                        ->services()
                         ->retailSales()
                         ->wholesaleSales()
                         ->where('user_id', Auth::user()->id)

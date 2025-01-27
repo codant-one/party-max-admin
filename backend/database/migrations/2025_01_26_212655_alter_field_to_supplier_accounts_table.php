@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->decimal('commission', 4, 2)->nullable()->after('address'); 
+        Schema::table('supplier_accounts', function (Blueprint $table) {
+            $table->decimal('service_sales_amount', 10, 2)->nullable()->after('wholesale_sales_amount'); 
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->dropColumn('commission');
+        Schema::table('supplier_accounts', function (Blueprint $table) {
+            $table->dropColumn('service_sales_amount');
         });
     }
 };

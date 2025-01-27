@@ -23,7 +23,6 @@ return new class extends Migration
     {
         Schema::table('suppliers', function (Blueprint $table) {
             $table->dropColumn('wholesale_commission');
-
         });
     }
 };

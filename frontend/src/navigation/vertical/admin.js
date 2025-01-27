@@ -14,14 +14,14 @@ export default [
         title: 'Roles', 
         icon: { icon: 'mdi-account-lock-open' },
         to: 'dashboard-admin-roles', 
-        action: 'ver' , 
+        action: 'ver', 
         subject: 'roles', 
       },
       {
         title: 'Home',
         icon: { icon: 'mdi-application-cog-outline' },
         to: 'dashboard-admin-images-home', 
-        action: 'ver' , 
+        action: 'ver', 
         subject: 'home-imágenes', 
       },
       {
