@@ -186,10 +186,10 @@ async function fetchData() {
       price: element.price_for_sale,
       originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
       categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
-      rating: element.rating,//agregar mas adelante informacion
-      comments: 0,//agregar mas adelante informacion
-      sales: element.sales,//agregar mas adelante informacion
-      selling_price: 0,//agregar mas adelante informacion,
+      rating: element.rating,
+      comments: element.comments,
+      sales: element.sales_price,
+      selling_price: element.selling_price,
       likes: element.likes
     })
   );

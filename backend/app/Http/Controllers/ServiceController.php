@@ -44,6 +44,10 @@ class ServiceController extends Controller
                             'cupcakes.cake_size.cake_type'
                         ])
                         ->order($request->category_id)
+                        ->selling()
+                        ->salesPrice()
+                        ->favorites()
+                        // ->comments()
                         ->applyFilters(
                             $request->only([
                                 'search',

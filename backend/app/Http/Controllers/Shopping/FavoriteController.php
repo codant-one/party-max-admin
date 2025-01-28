@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Shopping;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+use Carbon\Carbon;
 
 use App\Models\User;
 use App\Models\Product;
 use App\Models\ProductLike;
+use App\Models\Service;
+use App\Models\ServiceLike;
 
 class FavoriteController extends Controller
 {
@@ -19,30 +24,48 @@ class FavoriteController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 5;
 
-            $favoritesQuery = ProductLike::with(['user', 'product'])
-                             ->where('user_id', $request->user_id)
-                             ->paginate($limit); 
+            $favoritesProduct = ProductLike::with(['user', 'product'])
+                ->where('user_id', $request->user_id)
+                ->get()
+                ->map(function ($item) {
+                    $product = $item->product;
+                    $product->is_product = 1;
+                    $product->created_at = Carbon::parse($item->created_at);
+                    return $product;
+                });
 
-            $favorites = $favoritesQuery->getCollection()
-                            ->groupBy('user_id')
-                            ->map(function ($group) {
-                                return $group->map(function ($item) {
-                                    $product = $item->product;
-                                    return $product;
-                                });
-                            })
-                            ->values()
-                            ->all();
+            $favoritesService = ServiceLike::with(['user', 'service.cupcakes'])
+                ->where('user_id', $request->user_id)
+                ->get()
+                ->map(function ($item) {
+                    $service = $item->service;
+                    $service->is_product = 0;
+                    $service->created_at = Carbon::parse($item->created_at);
+                    return $service;
+                });
 
-            $favoritesQuery->setCollection(collect($favorites));
+            $favorites = $favoritesProduct->merge($favoritesService)
+                ->sortByDesc(function ($item) {
+                    return $item->created_at->timestamp;
+                })
+                ->values();
 
-            $count = $favoritesQuery->count();
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $pagedFavorites = $favorites->slice(($currentPage - 1) * $limit, $limit)->values();
+
+            $favoritesPaginated = new LengthAwarePaginator(
+                $pagedFavorites,
+                $favorites->count(),
+                $limit,
+                $currentPage,
+                ['path' => LengthAwarePaginator::resolveCurrentPath()]
+            );
 
             return response()->json([
                 'success' => true,
-                'data' => [ 
-                    'favorites' => $favoritesQuery,
-                    'favoritesTotalCount' => $count
+                'data' => [
+                    'favorites' => $favoritesPaginated,
+                    'favoritesTotalCount' => $favorites->count()
                 ]
             ], 200);
 
@@ -60,7 +83,10 @@ class FavoriteController extends Controller
 
         try {
 
-            $favorite = ProductLike::addFavorite($request);
+            if($request->product_id)
+                $favorite = ProductLike::addFavorite($request);
+            else
+                $favorite = ServiceLike::addFavorite($request);
 
             return response()->json([
                 'success' => true,
@@ -83,7 +109,10 @@ class FavoriteController extends Controller
     {
         try {
 
-            $favorite = ProductLike::deleteFavorite($request);
+            if($request->product_id)
+                $favorite = ProductLike::deleteFavorite($request);
+            else
+                $favorite = ServiceLike::deleteFavorite($request);
 
             return response()->json([
                 'success' => true,
@@ -106,10 +135,16 @@ class FavoriteController extends Controller
 
         try {
 
-            $favorite = ProductLike::where([
-                ['user_id', $request->user_id],
-                ['product_id', $request->product_id]]
-            )->first();
+            if($request->product_id)
+                $favorite = ProductLike::where([
+                    ['user_id', $request->user_id],
+                    ['product_id', $request->product_id]]
+                )->first();
+            else
+                $favorite = ServiceLike::where([
+                    ['user_id', $request->user_id],
+                    ['service_id', $request->service_id]]
+                )->first();
 
             return response()->json([
                 'success' => true,

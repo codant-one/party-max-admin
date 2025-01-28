@@ -98,7 +98,6 @@ class MiscellaneousController extends Controller
                                 'order',
                                 'colors'
                             ])
-                            ->isFavorite()
                             ->where('state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -114,7 +113,8 @@ class MiscellaneousController extends Controller
                                     'sortBy',
                                     'rating'
                                 ])
-                            );
+                            )
+                            ->isFavorite();
 
             $count = $query->count();
                            
@@ -351,7 +351,8 @@ class MiscellaneousController extends Controller
                                     'sortBy',
                                     'rating'
                                 ])
-                            );
+                            )
+                            ->isFavorite();
 
             $count = $query->count();
                            

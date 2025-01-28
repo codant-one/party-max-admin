@@ -169,6 +169,45 @@ class Product extends Model
                 }]);
     }
 
+    public function scopeSelling($query)
+    {
+        return  $query->addSelect(['selling_price' => function ($q){
+                    $q->selectRaw('COUNT(p.id)')
+                        ->from('products as p')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where(function ($query) {
+                            $query->where('o.shipping_state_id', 3)
+                                  ->orWhere('o.shipping_state_id', 4);
+                        })
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+    public function scopeSalesPrice($query)
+    {
+        return  $query->addSelect(['sales_price' => function ($q){
+                $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('products as p')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+    public function scopeComments($query)
+    {
+        return  $query->addSelect(['comments' => function ($q){
+                    $q->selectRaw('COUNT(p.id)')
+                        ->from('products as p')
+                        ->join('reviews as r', 'r.product_id', '=', 'p.id')
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->where('name', 'LIKE', '%' . $search . '%')
               ->orWhereHas('colors', function ($q) use ($search) {

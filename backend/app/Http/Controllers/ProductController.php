@@ -51,6 +51,9 @@ class ProductController extends Controller
                         ])
                         ->sales($request->date)
                         ->favorites()
+                        ->selling()
+                        ->salesPrice()
+                        ->comments()
                         ->order($request->category_id)
                         ->applyFilters(
                             $request->only([

@@ -84,6 +84,68 @@ class Service extends Model
    
     }
 
+    public function scopeSelling($query)
+    {
+        return  $query->addSelect(['selling_price' => function ($q){
+                    $q->selectRaw('COUNT(s.id)')
+                        ->from('services as s')
+                        ->leftJoin('order_details as od', 'od.service_id', '=', 's.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where(function ($query) {
+                            $query->where('o.shipping_state_id', 3)
+                                  ->orWhere('o.shipping_state_id', 4);
+                        })
+                        ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeSalesPrice($query)
+    {
+        return  $query->addSelect(['sales_price' => function ($q){
+                $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('services as s')
+                        ->leftJoin('order_details as od', 'od.service_id', '=', 's.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeComments($query)
+    {
+        return  $query->addSelect(['comments' => function ($q){
+                    $q->selectRaw('COUNT(s.id)')
+                        ->from('services as s')
+                        ->join('reviews as r', 'r.service_id', '=', 's.id')
+                        ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeFavorites($query)
+    {
+        return  $query->addSelect(['likes' => function ($q){
+                    $q->selectRaw('COUNT(s.id)')
+                      ->from('services as s')
+                      ->join('service_likes as s_l', 's.id', '=', 's_l.service_id')
+                      ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeIsFavorite($query)
+    {
+        return $query->addSelect(['is_favorite' => function($q) {
+            if (Auth::check()) {
+                $q->selectRaw('count(*)')
+                    ->from('service_likes')
+                    ->whereColumn('service_id', 'services.id')
+                    ->where('user_id', Auth::id());
+            } else {
+                $q->selectRaw('0');
+            }
+        }]);
+   
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->where('name', 'LIKE', '%' . $search . '%')
               ->orWhere('sku', 'LIKE', '%' . $search . '%');

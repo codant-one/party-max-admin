@@ -1,6 +1,7 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
+import { formatNumber } from '@/@core/utils/formatters'
 
 const props = defineProps({
     product: {
@@ -363,7 +364,7 @@ const colors = (id) => {
                             </span>
                         </div>
                         <div>Ventas:
-                            <span v-if="sales >= 0">{{ sales }}</span>
+                            <span v-if="sales >= 0">COP {{ formatNumber(sales) ?? '0.00' }}</span>
                             <span v-else>
                                 <VIcon
                                     size="20"
