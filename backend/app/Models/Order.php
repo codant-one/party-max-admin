@@ -135,7 +135,8 @@ class Order extends Model
             'tax' => $request->tax,
             'total' => $request->total,
             'wholesale' => $request->wholesale,
-            'type' => $request->type
+            'type' => $request->type,
+            'ip' => $request->ip === null ? null : $request->ip
         ]);
 
         $addressFind = collect($request->addresses)->firstWhere('id', $request->address_id);

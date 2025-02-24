@@ -170,6 +170,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         shweshi\OpenGraph\Providers\OpenGraphProvider::class,
 
+        Jenssegers\Agent\AgentServiceProvider::class,
+
     ])->toArray(),
 
     /*
@@ -186,6 +188,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'OpenGraph' => shweshi\OpenGraph\Facades\OpenGraphFacade::class,
+        'Agent' => Jenssegers\Agent\AgentServiceProvider::class,
     ])->toArray(),
 
 ];

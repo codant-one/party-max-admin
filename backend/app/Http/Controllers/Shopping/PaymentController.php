@@ -9,12 +9,15 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Jenssegers\Agent\Agent;
 
 use App\Models\Order;
 use App\Models\Billing;
 use App\Models\Client;
 use App\Models\Supplier;
 use App\Models\Event;
+use App\Models\ClientIp;
+use App\Models\ClientRegistration;
 
 class PaymentController extends Controller
 {
@@ -260,7 +263,8 @@ class PaymentController extends Controller
         }
 
         $order->update([
-            'payment_state_id' => $payment_state_id
+            'payment_state_id' => $payment_state_id,
+            'response_code_pol' => $request->response_code_pol
         ]);
         
         $nequi = $request->payment_method_name === 'NEQUI' ? 1 : 0;
@@ -280,12 +284,16 @@ class PaymentController extends Controller
 
         switch ($payment_state_id) { //4: pagado, 3: fallido, 2: cancelado , 1: pendiente
             case 2: 
-                Client::sendMailError($order->id, 2, $message);  
                 Event::updateState(6,$order->id);
+
+                if($request->response_code_pol !== '23')
+                    Client::sendMailError($order->id, 2, $message);
                 break;
             case 3:
-                Client::sendMailError($order->id, 3, $message);
-                Event::updateState(6,$order->id);  
+                Event::updateState(6,$order->id);
+
+                if($request->response_code_pol !== '23')
+                    Client::sendMailError($order->id, 3, $message);
                 break;
             case 4: 
                 Client::sendMail($order->id);
@@ -298,6 +306,7 @@ class PaymentController extends Controller
         parse_str($responseContent, $responseArray);
 
         $this->generateLog($order, $responseArray);
+        $this->generateIpInfo($order, $request, $message);
 
         return response()->json([
             'success' => true
@@ -320,5 +329,72 @@ class PaymentController extends Controller
 
         $log->info('Date:'. now());
         $log->info('PayU response: ' . json_encode($response, JSON_PRETTY_PRINT));
+    }
+
+    private function generateIpInfo($order, $request, $message){
+        
+        $agent = new Agent();
+
+        $deviceType = "";
+
+        if($agent->isMovile())
+            $deviceType = "Movile";
+        elseif($agent->isPhone())
+            $deviceType = "Phone";
+        elseif($agent->isTable())
+            $deviceType = "Table";
+        elseif($agent->isDesktop())
+            $deviceType = "Desktop";
+
+        $device = $deviceType . $agent->device() ? ': '. $agent->device() : '';
+        $plataform = $agent->platform();
+        $plataform.= ' ' . $agent->version($plataform);
+        $browser = $agent->browser();
+        $browser.= ' ' . $agent->version($browser);
+        $is_bot = $agent->isRobot();
+        $ip = ($request->has("ip") && !empty($request->ip)) ? $request->ip : $request->ip();
+        $location = file_get_contents('http://ipinfo.io/'.$ip.'/geo');
+
+        if (!empty($location)){
+            $json = json_decode($location, true);
+            $location = isset($json['country']) ? $json['country'].' - '.$json['region'].' - '.$json['city'] : 'Local';
+            $postal_code = $json['postal'] ?? '';
+            $coordinates = $json['loc'] ?? '';
+            $timezone = $json['timezone'] ?? '';
+        }
+
+        $registration_number = ClientIp::where('ip', $ip)->first()->registration_number ?? 0;
+
+        ClientIp::updateOrCreate(
+            [  'ip' => $ip ],
+            [ 
+                'client_id' => $order->client_id, 
+                'device' => $device, 
+                'plataform' => $plataform, 
+                'browser' => $browser, 
+                'is_bot' => $is_bot, 
+                'location' => $location, 
+                'postal_code' => $postal_code, 
+                'coordinates' => $coordinates, 
+                'timezone' => $timezone,
+                'registration_number' => $registration_number + 1
+            ]
+        );
+
+        ClientRegistration::create([
+            'ip_id' =>  ClientIp::where('ip', $ip)->first()->id,
+            'response_code_pol' => $request->response_code_pol,
+            'message' => $message,
+            'date' => now(),
+        ]);
+
+        $count = ClientRegistration::where('ip_id', ClientIp::where('ip', $ip)->first()->id)->count();
+
+        if($count >= 3 && $request->response_code_pol === '23') {// block ip automatically
+            $client_ip = ClientIp::where('ip', $ip)->first();
+            $client_ip->is_blocked = 1;
+            $client_ip->save();
+        }
+
     }
 }

@@ -39,6 +39,10 @@ class Client extends Model
         return $this->hasMany(Order::class, 'client_id');
     }
 
+    public function registrations(){
+        return $this->hasMany(ClientRegistration::class, 'client_id', 'id');
+    }
+
     /**** Scopes ****/
     public function scopeSales($query)
     {
