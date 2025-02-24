@@ -115,8 +115,8 @@ async function fetchData() {
     address.value = userData.value.user_details?.address
     document.value = userData.value.user_details?.document
     document_type_id.value = userData.value.user_details?.document_type_id
-    document_typeOld_id.value = userData.value.user_details?.document.name
-    type_document.value = userData.value.user_details?.document_type.name
+    document_typeOld_id.value = userData.value.user_details?.document?.name
+    type_document.value = userData.value.user_details?.document_type?.name
     countryOld_id.value = userData.value.user_details?.province.country.name
     country_id.value = userData.value.user_details?.province.country.name
     province.value = userData.value.user_details?.province.name
@@ -461,7 +461,6 @@ const getFlagCountry = country => {
                     v-model="name"
                     label="Nombres"
                     :rules="[requiredValidator]"
-                    readonly
                   />
                 </VCol>
                 <VCol

@@ -18,7 +18,7 @@ const closeTreeDialog  = function(){
         <!-- Dialog Activator -->
         <template #activator="{ props }">
             <VBtn
-                v-if="$can('crear','roles')"
+                v-if="$can('ver','roles')"
                 v-bind="props"
                 prepend-icon="tabler-sitemap"
                 >

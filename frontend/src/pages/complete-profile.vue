@@ -80,7 +80,7 @@ async function fetchData() {
     phone.value = data.user_details?.phone
     document.value = data.user_details?.document
     document_type_id.value = data.user_details?.document_type_id
-    document_typeOld_id.value = data.user_details?.document_type.name
+    document_typeOld_id.value = data.user_details?.document_type?.name
     address.value = data.user_details?.address
     province_id.value = data.user_details?.province.name
     provinceOld_id.value = data.user_details?.province_id

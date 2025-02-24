@@ -54,6 +54,7 @@ trait UserHelper
 
     public static function updateProfile($request, $user) {
         $user->update([
+            'name' => $request->name,
             'last_name' => $request->last_name,
             'username' => $request->username,
             'full_profile' => true
@@ -91,7 +92,7 @@ trait UserHelper
         ]);
 
         //Si NO es cliente se evalua la existencia del Rol.
-        if (!request('is_client')){
+        if (!request('is_client') && isset($request->roles)){
             $user->roles()->detach();  
             $user->syncRoles($request->roles);
         }

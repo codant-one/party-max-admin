@@ -229,10 +229,6 @@ const downloadCSV = async () => {
             <thead class="text-uppercase">
               <tr>
                 <th scope="col">
-                  #ID
-                </th>
-
-                <th scope="col">
                   ROL
                 </th>
 
@@ -249,11 +245,6 @@ const downloadCSV = async () => {
                 :key="rol.id"
                 style="height: 3.75rem;"
               >
-                <!-- 👉 Id -->
-                <td>
-                  #{{ rol.id }}
-                </td>
-
                 <!-- 👉 nombre -->
                 <td>
                   {{ rol.name }}

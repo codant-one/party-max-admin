@@ -12,8 +12,8 @@ class State extends Model
 
     protected $guarded = [];
 
-     /**** Relationship ****/
-    public function clients(){
+    /**** Relationship ****/
+    public function clients() {
         return $this->hasMany(Client::class, 'state_id', 'id');
     }
 

@@ -20,8 +20,7 @@ class Tag extends Model
         return $this->belongsTo(TagType::class, 'tag_type_id', 'id');
     }
 
-    public function blogTags()
-    {
+    public function blogTags() {
         return $this->hasMany(BlogTag::class, 'tag_id', 'id');
     }
 

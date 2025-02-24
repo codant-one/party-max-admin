@@ -2,8 +2,8 @@
 
 import { useReferralsStores } from '@/stores/useReferrals'
 import { themeConfig } from '@themeConfig'
+import { excelParser } from '@/plugins/csv/excelParser'
 import router from '@/router'
-import { readonly } from 'vue';
 
 const route = useRoute()
 const referralsStores = useReferralsStores()
@@ -44,7 +44,6 @@ const showDialog = referralData => {
 }
 
 const submit = () => {
-  console.log('products', products.value.details)
 
     let data = {
         id: Number(route.params.id),
@@ -74,6 +73,30 @@ const submit = () => {
             router.push({ name : 'dashboard-referrals'})
             emitter.emit('toast', data)
         })
+}
+
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+      
+  let dataArray = [];
+
+  products.value.details.forEach(element => {
+
+    let data = {
+        PRODUCTO: element.color.product.name,
+        SKU: element.color.sku,
+        CANTIDAD_RECIBIDA: element.delivered
+    }
+            
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "remision-" + products.value.date, "csv");
+
+  isRequestOngoing.value = false
+
 }
 
 </script>
@@ -127,6 +150,15 @@ const submit = () => {
           @click="showDialog"
         >
           RECIBIR
+        </VBtn>
+        <VBtn
+          v-if="$can('editar', 'remisiones') && products.delivered"
+          variant="tonal"
+          color="primary"
+          prepend-icon="tabler-file-export"
+          @click="downloadCSV"
+        >
+          EXPORTAR
         </VBtn>
       </div>
     </div>
@@ -202,7 +234,7 @@ const submit = () => {
                                     v-model="item.quantity"
                                     type="number"
                                     label="Stock"
-                                    :readonly="products.delivered"
+                                    :readonly="products.delivered === 0 ? false : true"
                                 />
                                 <span v-else> {{ item.quantity }}</span>
                             </span>

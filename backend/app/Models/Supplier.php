@@ -20,6 +20,7 @@ class Supplier extends Model
 
     protected $guarded = [];
 
+    /**** Relationship ****/
     public function state() {
         return $this->belongsTo(State::class, 'state_id', 'id');
     }

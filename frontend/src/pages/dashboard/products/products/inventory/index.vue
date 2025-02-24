@@ -1,16 +1,15 @@
 <script setup>
 
 import { themeConfig } from '@themeConfig'
-import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
+import { excelParser } from '@/plugins/csv/excelParser'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import show from "@/components/products/show.vue";
 
 const productsStores = useProductsStores()
 const categoriesStores = useCategoriesStores()
-const cp = useClipboard()
 
 const myProductsList = ref([])
 const products = ref([])
@@ -81,7 +80,6 @@ const status = ref([
     value: 6
   },
 ])
-
 
 const typesales = ref([
   {
@@ -175,24 +173,24 @@ async function fetchData() {
 
     myProductsList.value.forEach(element =>
         products.value.push({
-        id: element.id,
-        favourite: element.favourite,
-        discarded: element.discarded,
-        user: element.user,
-        state: element.state,
-        in_stock: element.in_stock,
-        stock: element.stock,
-        archived: element.archived,            
-        title: element.name,
-        image: element.image,
-        price: element.price_for_sale,
-        originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
-        categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
-        rating: element.rating,//agregar mas adelante informacion
-        comments: 0,//agregar mas adelante informacion
-        sales: element.sales,//agregar mas adelante informacion
-        selling_price: 0,//agregar mas adelante informacion,
-        likes: element.likes
+          id: element.id,
+          favourite: element.favourite,
+          discarded: element.discarded,
+          user: element.user,
+          state: element.state,
+          in_stock: element.in_stock,
+          stock: element.stock,
+          archived: element.archived,            
+          title: element.name,
+          image: element.image,
+          price: element.price_for_sale,
+          originalLink: themeConfig.settings.urlDomain + 'products/' + element.slug,
+          categories: element.colors[0]?.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
+          rating: element.rating,//agregar mas adelante informacion
+          comments: 0,//agregar mas adelante informacion
+          sales: element.sales,//agregar mas adelante informacion
+          selling_price: 0,//agregar mas adelante informacion,
+          likes: element.likes
         })
     );
 
@@ -247,50 +245,6 @@ const editProduct = id => {
     router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
 }
 
-const deleteProduct = id => {
-  isConfirmDeleteDialogVisible.value = true
-  selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
-}
-
-const updateLink = (data) => {
-
-  let request = {}
-
-  if(data.text === 'favourite')
-      request = { favourite: data.value }
-  else if(data.text === 'archived')
-      request = { archived: data.value }
-  else if(data.text === 'discarded')
-      request = { discarded: data.value }
-
-  productsStores.updateLink(request, data.id)
-      .then(response => {
-
-          window.scrollTo(0, 0)
-                  
-          advisor.value.show = true
-          advisor.value.type = 'success'
-          advisor.value.message = 'Producto actualizado!'
-
-          closeAdvisor()
-          fetchData()
-
-      }).catch(error => {
-          window.scrollTo(0, 0)
-                  
-          advisor.value.show = true
-          advisor.value.type = 'error'
-
-          if (error.feedback === 'params_validation_failed') {
-              advisor.value.message = error.message
-          } else {
-              advisor.value.message = 'Se ha producido un error...! (Server Error)'
-          }
-
-          closeAdvisor()  
-      })
-}
-
 const findArchived = () => {
   archived.value = (archived.value === 1) ? 0 : 1
   favourite.value = 0
@@ -309,73 +263,9 @@ const findDiscarded = () => {
     favourite.value = 0
 }
 
-const closeAdvisor = () => {
-    setTimeout(() => {
-    advisor.value = {
-      type: '',
-      message: '',
-      show: false
-    }
-  }, 3000)
-}
-
-const copy = (data) => {
-  cp.copy(data)
-  advisor.value.type = 'success'
-  advisor.value.show = true
-  advisor.value.message = 'Enlace copiado!'
-  closeAdvisor()
-}
-
-const open = (url) => {
-    window.open(url, '_blank', 'noreferrer');
-
-    advisor.value.type = 'success'
-    advisor.value.show = true
-    advisor.value.message = 'Enlace Abierto Exitosamente!'
-    closeAdvisor()
-}
-
-const download = async (img) => {
-
-    try {
-        const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + img);
-        const blob = await response.blob();
-
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-
-        link.setAttribute('download', 'image.jpg');
-
-        document.body.appendChild(link);
-        link.click();
-
-        window.URL.revokeObjectURL(url);
-
-        advisor.value.type = 'success'
-        advisor.value.show = true
-        advisor.value.message = 'Descarga Exitosa!'
-
-      } catch (error) {
-
-        advisor.value.type = 'error'
-        advisor.value.show = true
-        advisor.value.message = 'Error al descargar la imagen:' + error
-      }
-
-    closeAdvisor()
-}
-
 const showProduct = async (id) => {
   isProductDetailDialog.value = true
   selectedProduct.value = myProductsList.value.filter((element) => element.id === id )[0]
-}
-
-const showAlert = function(alert) {
-  advisor.value.show = alert.value.show
-  advisor.value.type = alert.value.type
-  advisor.value.message = alert.value.message
 }
 
 const closeDropdown = () => { 
@@ -406,6 +296,39 @@ const removeProduct = async () => {
   }, 3000)
 
   return true
+}
+
+const downloadCSV = async () => {
+  
+  isRequestOngoing.value = true
+
+  let data = { 
+    limit: -1,
+    state_id: 3,
+    supplierId: userData.value.id
+  }
+
+  await productsStores.fetchProducts(data)
+  
+  let skuArray = productsStores.getProducts.map(element => 
+    element.colors[0]?.sku
+  );
+  
+  const csvContent = skuArray.join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'sku-products.csv');
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  isRequestOngoing.value = false
 }
 </script>
 
@@ -621,6 +544,15 @@ const removeProduct = async () => {
         </div>
 
         <VSpacer />
+
+        <VBtn
+          variant="tonal"
+          color="secondary"
+          prepend-icon="tabler-file-export"
+          @click="downloadCSV"
+        >
+            Exportar SKU
+        </VBtn>
 
         <VBtn
           v-if="$can('crear','productos')"
