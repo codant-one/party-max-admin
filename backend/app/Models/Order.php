@@ -136,7 +136,8 @@ class Order extends Model
             'total' => $request->total,
             'wholesale' => $request->wholesale,
             'type' => $request->type,
-            'ip' => $request->ip === null ? null : $request->ip
+            'ip' => $request->ip === null ? null : $request->ip,
+            'user_agent' => $request->user_agent === null ? null : $request->user_agent
         ]);
 
         $addressFind = collect($request->addresses)->firstWhere('id', $request->address_id);

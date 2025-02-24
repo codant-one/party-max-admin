@@ -337,6 +337,10 @@ class PaymentController extends Controller
 
         $deviceType = "";
 
+        if (!is_null($order->user_agent)) {
+            $agent->setUserAgent($order->user_agent);
+        }
+
         if($agent->isMovile())
             $deviceType = "Movile";
         elseif($agent->isPhone())

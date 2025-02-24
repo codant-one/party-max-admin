@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->string('ip')->nullable()->after('type');
+            $table->string('user_agent')->nullable()->after('ip');
             $table->string('response_code_pol')->nullable()->after('reference_code'); 
         });
     }
@@ -24,6 +25,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->dropColumn('ip');
+            $table->dropColumn('user_agent');
             $table->dropColumn('response_code_pol');
         });
     }
