@@ -159,6 +159,17 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="tab n3">
+                            <strong>Ver Registros de Ips</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de registros de ips</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Bloquear Ips</strong>&emsp;/&emsp;<code>Permite el bloqueo de ips</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Ips</strong>&emsp;/&emsp;<code>Permite la eliminación de ips</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
                             <strong>FAQ's</strong>
                         </li>
                         <ul class="tab">

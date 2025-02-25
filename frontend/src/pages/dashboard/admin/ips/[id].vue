@@ -141,26 +141,27 @@ const downloadCSV = async () => {
       </div>
       <div class="d-flex gap-4">
         <VBtn
-          variant="tonal"
-          color="secondary"
-          @click="back"
-         >
+            variant="tonal"
+            color="secondary"
+            @click="back"
+        >
           REGRESAR
         </VBtn>
         <VBtn
-          variant="tonal"
-          color="error"
-          prepend-icon="tabler-file-export"
-          @click="downloadCSV"
+            variant="tonal"
+            color="error"
+            prepend-icon="tabler-file-export"
+            @click="downloadCSV"
         >
           EXPORTAR
         </VBtn>
 
         <VBtn
-          variant="tonal"
-          :color="ip.is_blocked === 0 ? 'warning' : 'success'"
-          :prepend-icon="ip.is_blocked === 0 ? 'tabler-device-imac-off': 'tabler-device-imac'"
-          @click="stateIp"
+            v-if="$can('bloquear','ips')"
+            variant="tonal"
+            :color="ip.is_blocked === 0 ? 'warning' : 'success'"
+            :prepend-icon="ip.is_blocked === 0 ? 'tabler-device-imac-off': 'tabler-device-imac'"
+            @click="stateIp"
         >
             {{ip.is_blocked === 0 ? 'BLOQUEAR' : 'HABILITAR' }}
         </VBtn>
