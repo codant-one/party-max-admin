@@ -23,6 +23,7 @@ use App\Models\Flavor;
 use App\Models\Filling;
 use App\Models\CakeType;
 use App\Models\CakeSize;
+use App\Models\ClientIp;
 
 class MiscellaneousController extends Controller
 {
@@ -444,6 +445,28 @@ class MiscellaneousController extends Controller
                     'fillings' => Filling::all(),
                     'cakeTypes' => CakeType::all(),
                     'cakeSizes' => CakeSize::all()                 
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function ips(Request $request): JsonResponse
+    {
+        try {
+
+            $ips = ClientIp::select(['ip'])->where('is_blocked', 1)->get()->pluck('ip');
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'ips' => $ips                  
                 ]
             ], 200);
 

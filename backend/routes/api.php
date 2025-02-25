@@ -289,6 +289,7 @@ Route::group([
     Route::get('services', [MiscellaneousController::class, 'services']);
     Route::get('services/{slug}', [MiscellaneousController::class, 'serviceDetail']);
     Route::get('cupcakes', [MiscellaneousController::class, 'cupcakes']);
+    Route::get('ips', [MiscellaneousController::class, 'ips']);
 });
 
 //Shopping-Cart

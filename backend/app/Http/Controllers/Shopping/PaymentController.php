@@ -399,9 +399,12 @@ class PaymentController extends Controller
             'date' => now(),
         ]);
 
-        $count = ClientRegistration::where('ip_id', ClientIp::where('ip', $ip)->first()->id)->count();
+        $count = ClientRegistration::where([
+            ['ip_id', ClientIp::where('ip', $ip)->first()->id],
+            ['response_code_pol', '23'] //fraude
+        ])->count();
 
-        if($count >= 3 && $request->response_code_pol === '23') {// block ip automatically
+        if($count >= 3) {// block ip automatically
             $client_ip = ClientIp::where('ip', $ip)->first();
             $client_ip->is_blocked = 1;
             $client_ip->save();
