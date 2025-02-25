@@ -73,7 +73,7 @@ class IpController extends Controller
     {
         try {
 
-            $ip = ClientIp::with(['registrations.order' => function($query) {
+            $ip = ClientIp::with(['registrations.order', 'registrations' => function($query) {
                 $query->orderBy('date', 'desc');
             }])->find($id);
 
