@@ -341,16 +341,19 @@ class PaymentController extends Controller
             $agent->setUserAgent($order->user_agent);
         }
 
-        if($agent->isMovile())
-            $deviceType = "Movile";
-        elseif($agent->isPhone())
+        if ($agent->isPhone()) {
             $deviceType = "Phone";
-        elseif($agent->isTable())
-            $deviceType = "Table";
-        elseif($agent->isDesktop())
+        } elseif ($agent->isTablet()) {
+            $deviceType = "Tablet";
+        } elseif ($agent->isMobile()) {
+            $deviceType = "Mobile";
+        } elseif ($agent->isDesktop()) {
             $deviceType = "Desktop";
+        } else {
+            $deviceType = "Unknown";
+        }
 
-        $device = $deviceType . $agent->device() ? ': '. $agent->device() : '';
+        $device = $deviceType . ($agent->device() ? ': '. $agent->device() : '');
         $plataform = $agent->platform();
         $plataform.= ' ' . $agent->version($plataform);
         $browser = $agent->browser();
