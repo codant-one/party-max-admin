@@ -395,6 +395,7 @@ class PaymentController extends Controller
         ClientRegistration::create([
             'ip_id' =>  ClientIp::where('ip', $ip)->first()->id,
             'response_code_pol' => $request->response_code_pol,
+            'reference_code' => $order->reference_code,
             'message' => $message,
             'date' => now(),
         ]);

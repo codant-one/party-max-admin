@@ -16,5 +16,9 @@ class ClientRegistration extends Model
     public function ip() {
         return $this->belongsTo(ClientIp::class, 'ip_id', 'id');
     }
+
+    public function order() {
+        return $this->belongsTo(Order::class, 'reference_code', 'reference_code');
+    }
     
 }

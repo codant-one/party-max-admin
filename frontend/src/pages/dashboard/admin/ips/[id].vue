@@ -39,6 +39,10 @@ const openLink = function (data) {
   window.open(`https://www.google.com/maps?q=${data.coordinates}`)
 }
 
+const seeOrder = orderData => {
+  router.push({ name : 'dashboard-admin-orders-id', params: { id: orderData.id } })
+}
+
 const stateIp = async () => {
     isRequestOngoing.value = true
 
@@ -192,6 +196,7 @@ const downloadCSV = async () => {
                 <thead>
                   <tr class="text-no-wrap">
                     <th class="font-weight-semibold"> FECHA </th>
+                    <th class="font-weight-semibold"> REFERENCIA </th>
                     <th class="font-weight-semibold"> CÓDIGO PAYU</th>
                     <th class="font-weight-semibold text-end"> MENSAJE</th>
                   </tr>
@@ -199,17 +204,22 @@ const downloadCSV = async () => {
                 <tbody>
                     <tr v-for="item in ip.registrations" style="height: 3.75rem;">
                         <td class="text-start justify-content-center">
-                            <span class="text-high-emphasis font-weight-medium">
+                            <span class="text-high-emphasis font-weight-medium" :class="item.response_code_pol === '23' ? 'text-warning' : ''">
                                 {{ item.date }}
                             </span>
                         </td>
                         <td class="text-start justify-content-center">
-                            <span class="text-high-emphasis font-weight-medium">
+                            <span class="text-high-emphasis font-weight-medium cursor-pointer" :class="item.response_code_pol === '23' ? 'text-warning' : ''"  @click="seeOrder(item.order)">
+                                {{ item.reference_code }}
+                            </span>
+                        </td>
+                        <td class="text-start justify-content-center">
+                            <span class="text-high-emphasis font-weight-medium" :class="item.response_code_pol === '23' ? 'text-warning' : ''">
                                 {{ item.response_code_pol }}
                             </span>
                         </td>
                         <td class="text-end justify-content-center">
-                            <span class="text-high-emphasis font-weight-medium">
+                            <span class="text-high-emphasis font-weight-medium" :class="item.response_code_pol === '23' ? 'text-warning' : ''">
                                 <span> {{ item.message }}</span>
                             </span>
                         </td>

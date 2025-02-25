@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('client_registrations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ip_id');
+            $table->string('reference_code');
             $table->string('response_code_pol');
             $table->string('message');
             $table->timestamp('date');
