@@ -15,7 +15,7 @@ class IpController extends Controller
     public function __construct()
     {
         $this->middleware(PermissionMiddleware::class . ':ver ips|administrador')->only(['index']);
-        $this->middleware(PermissionMiddleware::class . ':bloquear ips|administrador')->only(['updateState']);
+        $this->middleware(PermissionMiddleware::class . ':bloquear ips|administrador')->only(['updateStates']);
         $this->middleware(PermissionMiddleware::class . ':eliminar ips|administrador')->only(['destroy']);
     }
 
