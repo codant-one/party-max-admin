@@ -18,6 +18,7 @@ use App\Models\Supplier;
 use App\Models\Event;
 use App\Models\ClientIp;
 use App\Models\ClientRegistration;
+use App\Models\Country;
 
 class PaymentController extends Controller
 {
@@ -335,8 +336,6 @@ class PaymentController extends Controller
         
         $agent = new Agent();
 
-        $deviceType = "";
-
         if (!is_null($order->user_agent)) {
             $agent->setUserAgent($order->user_agent);
         }
@@ -364,7 +363,12 @@ class PaymentController extends Controller
 
         if (!empty($location)){
             $json = json_decode($location, true);
-            $location = isset($json['country']) ? $json['country'].' - '.$json['region'].' - '.$json['city'] : 'Local';
+
+            if(isset($json['country'])) {
+                $country = Country::where('iso', $json['country'])->first()->name;
+            }
+
+            $location = isset($json['country']) ? $country.' - '.$json['region'].' - '.$json['city'] : 'Local';
             $postal_code = $json['postal'] ?? '';
             $coordinates = $json['loc'] ?? '';
             $timezone = $json['timezone'] ?? '';
