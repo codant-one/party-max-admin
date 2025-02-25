@@ -57,7 +57,9 @@ class DatabaseSeeder extends Seeder
 
             InventaryPermissionSeeder::class,
             ReferralPermissionSeeder::class,
-            HomeImagePermissionsSeeder::class
+            HomeImagePermissionsSeeder::class,
+
+            IpPermissionSeeder::class
         ]);
 
     }

@@ -49,7 +49,8 @@ use App\Http\Controllers\{
     CakeSizeController,
     EventController,
     DashboardController,
-    ReferralController
+    ReferralController,
+    IpController
 };
 
 /*
@@ -113,6 +114,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('events', EventController::class);
     Route::apiResource('referrals', ReferralController::class);
     Route::apiResource('home-images', HomeController::class);
+    Route::apiResource('ips', IpController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -193,10 +195,16 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('blogs/all', [BlogCategoryController::class, 'all']);
     });
 
-    //Blog-categories
+    //Home-Images
     Route::group(['prefix' => 'home-images'], function () {
         Route::post('delete', [HomeController::class, 'delete']);
         Route::post('order_id', [HomeController::class, 'updateOrder']);
+    });
+
+    //Ips
+    Route::group(['prefix' => 'ips'], function () {
+        Route::post('delete', [IpController::class, 'delete']);
+        Route::put('updateStates/{id}', [IpController::class, 'updateStates']);
     });
 
     //Profile

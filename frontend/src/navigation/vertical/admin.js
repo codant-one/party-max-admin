@@ -25,6 +25,13 @@ export default [
         subject: 'home-imágenes', 
       },
       {
+        title: 'Registro de ips',
+        icon: { icon: 'tabler-device-imac-off' },
+        to: 'dashboard-admin-ips', 
+        action: 'ver', 
+        subject: 'ips', 
+      },
+      {
         title: "FAQ's",
         icon: { icon: 'tabler-help-hexagon' },
         action: 'ver',

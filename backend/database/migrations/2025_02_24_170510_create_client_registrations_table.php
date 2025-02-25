@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('ip_id');
             $table->string('response_code_pol');
             $table->string('message');
-            $table->date('date');
+            $table->timestamp('date');
             $table->timestamps();
 
             $table->foreign('ip_id')->references('id')->on('client_ips')->onDelete('cascade');
