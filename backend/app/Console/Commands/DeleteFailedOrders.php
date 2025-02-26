@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-use App\Models\Color;
+use App\Models\Order;
 
 class DeleteFailedOrders extends Command
 {
