@@ -19,6 +19,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('order-payment-state:update')
                  ->daily()
                  ->at('00:00');
+
+        $schedule->command('delete:failed-orders')
+                 ->daily()
+                 ->at('00:00');        
     }
 
     /**
