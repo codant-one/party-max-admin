@@ -169,12 +169,14 @@ class Order extends Model
         }
 
         if($request->type === 0 )
-            $reference_code = Order::where([['wholesale', $request->wholesale],['type', 0]])
+            $reference_code = Order::withTrashed()
+                           ->where([['wholesale', $request->wholesale],['type', 0]])
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.'0000000';
         else 
-            $reference_code = Order::where('type', $request->type)
+            $reference_code = Order::withTrashed()
+                           ->where('type', $request->type)
                            ->latest('reference_code')
                            ->first()
                            ->reference_code ?? $prefix.'0000000';
