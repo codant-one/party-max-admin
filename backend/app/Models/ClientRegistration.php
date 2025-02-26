@@ -18,7 +18,7 @@ class ClientRegistration extends Model
     }
 
     public function order() {
-        return $this->belongsTo(Order::class, 'reference_code', 'reference_code');
+        return $this->belongsTo(Order::class, 'reference_code', 'reference_code')->withTrashed();
     }
     
 }

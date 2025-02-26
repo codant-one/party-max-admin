@@ -117,7 +117,7 @@ class OrderController extends Controller
     {
         try {
 
-            $order = Order::with([
+            $order = Order::withTrashed()->with([
                 'details.product_color.product.user.userDetail', 
                 'details.product_color.product.user.supplier', 
                 'details.product_color.color',

@@ -14,6 +14,17 @@ const advisor = ref({
   show: false
 })
 
+const resolveStatusPayment = payment_state_id => {
+  if (payment_state_id === 1)
+    return { color: 'error' }
+  if (payment_state_id === 2)
+    return { color: 'default' }
+  if (payment_state_id === 3)
+    return { color: 'warning' }
+  if (payment_state_id === 4)
+    return { color: 'info' }
+}
+
 const isRequestOngoing = ref(true)
 
 watchEffect(fetchData)
@@ -22,7 +33,7 @@ async function fetchData() {
 
   isRequestOngoing.value = true
 
-  if(Number(route.params.id)) {
+  if(Number(route.params.id) && route.name === 'dashboard-admin-ips-id') {
     const response = await ipsStores.showIp(Number(route.params.id))
 
     ip.value = response
@@ -197,6 +208,7 @@ const downloadCSV = async () => {
                   <tr class="text-no-wrap">
                     <th class="font-weight-semibold"> FECHA </th>
                     <th class="font-weight-semibold"> REFERENCIA </th>
+                    <th class="font-weight-semibold"> ESTADO DEL PAGO </th>
                     <th class="font-weight-semibold"> CÓDIGO PAYU</th>
                     <th class="font-weight-semibold text-end"> MENSAJE</th>
                   </tr>
@@ -212,6 +224,14 @@ const downloadCSV = async () => {
                             <span class="text-high-emphasis font-weight-medium cursor-pointer" :class="item.response_code_pol === '23' ? 'text-warning' : ''"  @click="seeOrder(item.order)">
                                 {{ item.reference_code }}
                             </span>
+                        </td>
+                        <td class="text-start justify-content-center">
+                            <VChip
+                                label
+                                :color="resolveStatusPayment(item.order.payment.id)?.color"
+                            >
+                                {{ item.order.payment.name }}
+                            </VChip>
                         </td>
                         <td class="text-start justify-content-center">
                             <span class="text-high-emphasis font-weight-medium" :class="item.response_code_pol === '23' ? 'text-warning' : ''">
