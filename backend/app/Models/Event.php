@@ -126,4 +126,21 @@ class Event extends Model
 
         return $query->paginate($limit);
     }
+
+    public static function updateState($state_id, $order_id) {
+
+        $order = Order::with('details')->find($order_id);
+
+        if (!$order) {
+            return; // Salir si la orden no existe
+        }
+
+        // Obtener todos los eventos en una sola consulta
+        $eventIds = $order->details->pluck('id');
+        $events = self::whereIn('order_detail_id', $eventIds)->get();
+
+        foreach ($events as $event) {
+            $event->update(['state_id' => $state_id]);
+        }
+    }
 }
