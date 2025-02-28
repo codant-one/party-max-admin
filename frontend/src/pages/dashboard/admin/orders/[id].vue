@@ -225,7 +225,7 @@ const removeOrder = async () => {
                 <tbody>
                   <template v-for="item in order.details">
                     <template v-if="item.product_color_id !== null">
-                      <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
+                      <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || rol === 'Administrador'">
                         <td class="text-wrap">
                           <div class="d-flex gap-x-3 align-center my-1">
                             <VAvatar
