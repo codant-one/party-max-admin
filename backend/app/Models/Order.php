@@ -65,7 +65,8 @@ class Order extends Model
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
     $query->where('total', 'LIKE', '%' . $search . '%')
-          ->orWhere('reference_code', 'LIKE', '%' . $search . '%');
+          ->orWhere('reference_code', 'LIKE', '%' . $search . '%')
+          ->orWhere('ip', 'LIKE', '%' . $search . '%');
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {

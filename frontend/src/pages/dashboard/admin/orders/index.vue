@@ -447,6 +447,7 @@ const downloadCSV = async () => {
                 <thead>
                     <tr class="text-no-wrap">
                         <th> REFERENCIA </th>
+                        <th class="pe-4" v-if="rol === 'SuperAdmin'"> IP </th>
                         <th> FECHA </th>
                         <th> TIPO </th>
                         <th class="pe-4" v-if="rol !== 'Proveedor'"> CLIENTE </th>
@@ -471,6 +472,9 @@ const downloadCSV = async () => {
                                 @click="seeOrder(order)">
                                 {{ order.reference_code }} 
                             </span>
+                        </td>
+                        <td class="text-wrap" v-if="rol === 'SuperAdmin'">
+                            {{ order.ip }}
                         </td>
                         <td> {{ format(parseISO(order.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}</td>
                         <td>
