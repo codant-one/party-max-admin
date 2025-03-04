@@ -117,16 +117,7 @@ const closeDropdown = () => {
                     location="start"
                     class="calendar-add-event-drawer"
                     :temporary="$vuetify.display.mdAndDown">
-                    <!-- <div style="margin: 1.4rem;">
-                      <VBtn
-                        v-if="$can('crear','calendario')"
-                        block
-                        prepend-icon="tabler-plus"
-                        @click="isEventHandlerSidebarActive = true">
-                        Agregar Agenda
-                      </VBtn>
-                    </div>
-                    <VDivider v-if="$can('administrador')" /> -->
+
                     <div class="d-flex align-center justify-center pa-2 mb-3">
                       <AppDateTimePicker
                         :model-value="new Date().toJSON().slice(0, 10)"

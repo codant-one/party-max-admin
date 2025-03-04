@@ -179,6 +179,7 @@ const removeOrder = async () => {
           <span class="text-body-1" v-if="date">
             {{  format(parseISO(date), 'MMMM d, yyyy, H:mm', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()) }}
             <span class="text-xs"> (Fecha del pedido) </span>
+            <span class="text-xs ms-2" v-if="rol === 'SuperAdmin'"> {{order.ip}}</span>
           </span>
         </div>
       </div>
@@ -225,7 +226,7 @@ const removeOrder = async () => {
                 <tbody>
                   <template v-for="item in order.details">
                     <template v-if="item.product_color_id !== null">
-                      <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || rol === 'Administrador'">
+                      <tr style="height: 3.75rem;" v-if="(item.product_color.product.user.id === userData.id && rol === 'Proveedor') || rol === 'Administrador' || rol === 'SuperAdmin'">
                         <td class="text-wrap">
                           <div class="d-flex gap-x-3 align-center my-1">
                             <VAvatar
@@ -264,7 +265,7 @@ const removeOrder = async () => {
                       </tr>
                     </template>
                     <template v-else>
-                      <tr style="height: 3.75rem;" v-if="(item.service.user.id === userData.id && rol === 'Proveedor') || $can('administrador')">
+                      <tr style="height: 3.75rem;" v-if="(item.service.user.id === userData.id && rol === 'Proveedor') || rol === 'Administrador' || rol === 'SuperAdmin'">
                         <td class="text-wrap">
                           <div class="d-flex gap-x-3 align-center my-1">
                             <VAvatar

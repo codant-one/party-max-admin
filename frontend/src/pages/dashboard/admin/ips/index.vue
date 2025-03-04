@@ -42,8 +42,8 @@ async function fetchData() {
 
   let data = {
     search: searchQuery.value,
-    orderByField: 'id',
-    orderBy: 'asc',
+    orderByField: 'registration_number',
+    orderBy: 'desc',
     limit: rowPerPage.value,
     page: currentPage.value
   }
@@ -225,6 +225,7 @@ const downloadCSV = async () => {
               <tr>
                 <th scope="col"> #ID </th>
                 <th scope="col"> IP </th>
+                <th scope="col"> REGISTROS </th>
                 <th scope="col"> DISPOSITIVO </th>
                 <th scope="col"> PLATAFORMA </th>
                 <th scope="col"> NAVEGADOR </th>
@@ -244,6 +245,7 @@ const downloadCSV = async () => {
                     style="height: 3.75rem;">
                     <td> {{ ip.id }} </td>
                     <td class="text-wrap"> {{ ip.ip }} </td>
+                    <td class="text-wrap"> {{ ip.registration_number }} </td>
                     <td class="text-wrap"> {{ ip.device }} </td>
                     <td class="text-wrap"> {{ ip.plataform }} </td>
                     <td class="text-wrap"> {{ ip.browser }} </td>
