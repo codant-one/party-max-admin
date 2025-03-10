@@ -276,7 +276,7 @@ Route::group(['prefix' => 'colors'], function () {
 
 Route::group([
     'prefix' => 'miscellaneous',
-    'middleware' => 'throttle:10,1'
+    'middleware' => 'throttle:200,1'
 ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);

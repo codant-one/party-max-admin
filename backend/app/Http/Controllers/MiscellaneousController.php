@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -93,6 +94,7 @@ class MiscellaneousController extends Controller
             $limit = $request->has('limit') ? $request->limit : 12;
             $wholesale = 0;
 
+            /* ANTES
             $query = Product::with([
                                 'user.userDetail', 
                                 'user.supplier', 
@@ -120,13 +122,51 @@ class MiscellaneousController extends Controller
             $count = $query->count();
                            
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            */
+
+            $cacheKey = 'products_' . md5(serialize($request->all()));
+
+            $data = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $limit) {
+              
+                $query = Product::with([
+                                'user.userDetail', 
+                                'user.supplier', 
+                                'order',
+                                'colors'
+                            ])
+                            ->where('state_id', 3)
+                            ->applyFilters(
+                                $request->only([
+                                    'searchPublic',
+                                    'orderByField',
+                                    'orderBy',
+                                    'category',
+                                    'subcategory',
+                                    'colorId',
+                                    'min',
+                                    'max',
+                                    'wholesalers',
+                                    'sortBy',
+                                    'rating'
+                                ])
+                            )
+                            ->isFavorite();
+
+                $count = $query->count();
+                $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+                return [
+                    'count' => $count,
+                    'products' => $products
+                ];
+            });
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
-                    'products' => $products,
-                    'productsTotalCount' => $count                    
+                    'products' => $data['products'],
+                    'productsTotalCount' => $data['count']
                 ]
             ], 200);
 
@@ -333,6 +373,7 @@ class MiscellaneousController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 12;
 
+            /*ANTES
             $query = Service::with([
                                 'user.userDetail', 
                                 'user.supplier',
@@ -358,12 +399,48 @@ class MiscellaneousController extends Controller
             $count = $query->count();
                            
             $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            */
+
+            $cacheKey = 'products_' . md5(serialize($request->all()));
+
+            $data = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $limit) {
+
+                $query = Service::with([
+                    'user.userDetail', 
+                    'user.supplier',
+                    'order',
+                    'cupcakes.cake_size.cake_type'
+                ])
+                ->where('state_id', 3)
+                ->applyFilters(
+                    $request->only([
+                        'searchPublic',
+                        'orderByField',
+                        'orderBy',
+                        'category',
+                        'subcategory',
+                        'min',
+                        'max',
+                        'sortBy',
+                        'rating'
+                    ])
+                )
+                ->isFavorite();
+
+                $count = $query->count();
+                $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+                return [
+                    'count' => $count,
+                    'services' => $services
+                ];
+            });
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'services' => $services,
-                    'servicesTotalCount' => $count                    
+                    'services' => $data['services'],
+                    'servicesTotalCount' => $data['count']              
                 ]
             ], 200);
 

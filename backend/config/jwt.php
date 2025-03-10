@@ -101,7 +101,7 @@ return [
     |
     */
 
-    'ttl' => env('JWT_TTL', null),
+    'ttl' => env('JWT_TTL', 1440), // 1440 minutos = 24 horas
 
     /*
     |--------------------------------------------------------------------------
@@ -147,7 +147,7 @@ return [
     'required_claims' => [
         'iss',
         'iat',
-        // 'exp',
+        'exp',
         'nbf',
         'sub',
         'jti',
