@@ -245,7 +245,7 @@ const downloadCSV = async () => {
       REFERENCIA: element.reference_code ?? '',
       FECHA: format(parseISO(element.date), 'MMMM d, yyyy', { locale: es }).replace(/(^|\s)\S/g, (char) => char.toUpperCase()),
       TIPO: resolveType(element).text,
-      CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing.name + ' ' + (element.billing.last_name ?? '') + ' (no registrado)',
+      CLIENTE: element.client ? element.client.user.name + ' ' + (element.client.user.last_name ?? '') : element.billing?.name + ' ' + (element.billing?.last_name ?? '') + ' (no registrado)',
       CORREO: element.client ? element.client.user.email : element.billing.email,
       ESTADO_ENVIO: element.shipping.name,
       ESTADO_PAGO: element.payment.name,
@@ -511,11 +511,11 @@ const downloadCSV = async () => {
                                     variant="tonal"
                                     size="38"
                                 >
-                                    <span>{{ avatarText(order.billing.name) }}</span>
+                                    <span>{{ avatarText(order.billing?.name) }}</span>
                                 </VAvatar>
                                 <div class="d-flex flex-column">
                                     <span class="font-weight-medium text-success">
-                                        {{ order.billing.name }} {{ order.billing.last_name }} 
+                                        {{ order.billing?.name }} {{ order.billing?.last_name }} 
                                     </span>
                                     <span class="text-sm text-disabled">{{ order.billing.email }}</span>
                                     <span class="text-sm text-secondary">Cliente no registrado</span>

@@ -584,11 +584,11 @@ const removeOrder = async () => {
                     variant="tonal"
                     size="38"
                     >
-                    <span>{{ avatarText(order.billing.name) }}</span>
+                    <span>{{ avatarText(order.billing?.name) }}</span>
                   </VAvatar>
                   <div>
                     <div class="text-body-1 font-weight-medium">
-                      {{ order.billing.name }} {{ order.billing.last_name }}
+                      {{ order.billing?.name }} {{ order.billing?.last_name }}
                     </div>
                     <span class="text-sm text-disabled d-print-none">Cliente no registrado</span>
                   </div>
