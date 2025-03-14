@@ -610,10 +610,10 @@ const removeOrder = async () => {
                   <div class="d-flex justify-space-between align-center text-body-2 d-print-none">
                     <span class="text-body-1 text-high-emphasis font-weight-medium">Datos de contacto</span>
                   </div>
-                  <span>Tipo de documento: {{ order.billing.document_type?.name }} </span>
-                  <span>Documento: {{ order.billing.document }} </span>
-                  <span>Email: {{ order.client ? order.client.user.email : order.billing.email }} </span>
-                  <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing.phone}}</span>
+                  <span>Tipo de documento: {{ order.billing?.document_type?.name }} </span>
+                  <span>Documento: {{ order.billing?.document }} </span>
+                  <span>Email: {{ order.client ? order.client.user.email : order.billing?.email }} </span>
+                  <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing?.phone}}</span>
                 </div>
               </VCardText>
             </VCard>
@@ -646,8 +646,8 @@ const removeOrder = async () => {
                     {{ order.shipping_postal_code }}
                   </span>
 
-                  <span v-if="order.billing.note !== null">
-                    <br>({{ order.billing.note }}).
+                  <span v-if="order.billing?.note !== null">
+                    <br>({{ order.billing?.note }}).
                   </span>
                 </div>
               </VCardText>
@@ -656,15 +656,15 @@ const removeOrder = async () => {
             <!-- 👉 Billing Address -->
             <VCard title="Dirección de Facturación" class="billing">
               <template #append>
-                <div v-if="order.billing.pse === 0 && order.billing?.card_number">
+                <div v-if="order.billing?.pse === 0 && order.billing?.card_number">
                   <VImg
-                      :src="order.billing.payment_method_name === 'MASTERCARD' ? mastercard : visa"
+                      :src="order.billing?.payment_method_name === 'MASTERCARD' ? mastercard : visa"
                       height="50"
                       max-width="50"
                       min-width="50"
                     />
                 </div>
-                <div v-if="order.billing.nequi === 1">
+                <div v-if="order.billing?.nequi === 1">
                   <VImg
                       :src="nequi"
                       height="50"
@@ -672,7 +672,7 @@ const removeOrder = async () => {
                       min-width="50"
                     />
                 </div>
-                <div v-if="order.billing.pse === 1">
+                <div v-if="order.billing?.pse === 1">
                   <VImg
                       :src="pse"
                       height="50"
@@ -682,39 +682,39 @@ const removeOrder = async () => {
                 </div>
               </template>
               <VCardText>
-                <h6 class="text-h6 me-2" v-if="order.billing.company">
-                  {{ order.billing.company }}
+                <h6 class="text-h6 me-2" v-if="order.billing?.company">
+                  {{ order.billing?.company }}
                 </h6>
                 <span>
-                  {{ order.billing.address }} <br> 
-                  {{ order.billing.street }} <br> 
-                  {{ order.billing.city }} <br> 
-                  {{ order.billing.postal_code }}
+                  {{ order.billing?.address }} <br> 
+                  {{ order.billing?.street }} <br> 
+                  {{ order.billing?.city }} <br> 
+                  {{ order.billing?.postal_code }}
                 </span>
-                <div class="mt-6" v-if="order.billing.pse === 0 && order.billing?.card_number">
+                <div class="mt-6" v-if="order.billing?.pse === 0 && order.billing?.card_number">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
-                    {{ order.billing.payment_method_name }}
+                    {{ order.billing?.payment_method_name }}
                   </div>
                   <div class="text-body-1">
-                    Número de tarjeta: {{ order.billing.card_number }}
+                    Número de tarjeta: {{ order.billing?.card_number }}
                   </div>
                 </div>
 
-                <div class="mt-6" v-if="order.billing.pse === 1">
+                <div class="mt-6" v-if="order.billing?.pse === 1">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
-                    PSE: {{ order.billing.pse_bank }}
+                    PSE: {{ order.billing?.pse_bank }}
                   </div>
                   <div class="text-body-1">
-                    Referencia de pago: {{ order.billing.reference_pol }}
+                    Referencia de pago: {{ order.billing?.reference_pol }}
                   </div>
                 </div>
 
-                <div class="mt-6" v-if="order.billing.nequi === 1">
+                <div class="mt-6" v-if="order.billing?.nequi === 1">
                   <div class="text-body-1 text-body-1 text-high-emphasis font-weight-medium">
-                    {{ order.billing.payment_method_name }}
+                    {{ order.billing?.payment_method_name }}
                   </div>
                   <div class="text-body-1">
-                    Referencia de pago: {{ order.billing.reference_pol }}
+                    Referencia de pago: {{ order.billing?.reference_pol }}
                   </div>
                 </div>
               </VCardText>
