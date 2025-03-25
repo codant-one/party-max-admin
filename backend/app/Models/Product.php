@@ -216,7 +216,10 @@ class Product extends Model
     }
 
     public function scopeWhereSearchPublic($query, $search) {
-        $query->where('products.name', 'LIKE', '%' . $search . '%');
+        $query->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $search . '%'])
+              ->orWhereHas('colors.categories.category', function ($q) use ($search) {
+                  $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+              });
     }
 
     public function scopeWhereCategory($query, $search) {
