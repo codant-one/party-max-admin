@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+
 use App\Models\Review;
 use App\Models\Product;
+use App\Models\OrderDetail;
 
 class ReviewController extends Controller
 {
@@ -36,6 +38,18 @@ class ReviewController extends Controller
 
             Product::calculateRating($request->product_id);
 
+            $details = 
+                OrderDetail::with(['product_color.product'])
+                        ->where('order_id', $request->order_id)
+                        ->whereHas('product_color.product', function ($query) use ($request) {
+                            $query->where('id', $request->product_id);
+                        })
+                        ->first();
+                        
+            if ($details) {
+                $details->update(['is_rating' => 1]);
+            }
+            
             return response()->json([
                 'success' => true,
                 'data' => [ 
@@ -86,6 +100,18 @@ class ReviewController extends Controller
 
             $review = $review->updateReview($request, $review);
             Product::calculateRating($request->product_id);
+
+            $details = 
+                OrderDetail::with(['product_color.product'])
+                        ->where('order_id', $request->order_id)
+                        ->whereHas('product_color.product', function ($query) use ($request) {
+                            $query->where('id', $request->product_id);
+                        })
+                        ->first();
+
+            if ($details) {
+                $details->update(['is_rating' => 1]);
+            }
 
             return response()->json([
                 'success' => true,

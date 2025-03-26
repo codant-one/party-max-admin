@@ -401,6 +401,7 @@ class OrderController extends Controller
                             $detail->product_color->product->reviews->firstWhere('client_id', $order->client_id);
                         
                         $productInfo = [
+                            'product_color_id' => $detail->product_color->id,
                             'product_id' => $detail->product_color->product->id,
                             'product_name' => $detail->product_color->product->name,
                             'product_image' => $detail->product_color->product->image,
