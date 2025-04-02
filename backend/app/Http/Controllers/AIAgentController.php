@@ -34,8 +34,13 @@ class AIAgentController extends Controller
     
     private function getRelevantProducts($criteria)
     {
-        return Product::select('id', 'name', 'description', 'price')
-            ->get();
+        return 
+            Product::select('id', 'name', 'description', 'price')
+                   ->whereHas('colors.categories.category', function ($query) use ($criteria) {
+                    $query->where('name', 'LIKE', '%'.$criteria['theme'].'%');
+                   })
+                   ->with(['colors.categories.category'])
+                   ->get();
     }
     
     private function getRelevantServices($criteria)
@@ -60,8 +65,11 @@ class AIAgentController extends Controller
     private function prepareContext($criteria, $products)
     {
         // Formatear productos para incluir en el prompt
-        $productsText = $products->map(function($product) {
-            return "- ID: {$product->id}, Nombre: {$product->name}, Precio: {$product->price}, Descripción: " . substr($product->description, 0, 100) . "...";
+        $productsText = $products->map(function ($product) {
+            return "- ID: " . utf8_encode($product->id) . 
+                   ", Nombre: " . utf8_encode($product->name) . 
+                   ", Precio: " . utf8_encode($product->price) . 
+                   ", Descripción: " . utf8_encode(substr($product->description, 0, 100)) . "...";
         })->join("\n");
 
         // Construir el prompt completo
