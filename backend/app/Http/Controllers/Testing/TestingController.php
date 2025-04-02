@@ -464,6 +464,20 @@ class TestingController extends Controller
                 ];
                 
                 array_push($products, $productInfo);
+            } else {
+                $serviceInfo = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => $detail->flavor->name,
+                    'filling' => $detail->filling->name,
+                    'cake_size' => $detail->cake_size->name,
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($services, $serviceInfo);
             }
         }
 
@@ -566,6 +580,88 @@ class TestingController extends Controller
             'total' => $productDetails
         ], 200);
         
+    }
+
+    public function sendEvaluation() {
+
+        $orderId = 61;
+
+        $order = 
+            Order::with([
+                'billing', 
+                'details' => function ($query) {
+                    $query->where('is_rating', 0);
+                },
+                'details.product_color.product', 
+                'details.service',
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        // $link = env('APP_DOMAIN').'/register/form_client';
+        $link = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+        }
+
+        $products = [];
+        $services = [];
+
+        foreach ($order->details as $detail) {
+            if($detail->product_color) {
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                ];
+                
+                array_push($products, $productInfo);
+            } else {
+                $serviceInfo = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                ];
+                
+                array_push($services, $serviceInfo);
+            }
+        }
+
+        // $text = 'Hola <strong>'.$user.'</strong>,<br> Gracias por tu compra en Partymax.';
+        // $text .= 'Queremos saber tu opinión sobre los productos que adquiriste. ';
+        // $text .= 'Tu calificación nos ayuda a mejorar y brindarte un mejor servicio. ';
+        // $text .= 'Para dejar tu opinión, solo necesitas registrarte en nuestra plataforma y acceder a promociones exclusivas que pronto tendremos para ti.';
+
+        // $text2 = '¡Esperamos tu valoración!<br>Saludos';
+
+        // $buttonText = 'Regístrate y califica aquí';
+
+        $text = 'Hola <strong>'.$user.'</strong>,<br>';
+        $text .= 'Notamos que aún no has calificado los productos que compraste en Partymax. ';
+        $text .= 'Tu opinión es clave para ayudarnos a mejorar y ofrecerte un mejor servicio. ';
+        $text .= '<strong>Tómate un minuto y déjanos tu valoración</strong>. Además, al calificar, seguirás accediendo a promociones y beneficios exclusivos.';
+
+        $text2 = '¡Gracias por ser parte de nuestra comunidad!<br>Saludos';
+
+        $buttonText = 'Califica ahora';
+
+        $data = [
+            'products' => $products,
+            'services' => $services,
+            'link' => $link,
+            'title' => '¿Qué te pareció tu producto? ',
+            'text' => $text,
+            'text2' => $text2,
+            'buttonText' => $buttonText
+        ];
+
+        return view('emails.clients.send_evaluation', compact('data'));
     }
 
 }

@@ -126,7 +126,7 @@ class MiscellaneousController extends Controller
 
             $cacheKey = 'products_' . md5(serialize($request->all()));
 
-            $data = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $limit) {
+            $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
               
                 $query = Product::with([
                                 'user.userDetail', 
@@ -403,7 +403,7 @@ class MiscellaneousController extends Controller
 
             $cacheKey = 'products_' . md5(serialize($request->all()));
 
-            $data = Cache::remember($cacheKey, now()->addMinutes(60), function () use ($request, $limit) {
+            $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
 
                 $query = Service::with([
                     'user.userDetail', 

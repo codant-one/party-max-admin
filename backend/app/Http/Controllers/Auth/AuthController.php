@@ -19,6 +19,9 @@ use App\Models\User;
 use App\Models\UserDetails;
 use App\Models\UserRegisterToken;
 use App\Models\Supplier;
+use App\Models\Billing;
+use App\Models\Order;
+use App\Models\Address;
 
 class AuthController extends Controller
 {
@@ -423,6 +426,28 @@ class AuthController extends Controller
                 $client->user_id = $user->id;
                 $client->gender_id = 1;
                 $client->save();
+
+                $billings = Billing::where('email', $request->email)->get();
+
+                foreach($billings as $billing) {
+                    $address = new Address();
+                    $address->client_id = $client->id;
+                    $address->addresses_type_id = 1;
+                    $address->province_id = $billing->province_id;
+                    $address->title = 'Default';
+                    $address->phone = $billing->phone;
+                    $address->address = $billing->address;
+                    $address->street = $billing->street;
+                    $address->city = $billing->city;
+                    $address->postal_code = $billing->postal_code;
+                    $address->default = 1;
+                    $address->save();
+
+                    $order = Order::find($billing->order_id);
+                    $order->client_id = $client->id;
+                    $order->address_id = $address->id;
+                    $order->save();
+                }
 
                 $client = Client::with(['user'])->find($client->id);
 
