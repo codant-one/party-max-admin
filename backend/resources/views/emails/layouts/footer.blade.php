@@ -25,7 +25,7 @@
                                     <img src="{{ asset('/images/subtract.png') }}" alt="Subtract" title="Subtract" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                                 </td> -->
                                 <td align="center" valign="top" width="null" style="padding:0;Margin:0">
-                                    <a href="https://www.facebook.com/PartymaxCo/?locale=es_LA" target="_blank">
+                                    <a href="https://www.facebook.com/partymaxcolombia" target="_blank">
                                         <img src="{{ asset('/images/facebook.png') }}" alt="Facebook" title="Facebook" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                                     </a>
                                 </td>
