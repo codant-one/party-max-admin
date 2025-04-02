@@ -227,7 +227,7 @@ class MiscellaneousController extends Controller
             }
 
             $keywords = $product->colors
-                ->flatMap(fn($color) => $color->categories)
+                ->flatMap(fn($color) => $color->categories->pluck('category'))
                 ->unique('id')
                 ->pluck('keywords')
                 ->flatten()

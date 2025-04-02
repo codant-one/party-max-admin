@@ -36,10 +36,10 @@ class AIAgentController extends Controller
     {
         return 
             Product::select('id', 'name', 'description', 'price')
-                   ->whereHas('colors.categories.category', function ($query) use ($criteria) {
-                    $query->where('name', 'LIKE', '%'.$criteria['theme'].'%');
-                   })
                    ->with(['colors.categories.category'])
+                        ->whereHas('colors.categories.category', function($q) use ($criteria) {
+                            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+                        })
                    ->get();
     }
     
@@ -94,7 +94,7 @@ class AIAgentController extends Controller
     private function callOpenAI($context)
     {
         $result = OpenAI::chat()->create([
-            'model' => 'gpt-4o',
+            'model' => 'gpt-4o-mini',
             'messages' => [
                 ['role' => 'system', 'content' => 'Eres un asistente virtual especializado en planificación de fiestas colombianas que trabaja para un marketplace de productos y servicios para celebraciones. Tu objetivo es ofrecer recomendaciones personalizadas y específicas usando solo los productos y servicios disponibles en el catálogo.'],
                 ['role' => 'user', 'content' => $context]
