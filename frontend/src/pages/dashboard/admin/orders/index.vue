@@ -22,7 +22,7 @@ const isConfirmDeleteDialogVisible = ref(false)
 const selectedOrder = ref({})
 const wholesale = ref(null)
 const shipping_state_id = ref(null)
-const payment_state_id = ref(null)
+const payment_state_id = ref(4)
 const type = ref(null)
 
 const rol = ref(null)

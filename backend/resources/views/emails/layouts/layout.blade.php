@@ -87,27 +87,27 @@
             }
         </style>
     </head>
-    <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
+    <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
         <div dir="ltr" class="es-wrapper-color" lang="und" style="background-color:#F6F6F6">
-            <table class="es-wrapper" width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#F6F6F6">
+            <table class="es-wrapper" width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#F6F6F6">
                 <tr>
-                    <td valign="top" style="padding:0;Margin:0">
+                    <td valign="top" style="padding:0;margin:0">
                         <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
                             <tr>
-                                <td align="center" style="padding:0;Margin:0">
+                                <td align="center" style="padding:0;margin:0">
                                     <table class="es-header-body" cellspacing="0" cellpadding="0" bgcolor="#ffffff" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
                                         <tr>
-                                            <td align="left" bgcolor="#E2F8FC" style="padding:20px;Margin:0;background-color:#e2f8fc">
+                                            <td align="left" bgcolor="#E2F8FC" style="padding:20px;margin:0;background-color:#e2f8fc">
                                                 @include("emails.layouts.header")
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align="left" bgcolor="#E2F8FC" style="Margin:0;padding-left:40px;padding-right:40px;background-color:#e2f8fc">
+                                            <td align="left" bgcolor="#E2F8FC" style="margin:0;padding-left:40px;padding-right:40px;background-color:#e2f8fc">
                                                 @yield("content")
                                             </td>                
                                         </tr>
                                         <tr>
-                                            <td align="left" bgcolor="#E2F8FC" style="Margin:0;padding-top:25px;padding-bottom:25px;padding-left:40px;padding-right:40px;background-color:#e2f8fc">
+                                            <td align="left" bgcolor="#E2F8FC" style="margin:0;padding-top:25px;padding-bottom:25px;padding-left:40px;padding-right:40px;background-color:#e2f8fc">
                                                 @include("emails.layouts.footer")
                                             </td>
                                         </tr>

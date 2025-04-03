@@ -332,3 +332,4 @@ Route::get('minus-stock/{order}', [TestingController::class , 'minus_stock'])->n
 Route::get('sum-sales/{order}', [TestingController::class , 'sum_sales'])->name('sum_sales');
 Route::post('party-recommendations', [AIAgentController::class, 'getRecommendations']);
 Route::get('sendEvaluation', [TestingController::class , 'sendEvaluation'])->name('sendEvaluation');
+Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendSurvey');

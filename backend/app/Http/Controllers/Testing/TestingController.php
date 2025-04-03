@@ -664,4 +664,43 @@ class TestingController extends Controller
         return view('emails.clients.send_evaluation', compact('data'));
     }
 
+    public function sendSurvey() {
+
+        $orderId = 65;
+
+        $order = 
+            Order::with([
+                'billing',
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link = 'https://docs.google.com/forms/d/1m3TVPc3rD2ECSnx4B2A6ZQqkCxFwdN-NSFR-UNcEJ5A/edit';
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+        }
+
+        $text = 'Hola <strong>'.$user.'</strong>,<br>';
+        $text .= 'Gracias por confiar en PartyMax. Queremos asegurarnos de que tu experiencia de compra haya sido excelente y, para ello, tu opinión es clave. ';
+        $text .= 'Te invitamos a completar nuestra encuesta de satisfacción. Solo te tomará menos de 2 minutos y nos ayudará a seguir mejorando para ofrecerte el mejor servicio posible.';
+
+        $text2 = 'Valoramos mucho tu tiempo y tu opinión.<br> ¡Gracias por ayudarnos a mejorar!';
+
+        $buttonText = '✏️ Responder encuesta';
+
+        $data = [
+            'link' => $link,
+            'title' => '¿Nos ayudarías con tu opinión?',
+            'text' => $text,
+            'text2' => $text2,
+            'buttonText' => $buttonText
+        ];
+
+        return view('emails.clients.send_survey', compact('data'));
+    }
+
 }

@@ -22,7 +22,11 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('delete:failed-orders')
                  ->daily()
-                 ->at('00:00');        
+                 ->at('00:00');   
+                 
+        $schedule->command('orders:send-survey')
+                 ->daily()
+                 ->at('00:00'); 
     }
 
     /**
