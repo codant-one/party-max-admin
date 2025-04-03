@@ -118,6 +118,9 @@ class SendSurvey extends Command
                         $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                         $message->to($email)->subject($subject);
                 });
+
+                $order->update([ 'survey' => 1]);//enviada
+
             } catch (\Exception $e){
                 $message = 'Error e-mail evaluation: ';
                 $responseMail = $e->getMessage();
