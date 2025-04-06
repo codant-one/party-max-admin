@@ -94,37 +94,6 @@
       .border-title {
         border-bottom: 1px solid #D9EEF2;
       }
-
-      @media only screen and (max-width:991px) {
-        svg {
-            width: 20px;
-            height: 25px;
-        }
-        .products {
-            height: 60px !important;
-        }
-
-        .products span {
-            margin-left: 10px !important;
-            font-size: 12px !important;
-        }
-
-        .products a {
-            border-radius: 8px !important;
-        }
-
-        .products img {
-            max-width: 50px !important;
-        }
-
-        .address span {
-            font-size: 13px !important;
-        }
-
-        .out_of_stock img {
-            width: 60px!important; 
-        }
-      }
   </style>
   </head>
   <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
@@ -170,10 +139,10 @@
               <td class="products">
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
-                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 20px;">
+                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
                             {{ $product['product_name'] }}
                         </span>
-                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Color: {{ $product['color'] }}
                         </span>
                     </div>
@@ -201,16 +170,16 @@
                 
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
-                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 20px;">
+                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
                             {{ $service['service_name'] }}
                         </span>
                         @if($service['cake_size'])
-                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Tamaño: {{ $service['cake_size'] }}
                         </span>
                         @endif
                         @if($service['flavor'])
-                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Sabor: {{ $service['flavor'] }}
                      
                         
