@@ -50,7 +50,6 @@
 
       .products {
         display: flex;
-        height: 60px;
         margin: 10px 0;
       } 
       
