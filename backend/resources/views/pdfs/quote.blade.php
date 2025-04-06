@@ -50,7 +50,7 @@
 
       .products {
         display: flex;
-        margin: 10px 0;
+        vertical-align: top !important;
       } 
       
       .products_img {
@@ -60,6 +60,7 @@
       
       .products_cant {
         width: 12%;
+        vertical-align: top !important;
         text-align: right;
       }  
 
@@ -152,7 +153,7 @@
           <tr>
               <td class="products_img">
                 <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
-                      <img src="{{ $product['product_image'] }}" width="80%">
+                      <img src="{{ $product['product_image'] }}" width="90%">
                   </a>
               </td>
               <td class="products">
@@ -182,7 +183,7 @@
           <tr>
             <td class="products_img">
               <a href="{{$service['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
-                  <img src="{{ $service['service_image'] }}" width="80%">
+                  <img src="{{ $service['service_image'] }}" width="90%">
               </a>
             </td>
             <td class="products">
