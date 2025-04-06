@@ -34,7 +34,7 @@
         text-transform: none;
       }
 
-      table tr {
+      table tr, table td {
         height: 20px;
       }
     
@@ -71,17 +71,20 @@
       .products {
         display: flex;
         vertical-align: top !important;
+        margin: 5px 0;
       } 
       
       .products_img {
         width: 5%;
         vertical-align: top !important;
+        margin: 5px 0;
       } 
       
       .products_cant {
         width: 12%;
         vertical-align: top !important;
         text-align: right;
+        margin: 5px 0;
       }  
 
       .content {
@@ -90,6 +93,10 @@
 
       .m-0 {
         margin: 0 !important;
+      }
+
+      .border-title {
+        border-bottom: 1px solid #D9EEF2;
       }
 
       @media only screen and (max-width:991px) {
@@ -145,7 +152,7 @@
             <td>CLIENTE</td>
             <td style="text-align: right">COTIZACIÓN # {{$quote->id}}</td>
           </tr>
-          <tr>
+          <tr class="border-title">
             <td>
                 <p class="m-0">Nombre: {{ $quote->name }}</p>
                 @if($quote->company)
@@ -162,7 +169,7 @@
           </tr>
         </table>
         <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
-          <tr>
+          <tr class="border-title">
             <td class="products_img">Productos</td>
             <td class="products"></td>
             <td class="products_cant">Cant.</td>
@@ -170,7 +177,7 @@
             <td class="products_cant">Total</td>
           </tr>
           @foreach($products as $product)
-          <tr>
+          <tr class="border-title">
               <td class="products_img">
                 <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="90%">
@@ -200,7 +207,7 @@
           </tr>
           @endforeach
           @foreach($services as $service)
-          <tr>
+          <tr class="border-title">
             <td class="products_img">
               <a href="{{$service['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                   <img src="{{ $service['service_image'] }}" width="90%">
@@ -244,7 +251,7 @@
               </td>  
           </tr>
           @endforeach
-          <tr>
+          <tr class="border-title">
             <td class="products_img"></td>
             <td class="products"></td>
             <td colspan="3" style="text-align: right">
@@ -264,7 +271,7 @@
               </table>
             </td>
           </tr>
-          <tr>
+          <tr class="border-title">
             <td colspan="5">
               <span class="ms-2">
                 Los precios mostrados en esta cotización corresponden únicamente a los productos seleccionados. <br>
