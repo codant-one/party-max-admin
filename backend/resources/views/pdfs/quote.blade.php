@@ -16,7 +16,7 @@
         font-family: 'Switzer Regular';
         font-style: normal;
         font-weight: 400;
-        src: url('{{ asset('/fonts/switzer.ttf') }}') format('truetype');
+        src: url({{ storage_path('fonts/switzer.ttf') }}) format('truetype');
         font-display: swap;
       }
 
