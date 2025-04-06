@@ -12,18 +12,10 @@
         margin: 170px 0 210px 0;
       }
 
-      @font-face {
-        font-family: 'Switzer Regular';
-        font-style: normal;
-        font-weight: 400;
-        src: url({{ storage_path('fonts/switzer.ttf') }}) format('truetype');
-        font-display: swap;
-      }
-
       body {
         margin: 0;
         padding: 0;
-        font-family: 'Switzer Regular', Arial, sans-serif !important;
+        font-family: 'switzer', Arial, sans-serif !important;
         font-size: 14px;
       }
 
@@ -132,7 +124,7 @@
           @foreach($products as $product)
           <tr class="border-title">
               <td class="products_img">
-                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 35px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 50px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="90%">
                   </a>
               </td>
@@ -162,7 +154,7 @@
           @foreach($services as $service)
           <tr class="border-title">
             <td class="products_img">
-              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 35px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 50px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                   <img src="{{ $service['service_image'] }}" width="90%">
               </a>
             </td>
