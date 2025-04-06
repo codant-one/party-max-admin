@@ -12,6 +12,7 @@ use App\Models\OrderDetail;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\SupplierAccount;
+use App\Models\Quote;
 
 class TestingController extends Controller
 {
@@ -153,7 +154,6 @@ class TestingController extends Controller
                 
                 array_push($services, $serviceInfo);
             }
-        
         }
         // dd($order);
         $data = [
@@ -701,6 +701,57 @@ class TestingController extends Controller
         ];
 
         return view('emails.clients.send_survey', compact('data'));
+    }
+
+    public function pdfs() {
+
+        $quote = Quote::with(
+            'document_type',
+            'details.product_color',
+            'details.service',
+            'details.cake_size',
+            'details.flavor',
+            'details.filling'
+        )->find(1);
+
+        $products = [];
+        $services = [];
+
+        foreach ($quote->details as $detail) {
+            if($detail->product_color) {
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_price' => $detail->price,
+                    'product_total' => $detail->total * $detail->quantity,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => $detail->product_color->color->name,
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($products, $productInfo);
+            } else {
+                $serviceInfo = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_price' => $detail->price,
+                    'service_total' => $detail->total *  $detail->quantity,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => $detail->flavor->name,
+                    'filling' => $detail->filling->name,
+                    'cake_size' => $detail->cake_size->name,
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'text_quantity' => ($detail->quantity === '1') ? 'Unidad' : 'Unidades'
+                ];
+                
+                array_push($services, $serviceInfo);
+            }
+        }
+
+        return view('pdfs.quote', compact('quote', 'products', 'services') );
     }
 
 }

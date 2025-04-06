@@ -51,7 +51,8 @@ use App\Http\Controllers\{
     DashboardController,
     ReferralController,
     IpController,
-    AIAgentController
+    AIAgentController,
+    QuoteController
 };
 
 /*
@@ -291,6 +292,7 @@ Route::group([
     Route::get('services/{slug}', [MiscellaneousController::class, 'serviceDetail']);
     Route::get('cupcakes', [MiscellaneousController::class, 'cupcakes']);
     Route::get('ips', [MiscellaneousController::class, 'ips']);
+    Route::post('quotes', [QuoteController::class, 'store']);
 });
 
 //Shopping-Cart
@@ -333,3 +335,4 @@ Route::get('sum-sales/{order}', [TestingController::class , 'sum_sales'])->name(
 Route::post('party-recommendations', [AIAgentController::class, 'getRecommendations']);
 Route::get('sendEvaluation', [TestingController::class , 'sendEvaluation'])->name('sendEvaluation');
 Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendSurvey');
+Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
