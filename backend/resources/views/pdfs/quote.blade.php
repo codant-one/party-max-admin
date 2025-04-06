@@ -74,7 +74,7 @@
       
       .products_img {
         width: 5%;
-        margin: 5px 0;
+        padding: 5px 0;
       } 
       
       .products_cant {
@@ -132,7 +132,7 @@
           @foreach($products as $product)
           <tr class="border-title">
               <td class="products_img">
-                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 35px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="90%">
                   </a>
               </td>
@@ -162,12 +162,11 @@
           @foreach($services as $service)
           <tr class="border-title">
             <td class="products_img">
-              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 60px; min-height: 35px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                   <img src="{{ $service['service_image'] }}" width="90%">
               </a>
             </td>
-            <td class="products">
-                
+            <td class="products">         
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
                         <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
@@ -207,25 +206,20 @@
           <tr class="border-title">
             <td class="products_img"></td>
             <td class="products"></td>
-            <td colspan="3" style="text-align: right">
-              <table width="100%">
-                <tr>
-                    <td class="text">Subtotal:</td>
-                    <td class="numbers" style="text-align: right;"><span>${{ formatCurrency($quote->sub_total) }}</span></td>
-                </tr>
-                <tr>
-                    <td class="text">Tax:</td>
-                    <td class="numbers" style="text-align: right;"><span>${{ formatCurrency($quote->tax) }}</span></td>
-                </tr>
-                <tr>
-                    <td class="text">Total:</td>
-                    <td class="numbers" style="text-align: right;"><span>${{ formatCurrency($quote->total) }}</span></td>
-                </tr>
-              </table>
+            <td class="products_cant"></td>
+            <td class="products_cant">
+              <p class="text m-0">Subtotal:</p>
+              <p class="text m-0">Tax:</p>
+              <p class="text m-0">Total:</p>
+            </td>
+            <td class="products_cant" style="padding: 10px 0;">
+              <p class="numbers m-0"><span>${{ formatCurrency($quote->sub_total) }}</span></p>
+              <p class="numbers m-0"><span>${{ formatCurrency($quote->tax) }}</span></p>
+              <p class="numbers m-0"><span>${{ formatCurrency($quote->total) }}</span></p>
             </td>
           </tr>
-          <tr class="border-title">
-            <td colspan="5">
+          <tr>
+            <td colspan="5" style="padding: 10px 0;">
               <span class="ms-2">
                 Los precios mostrados en esta cotización corresponden únicamente a los productos seleccionados. <br>
                 El costo de envío no está incluido y se calculará por separado, según la dirección de entrega. <br>
