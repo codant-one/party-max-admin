@@ -9,7 +9,7 @@
     <title>Cotización PARTYMAX</title>
     <style>
       @page {
-        margin: 160px 0 200px 0;
+        margin: 160px 0 220px 0;
       }
 
       body {
@@ -35,10 +35,10 @@
     
       footer {
         position: fixed;
-        bottom: -200px; 
+        bottom: -220px; 
         left: 0;
         right: 0;
-        height: 200px;
+        height: 220px;
         background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
@@ -52,6 +52,10 @@
         display: flex;
         height: 60px;
         margin: 10px 0;
+      } 
+      
+      .products_img {
+        width: 5%;
       } 
       
       .products_cant {
@@ -114,15 +118,14 @@
   <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
       <header></header>
       <footer></footer>
-      
       <div class="content">
         <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
           <tr>
-            <td colspan="2">CLIENTE</td>
-            <td colspan="2" style="text-align: right">COTIZACIÓN # {{$quote->id}}</td>
+            <td>CLIENTE</td>
+            <td style="text-align: right">COTIZACIÓN # {{$quote->id}}</td>
           </tr>
           <tr>
-            <td colspan="2">
+            <td>
                 <p class="m-0">Nombre: {{ $quote->name }}</p>
                 @if($quote->company)
                 <p class="m-0">Empresa: {{ $quote->company }}</p>
@@ -131,7 +134,7 @@
                 <p class="m-0">Teléfono: {{substr($quote->phone, 0, 3) === '+57' ? '' : '(+57)'}} {{ $quote->phone }}</p>
                 <p class="m-0">Correo electrónico: {{ $quote->email }}</p>
             </td>
-            <td colspan="2" style="text-align: right; vertical-align: top;">
+            <td style="text-align: right; vertical-align: top;">
                 <p class="m-0">Fecha de solicitud: {{$quote->start_date}}</p>
                 <p class="m-0">Fecha de vencimiento: {{$quote->due_date}}</p>
             </td>
@@ -139,27 +142,30 @@
         </table>
         <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
           <tr>
-            <td class="products">Productos</td>
+            <td class="products_img">Productos</td>
+            <td class="products"></td>
             <td class="products_cant">Cant.</td>
             <td class="products_cant">Unitario</td>
             <td class="products_cant">Total</td>
           </tr>
           @foreach($products as $product)
           <tr>
-              <td class="products">
-                  <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+              <td class="products_img">
+                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="80%">
                   </a>
-                  <div style="justify-content: start; align-items: center; display: flex;">
-                      <div style="display:block;">
-                          <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
-                              {{ $product['product_name'] }}
-                          </span>
-                          <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
-                              Color: {{ $product['color'] }}
-                          </span>
-                      </div>
-                  </div>
+              </td>
+              <td class="products">
+                <div style="justify-content: start; align-items: center; display: flex;">
+                    <div style="display:block;">
+                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 20px;">
+                            {{ $product['product_name'] }}
+                        </span>
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
+                            Color: {{ $product['color'] }}
+                        </span>
+                    </div>
+                </div>
               </td>
               <td class="products_cant">
                 {{ $product['quantity'] }}
@@ -174,22 +180,25 @@
           @endforeach
           @foreach($services as $service)
           <tr>
+            <td class="products_img">
+              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="max-width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+                  <img src="{{ $service['service_image'] }}" width="80%">
+              </a>
+            </td>
             <td class="products">
-                <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 25%; max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
-                    <img src="{{ $service['service_image'] }}" width="80%">
-                </a>
-                <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
+                
+                <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
-                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
+                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 20px;">
                             {{ $service['service_name'] }}
                         </span>
                         @if($service['cake_size'])
-                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
                             Tamaño: {{ $service['cake_size'] }}
                         </span>
                         @endif
                         @if($service['flavor'])
-                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
+                        <span style="display: block; font-size: 15px; color: #999999; margin-left: 20px;">
                             Sabor: {{ $service['flavor'] }}
                      
                         
@@ -215,8 +224,9 @@
           </tr>
           @endforeach
           <tr>
+            <td class="products_img"></td>
             <td class="products"></td>
-            <td  colspan="3" style="text-align: right">
+            <td colspan="3" style="text-align: right">
               <table width="100%">
                 <tr>
                     <td class="text">Subtotal:</td>
@@ -234,7 +244,7 @@
             </td>
           </tr>
           <tr>
-            <td colspan="4">
+            <td colspan="5">
               <span class="ms-2">
                 Los precios mostrados en esta cotización corresponden únicamente a los productos seleccionados. <br>
                 El costo de envío no está incluido y se calculará por separado, según la dirección de entrega. <br>
