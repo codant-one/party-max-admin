@@ -9,7 +9,7 @@
     <title>Cotización PARTYMAX</title>
     <style>
       @page {
-        margin: 150px 0;
+        margin: 160px 0;
       }
 
       body {
@@ -19,10 +19,10 @@
     
       header {
         position: fixed;
-        top: -150px;
+        top: -160px;
         left: 0;
         right: 0;
-        height: 150px;
+        height: 160px;
         background-image: url('{{ asset('/images/letterhead_header.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
@@ -34,13 +34,14 @@
     
       footer {
         position: fixed;
-        bottom: -150px; 
+        bottom: -160px; 
         left: 0;
         right: 0;
-        height: 150px;
+        height: 160px;
         background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
+        background-size: cover;
         text-align: center;
         line-height: 80px;
         font-size: 16px;
@@ -53,7 +54,7 @@
       } 
       
       .products_cant {
-        width: 100px;
+        width: 10%;
         text-align: right;
       }  
 
@@ -134,8 +135,10 @@
                 <p class="m-0">Fecha de vencimiento: {{$quote->due_date}}</p>
             </td>
           </tr>
+        </table>
+        <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
           <tr>
-            <td>Productos</td>
+            <td class="products">Productos</td>
             <td class="products_cant">Cant.</td>
             <td class="products_cant">Unitario</td>
             <td class="products_cant">Total</td>
@@ -143,10 +146,10 @@
           @foreach($products as $product)
           <tr>
               <td class="products">
-                  <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 25%; max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+                  <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="80%">
                   </a>
-                  <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
+                  <div style="justify-content: start; align-items: center; display: flex;">
                       <div style="display:block;">
                           <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
                               {{ $product['product_name'] }}
