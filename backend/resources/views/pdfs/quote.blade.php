@@ -69,20 +69,16 @@
       }
 
       .products {
-        display: flex;
-        vertical-align: top !important;
         margin: 5px 0;
       } 
       
       .products_img {
         width: 5%;
-        vertical-align: top !important;
         margin: 5px 0;
       } 
       
       .products_cant {
         width: 12%;
-        vertical-align: top !important;
         text-align: right;
         margin: 5px 0;
       }  
@@ -167,7 +163,7 @@
           @foreach($products as $product)
           <tr class="border-title">
               <td class="products_img">
-                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+                <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                       <img src="{{ $product['product_image'] }}" width="90%">
                   </a>
               </td>
@@ -197,7 +193,7 @@
           @foreach($services as $service)
           <tr class="border-title">
             <td class="products_img">
-              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="max-width: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
+              <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 60px; height: 60px; border-radius: 8px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
                   <img src="{{ $service['service_image'] }}" width="90%">
               </a>
             </td>
