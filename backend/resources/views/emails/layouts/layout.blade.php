@@ -9,6 +9,21 @@
         <title>E-mails PARTYMAX</title>
 
         <style type="text/css">
+             @font-face {
+                font-family: 'Switzer Regular';
+                font-style: normal;
+                font-weight: 400;
+                src: url('{{ asset('/fonts/Switzer-Regular.ttf') }}') format('truetype');
+                font-display: swap;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Switzer Regular', Arial, sans-serif !important;
+                font-size: 14px;
+            }
+
             #outlook a {
                 padding:0;
             }
@@ -87,7 +102,7 @@
             }
         </style>
     </head>
-    <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
+    <body style="width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
         <div dir="ltr" class="es-wrapper-color" lang="und" style="background-color:#F6F6F6">
             <table class="es-wrapper" width="100%" cellspacing="0" cellpadding="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#F6F6F6">
                 <tr>

@@ -12,10 +12,30 @@
         margin: 160px 0 220px 0;
       }
 
+      @font-face {
+        font-family: 'Switzer Regular';
+        font-style: normal;
+        font-weight: 400;
+        src: url('{{ asset('/fonts/Switzer-Regular.ttf') }}') format('truetype');
+        font-display: swap;
+      }
+
       body {
         margin: 0;
         padding: 0;
+        font-family: 'Switzer Regular', Arial, sans-serif !important;
         font-size: 14px;
+      }
+
+      table {
+        border-spacing: unset;
+        font-weight: 400;
+        letter-spacing: normal;
+        text-transform: none;
+      }
+
+      table tr {
+        height: 20px;
       }
     
       header {
