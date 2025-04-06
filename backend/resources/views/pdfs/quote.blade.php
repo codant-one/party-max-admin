@@ -9,7 +9,7 @@
     <title>Cotización PARTYMAX</title>
     <style>
       @page {
-        margin: 160px 0 220px 0;
+        margin: 170px 0 210px 0;
       }
 
       @font-face {
@@ -40,10 +40,10 @@
     
       header {
         position: fixed;
-        top: -160px;
+        top: -170px;
         left: 0;
         right: 0;
-        height: 160px;
+        height: 170px;
         background-image: url('{{ asset('/images/letterhead_header.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
@@ -55,14 +55,14 @@
     
       footer {
         position: fixed;
-        bottom: -220px; 
+        bottom: -210px; 
         left: 0;
         right: 0;
-        height: 220px;
+        height: 210px;
         background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
-        background-size: contain;
+        background-size: cover;
         text-align: center;
         line-height: 80px;
         font-size: 16px;
@@ -125,18 +125,6 @@
             font-size: 13px !important;
         }
 
-        .es-header .es-left { 
-            width: 60%!important; 
-        }
-
-        .es-header .es-right { 
-            width: 40%!important; 
-        }
-
-        .es-header .es-right img, .festin img { 
-            width: 100px!important; 
-        }
-
         .out_of_stock img {
             width: 60px!important; 
         }
@@ -147,7 +135,7 @@
       <header></header>
       <footer></footer>
       <div class="content">
-        <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
+        <table cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
           <tr>
             <td>CLIENTE</td>
             <td style="text-align: right">COTIZACIÓN # {{$quote->id}}</td>
@@ -168,7 +156,7 @@
             </td>
           </tr>
         </table>
-        <table class="es-header" cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
+        <table cellspacing="0" cellpadding="0" align="center" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top">
           <tr class="border-title">
             <td class="products_img">Productos</td>
             <td class="products"></td>
