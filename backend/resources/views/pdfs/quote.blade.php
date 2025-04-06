@@ -9,12 +9,13 @@
     <title>Cotización PARTYMAX</title>
     <style>
       @page {
-        margin: 160px 0;
+        margin: 160px 0 200px 0;
       }
 
       body {
         margin: 0;
         padding: 0;
+        font-size: 14px;
       }
     
       header {
@@ -34,10 +35,10 @@
     
       footer {
         position: fixed;
-        bottom: -160px; 
+        bottom: -200px; 
         left: 0;
         right: 0;
-        height: 160px;
+        height: 200px;
         background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
@@ -151,7 +152,7 @@
                   </a>
                   <div style="justify-content: start; align-items: center; display: flex;">
                       <div style="display:block;">
-                          <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
+                          <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
                               {{ $product['product_name'] }}
                           </span>
                           <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
@@ -179,7 +180,7 @@
                 </a>
                 <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
-                        <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
+                        <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
                             {{ $service['service_name'] }}
                         </span>
                         @if($service['cake_size'])
@@ -214,10 +215,8 @@
           </tr>
           @endforeach
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td style="text-align: right">
+            <td class="products"></td>
+            <td  colspan="3" style="text-align: right">
               <table width="100%">
                 <tr>
                     <td class="text">Subtotal:</td>
