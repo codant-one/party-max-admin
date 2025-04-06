@@ -55,10 +55,11 @@
       
       .products_img {
         width: 5%;
+        vertical-align: top !important;
       } 
       
       .products_cant {
-        width: 10%;
+        width: 12%;
         text-align: right;
       }  
 
