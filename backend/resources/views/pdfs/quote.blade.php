@@ -9,7 +9,7 @@
     <title>Cotización PARTYMAX</title>
     <style>
       @page {
-        margin: 100px 0;
+        margin: 150px 0;
       }
 
       body {
@@ -19,10 +19,10 @@
     
       header {
         position: fixed;
-        top: -100px;
+        top: -150px;
         left: 0;
         right: 0;
-        height: 100px;
+        height: 150px;
         background-image: url('{{ asset('/images/letterhead_header.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
@@ -34,11 +34,13 @@
     
       footer {
         position: fixed;
-        bottom: -100px; 
+        bottom: -150px; 
         left: 0;
         right: 0;
-        height: 100px;
-        background: #f0f0f0;
+        height: 150px;
+        background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
+        background-repeat: no-repeat;
+        background-position: center;
         text-align: center;
         line-height: 80px;
         font-size: 16px;
@@ -142,7 +144,7 @@
           <tr>
               <td class="products">
                   <a href="{{$product['slug']}}" class="es-button" target="_blank" style="width: 25%; max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
-                      <img src="{{ asset('storage/'. $product['product_image']) }}" width="80%">
+                      <img src="{{ $product['product_image'] }}" width="80%">
                   </a>
                   <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                       <div style="display:block;">
@@ -170,7 +172,7 @@
           <tr>
             <td class="products">
                 <a href="{{$service['slug']}}" class="es-button" target="_blank" style="width: 25%; max-width: 60px; border-radius: 16px; border: 1px solid #E2F8FC; text-align: center; align-items: center; justify-content: center; display: flex !important;">
-                    <img src="{{ asset('storage/'.$service['service_image']) }}" width="80%">
+                    <img src="{{ $service['service_image'] }}" width="80%">
                 </a>
                 <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
