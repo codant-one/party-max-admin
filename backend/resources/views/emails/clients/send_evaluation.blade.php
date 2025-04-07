@@ -31,7 +31,7 @@
                                     <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                                         <div style="display:block;">
                                             <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
-                                                {{ $product['product_name'] }}
+                                                {{ ucwords(strtolower($product['product_name'])) }}
                                             </span>
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 <svg width="41" height="38" viewBox="0 0 41 38" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -70,7 +70,7 @@
                                     <div style="width: 75%; justify-content: start; align-items: center; display: flex;">
                                         <div style="display:block;">
                                             <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
-                                                {{ $service['service_name'] }}
+                                                {{ ucwords(strtolower($service['service_name'])) }}
                                             </span>
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 <svg width="41" height="38" viewBox="0 0 41 38" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -141,7 +141,7 @@
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
                         <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
-                            {{ $product['product_name'] }}
+                            {{ ucwords(strtolower($product['product_name'])) }}
                         </span>
                         <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Color: {{ $product['color'] }}
@@ -171,7 +171,7 @@
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
                         <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
-                            {{ $service['service_name'] }}
+                            {{ ucwords(strtolower($service['service_name'])) }}
                         </span>
                         @if($service['cake_size'])
                         <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
