@@ -17,13 +17,14 @@ const totalPages = ref(1)
 const totalCategories = ref(0)
 const isRequestOngoing = ref(true)
 const isConfirmDeleteDialogVisible = ref(false)
+const isConfirmStateDialogVisible = ref(false)
 const selectedCategory = ref({})
 const category_type_id = ref()
 const categoryTypes = ref([
   {id: 1, name: 'Productos'},
   {id: 2, name: 'Servicios'},
 ])
-
+const state_id = ref()
 
 const advisor = ref({
   type: '',
@@ -82,6 +83,55 @@ const openCategory = function (categoryData) {
 const showDeleteDialog = categoryData => {
   isConfirmDeleteDialogVisible.value = true
   selectedCategory.value = { ...categoryData }
+}
+
+const resolveStatus = statusMsg => {
+  if (statusMsg === 1)
+    return {
+      text: 'Inactivo',
+      color: 'warning',
+    }
+  if (statusMsg === 2)
+    return {
+      text: 'Activo',
+      color: 'success',
+    }
+}
+
+const showStateDialog = (categoryData, id) => {
+  isConfirmStateDialogVisible.value = true
+  state_id.value = id
+  selectedCategory.value = { ...categoryData }
+}
+
+const stateCategory = async state_id => {
+  isConfirmStateDialogVisible.value = false
+
+  let data = {
+      state_id: state_id
+  }
+
+  let res = await categoriesStores.updateState(data, selectedCategory.value.id)
+  selectedCategory.value = {}
+
+  advisor.value = {
+      type: res.data.success ? 'success' : 'error',
+      message: res.data.success ? 'Categoría actualizada!' : res.data.message,
+      show: true
+  }
+
+  await fetchData()
+
+  setTimeout(() => {
+      advisor.value = {
+          type: '',
+          message: '',
+          show: false
+      }
+  }, 3000)
+
+  return true
+
 }
 
 const removeCategory = async () => {
@@ -206,7 +256,7 @@ const removeCategory = async () => {
                 <th> SUBCATEGORÍA </th>
                 <th> TIPO </th>
                 <th class="text-end pe-4" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> PRODUCTOS PUBLICADOS</th>
-                <!-- <th class="text-end pe-4"> GANANCIA TOTAL </th> -->
+                <th class="pe-4"> STATUS </th>
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES
                 </th>
@@ -260,14 +310,19 @@ const removeCategory = async () => {
                 <td> {{ category.category_type?.name }} </td>
                 <td v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> 
                   <h4 class="text-end">
-                    {{ (category.product_count).toLocaleString() }}
+                    {{ category.category_type_id === 1 ? 
+                      (category.product_count).toLocaleString() :
+                      (category.service_count).toLocaleString()  
+                    }}
                   </h4> 
                 </td>
-                <!-- <td>
-                  <h4 class="text-sm text-end">
-                    {{ (parseFloat(category.sum ?? 0)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
-                  </h4>
-                </td> -->
+                <td> 
+                  <VChip
+                      v-bind="resolveStatus(category.state_id)"
+                      density="default"
+                      label
+                  />
+                </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">      
                   <VBtn
@@ -289,6 +344,42 @@ const removeCategory = async () => {
                       @click="openCategory(category)"
                       />
                   </VBtn>
+                  <VBtn
+                    v-if="$can('editar', 'categorías') && category.state_id === 1"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showStateDialog(category, 2)">
+                    <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Activar
+                    </VTooltip>      
+                    <VIcon
+                        size="22"
+                        icon="mdi-checkbox-marked-circle-outline" />
+                </VBtn>
+
+                <VBtn
+                    v-if="$can('editar', 'categorías') && category.state_id === 2"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showStateDialog(category, 1)">
+                    <VTooltip
+                        open-on-focus
+                        location="top"
+                        activator="parent">
+                        Inactivar
+                    </VTooltip>      
+                    <VIcon
+                        size="22"
+                        icon="mdi-close-circle-multiple-outline" />
+                </VBtn>
+
                   <VBtn
                     v-if="$can('editar', 'categorías')"
                     icon
@@ -358,6 +449,36 @@ const removeCategory = async () => {
         </v-card>
       </v-col>
     </v-row>
+
+     <!-- 👉 Confirm State -->
+     <VDialog
+        v-model="isConfirmStateDialogVisible"
+        persistent
+        class="v-dialog-sm" >
+        <!-- Dialog close btn -->
+        
+        <DialogCloseBtn @click="isConfirmStateDialogVisible = !isConfirmStateDialogVisible" />
+
+        <!-- Dialog Content -->
+        <VCard :title=" (state_id === 2 ? 'Activar ': 'Inactivar') + ' Categoría'">
+            <VDivider class="mt-4"/>
+            <VCardText>
+                Está seguro de {{ state_id === 2 ? 'activar': 'inactivar' }}  la categoría <strong>{{ selectedCategory.name }}</strong>?.
+            </VCardText>
+
+            <VCardText class="d-flex justify-end gap-3 flex-wrap">
+            <VBtn
+                color="secondary"
+                variant="tonal"
+                @click="isConfirmStateDialogVisible = false">
+                Cancelar
+            </VBtn>
+            <VBtn @click="stateCategory(state_id)">
+                Aceptar
+            </VBtn>
+            </VCardText>
+        </VCard>
+    </VDialog>
 
     <!-- 👉 Confirm Delete -->
     <VDialog

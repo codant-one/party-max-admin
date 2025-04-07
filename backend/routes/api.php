@@ -154,6 +154,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('list/order', [CategoryController::class, 'order']);
         Route::post('delete', [CategoryController::class, 'delete']);
         Route::get('/events/all', [CategoryController::class, 'events']);
+        Route::put('updateStates/{id}', [CategoryController::class, 'updateStates']);
     });
 
     //Products

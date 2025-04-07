@@ -75,6 +75,21 @@ export const useCategoriesStores = defineStore('categories', {
                 })
          
         },
+        updateState(data, id) {
+            this.setLoading(true)
+            
+            return Categories.updateState(data, id)
+                .then((response) => {
+                    let pos = this.categories.findIndex((item) => item.id === response.data.data.category.id)
+                    this.categories.splice(pos, 1)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         deleteCategory(id) {
             this.setLoading(true)
 

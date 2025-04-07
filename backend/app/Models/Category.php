@@ -26,6 +26,10 @@ class Category extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function state() {
+        return $this->belongsTo(State::class, 'state_id', 'id');
+    }
+
     public function banner1() {
         return $this->belongsTo(Category::class, 'banner_category_id', 'id');
     }
@@ -44,6 +48,10 @@ class Category extends Model
 
     public function product() {
         return $this->hasMany(ProductCategory::class, 'category_id', 'id');
+    }
+
+    public function service() {
+        return $this->hasMany(ServiceCategory::class, 'category_id', 'id');
     }
 
     public function children() {
@@ -238,5 +246,14 @@ class Category extends Model
                 deleteFile($category->banner_4);
             }
         }
+    }
+
+    public static function updateStatesCategory($request, $category) {
+
+        $category->update([
+            'state_id' => $request->state_id
+        ]);  
+
+        return $category;
     }
 }

@@ -233,7 +233,7 @@ class Product extends Model
         $query->select('products.*')
               ->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
               ->join('categories as c', 'c.id', '=', 'pl.category_id')
-              ->where('c.slug', 'LIKE', '%' . $search);
+              ->where('c.slug', $search);
     }
 
     public function scopeWhereColor($query, $colorIds) {
@@ -317,9 +317,11 @@ class Product extends Model
             $query->whereCategory($filters->get('category_id'));
         }
 
-        if ($filters->get('subcategory') !== null) {
-            $query->whereCategorySlug($filters->get('subcategory'));
-        } else if ($filters->get('category') !== null && $filters->get('category') !== 'all') {
+        if ($filters->get('fathercategory') !== null) {
+            $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('fathercategory') . '/' . $filters->get('subcategory'));
+        } else if ($filters->get('subcategory') !== null) {
+            $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('subcategory'));
+        } else if ($filters->get('category') !== null) {
             $query->whereCategorySlug($filters->get('category'));
         }
 

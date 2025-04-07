@@ -77,7 +77,7 @@ async function fetchData() {
 
   let data = {
     search: searchQuery.value,
-    orderByField: 'id',
+    orderByField: 'sales',
     orderBy: 'desc',
     limit: rowPerPage.value,
     page: currentPage.value
@@ -344,7 +344,6 @@ const getFlagCountry = country => {
             <!-- 👉 table head -->
             <thead>
               <tr>
-                <th scope="col"> #ID </th>
                 <th scope="col"> NOMBRE </th>
                 <th scope="col"> USUARIO </th>
                 <th scope="col"> PAÍS </th>
@@ -361,8 +360,6 @@ const getFlagCountry = country => {
                 v-for="client in clients"
                 :key="client.id"
                 style="height: 3.75rem;">
-
-                <td> {{ client.id }} </td>
                 <td class="text-wrap">
                   <div class="d-flex align-center gap-x-3">
                     <VAvatar

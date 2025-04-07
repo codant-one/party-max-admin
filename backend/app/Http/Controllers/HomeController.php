@@ -31,25 +31,65 @@ class HomeController extends Controller
 
             $data = [];
     
-            $data['parentCategories'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_type_id', 1)->whereNull('category_id')->get()->toArray();
+            $data['parentCategories'] = 
+                Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                        ->where([
+                            ['category_type_id', 1], 
+                            ['state_id', 2]
+                        ])
+                        ->whereNull('category_id')
+                        ->get()
+                        ->toArray();
 
             foreach($data['parentCategories'] as $key => $parentCategory) {
                 
-                $data['parentCategories'][$key]['children'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_id', $parentCategory['id'])->get();
+                $data['parentCategories'][$key]['children'] = 
+                    Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                            ->where([
+                                ['category_id', $parentCategory['id']],
+                                ['state_id', 2]
+                            ])
+                            ->get();
 
                 foreach($data['parentCategories'][$key]['children'] as $k => $son) {
-                    $data['parentCategories'][$key]['children'][$k]['grandchildren'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_id', $son['id'])->get();
+                    $data['parentCategories'][$key]['children'][$k]['grandchildren'] = 
+                        Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                                ->where([
+                                    ['category_id', $son['id']],
+                                    ['state_id', 2]
+                                ])
+                                ->get();
                 }
             }
 
-            $data['parentServices'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_type_id', 2)->whereNull('category_id')->get()->toArray();
+            $data['parentServices'] = 
+                Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                        ->where([
+                            ['category_type_id', 2],
+                            ['state_id', 2]
+                        ])
+                        ->whereNull('category_id')
+                        ->get()
+                        ->toArray();
 
             foreach($data['parentServices'] as $key => $parentCategory) {
                 
-                $data['parentServices'][$key]['children'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_id', $parentCategory['id'])->get();
+                $data['parentServices'][$key]['children'] = 
+                    Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                            ->where([
+                                ['category_id', $parentCategory['id']],
+                                ['state_id', 2]
+                            ])
+                            ->get();
 
                 foreach($data['parentServices'][$key]['children'] as $k => $son) {
-                    $data['parentServices'][$key]['children'][$k]['grandchildren'] = Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])->where('category_id', $son['id'])->get();
+                    $data['parentServices'][$key]['children'][$k]['grandchildren'] = 
+                        Category::select(['id', 'name', 'slug', 'icon_subcategory', 'keywords'])
+                                ->where([
+                                    ['category_id', $son['id']],
+                                    ['state_id', 2]
+                                ])
+                                ->get();
                 }
             }
 

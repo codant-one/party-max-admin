@@ -162,7 +162,7 @@ class Service extends Model
         $query->select('services.*')
               ->join('service_lists as sl', 'sl.service_id', '=', 'services.id')
               ->join('categories as c', 'c.id', '=', 'sl.category_id')
-              ->where('c.slug', 'LIKE', '%' . $search);
+              ->where('c.slug', $search);
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {
@@ -201,10 +201,6 @@ class Service extends Model
             $query->whereSearch($filters->get('search'));
         }
 
-        if ($filters->get('searchPublic')) {
-            $query->whereSearchPublic($filters->get('searchPublic'));
-        }
-
         if ($filters->get('favourite') !== null) {
             $query->where('favourite', $filters->get('favourite'));
         }
@@ -229,9 +225,11 @@ class Service extends Model
             $query->whereCategory($filters->get('category_id'));
         }
 
-        if ($filters->get('subcategory') !== null) {
-            $query->whereCategorySlug($filters->get('subcategory'));
-        } else if ($filters->get('category') !== null && $filters->get('category') !== 'all') {
+        if ($filters->get('fathercategory') !== null) {
+            $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('fathercategory') . '/' . $filters->get('subcategory'));
+        } else if ($filters->get('subcategory') !== null) {
+            $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('subcategory'));
+        } else if ($filters->get('category') !== null) {
             $query->whereCategorySlug($filters->get('category'));
         }
 

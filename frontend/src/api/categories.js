@@ -29,6 +29,10 @@ class Categories {
     events(){
         return axios.get('/categories/events/all')
     }
+
+    updateState(data, id) {
+        return axios.put(`/categories/updateStates/${id}`, data)
+    }
     
 }
 

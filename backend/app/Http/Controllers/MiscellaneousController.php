@@ -101,7 +101,7 @@ class MiscellaneousController extends Controller
                                 'order',
                                 'colors'
                             ])
-                            ->where('state_id', 3)
+                            ->where('products.state_id', 3)
                             ->applyFilters(
                                 $request->only([
                                     'searchPublic',
@@ -109,6 +109,7 @@ class MiscellaneousController extends Controller
                                     'orderBy',
                                     'category',
                                     'subcategory',
+                                    'fathercategory',
                                     'colorId',
                                     'min',
                                     'max',
@@ -134,7 +135,7 @@ class MiscellaneousController extends Controller
                                 'order',
                                 'colors'
                             ])
-                            ->where('state_id', 3)
+                            ->where('products.state_id', 3)
                             ->applyFilters(
                                 $request->only([
                                     'searchPublic',
@@ -142,6 +143,7 @@ class MiscellaneousController extends Controller
                                     'orderBy',
                                     'category',
                                     'subcategory',
+                                    'fathercategory',
                                     'colorId',
                                     'min',
                                     'max',
@@ -389,14 +391,14 @@ class MiscellaneousController extends Controller
                                 'order',
                                 'cupcakes.cake_size.cake_type'
                             ])
-                            ->where('state_id', 3)
+                            ->where('services.state_id', 3)
                             ->applyFilters(
                                 $request->only([
-                                    'searchPublic',
                                     'orderByField',
                                     'orderBy',
                                     'category',
                                     'subcategory',
+                                    'fathercategory',
                                     'min',
                                     'max',
                                     'sortBy',
@@ -410,7 +412,7 @@ class MiscellaneousController extends Controller
             $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
             */
 
-            $cacheKey = 'products_' . md5(serialize($request->all()));
+            $cacheKey = 'services_' . md5(serialize($request->all()));
 
             $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
 
@@ -420,14 +422,14 @@ class MiscellaneousController extends Controller
                     'order',
                     'cupcakes.cake_size.cake_type'
                 ])
-                ->where('state_id', 3)
+                ->where('services.state_id', 3)
                 ->applyFilters(
                     $request->only([
-                        'searchPublic',
                         'orderByField',
                         'orderBy',
                         'category',
                         'subcategory',
+                        'fathercategory',
                         'min',
                         'max',
                         'sortBy',

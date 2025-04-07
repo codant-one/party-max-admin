@@ -54,7 +54,7 @@ class CategoryController extends Controller
             $limit = $request->has('limit') ? $request->limit : 10;
         
             $query = Category::with(['category.category', 'category_type'])
-                            ->withCount(['product'])
+                            ->withCount(['product', 'service'])
                             ->categoryTotalPrice()
                             ->applyFilters(
                                     $request->only([
@@ -216,7 +216,7 @@ class CategoryController extends Controller
                 return response()->json([
                     'sucess' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Categoría no encontrado'
+                    'message' => 'Categoría no encontrada'
                 ], 404);
 
             return response()->json([
@@ -248,7 +248,7 @@ class CategoryController extends Controller
                 return response()->json([
                     'sucess' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Categoría no encontrado'
+                    'message' => 'Categoría no encontrada'
                 ], 404);
 
             $category = $category->updateCategory($request, $category);
@@ -354,7 +354,7 @@ class CategoryController extends Controller
                 return response()->json([
                     'sucess' => false,
                     'feedback' => 'not_found',
-                    'message' => 'Categoría no encontrado'
+                    'message' => 'Categoría no encontrada'
                 ], 404);
                 
             Category::deleteCategories($request->ids);
@@ -405,6 +405,37 @@ class CategoryController extends Controller
             'availableServices' => $availableServices,
             'selectedCalendars' => $selectedCalendars
         ]);
+    }
+
+    public function updateStates(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $category = Category::find($id);
+        
+            if (!$category)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Categoría no encontrada'
+                ], 404);
+
+            $category->updateStatesCategory($request, $category); 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'category' => $category
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
 }
