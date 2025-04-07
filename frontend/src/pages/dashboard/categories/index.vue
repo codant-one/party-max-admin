@@ -251,7 +251,6 @@ const removeCategory = async () => {
             <!-- 👉 table head -->
             <thead>
               <tr class="text-no-wrap">
-                <th> #ID </th>
                 <th> NOMBRE </th>
                 <th> SUBCATEGORÍA </th>
                 <th> TIPO </th>
@@ -269,7 +268,6 @@ const removeCategory = async () => {
                 :key="category.id"
                 style="height: 3.75rem;">
 
-                <td> {{ category.id }} </td>
                 <td>
                   <div class="d-flex gap-x-3">
                     <VAvatar
