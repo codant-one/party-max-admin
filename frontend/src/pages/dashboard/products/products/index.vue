@@ -4,6 +4,7 @@ import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
+import { excelParser } from '@/plugins/csv/excelParser'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import detailsProduct from "@/components/products/detailsProduct.vue";
@@ -408,6 +409,42 @@ const removeProduct = async () => {
 
   return true
 }
+
+const downloadCSV = async () => {
+
+  isRequestOngoing.value = true
+
+  let data = {
+    state_id: selectedStatus.value,
+    category_id: selectedCategory.value,
+    orderByField: 'id',
+    orderBy: 'desc',
+    limit: -1,
+  }
+
+  await productsStores.fetchProducts(data)
+
+  let dataArray = [];
+      
+  productsStores.getProducts.forEach(element => {
+    let data = {
+      ID: element.id,
+      NOMBRE: element.name,
+      CATEGORIAS: element.colors[0]?.categories.map(item => item.category.name),
+      PRECIO: element.price_for_sale,
+      IMAGEN: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
+      SLUG: themeConfig.settings.urlDomain + 'products/' + element.slug
+    }
+          
+    dataArray.push(data)
+  })
+
+  excelParser()
+    .exportDataFromJSON(dataArray, "product", "csv");
+
+  isRequestOngoing.value = false
+
+}
 </script>
 
 <template>
@@ -619,6 +656,16 @@ const removeProduct = async () => {
             variant="outlined"
             :items="[10, 20, 30, 50]"
           />
+        </div>
+
+        <div class="d-flex align-center">
+          <VBtn
+            variant="tonal"
+            color="secondary"
+            prepend-icon="tabler-file-export"
+            @click="downloadCSV">
+            Exportar
+          </VBtn>
         </div>
 
         <VSpacer />
