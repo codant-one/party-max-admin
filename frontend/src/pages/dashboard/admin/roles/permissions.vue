@@ -242,6 +242,23 @@ const closeModal = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Cotizaciones
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver cotizaciones"
+                            value="ver cotizaciones"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="eliminar cotizaciones"
+                            value="eliminar cotizaciones"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">

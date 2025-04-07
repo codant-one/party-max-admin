@@ -133,6 +133,9 @@ class Quote extends Model
         foreach ($ids as $id) {
             $quote = self::find($id);
             $quote->delete();
+
+            if($quote->file)
+                deleteFile($quote->file);
         }
     }
 

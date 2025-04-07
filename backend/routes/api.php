@@ -117,6 +117,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('referrals', ReferralController::class);
     Route::apiResource('home-images', HomeController::class);
     Route::apiResource('ips', IpController::class);
+    Route::apiResource('quotes', QuoteController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -259,6 +260,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('/products/update', [ReferralController::class, 'updateProducts']);
         Route::get('/products/user', [ReferralController::class, 'userDetails']);
         Route::post('/products/upload', [ReferralController::class, 'uploadProducts']);
+    });
+
+    //Quotes
+    Route::group(['prefix' => 'quotes'], function () {
+        Route::post('delete', [QuoteController::class, 'delete']);
     });
 
 });

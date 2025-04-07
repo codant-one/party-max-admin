@@ -114,6 +114,14 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="n2">
+                            <strong>Cotizaciones</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de cotizaciones</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Eliminar cotizaciones</strong>&emsp;/&emsp;<code>Permite la eliminación de las cotizaciones</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Administración</strong>
                         </li>
                         <li class="tab n3">

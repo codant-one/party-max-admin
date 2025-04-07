@@ -322,6 +322,25 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Cotizaciones
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver cotizaciones"
+                            value="ver cotizaciones"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="eliminar cotizaciones"
+                            value="eliminar cotizaciones"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Administración  
                 </VCardTitle>
                 <VCardText class="pb-0">

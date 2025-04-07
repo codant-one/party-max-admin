@@ -55,6 +55,13 @@ export default [
         to: 'dashboard-referrals',
         action: 'ver',
         subject: 'remisiones',
+    },
+    {
+        title: 'Cotizaciones',
+        icon: { icon: 'tabler-file-dollar' },
+        to: 'dashboard-quotes',
+        action: 'ver',
+        subject: 'cotizaciones',
     }
 ]
   

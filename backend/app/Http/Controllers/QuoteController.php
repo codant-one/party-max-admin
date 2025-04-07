@@ -5,17 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+use Spatie\Permission\Middlewares\PermissionMiddleware;
+
 use App\Models\Quote;
 use App\Models\QuoteDetail;
 
 class QuoteController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(PermissionMiddleware::class . ':ver cotizaciones|administrador')->only(['index']);
+        $this->middleware(PermissionMiddleware::class . ':eliminar cotizaciones|administrador')->only(['delete']);
+    }
+
     /**
     * Display a listing of the resource.
     */
     public function index(Request $request)
     {
-        //
+        try {
+
+            $limit = $request->has('limit') ? $request->limit : 10;
+
+            $query = Quote::with(['document_type']);
+                   
+            $count = $query->count();
+
+            $quotes = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'quotes' => $quotes,
+                    'quotesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -100,7 +133,6 @@ class QuoteController extends Controller
                 ], 404);
 
             Quote::deleteQuotes($request->ids);
-            Product::calculateRating($request->product_id);
             
             return response()->json([
                 'success' => true
