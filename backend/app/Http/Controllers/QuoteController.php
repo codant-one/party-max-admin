@@ -28,7 +28,15 @@ class QuoteController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Quote::with(['document_type']);
+            $query = 
+                Quote::with(['document_type'])
+                     ->applyFilters(
+                        $request->only([
+                            'search',
+                            'orderByField',
+                            'orderBy'
+                        ])
+                     );
                    
             $count = $query->count();
 

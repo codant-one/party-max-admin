@@ -43,7 +43,7 @@ async function fetchData() {
     let data = {
         search: searchQuery.value,
         orderByField: 'id',
-        orderBy: 'asc',
+        orderBy: 'desc',
         limit: rowPerPage.value,
         page: currentPage.value
     }
