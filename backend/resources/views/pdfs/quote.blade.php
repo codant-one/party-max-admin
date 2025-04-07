@@ -141,7 +141,7 @@
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
                         <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
-                            {{ ucwords(strtolower($product['product_name'])) }}
+                          {{ ucwords(strtolower($product['product_name'])) }}
                         </span>
                         <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Color: {{ $product['color'] }}
@@ -171,7 +171,7 @@
                 <div style="justify-content: start; align-items: center; display: flex;">
                     <div style="display:block;">
                         <span style="display: block; font-size: 16px; color: #0a1b33; margin-left: 40px;">
-                            {{ ucwords(strtolower($service['service_name'])) }}
+                          {{ ucwords(strtolower($service['service_name'])) }}
                         </span>
                         @if($service['cake_size'])
                         <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
@@ -220,12 +220,16 @@
             </td>
           </tr>
           <tr>
-            <td colspan="5" style="padding: 10px 0;">
-              <div style="display: flex; align-items: center;">
+            <td colspan="5" style="padding: 10px 0 5px 0;">
+              <strong style="display: flex; align-items: center;">
+                OBSERVACIONES
+                <img src="{{ asset('/images/info-circle.svg') }}" width="15" alt="info" style="margin-left: 5px;">  
+              </strong>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="5" style="padding: 5px 0;">
                 <span>
-                  <img src="{{ asset('/images/info-circle.svg') }}" width="25" alt="info">  
-                </span>
-                <span style="margin-left: 10px;">
                   Los precios mostrados en esta cotización corresponden únicamente a los productos seleccionados. <br>
                   El costo de envío no está incluido y se calculará por separado, según la dirección de entrega. <br>
                   Todos nuestros productos en el marketplace incluyen el IVA. <br>
