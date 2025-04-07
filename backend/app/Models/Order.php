@@ -265,7 +265,9 @@ class Order extends Model
             'shipping_state_id' => $request->shipping_state_id,
             'reason' => $request->reason
         ]);
-
+        
+        if($request->shipping_state_id === '3')
+            self::sendMailEvaluation($order->id);
         if($request->shipping_state_id !== '1')
             self::sendMail($order->id, $request->shipping_state_id, $request->reason);
     
@@ -329,6 +331,99 @@ class Order extends Model
         }
     
         return $prefix . sprintf('%06d', $number);
+    }
+
+    public static function sendMailEvaluation($orderId) {
+        $order = 
+            Order::with([
+                'billing',
+                'details.product_color.product', 
+                'details.service',
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+            $link = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
+
+            $text = '¡Gracias por tu compra, <strong>'.$user.'</strong>!<br>';
+            $text .= 'Esperamos que los productos que elegiste hayan hecho de tu fiesta un momento inolvidable. Ahora, nos encantaría conocer tu experiencia. ';
+            $text .= 'Tu opinión es clave para ayudarnos a mejorar y ofrecerte un mejor servicio. ';
+            $text .= '<strong>Tómate un minuto y déjanos tu valoración</strong>. Además, al calificar, seguirás accediendo a promociones y beneficios exclusivos.';
+    
+            $text2 = '¡Gracias por ser parte de nuestra comunidad!<br>Saludos';
+    
+            $buttonText = 'Califica ahora';
+
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+            $link = env('APP_DOMAIN').'/register/form_client';
+
+            $text = '¡Gracias por tu compra, <strong>'.$user.'</strong>!<br>';
+            $text .= 'Los productos que elegiste están listos para hacer de tu fiesta un momento especial. ';
+            $text .= 'Tu calificación nos ayuda a mejorar y brindarte un mejor servicio. ';
+            $text .= 'Para dejar tu opinión, solo necesitas registrarte en nuestra plataforma y acceder a promociones exclusivas que pronto tendremos para ti.<br>';
+            $text .= 'Registrarte ¡Es rápido y fácil!<br>';
+            $text2 = '¡Esperamos tu valoración!<br>Saludos';
+
+            $buttonText = 'Regístrate y califica aquí';
+        }
+
+        $products = [];
+        $services = [];
+
+        foreach ($order->details as $detail) {
+            if($detail->product_color) {
+                $productInfo = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'slug' =>env('APP_DOMAIN').'/products/'.$detail->product_color->product->slug,
+                ];
+                
+                array_push($products, $productInfo);
+            } else {
+                $serviceInfo = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
+                ];
+                
+                array_push($services, $serviceInfo);
+            }
+        }
+
+        $subject = '¿cómo calificarías tus productos? ¡Nos encantaría saberlo!';
+
+        $data = [
+            'products' => $products,
+            'services' => $services,
+            'link' => $link,
+            'title' => '¿Qué te pareció tu producto? ',
+            'text' => $text,
+            'text2' => $text2,
+            'buttonText' => $buttonText
+        ];
+
+        try {
+            \Mail::send(
+                'emails.clients.send_evaluation'
+                , ['data' => $data]
+                , function ($message) use ($email, $subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to($email)->subject($subject);
+            });
+        } catch (\Exception $e){
+            $message = 'error';
+            $responseMail = $e->getMessage();
+
+            Log::info($message . ' ' . $responseMail);
+        } 
+
     }
 
     public static function sendMail($orderId, $shipping_state_id, $reason) {

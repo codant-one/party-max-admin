@@ -25,7 +25,7 @@ class SendSurvey extends Command
      *
      * @var string
      */
-    protected $description = 'Send product evaluation';
+    protected $description = 'Send survey evaluation';
 
     /**
      * Create a new command instance.

@@ -584,7 +584,7 @@ class TestingController extends Controller
 
     public function sendEvaluation() {
 
-        $orderId = 61;
+        $orderId = 65;
 
         $order = 
             Order::with([
@@ -597,8 +597,8 @@ class TestingController extends Controller
                 'client.user.userDetail'
             ])->find($orderId); 
 
-        // $link = env('APP_DOMAIN').'/register/form_client';
-        $link = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
+        $link = env('APP_DOMAIN').'/register/form_client';
+        // $link = env('APP_DOMAIN').'/detail-purchases/'.$orderId;
 
         if($order->client) {
             $user = $order->client->user->name . ' ' . $order->client->user->last_name;
@@ -632,25 +632,37 @@ class TestingController extends Controller
                 array_push($services, $serviceInfo);
             }
         }
+        $text = '¡Gracias por tu compra, <strong>'.$user.'</strong>!<br>';
+        $text .= 'Los productos que elegiste están listos para hacer de tu fiesta un momento especial. ';
+        $text .= 'Tu calificación nos ayuda a mejorar y brindarte un mejor servicio. ';
+        $text .= 'Para dejar tu opinión, solo necesitas registrarte en nuestra plataforma y acceder a promociones exclusivas que pronto tendremos para ti.<br>';
+        $text .= 'Registrarte ¡Es rápido y fácil!<br>';
+        $text2 = '¡Esperamos tu valoración!<br>Saludos';
 
-        // $text = 'Hola <strong>'.$user.'</strong>,<br> Gracias por tu compra en Partymax.';
-        // $text .= 'Queremos saber tu opinión sobre los productos que adquiriste. ';
-        // $text .= 'Tu calificación nos ayuda a mejorar y brindarte un mejor servicio. ';
-        // $text .= 'Para dejar tu opinión, solo necesitas registrarte en nuestra plataforma y acceder a promociones exclusivas que pronto tendremos para ti.';
+        $buttonText = 'Regístrate y califica aquí';
 
-        // $text2 = '¡Esperamos tu valoración!<br>Saludos';
+        // ----------------------------------------
+        // $text = '¡Gracias por tu compra, <strong>'.$user.'</strong>!<br>';
+        // $text .= 'Esperamos que los productos que elegiste hayan hecho de tu fiesta un momento inolvidable. Ahora, nos encantaría conocer tu experiencia. ';
+        // $text .= 'Tu opinión es clave para ayudarnos a mejorar y ofrecerte un mejor servicio. ';
+        // $text .= '<strong>Tómate un minuto y déjanos tu valoración</strong>. Además, al calificar, seguirás accediendo a promociones y beneficios exclusivos.';
 
-        // $buttonText = 'Regístrate y califica aquí';
+        // $text2 = '¡Gracias por ser parte de nuestra comunidad!<br>Saludos';
 
-        $text = 'Hola <strong>'.$user.'</strong>,<br>';
-        $text .= 'Notamos que aún no has calificado los productos que compraste en Partymax. ';
-        $text .= 'Tu opinión es clave para ayudarnos a mejorar y ofrecerte un mejor servicio. ';
-        $text .= '<strong>Tómate un minuto y déjanos tu valoración</strong>. Además, al calificar, seguirás accediendo a promociones y beneficios exclusivos.';
+        // $buttonText = 'Califica ahora';
+        // ----------------------------------------
 
-        $text2 = '¡Gracias por ser parte de nuestra comunidad!<br>Saludos';
+        // $register = env('APP_DOMAIN').'/register/form_client';
+        // $text = 'Hola <strong>'.$user.'</strong>,<br>';
+        // $text .= 'Tus compras ayudaron a crear momentos increíbles. Y ahora puedes ayudarnos a crear aún más. ¡Tu opinión es clave!✨. <br> ';
+        // $text .= 'Al dejar tu calificación, no solo guías a otros para que elijan los mejores productos para sus fiestas, sino que también <strong>haces que la celebración sea aún más grande⭐. </strong>';
+        // $text .= 'Además, al calificarnos, <strong>seguirás disfrutando</strong> de promociones y beneficios exclusivos.<br><br>';
+        // $text .= '🔹 <strong>¿Aún no estás registrado?</strong><br>';
+        // $text .= 'Para dejar tu evaluación y acceder a estos beneficios, solo necesitas registrarte en nuestro sistema. ¡Es rápido y fácil!<br>';
+        // $text .= "<a href='$register' target='_blank'>Haz clic aquí para registrarte</a><br>";
+        // $text2 = '¡Gracias por ser parte de nuestra comunidad!<br>Saludos';
 
-        $buttonText = 'Califica ahora';
-
+        // $buttonText = 'Califica ahora';
         $data = [
             'products' => $products,
             'services' => $services,
