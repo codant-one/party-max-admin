@@ -56,6 +56,18 @@ class Supplier extends Model
                 }]);
     }
 
+    public function scopeServicesCount($query)
+    {
+        return  $query->addSelect(['service_count' => function ($q){
+                        $q->selectRaw('COUNT(*)')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('services as ss', 'ss.user_id', '=', 'u.id')
+                        ->where('ss.state_id', 3)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
     public function scopeServices($query)
     {
         return  $query->addSelect(['services' => function ($q){

@@ -2,6 +2,7 @@
 
 import CustomerOrderTable from './CustomerOrderTable.vue'
 import CustomerProductTable from './CustomerProductTable.vue'
+import CustomerServiceTable from './CustomerServiceTable.vue'
 import { formatNumber } from '@/@core/utils/formatters'
 
 const props = defineProps({
@@ -16,6 +17,7 @@ const props = defineProps({
 })
 
 const balance = ref(null)
+const typeTab = ref(null)
 
 watch(() =>  
   props.isSupplier, (addreses_) => {
@@ -151,15 +153,35 @@ async function fetchData() {
         </VCard>
       </VCol>
 
-      <VCol cols="12" md="12">
-        <CustomerOrderTable v-if="!props.isSupplier"/>
+      <VCol cols="12" md="12" v-if="!props.isSupplier">
+        <CustomerOrderTable />
       </VCol>
 
       <VCol cols="12" md="12">
-        <CustomerProductTable 
-          v-if="props.isSupplier"
-          :id="props.customerData.user.id"  
-        />
+        <VTabs
+          v-model="typeTab"
+          class="v-tabs-pill mb-3 disable-tab-transition">
+            <VTab><span>Productos</span></VTab>
+            <VTab><span>Servicios</span></VTab>
+        </VTabs>
+        <VWindow
+            v-model="typeTab"
+            class="disable-tab-transition"
+            :touch="false"
+        >
+            <VWindowItem>
+              <CustomerProductTable 
+                v-if="props.isSupplier"
+                :id="props.customerData.user.id"  
+              />
+            </VWindowItem>
+            <VWindowItem>
+              <CustomerServiceTable 
+                v-if="props.isSupplier"
+                :id="props.customerData.user.id"  
+              />
+            </VWindowItem>
+        </VWindow>
       </VCol>
     </VRow>
   </Suspense>

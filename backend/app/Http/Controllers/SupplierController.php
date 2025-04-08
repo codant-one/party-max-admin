@@ -42,6 +42,7 @@ class SupplierController extends Controller
         
             $query = Supplier::with(['user.userDetail.province.country', 'user.products', 'gender', 'document.type', 'account'])
                         ->productsCount()
+                        ->servicesCount()
                         ->sales()
                         ->services()
                         ->applyFilters(
@@ -159,6 +160,7 @@ class SupplierController extends Controller
                                     'account'
                                 ])
                                 ->productsCount()
+                                ->servicesCount()
                                 ->sales()
                                 ->services()
                                 ->retailSales()

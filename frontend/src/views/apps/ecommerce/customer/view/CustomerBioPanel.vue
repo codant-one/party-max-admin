@@ -37,7 +37,7 @@ async function fetchData() {
     valueText.value = 'Pedidos'
     icon.value = 'tabler-shopping-cart'
   } else {
-    valueCount.value = props.customerData.product_count ?? 0
+    valueCount.value = (props.customerData.product_count + props.customerData.service_count) ?? 0
     valueText.value = 'Publicados'
     icon.value = 'tabler-building-store'
     sales.value = Number(props.customerData.sales) + Number(props.customerData.services)

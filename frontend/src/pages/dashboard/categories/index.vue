@@ -254,7 +254,7 @@ const removeCategory = async () => {
                 <th> NOMBRE </th>
                 <th> SUBCATEGORÍA </th>
                 <th> TIPO </th>
-                <th class="text-end pe-4" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> PRODUCTOS PUBLICADOS</th>
+                <th class="text-end pe-4" v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')"> PUBLICADOS</th>
                 <th class="pe-4"> STATUS </th>
                 <th v-if="$can('editar', 'categorías') || $can('eliminar', 'categorías')">
                   ACCIONES

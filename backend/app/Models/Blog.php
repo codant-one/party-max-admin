@@ -75,7 +75,6 @@ class Blog extends Model
 
         $blog->update([
             'blog_category_id' => $request->blog_category_id,
-            'user_id' => auth()->user()->id,
             'is_popular_blog' => $request->is_popular_blog,
             'date' => $request->date,
             'title' => $request->title,

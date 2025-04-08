@@ -133,6 +133,7 @@ const downloadCSV = async () => {
       DOCUMENTO: (element.document === null) ? '' : (element.document?.type.code + ': ' + element.document?.main_document),
       PAÍS:  element.user.user_detail.province.country.name,
       PRODUCTOS_PUBLICADOS:  element.product_count,
+      SERVICIOS_PUBLICADOS:  element.service_count,
       TOTAL_VENTAS:  formatNumber(element.sales) ?? '0.00',
       TOTAL_SERVICES:  formatNumber(element.services) ?? '0.00'
     }
@@ -245,12 +246,13 @@ const getFlagCountry = country => {
             <!-- 👉 table head -->
             <thead>
               <tr>
-                <th scope="col"> #ID </th>
+                <!-- <th scope="col"> #ID </th> -->
                 <th scope="col"> EMPRESA </th>
                 <th scope="col"> CONTACTO </th>
-                <th scope="col"> PAÍS </th>
-                <th scope="col"> PROD. PUBLICADOS </th>
-                <th scope="col"> TOTAL VENTAS </th>
+                <!-- <th scope="col"> PAÍS </th> -->
+                <th scope="col"> PRODUCTOS PUB. </th>
+                <th scope="col"> SERVICIOS PUB. </th>
+                <th scope="col"> TOTAL PRODUCTOS </th>
                 <th scope="col"> TOTAL SERVICIOS </th>
                 <th scope="col" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">
                   ACCIONES
@@ -264,7 +266,7 @@ const getFlagCountry = country => {
                 :key="supplier.id"
                 style="height: 3.75rem;">
 
-                <td> {{ supplier.id }} </td>
+                <!-- <td> {{ supplier.id }} </td> -->
                 <td class="text-wrap w-25">
                   <div class="d-flex align-center gap-x-3">
                     <VAvatar
@@ -296,7 +298,7 @@ const getFlagCountry = country => {
                     <span class="text-sm text-disabled">{{ supplier.user.email }}</span>
                   </div>
                 </td>
-                <td class="text-wrap w-15"> 
+                <!-- <td class="text-wrap w-15"> 
                   <VAvatar
                     start
                     size="25"
@@ -305,9 +307,12 @@ const getFlagCountry = country => {
                   <span class="text-body-2 ms-2">
                     {{ supplier.user.user_detail.province.country.name }} 
                   </span>
-                </td>
+                </td> -->
                 <td class="text-wrap w-15">
                   {{ supplier.product_count }}
+                </td>
+                <td class="text-wrap w-15">
+                  {{ supplier.service_count }}
                 </td>
                 <td>
                   <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
