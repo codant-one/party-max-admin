@@ -129,6 +129,7 @@ class Order extends Model
         $order = self::create([
             'client_id' => $request->client_id === null ? null : $request->client_id,
             'address_id' => $request->client_id === null ? null : $request->address_id,
+            'coupon_id' => $request->coupon_id === 0 ? null : $request->coupon_id,
             'date' => now(),
             'sub_total' => $request->sub_total,
             'shipping_total' => $request->shipping_total,

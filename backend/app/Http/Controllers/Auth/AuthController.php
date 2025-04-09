@@ -22,6 +22,7 @@ use App\Models\Supplier;
 use App\Models\Billing;
 use App\Models\Order;
 use App\Models\Address;
+use App\Models\Coupon;
 
 class AuthController extends Controller
 {
@@ -450,6 +451,17 @@ class AuthController extends Controller
                 }
 
                 $client = Client::with(['user'])->find($client->id);
+
+                $client = Client::where('user_id', $user->id)->first();
+
+                $coupon = new Coupon();
+                $coupon->client_id = $client->id;
+                $coupon->is_percentage = 1;
+                $coupon->description = 'Cupón de bienvenida, disfruta de un 10% OFF en tus compras';
+                $coupon->code = 'BIENVENIDO'.$client->id;
+                $coupon->amount = 10;
+                $coupon->expiration_date = now()->addMonth();;
+                $coupon->save();
 
                 $username = $client->user->username;
                 $email = $client->user->email;

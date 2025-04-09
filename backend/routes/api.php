@@ -52,7 +52,8 @@ use App\Http\Controllers\{
     ReferralController,
     IpController,
     AIAgentController,
-    QuoteController
+    QuoteController,
+    CouponController
 };
 
 /*
@@ -266,6 +267,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     //Quotes
     Route::group(['prefix' => 'quotes'], function () {
         Route::post('delete', [QuoteController::class, 'delete']);
+    });
+
+    //Coupons
+    Route::group(['prefix' => 'coupons'], function () {
+        Route::get('show/{id}', [CouponController::class, 'couponsbyclient']);
+        Route::get('show-coupon/{code}', [CouponController::class, 'couponbyCode']);
     });
 
 });

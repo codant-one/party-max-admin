@@ -19,6 +19,7 @@ use App\Models\Event;
 use App\Models\ClientIp;
 use App\Models\ClientRegistration;
 use App\Models\Country;
+use App\Models\Coupon;
 
 class PaymentController extends Controller
 {
@@ -137,8 +138,9 @@ class PaymentController extends Controller
             case '1':
                 $payment_state_id = 4;
                 $message = 'Transacción aprobada.';
-                $request->request->add(['client_id' => $order->client_id ]);
+                $request->request->add(['client_id' => $order->client_id]);
                 Order::updateInventary($order);
+                Coupon::updateState($order);
                 break;
             case '4':
                 $payment_state_id = 3;
@@ -264,6 +266,7 @@ class PaymentController extends Controller
         }
 
         $order->update([
+            'coupon_id' => $payment_state_id !== 4 ? null : $order->coupon_id,
             'payment_state_id' => $payment_state_id,
             'response_code_pol' => $request->response_code_pol
         ]);
