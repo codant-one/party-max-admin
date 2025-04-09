@@ -50,6 +50,10 @@ class Order extends Model
         return $this->belongsTo(Address::class, 'address_id', 'id');
     }
 
+    public function coupon() {
+        return $this->belongsTo(Coupon::class, 'coupon_id', 'id');
+    }
+
     public function histories() {
         return $this->hasMany(ShippingHistory::class, 'order_id', 'id');
     }

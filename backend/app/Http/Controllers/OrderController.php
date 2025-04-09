@@ -368,7 +368,8 @@ class OrderController extends Controller
                                 'payment', 
                                 'billing',
                                 'address.province',
-                                'histories'
+                                'histories',
+                                'coupon'
                            ])
                            ->where('id', $id)
                            ->get();
@@ -379,6 +380,8 @@ class OrderController extends Controller
 
                 $orderInfo = [
                     'order_id' => $order->id,
+                    'coupon_id' => $order->coupon_id,
+                    'coupon' => $order->coupon,
                     'type' => $order->type,
                     'order_date' => $order->date,
                     'subtotal' => $order->sub_total,
