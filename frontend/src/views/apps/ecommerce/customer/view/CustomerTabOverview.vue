@@ -114,7 +114,7 @@ async function fetchData() {
             <div>
               <p class="mb-1">
                 <span class="text-warning text-h5 me-2">{{ props.customerData.user.favorites.length }}</span>
-                <span class="text-body-1">artículos en la lista de deseos</span>
+                <span class="text-body-1">{{ props.customerData.user.favorites.length > 1 ? 'artículos' : 'artículo '}} en la lista de deseos</span>
               </p>
               <p class="mb-0 text-disabled">
                 Artículos agregados por el cliente.
@@ -142,11 +142,11 @@ async function fetchData() {
             </h4>
             <div>
               <p class="mb-1">
-                <span class="text-info text-h5 me-2">0</span>
-                <span class="text-body-1">Cupones que obtuvieron</span>
+                <span class="text-info text-h5 me-2">{{ props.customerData.coupons.length }}</span>
+                <span class="text-body-1">{{ props.customerData.coupons.length > 1 ? 'Cupones' : 'Cupón' }} que obtuvieron</span>
               </p>
               <p class="mb-0 text-disabled">
-                Para usar cupón en sus próximas compras
+                Para usar cupón en sus compras
               </p>
             </div>
           </VCardText>

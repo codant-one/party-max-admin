@@ -155,7 +155,8 @@ class ClientController extends Controller
                                 'gender', 
                                 'addresses.type', 
                                 'addresses.province.country',
-                                'orders'
+                                'orders',
+                                'coupons'
                             ])
                             ->withCount(['orders'])
                             ->sales()
