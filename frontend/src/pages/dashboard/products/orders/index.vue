@@ -99,8 +99,6 @@ async function fetchData() {
       user: element.user,
       state: element.state,
       state_id: element.state_id,
-      in_stock: element.in_stock,
-      stock: element.stock,
       archived: element.archived,            
       title: element.name,
       image: element.image,
@@ -226,11 +224,9 @@ const onEnd = async (e) => {
             <tr class="text-no-wrap">
               <th> #ORDEN ID </th>
               <th> PRODUCTO </th>
-              <th class="pe-4"> STOCK </th>
               <th class="pe-4"> SKU </th>
               <th class="pe-4"> CATEGORÍAS </th>
               <th class="pe-4"> PRECIO </th>
-              <th class="pe-4"> QTY </th>
               <th class="pe-4 text-end"> STATUS </th>
             </tr>
           </thead>
@@ -246,7 +242,7 @@ const onEnd = async (e) => {
                 style="height: 3.75rem;"
                 class="draggable-item">
                 <td> {{ (selectedCategory != '' && selectedCategory != null) ? element.category_order_id : element.order_id }}  </td>
-                <td> 
+                <td class="text-wrap"> 
                   <div class="d-flex align-center gap-x-2">
                     <VAvatar
                       v-if="element.image"
@@ -260,12 +256,6 @@ const onEnd = async (e) => {
                       <span class="text-sm text-disabled">Tienda: {{ element.user.user_detail.store_name ?? (element.user.supplier?.company_name ?? (element.user.name + ' ' + (element.user.last_name ?? ''))) }}</span>
                     </div>
                   </div>
-                </td>
-                <td>   
-                  <VSwitch 
-                    :model-value="element.in_stock === 1 ? true : false"
-                    readonly
-                  /> 
                 </td>
                 <td> {{ element.sku }} </td>
                 <td style="width: 10px;">
@@ -285,7 +275,6 @@ const onEnd = async (e) => {
                   </span>
                 </td>  
                 <td> {{ (parseFloat(element.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                <td> {{ element.stock }} </td>
                 <td class="text-end"> 
                   <VChip
                     v-bind="resolveStatus(element.state_id)"

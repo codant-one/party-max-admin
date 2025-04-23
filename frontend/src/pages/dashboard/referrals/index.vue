@@ -54,7 +54,7 @@ async function fetchData() {
         search: searchQuery.value,
         category_id: selectedCategory.value,
         orderByField: 'id',
-        orderBy: 'asc',
+        orderBy: 'desc',
         limit: rowPerPage.value,
         page: currentPage.value,
         supplierId: userData.value.id

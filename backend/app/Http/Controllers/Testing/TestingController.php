@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\SupplierAccount;
 use App\Models\Quote;
+use App\Models\ProductColor;
 
 class TestingController extends Controller
 {
@@ -356,17 +357,18 @@ class TestingController extends Controller
 
     public function littleProductExistenceEmail() {
 
-        $productId = 16;
+        $productColorId = 2749;
+        $product_color = ProductColor::with(['product', 'color'])->find($productColorId);
 
-        $product = Product::with(['colors.product', 'user'])->find($productId); 
         $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
 
         $productInfo = [
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_image' => asset('storage/' . $product->image),
-            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
-            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+            'product_id' => $product_color->product->id,
+            'product_name' => $product_color->product->name,
+            'product_color' => $product_color->color->name,
+            'product_image' => asset('storage/' . $product_color->product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product_color->product->id,
+            'stock' => $product_color->stock . ((intval($product_color->stock) > 1) ? ' Unidades' : ' Unidad'),
         ];
 
         $data = [
@@ -374,23 +376,23 @@ class TestingController extends Controller
             'link' => $link
         ];
 
-        //dd($data);
         return view('emails.suppliers.little_product_existence', compact('data'));
     }
 
     public function outOfStockEmail() {
 
-        $productId = 16;
+        $productColorId = 2749;
+        $product_color = ProductColor::with(['product', 'color'])->find($productColorId);
 
-        $product = Product::with(['colors.product', 'user'])->find($productId); 
         $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
 
         $productInfo = [
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_image' => asset('storage/' . $product->image),
-            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
-            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+            'product_id' => $product_color->product->id,
+            'product_name' => $product_color->product->name,
+            'product_color' => $product_color->color->name,
+            'product_image' => asset('storage/' . $product_color->product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product_color->product->id,
+            'stock' => $product_color->stock . ((intval($product_color->stock) > 1) ? ' Unidades' : ' Unidad'),
         ];
 
         $data = [
@@ -536,16 +538,18 @@ class TestingController extends Controller
         
         $productDetails = $order_details->map(function ($detail) {
             return [
-                'product_id' => $detail->product_color->product_id,
+                'product_color_id' => $detail->product_color_id,
+                'product_id' => $detail->product_color ? $detail->product_color->product_id : 0,
                 'quantity' => $detail->quantity,
+                'total' => $detail->tota
             ];
         })->toArray();
 
         foreach ($productDetails as $item) {
             try {
-                $product = Product::find($item['product_id']);
+                $product = Product::with(['colors.product', 'user'])->find($item['product_id']);
                 if ($product) {
-                     $product->updateStockProduct($product, $item['quantity']);
+                    $product->updateStockProduct($item);
                 }
                     
             } catch (Exception $e) {

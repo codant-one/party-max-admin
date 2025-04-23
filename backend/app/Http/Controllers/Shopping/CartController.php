@@ -105,14 +105,11 @@ class CartController extends Controller
 
             $productColorIds = explode(',', $request->product_color_id);
             $quantities = explode(',', $request->quantity);
-
-            $products = ProductColor::with(['product:id,stock'])
-                                    ->whereIn('id', $productColorIds)
-                                    ->get();
+            $products = ProductColor::whereIn('id', $productColorIds)->get();
 
             $cart = collect($products)->map(function ($productColor, $index) use ($quantities) {
                 return [
-                    'stock' => $productColor->product->stock,
+                    'stock' => $productColor->stock,
                     'quantity' => intval($quantities[$index])
                 ];
             });

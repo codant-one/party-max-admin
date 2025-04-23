@@ -99,9 +99,9 @@ async function fetchData() {
             labels: {
               show: true,
               value: {
-                fontSize: '15px',
+                fontSize: '18px',
                 color: 'rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity))',
-                fontWeight: 500,
+                fontWeight: 800,
                 offsetY: -15,
                 formatter(val) {
                   return `${ Number.parseFloat(val).toFixed(1) }%`

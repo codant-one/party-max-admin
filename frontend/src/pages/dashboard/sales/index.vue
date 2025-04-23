@@ -21,6 +21,7 @@ const totalPages = ref(1)
 const totalProducts = ref(0)
 const isRequestOngoing = ref(true)
 const selectedProduct = ref({})
+const totalSum = ref(0)
 
 const date = ref(null)
 const dateRangeArray = ref(null)
@@ -34,7 +35,6 @@ const discarded = ref(null)
 
 const selectedStatus = ref(3)
 const selectedCategory = ref()
-const selectedStock = ref()
 const selectedDetail = ref()
 
 const isConfirmApproveDialogVisible = ref(false)
@@ -99,17 +99,6 @@ const typesales = ref([
 
 const categories = ref([])
 
-const stockStatus = ref([
-  {
-    title: 'En Stock',
-    value: 1
-  },
-  {
-    title: 'Agotado',
-    value: 0
-  },
-])
-
 const advisor = ref({
   type: '',
   message: '',
@@ -149,7 +138,6 @@ async function fetchData() {
         archived: archived.value,
         discarded: discarded.value,
         state_id: selectedStatus.value,
-        in_stock: selectedStock.value,
         type_sales: selectedDetail.value,
         category_id: selectedCategory.value,
         orderByField: 'count_sales',
@@ -174,6 +162,8 @@ async function fetchData() {
 
     await productsStores.fetchProducts(data)
 
+    totalSum.value = productsStores.data.totalSum
+
     products.value =  []
     myProductsList.value =  []
     myProductsList.value = productsStores.getProducts
@@ -185,8 +175,6 @@ async function fetchData() {
         discarded: element.discarded,
         user: element.user,
         state: element.state,
-        in_stock: element.in_stock,
-        stock: element.stock,
         archived: element.archived,            
         title: element.name,
         image: element.image,
@@ -545,7 +533,7 @@ const removeProduct = async () => {
           <!-- 👉 Select Status -->
           <VCol
             cols="12"
-            sm="3"
+            sm="4"
           >
             <AppSelect
               v-model="selectedStatus"
@@ -559,7 +547,7 @@ const removeProduct = async () => {
           <!-- 👉 Select Category -->
           <VCol
             cols="12"
-            sm="3"
+            sm="4"
           >
             <VAutocomplete
               id="selectCategory"
@@ -605,24 +593,10 @@ const removeProduct = async () => {
             </VAutocomplete>
           </VCol>
 
-          <!-- 👉 Select Stock Status -->
-          <VCol
-            cols="12"
-            sm="3"
-          >
-            <AppSelect
-              v-model="selectedStock"
-              placeholder="Stock"
-              :items="stockStatus"
-              clearable
-              clear-icon="tabler-x"
-            />
-          </VCol>
-
           <!-- 👉 Select Detail  -->
           <VCol
             cols="12"
-            sm="3"
+            sm="4"
           >
             <AppSelect
               v-model="selectedDetail"
@@ -670,9 +644,8 @@ const removeProduct = async () => {
                 <tr class="text-no-wrap">
                   <th> #ID </th>
                   <th> PRODUCTO </th>
-                  <th class="pe-4"> STOCK </th>
                   <th class="pe-4"> SKU </th>
-                  <th class="pe-4"> PRECIO </th>
+                  <th class="pe-4"> TOTAL VENTAS </th>
                   <th class="pe-4"> VENTAS </th>
                   <th class="pe-4"> STATUS </th>
                   <th scope="pe-4" v-if="
@@ -703,15 +676,9 @@ const removeProduct = async () => {
                             </div>
                         </div>
                         </td>
-                        <td>   
-                        <VSwitch 
-                            :model-value="product.in_stock === 1 ? true : false"
-                            readonly
-                        /> 
-                        </td>
                         <td> {{ product.colors[0]?.sku ?? '--' }} </td>
-                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                        <td> {{ product.count_sales }} </td>
+                        <td> {{ (parseFloat(product.sales_total)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                        <td> {{ product.count_sales }}</td>
                         <td> 
                         <VChip
                             v-bind="resolveStatus(product.state_id)"
@@ -834,6 +801,10 @@ const removeProduct = async () => {
             <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3 px-5">
               <span class="text-sm text-disabled">
                 {{ paginationData }}
+              </span>
+
+              <span class="text-sm text-disabled">
+                <strong>TOTAL: COP {{ totalSum }}</strong>
               </span>
 
               <VPagination

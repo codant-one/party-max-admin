@@ -12,6 +12,7 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 use App\Models\Referral;
 use App\Models\ReferralDetail;
 use App\Models\Product;
+use App\Models\ProductColor;
 
 class ReferralController extends Controller
 {
@@ -31,7 +32,16 @@ class ReferralController extends Controller
 
             $limit = $request->has('limit') ? $request->limit : 10;
 
-            $query = Referral::with(['user.supplier.document.type'])->withCount(['details']);
+            $query = 
+                Referral::with(['user.supplier.document.type'])
+                        ->withCount(['details'])
+                        ->applyFilters(
+                            $request->only([
+                                'search',
+                                'orderByField',
+                                'orderBy'
+                            ])
+                        );
                    
             $count = $query->count();
 
@@ -221,7 +231,7 @@ class ReferralController extends Controller
                     ]
                 );
 
-                $product_ = Product::find($product['color']['product']['id']);
+                $product_ = ProductColor::find($product['color']['id']);
                 $product_->stock = $product_->stock + intval($product['quantity']);
                 $product_->in_stock = 1;
                 $product_->update();

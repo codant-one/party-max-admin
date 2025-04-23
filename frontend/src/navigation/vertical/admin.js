@@ -32,6 +32,13 @@ export default [
         subject: 'ips', 
       },
       {
+        title: 'Cupones',
+        icon: { icon: 'mdi-ticket-percent' },
+        to: 'dashboard-admin-coupons', 
+        action: 'ver', 
+        subject: 'ips', 
+      },
+      {
         title: "FAQ's",
         icon: { icon: 'tabler-help-hexagon' },
         action: 'ver',

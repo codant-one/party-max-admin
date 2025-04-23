@@ -86,7 +86,7 @@ const go = (id) => {
             {{ product.name }}
           </VListItemTitle>
           <VListItemSubtitle class="text-disabled d-flex" style="width: 230px;">
-            SKU: {{ product.colors[0].sku }} 
+            SKU: {{ isPopular === '0' ? product.sku : product.colors[0].sku }} 
             <VSpacer />
             <span v-if="isPopular === '0'">({{ product.stock }}/{{ product.wholesale_min }})</span>
           </VListItemSubtitle>

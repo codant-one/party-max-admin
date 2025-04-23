@@ -69,6 +69,8 @@ watchEffect(() => {
             categories.value = props.product.colors[0]?.categories.map(item => item.category.name)
             productImages.value = (props.product.colors[0]?.images.length === 0) ? imageAux.value : props.product.colors[0]?.images
             color.value = props.product.colors[0]?.color.name
+            stock.value = props.product.colors[0]?.stock
+
             selectedColor.value = props.product.colors[0]?.color.id.toString()
 
             props.product.colors.forEach(element => { 
@@ -94,7 +96,6 @@ watchEffect(() => {
             price_for_sale.value = props.product.price_for_sale
             wholesale_price.value = props.product.wholesale_price
             wholesale.value = props.product.wholesale
-            stock.value = props.product.stock
             width.value = props.product.detail.width
             weigth.value = props.product.detail.weigth
             height.value = props.product.detail.height
@@ -130,6 +131,8 @@ const chanceRadio = (value) => {
         color.value = seleted?.color.name
         selectedColor.value = seleted?.color.id.toString()
         sku.value = seleted?.sku ?? null
+
+        stock.value = seleted?.stock
     }
 }
 </script>
@@ -138,7 +141,7 @@ const chanceRadio = (value) => {
     <!-- DIALOGO DE VER -->
     <VDialog
         :model-value="props.isDrawerOpen"
-        max-width="1000"
+        max-width="1200"
         persistent>
         <DialogCloseBtn @click="closeProductDetailDialog" />
 
@@ -163,13 +166,13 @@ const chanceRadio = (value) => {
                             </swiper>
                         </div>
                         <div class="d-block d-md-none">
-                            <Carousel id="gallery" :items-to-show="1" :wrap-around="false" v-model="currentSlide">
+                            <!-- <Carousel id="gallery" :items-to-show="1" :wrap-around="false" v-model="currentSlide">
                                 <Slide v-for="(picture, index) in productImages" :key="index">
                                     <div class="carousel__item">
                                         <img :src="themeConfig.settings.urlStorage + picture.image" />
                                     </div>
                                 </Slide>
-                            </Carousel>
+                            </Carousel> -->
 
                             <Carousel
                                 id="thumbnails"
@@ -179,7 +182,7 @@ const chanceRadio = (value) => {
                                 ref="carousel"
                             >
                                 <Slide v-for="(picture, index) in productImages" :key="index">
-                                    <div class="carousel__item" @click="slideTo(index)">
+                                    <div class="carousel__item border-img p-1" @click="slideTo(index)">
                                         <img :src="themeConfig.settings.urlStorage + picture.image" />
                                     </div>
                                 </Slide>
@@ -195,7 +198,7 @@ const chanceRadio = (value) => {
                                 :spaceBetween="10"
                                 :thumbs="{ swiper: thumbsSwiper }"
                                 :modules="modules"
-                                class="mySwiper2"
+                                class="mySwiper2 border-img"
                             >
                                 <swiper-slide v-for="(picture, index) in productImages" :key="index">
                                     <img :src="themeConfig.settings.urlStorage + picture.image" />
@@ -216,6 +219,9 @@ const chanceRadio = (value) => {
                             <div>Color: 
                                 <span class="font-weight-semibold text-uppercase">{{ color }}</span>
                             </div>
+                            <div>Stock: 
+                                <span class="font-weight-semibold text-uppercase">{{ stock }}</span>
+                            </div>
                             <div> 
                                 <CustomRadiosWithIcon
                                     v-model:selected-radio="selectedColor"
@@ -232,7 +238,9 @@ const chanceRadio = (value) => {
                                             <div class="d-flex align-center justify-center">
                                                 <img 
                                                     width="100"
-                                                    :src="themeConfig.settings.urlStorage + item.image" />
+                                                    height="100"
+                                                    :src="themeConfig.settings.urlStorage + item.image"
+                                                    style="max-height: 80px" />
                                             </div>
                                         </div>
                                     </template>
@@ -275,10 +283,6 @@ const chanceRadio = (value) => {
                                                 <div v-if="wholesale">
                                                     <span class="font-weight-semibold"> Precio al mayor: </span>
                                                     <span>{{ (parseFloat(wholesale_price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-weight-semibold"> Stock: </span>
-                                                    <span>{{ stock }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="font-weight-semibold"> Alto: </span>
@@ -401,7 +405,8 @@ const chanceRadio = (value) => {
     }
 
     .carousel__item img {
-        width: 60%;
+        width: 100%;
+        padding: 0 10px;
     }
 
     .swiper-vertical > .swiper-pagination-bullets .swiper-pagination-bullet, .swiper-pagination-vertical.swiper-pagination-bullets .swiper-pagination-bullet {
@@ -438,6 +443,15 @@ const chanceRadio = (value) => {
     .mySwiper2 {
         height: 350px;
         width: 100%;
+    }
+
+    .border-img {
+        border-radius: 16px !important;
+        border: 1px solid #D9D9D9;
+        background-color: white;
+        text-align: center;
+        align-items: center;
+        display: flex;
     }
 
     .mySwiper {

@@ -202,7 +202,7 @@ class MiscellaneousController extends Controller
                               ->first();
 
             $recommendations = 
-                Product::with(['user.userDetail', 'user.supplier'])
+                Product::with(['user.userDetail', 'user.supplier', 'colors'])
                        ->where('favourite', true)
                        ->orderBy('created_at', 'desc')
                        ->limit(5)
@@ -217,7 +217,7 @@ class MiscellaneousController extends Controller
                     $tag_id = $productTag->tag_id;
 
                     $recommendations = 
-                            Product::with(['user.userDetail', 'user.supplier', 'tags'])
+                            Product::with(['user.userDetail', 'user.supplier', 'tags', 'colors'])
                                    ->whereHas('tags', function($query) use ($tag_id) {
                                         $query->where('tag_id', $tag_id);
                                    })

@@ -19,6 +19,9 @@ const emitter = inject("emitter")
 const order = ref(null)
 const date = ref(null)
 const total = ref(0)
+const coupon_id = ref(null)
+const coupon = ref(null)
+const discount = ref(null)
 const isConfirmDeleteDialogVisible = ref(false)
 
 const isRequestOngoing = ref(true)
@@ -37,6 +40,16 @@ async function fetchData() {
 
     order.value = response.order
     total.value = response.ordersTotalCount
+
+    coupon_id.value = order.value.coupon_id
+    coupon.value = order.value.coupon
+
+    if(coupon_id.value !== null) {//aplico cupón
+      if(coupon.value.is_percentage)// es porcentaje
+        discount.value = ((order.value.sub_total * coupon.value.amount) / 100).toFixed(2)
+      else
+         discount.value = coupon.value.amount.toFixed(2)
+    }
 
     date.value = order.value.created_at
   }
@@ -71,6 +84,10 @@ const resolveStatusPayment = payment_state_id => {
 
 const printInvoice = () => {
   window.print()
+}
+
+const seeCoupon = () => {
+  router.push({ name : 'dashboard-admin-coupons-id', params: { id: coupon_id.value } })
 }
 
 const showDeleteDialog = orderData => {
@@ -344,19 +361,25 @@ const removeOrder = async () => {
                         <td width="200px">
                           Subtotal:
                         </td>
-                        <td>
+                        <td class="ps-1">
                           $ {{ formatNumber(order.sub_total) }}
+                        </td>
+                      </tr>
+                      <tr v-if="coupon_id">
+                        <td class="text-error">Descuento: </td>
+                        <td class="text-error">
+                          -$ {{ formatNumber(discount) }}
                         </td>
                       </tr>
                       <tr>
                         <td>Envío Total: </td>
-                        <td>
+                        <td class="ps-1">
                           $ {{ formatNumber(order.shipping_total) }}
                         </td>
                       </tr>
                       <tr>
                         <td>Tax: </td>
-                        <td>
+                        <td class="ps-1">
                           $ {{ formatNumber(order.tax) }}
                         </td>
                       </tr>
@@ -364,7 +387,7 @@ const removeOrder = async () => {
                         <td class="text-high-emphasis font-weight-medium">
                           Total:
                         </td>
-                        <td class="font-weight-medium">
+                        <td class="font-weight-medium ps-1">
                           $ {{ formatNumber(order.total) }}
                         </td>
                       </tr>
@@ -550,6 +573,26 @@ const removeOrder = async () => {
           </VCol>
 
           <VCol cols="12" md="4" class="print-row print-order-1" v-if="rol !== 'Proveedor' || order.type === 1">
+             <!-- 👉 Customer Details  -->
+             <VCard class="mb-6 client-details" v-if="coupon_id">
+              <VCardText class="d-flex flex-column gap-y-6">
+                <div class="text-body-1 text-high-emphasis font-weight-medium">
+                    Cupón aplicado
+                </div>
+
+                <div class="d-print-none">
+                  <VAvatar
+                    variant="tonal"
+                    color="primary"
+                    class="me-3"
+                  >
+                    <VIcon icon="mdi-ticket-percent" />
+                  </VAvatar>
+                  <span class="text-body-1 font-weight-medium text-high-emphasis cursor-pointer" @click="seeCoupon">{{ coupon.code}}</span>
+                </div>
+              </VCardText>
+            </VCard>
+
             <!-- 👉 Customer Details  -->
             <VCard class="mb-6 client-details">
               <VCardText class="d-flex flex-column gap-y-6">

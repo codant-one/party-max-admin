@@ -359,6 +359,21 @@ const closeModal = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
+                            Cupones
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver cupones"
+                                value="ver cupones"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar cupones"
+                                value="eliminar cupones"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
                             FAQ's
                         </VLabel>
                         <div class="ml-5">

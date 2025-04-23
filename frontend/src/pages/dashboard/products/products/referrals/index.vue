@@ -87,9 +87,7 @@ async function fetchData() {
         products.value.push({
         id: element.id,
         user: element.user,
-        state: element.state,
-        in_stock: element.in_stock,
-        stock: element.stock,           
+        state: element.state,         
         title: element.name,
         image: element.image,
         price: element.price_for_sale,

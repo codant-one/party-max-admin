@@ -56,7 +56,7 @@ const price_for_sale = ref('')
 const wholesale_price = ref('')
 const wholesale_min = ref('')
 const wholesale = ref(false)
-const stock = ref('')
+const stock = ref([])
 const image = ref('')
 const avatar = ref('')
 const filename = ref([])
@@ -132,7 +132,8 @@ async function fetchData() {
           category_id.value.push(value.categories.map(category => category.category_id))
       });
       sku.value = product.value.colors.map(color => color.sku)
-    
+      stock.value = product.value.colors.map(color => color.stock)
+
       product.value.colors.forEach(async function callback(value, index) { 
           let files = []
           for(var i = 0; i < value.images.length; i++) {
@@ -166,7 +167,6 @@ async function fetchData() {
       wholesale_price.value = product.value.wholesale_price
       wholesale_min.value = product.value.wholesale_min
       wholesale.value = product.value.wholesale
-      stock.value = product.value.stock
 
       avatar.value = product.value.image === null ? '' : themeConfig.settings.urlStorage + product.value.image
 
@@ -297,7 +297,6 @@ const onSubmit = () => {
             formData.append('wholesale', wholesale.value ? 1 : 0)
             formData.append('wholesale_price', wholesale_price.value)
             formData.append('wholesale_min', wholesale_min.value)
-            formData.append('stock', stock.value)
             formData.append('image', image.value)
 
             //product_details
@@ -317,6 +316,7 @@ const onSubmit = () => {
             formData.append('color_id', color_id.value)
             formData.append('sku', sku.value)
             formData.append('product_files', product_files.value)
+            formData.append('stock', stock.value)
 
             product_files.value.forEach(function callback(value, index) {
                 value.forEach(function callback(image, i) {
@@ -497,7 +497,7 @@ const onSubmit = () => {
                   </VCol>
                   <VCol
                     cols="12"
-                    md="3"
+                    md="4"
                   >
                     <VSelect
                       v-model="color_id[i-1]"
@@ -513,7 +513,7 @@ const onSubmit = () => {
                   </VCol>
                   <VCol
                     cols="12"
-                    md="3"
+                    md="4"
                   >
                     <AppTextField
                       v-model="sku[i-1]"
@@ -521,9 +521,22 @@ const onSubmit = () => {
                       :rules="[requiredValidator]"
                     />
                   </VCol>
+
                   <VCol
                     cols="12"
-                    md="6"
+                    md="4"
+                  >
+                    <AppTextField
+                      v-model="stock[i-1]"
+                      type="number"
+                      placeholder="Stock"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+
+                  <VCol
+                    cols="12"
+                    md="12"
                   >
                     <VAutocomplete
                       :id="'selectCategory_' + i"
@@ -681,14 +694,6 @@ const onSubmit = () => {
                   :min="1"
                 />
               </div>
-              
-              <AppTextField
-                v-model="stock"
-                type="number"
-                label="Stock"
-                class="mb-4"
-                :rules="[requiredValidator]"
-              />
 
             </VCardText>
           </VCard>

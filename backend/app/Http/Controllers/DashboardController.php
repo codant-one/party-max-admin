@@ -61,14 +61,24 @@ class DashboardController extends Controller
             $productsWithLessStock = 
                 Product::with(['colors.color'])
                 ->withTrashed()
-                ->selectRaw('*, CASE WHEN stock <= 6 THEN FORMAT((stock / NULLIF(wholesale_min, 0)) * 100, 1) ELSE 100.0 END as stock_percentage')
-                ->where([
-                    ['user_id', Auth::user()->id],
-                    ['state_id', 3]
-                ])
-                ->orderBy('stock', 'ASC')  // Ordenar por stock en orden ascendente
-                ->limit(6)  // Limitar la consulta a los 6 productos con menos existencias
-                ->get();
+                ->where('user_id', Auth::id())
+                ->where('state_id', 3)
+                ->get()
+                ->map(function ($product) {
+                    $color = $product->colors->sortBy('stock')->first();
+
+                    $stock = $color->stock ?? 0;
+                    $min = $product->wholesale_min ?: 1;
+                    $stock_percentage = $stock <= 6 ? round(($stock / $min) * 100, 1) : 100.0;
+
+                    $product->stock_percentage = $stock_percentage;
+                    $product->lowest_color_stock = $stock;
+                    $product->sku = $color->sku;
+
+                    return $product;
+                })
+                ->sortBy('stock_percentage')
+                ->take(6);
 
             $services = 
                 Service::withTrashed()

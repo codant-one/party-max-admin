@@ -4,13 +4,13 @@ import { themeConfig } from '@themeConfig'
 import { formatNumber } from '@/@core/utils/formatters'
 import { useProductsStores } from '@/stores/useProducts'
 import { excelParser } from '@/plugins/csv/excelParser'
+import show from "@/components/products/show.vue";
 import router from '@/router'
 
 const productsStores = useProductsStores()
 
 const isMobile = ref(false)
 
-const data = ref(null)
 const widgetData = ref([])
 
 const products = ref([])
@@ -21,6 +21,7 @@ const totalPages = ref(1)
 const totalProducts = ref(0)
 const isRequestOngoing = ref(true)
 const selectedProduct = ref({})
+const isProductDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const isConfirmApproveDialogVisible = ref(false)
 const state_id = ref(3)
@@ -151,6 +152,11 @@ const showStateDialog = (productData, id) => {
     selectedProduct.value = { ...productData }
 }
 
+const showProduct = async (id) => {
+  isProductDetailDialog.value = true
+  selectedProduct.value = products.value.filter((element) => element.id === id )[0]
+}
+
 const stateProduct = async state_id => {
     isConfirmApproveDialogVisible.value = false
 
@@ -225,10 +231,8 @@ const downloadCSV = async () => {
         ID: element.id,
         PRODUCTO: element.name,
         TIENDA: element.user.user_detail.store_name ?? (element.user.supplier?.company_name ?? (element.user.name + ' ' + (element.user.last_name ?? ''))),
-        STOCK: element.in_stock === 0 ? 'NO' : 'SI',
         SKU: element.colors[0].sku,
-        PRECIO: element.price_for_sale,
-        QTY:  element.stock
+        PRECIO: element.price_for_sale
     }
             
     dataArray.push(data)
@@ -366,10 +370,8 @@ const downloadCSV = async () => {
                     <tr class="text-no-wrap">
                         <th> #ID </th>
                         <th> PRODUCTO </th>
-                        <th class="pe-4"> STOCK </th>
                         <th class="pe-4"> SKU </th>
                         <th class="pe-4"> PRECIO </th>
-                        <th class="pe-4"> QTY </th>
                         <th class="pe-4"> STATUS </th>
                         <th scope="pe-4" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
                             ACCIONES
@@ -397,15 +399,8 @@ const downloadCSV = async () => {
                                 </div>
                             </div>
                         </td>
-                        <td>   
-                            <VSwitch 
-                                :model-value="product.in_stock === 1 ? true : false"
-                                readonly
-                            /> 
-                        </td>
                         <td> {{ product.colors[0]?.sku ?? '--' }} </td>
                         <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                        <td> {{ product.stock }} </td>
                         <td> 
                             <VChip
                                 v-bind="resolveStatus(product.state_id)"
@@ -414,6 +409,26 @@ const downloadCSV = async () => {
                             />
                         </td>
                         <td class="text-center" style="width: 5rem;" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
+                            <VBtn
+                                v-if="$can('ver', 'productos')"
+                                @click="showProduct(product.id)"
+                                icon
+                                variant="text"
+                                color="default"
+                                size="x-small">
+                                <VTooltip
+                                open-on-focus
+                                location="top"
+                                activator="parent">
+                                Ver
+                                </VTooltip>
+                                <VIcon
+                                size="28"
+                                icon="tabler-eye"
+                                class="me-1"
+                                />
+                            </VBtn> 
+
                             <VBtn
                                 v-if="$can('aprobar', 'productos')"
                                 icon
@@ -497,6 +512,10 @@ const downloadCSV = async () => {
             
             </VCardText>
         </VCard>
+
+        <show 
+            v-model:isDrawerOpen="isProductDetailDialog"
+            :product="selectedProduct"/>
 
         <!-- 👉 Confirm Delete -->
         <VDialog

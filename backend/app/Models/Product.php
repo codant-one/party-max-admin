@@ -98,25 +98,44 @@ class Product extends Model
     /**** Scopes ****/
     public function scopeSales($query, $date = null)
     {
-        return $query->addSelect(['count_sales' => function($q) use ($date) {
-            $q->selectRaw('count(p.id)')
-              ->from('products as p')
-              ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
-              ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
-              ->join('orders as o', 'o.id', '=', 'od.order_id')
-              ->whereColumn('p.id', 'products.id')
-              ->where([
-                ['p.user_id', Auth::id()],
-                ['o.payment_state_id', 4]
-              ]);
+        return 
+            $query->addSelect(['count_sales' => function($q) use ($date) {
+                $q->selectRaw('SUM(od.quantity)')
+                  ->from('products as p')
+                  ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                  ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
+                  ->join('orders as o', 'o.id', '=', 'od.order_id')
+                  ->whereColumn('p.id', 'products.id')
+                  ->where([
+                    ['p.user_id', Auth::id()],
+                    ['o.payment_state_id', 4]
+                  ]);
 
-              if($date !== null) {
-                if(count($date) === 2)
-                    $q->whereBetween('o.date', $date);
-                else 
-                    $q->where('o.date', $date[0]);
-              }
-        }]);
+                if($date !== null) {
+                    if(count($date) === 2)
+                        $q->whereBetween('o.date', $date);
+                    else 
+                        $q->where('o.date', $date[0]);
+                }
+            }])->addSelect(['sales_total' => function($q) use ($date) {
+                $q->selectRaw('SUM(od.total)')
+                  ->from('products as p')
+                  ->join('product_colors as pc', 'p.id', '=', 'pc.product_id')
+                  ->join('order_details as od', 'pc.id', '=', 'od.product_color_id')
+                  ->join('orders as o', 'o.id', '=', 'od.order_id')
+                  ->whereColumn('p.id', 'products.id')
+                  ->where([
+                    ['p.user_id', Auth::id()],
+                    ['o.payment_state_id', 4]
+                  ]);
+
+                if($date !== null) {
+                    if(count($date) === 2)
+                        $q->whereBetween('o.date', $date);
+                    else 
+                        $q->where('o.date', $date[0]);
+                }
+            }]);
     }
 
     public function scopeIsFavorite($query)
@@ -194,6 +213,16 @@ class Product extends Model
                         ->leftJoin('order_details as od', 'od.product_color_id', '=', 'pc.id')
                         ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
                         ->where('o.payment_state_id', 4)
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+    public function scopeMinStock($query)
+    {
+        return  $query->addSelect(['min_stock' => function ($q){
+                $q->selectRaw('MIN(pc.stock)')
+                        ->from('products as p')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
                         ->whereColumn('p.id', 'products.id');
                 }]);
     }
@@ -310,7 +339,9 @@ class Product extends Model
         }
 
         if ($filters->get('in_stock') !== null) {
-            $query->where('in_stock', $filters->get('in_stock'));
+            $query->whereHas('colors', function ($q) use ($filters) {
+                $q->where('in_stock', $filters->get('in_stock'));
+            });
         }
 
         if ($filters->get('category_id') !== null) {
@@ -443,7 +474,8 @@ class Product extends Model
             $product_color = ProductColor::create([
                 'product_id' => $product_id,
                 'color_id' => $color,
-                'sku' => explode(",", $request->sku)[$key]
+                'sku' => explode(",", $request->sku)[$key],
+                'stock' => explode(",", $request->stock)[$key]
             ]);
 
             self::createProductImages($product_color->id, $key, $request);
@@ -473,13 +505,17 @@ class Product extends Model
                 $product_color->update([
                     'product_id' => $product_id,
                     'color_id' => $color,
-                    'sku' => explode(",", $request->sku)[$key]
+                    'sku' => explode(",", $request->sku)[$key],
+                    'stock' => explode(",", $request->stock)[$key],
+                    'in_stock' => (intval(explode(",", $request->stock)[$key]) >= 1) ? 1 : 0
                 ]);
             else 
                 $product_color = ProductColor::create([
                     'product_id' => $product_id,
                     'color_id' => $color,
-                    'sku' => explode(",", $request->sku)[$key]
+                    'sku' => explode(",", $request->sku)[$key],
+                    'stock' => explode(",", $request->stock)[$key],
+                    'in_stock' => (intval(explode(",", $request->stock)[$key]) >= 1) ? 1 : 0
                 ]);
 
             $product_color->categories()->delete();
@@ -535,9 +571,9 @@ class Product extends Model
                 $file_data = uploadFile($image, $path);
 
                 $product_image = ProductImage::create([
-                        'product_color_id' => $product_color_id,
-                        'image' => $file_data['filePath']
-                    ]);
+                    'product_color_id' => $product_color_id,
+                    'image' => $file_data['filePath']
+                ]);
             }
         }
     }
@@ -561,7 +597,6 @@ class Product extends Model
             'wholesale' => $request->wholesale,
             'wholesale_price' => $request->wholesale_price === 'null' ? null : $request->wholesale_price,
             'wholesale_min' => $request->wholesale_min,
-            'stock' => $request->stock,
             'slug' => Str::slug($request->name)
         ]);
 
@@ -592,8 +627,6 @@ class Product extends Model
             'wholesale' => $request->wholesale,
             'wholesale_price' => ($request->wholesale_price === 'null' || $request->wholesale === '0') ? null : $request->wholesale_price,
             'wholesale_min' => $request->wholesale_min,
-            'stock' => $request->stock,
-            'in_stock' => (intval($request->stock) >= 1) ? 1 : 0,
             'slug' => Str::slug($request->name)
         ]);
 
@@ -666,40 +699,43 @@ class Product extends Model
         return $product;
     }
 
-    public static function updateStockProduct($product, $quantity) {
-        $new_stock = $product->stock - $quantity;
+    public static function updateStockProduct($item) {
+
+        $product_color = ProductColor::with(['product', 'color'])->find($item['product_color_id']);
+        $new_stock = $product_color->stock - $item['quantity'];
     
-        $product->update([
+        $product_color->update([
             'stock' => $new_stock,
             'in_stock' => ($new_stock === 0) ? 0 : 1
         ]);
 
         if(intval($new_stock) < 3 && intval($new_stock) !== 0)
-            self::sendMail($product, 1);
+            self::sendMail($product_color, 1);
         else if(intval($new_stock) === 0)
-            self::sendMail($product, 2);
+            self::sendMail($product_color, 2);
     }
 
-    public static function sendMail($product, $type) {
+    public static function sendMail($product_color, $type) {
 
-        $email = $product->user->email;
+        $email = $product_color->product->user->email;
 
         if($type === 1) {
-            $subject = '('. $product->user->name . ' ' . $product->user->last_name . ') tienes poca existencia, monitorea tu producto.';
+            $subject = '('. $product_color->product->user->name . ' ' . $product_color->product->user->last_name . ') tienes poca existencia, monitorea tu producto.';
             $view = 'emails.suppliers.little_product_existence';
         } else {
-            $subject = '('. $product->user->name . ' ' . $product->user->last_name . ') inventario agotado.';
+            $subject = '('. $product_color->product->user->name . ' ' . $product_color->product->user->last_name . ') inventario agotado.';
             $view = 'emails.suppliers.out_of_stock';
         }
 
         $link = env('APP_DOMAIN_ADMIN').'/dashboard/products/products';
 
         $productInfo = [
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_image' => asset('storage/' . $product->image),
-            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product->id,
-            'stock' => $product->stock . ((intval($product->stock) > 1) ? ' Unidades' : ' Unidad'),
+            'product_id' => $product_color->product->id,
+            'product_name' => $product_color->product->name,
+            'product_color' => $product_color->color->name,
+            'product_image' => asset('storage/' . $product_color->product->image),
+            'slug' =>env('APP_DOMAIN_ADMIN').'/dashboard/products/products/edit/'.$product_color->product->id,
+            'stock' => $product_color->stock . ((intval($product_color->stock) > 1) ? ' Unidades' : ' Unidad'),
         ];
 
         $data = [

@@ -178,6 +178,14 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="tab n3">
+                            <strong>Ver Cupones</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de cupones</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Eliminar Cupones</strong>&emsp;/&emsp;<code>Permite la eliminación de cupones</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
                             <strong>FAQ's</strong>
                         </li>
                         <ul class="tab">

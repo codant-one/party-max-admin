@@ -47,13 +47,15 @@ class ProductController extends Controller
                             'user.userDetail',
                             'user.supplier',
                             'state',
-                            'tags'
+                            'tags',
+                            'orderDetails'
                         ])
                         ->sales($request->date)
                         ->favorites()
                         ->selling()
                         ->salesPrice()
                         ->comments()
+                        ->minStock()
                         ->order($request->category_id)
                         ->applyFilters(
                             $request->only([
@@ -77,11 +79,14 @@ class ProductController extends Controller
             
             $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
+            $totalSum = $request->isSales === '1' ? number_format($query->sum('sales_total'), 2) : 0;
+
             $data = [
                 'ordersTotalCount' => Order::count(),
                 'ordersClient' => Order::distinct('client_id')->count('client_id'),
                 'ordersSales' => Order::sum('total'),
-                'suppliersTotalCount' => Supplier::count()
+                'suppliersTotalCount' => Supplier::count(),
+                'totalSum' => $totalSum
             ];
 
             return response()->json([

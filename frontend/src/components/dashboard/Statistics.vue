@@ -38,20 +38,20 @@ const statistics = [
     icon: 'mdi-poll',
     color: 'secondary',
   },
-  {
-    title: 'Productos',
-    comission: '',
-    stats: props.data.productsCount,
-    icon: 'tabler-shopping-cart',
-    color: 'error',
-  },
-  {
-    title: 'Servicios',
-    comission: '',
-    stats: props.data.serviceCount,
-    icon: 'mdi-hand-heart-outline',
-    color: 'info',
-  }
+  // {
+  //   title: 'Productos',
+  //   comission: '',
+  //   stats: props.data.productsCount,
+  //   icon: 'tabler-shopping-cart',
+  //   color: 'error',
+  // },
+  // {
+  //   title: 'Servicios',
+  //   comission: '',
+  //   stats: props.data.serviceCount,
+  //   icon: 'mdi-hand-heart-outline',
+  //   color: 'info',
+  // }
 ]
 </script>
 
@@ -66,8 +66,8 @@ const statistics = [
         <VCol
           v-for="item in statistics"
           :key="item.title"
-          cols="6"
-          md="2"
+          cols="12"
+          md="3"
           class="pr-0"
         >
           <div class="d-flex align-center gap-1">

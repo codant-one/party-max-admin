@@ -147,7 +147,7 @@ async function fetchData() {
         in_stock: selectedStock.value,
         type_sales: selectedDetail.value,
         category_id: selectedCategory.value,
-        orderByField: 'stock',
+        orderByField: 'min_stock',
         orderBy: 'asc',
         limit: rowPerPage.value,
         page: currentPage.value,
@@ -178,8 +178,8 @@ async function fetchData() {
           discarded: element.discarded,
           user: element.user,
           state: element.state,
-          in_stock: element.in_stock,
-          stock: element.stock,
+          in_stock: element.colors[0]?.in_stock,
+          stock: element.colors[0]?.stock,
           archived: element.archived,            
           title: element.name,
           image: element.image,
@@ -310,10 +310,10 @@ const downloadCSV = async () => {
 
   await productsStores.fetchProducts(data)
   
-  let skuArray = productsStores.getProducts.map(element => 
-    element.colors[0]?.sku
+  let skuArray = productsStores.getProducts.flatMap(product => 
+    product.colors.map(color => color.sku)
   );
-  
+
   const csvContent = skuArray.join('\n');
   
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -570,7 +570,6 @@ const downloadCSV = async () => {
                 <tr class="text-no-wrap">
                   <th> #ID </th>
                   <th> PRODUCTO </th>
-                  <th class="pe-4"> STOCK </th>
                   <th class="pe-4"> SKU </th>
                   <th class="pe-4"> PRECIO </th>
                   <th class="pe-4"> QTY </th>
@@ -586,7 +585,7 @@ const downloadCSV = async () => {
             </thead>
             <tbody>
                 <template  v-for="product in myProductsList" :key="product.id">
-                    <tr style="height: 3.75rem;" :style="{ background: product.stock === 0 ? '#FFC549' : '#FFFFFF' }">
+                    <tr style="height: 3.75rem;" :style="{ background: product.min_stock === 0 ? '#FFC549' : '#FFFFFF' }">
                         <td> {{ product.id }} </td>
                         <td> 
                         <div class="d-flex align-center gap-x-2">
@@ -603,19 +602,13 @@ const downloadCSV = async () => {
                             </div>
                         </div>
                         </td>
-                        <td>   
-                        <VSwitch 
-                            :model-value="product.in_stock === 1 ? true : false"
-                            readonly
-                        /> 
-                        </td>
-                        <td> {{ product.colors[0]?.sku ?? '--' }} </td>
+                        <td> {{ product.colors.find(c => c.stock === product.min_stock)?.sku ?? '--' }} </td>
                         <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                        <td> {{ product.stock }} </td>
+                        <td> {{ product.min_stock }} </td>
                         <td> 
                         <VChip
                             v-bind="resolveStatus(product.state_id)"
-                            :variant="product.stock === 0 ? 'elevated' : 'outlined'"
+                            :variant="product.min_stock === 0 ? 'elevated' : 'outlined'"
                             label
                         />
                         </td>

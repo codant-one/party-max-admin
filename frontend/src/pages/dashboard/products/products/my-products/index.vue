@@ -180,8 +180,8 @@ async function fetchData() {
         discarded: element.discarded,
         user: element.user,
         state: element.state,
-        in_stock: element.in_stock,
-        stock: element.stock,
+        in_stock: element.colors[0]?.in_stock,
+        stock: element.colors[0]?.stock,
         archived: element.archived,            
         title: element.name,
         image: element.image,
@@ -681,7 +681,7 @@ const removeProduct = async () => {
                 </td>
                 <td> {{ product.colors[0]?.sku ?? '--' }} </td>
                 <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                <td> {{ product.stock }} </td>
+                <td> {{ product.colors[0]?.stock }} </td>
                 <td> 
                   <VChip
                     v-bind="resolveStatus(product.state_id)"

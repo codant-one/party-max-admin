@@ -26,7 +26,6 @@ class ProductFactory extends Factory
     {
         $name = $this->faker->unique()->words(3, true);
         $rand = rand(1, 0);
-        $in_stock = rand(0, 1);
 
         return [
             'user_id' => rand(1, 20),
@@ -38,8 +37,6 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 100), 
             'price_for_sale' => $this->faker->randomFloat(2, 5, 50), 
             'wholesale_price' => $this->faker->randomFloat(2, 5, 50), 
-            'stock' => ($in_stock === 0) ? 0 : $this->faker->numberBetween(0, 100),
-            'in_stock' => $in_stock,
             'sales' => $this->faker->numberBetween(0, 100),
             'rating' => $this->faker->numberBetween(0, 5),
             'slug' => Str::slug($name),

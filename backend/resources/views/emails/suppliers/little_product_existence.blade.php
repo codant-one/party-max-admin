@@ -29,6 +29,9 @@
                                 {{ $data['product']['product_name'] }}
                             </span>
                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
+                                Color: {{ $data['product']['product_color'] }}
+                            </span>
+                            <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                 {{ $data['product']['stock'] }}
                             </span>
                         </div>

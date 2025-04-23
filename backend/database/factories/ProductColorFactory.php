@@ -23,9 +23,13 @@ class ProductColorFactory extends Factory
      */
     public function definition()
     {
+        $in_stock = rand(0, 1);
+        
         return [
             'color_id' => rand(1, 10),
-            'sku' => rand(100000, 999999)
+            'sku' => rand(100000, 999999),
+            'stock' => ($in_stock === 0) ? 0 : $this->faker->numberBetween(0, 100),
+            'in_stock' => $in_stock,
         ];
         
     }

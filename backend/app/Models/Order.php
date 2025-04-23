@@ -308,6 +308,7 @@ class Order extends Model
         
         $productDetails = $orderDetails->map(function ($detail) {
             return [
+                'product_color_id' => $detail->product_color_id,
                 'product_id' => $detail->product_color ? $detail->product_color->product_id : 0,
                 'quantity' => $detail->quantity,
                 'total' => $detail->total
@@ -317,7 +318,7 @@ class Order extends Model
         foreach ($productDetails as $item) {
             $product = Product::with(['colors.product', 'user'])->find($item['product_id']);
             if ($product) {
-                $product->updateStockProduct($product, $item['quantity']);  
+                $product->updateStockProduct($item);  
                 
                 $supplier = Supplier::where('user_id', $product->user_id)->first();
                 if ($supplier) 

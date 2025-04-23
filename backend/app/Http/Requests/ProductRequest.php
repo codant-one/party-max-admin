@@ -36,9 +36,6 @@ class ProductRequest extends FormRequest
             ],
             'price_for_sale' => [
                 'required'
-            ],
-            'stock' => [
-                'required'
             ]
         ];
     }
@@ -50,7 +47,6 @@ class ProductRequest extends FormRequest
             'sku.required' => 'El sku requerido',
             'price.required' => 'El precio es requerido.',
             'price_for_sale.required' => 'El precio para la venta es requerido.',
-            'stock.required' => 'El stock es requerido.',
         ];
     }
 

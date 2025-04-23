@@ -136,7 +136,8 @@ class OrderController extends Controller
                 'payment', 
                 'client.user.userDetail',
                 'histories',
-                'address_type'
+                'address_type',
+                'coupon'
             ])->find($id);
 
             if (!$order)
