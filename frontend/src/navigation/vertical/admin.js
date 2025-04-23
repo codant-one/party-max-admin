@@ -36,7 +36,7 @@ export default [
         icon: { icon: 'mdi-ticket-percent' },
         to: 'dashboard-admin-coupons', 
         action: 'ver', 
-        subject: 'ips', 
+        subject: 'cupones', 
       },
       {
         title: "FAQ's",
