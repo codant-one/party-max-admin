@@ -378,7 +378,7 @@ const removeOrder = async () => {
                         </td>
                       </tr>
                       <tr>
-                        <td>Tax: </td>
+                        <td>IVA: </td>
                         <td class="ps-1">
                           $ {{ formatNumber(order.tax) }}
                         </td>

@@ -210,7 +210,7 @@
             <td class="products_cant"></td>
             <td class="products_cant">
               <p class="text m-0"><strong>Subtotal:</strong></p>
-              <p class="text m-0"><strong>Tax:</strong></p>
+              <p class="text m-0"><strong>IVA:</strong></p>
               <p class="text m-0 text-primary"><strong>Total:</strong></p>
             </td>
             <td class="products_cant" style="padding: 10px 0;">
