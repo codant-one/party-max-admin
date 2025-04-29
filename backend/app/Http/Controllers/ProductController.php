@@ -70,16 +70,15 @@ class ProductController extends Controller
                                 'type_sales',
                                 'category_id',
                                 'supplierId',
+                                'supplier_id',
                                 'isSales'
                             ])
                         )
                         ->withTrashed();
             
             $count = $query->count();
-            
-            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-
             $totalSum = $request->isSales === '1' ? number_format($query->sum('sales_total'), 2) : 0;
+            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
 
             $data = [
                 'ordersTotalCount' => Order::count(),

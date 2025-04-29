@@ -107,7 +107,7 @@ class Product extends Model
                   ->join('orders as o', 'o.id', '=', 'od.order_id')
                   ->whereColumn('p.id', 'products.id')
                   ->where([
-                    ['p.user_id', Auth::id()],
+                    ['p.state_id', 3],
                     ['o.payment_state_id', 4]
                   ]);
 
@@ -125,7 +125,7 @@ class Product extends Model
                   ->join('orders as o', 'o.id', '=', 'od.order_id')
                   ->whereColumn('p.id', 'products.id')
                   ->where([
-                    ['p.user_id', Auth::id()],
+                    ['p.state_id', 3],
                     ['o.payment_state_id', 4]
                   ]);
 
@@ -304,6 +304,10 @@ class Product extends Model
 
         if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
             $query->where('user_id', Auth::user()->id);
+        } else {
+            if($filters->get('supplier_id')) {
+                $query->where('user_id', $filters->get('supplier_id'));
+            }
         }
  
         if ($filters->get('search')) {

@@ -4,16 +4,19 @@ import { themeConfig } from '@themeConfig'
 import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
+import { useSuppliersStores } from '@/stores/useSuppliers'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import show from "@/components/products/show.vue";
 
 const productsStores = useProductsStores()
 const categoriesStores = useCategoriesStores()
+const suppliersStores = useSuppliersStores()
 const cp = useClipboard()
 
 const myProductsList = ref([])
 const products = ref([])
+const suppliers = ref([])
 const searchQuery = ref('')
 const rowPerPage = ref(10)
 const currentPage = ref(1)
@@ -33,6 +36,7 @@ const favourite = ref(null)
 const archived = ref(null)
 const discarded = ref(null)
 
+const supplier_id = ref(null)
 const selectedStatus = ref(3)
 const selectedCategory = ref()
 const selectedDetail = ref()
@@ -119,6 +123,17 @@ watchEffect(() => {
     currentPage.value = totalPages.value
 })
 
+const loadSuppliers = () => {
+  suppliers.value = suppliersStores.getSuppliers
+}
+
+onMounted(async () => {
+
+  await suppliersStores.fetchSuppliers({limit: -1})
+
+  loadSuppliers()
+})
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -144,8 +159,8 @@ async function fetchData() {
         orderBy: 'desc',
         limit: rowPerPage.value,
         page: currentPage.value,
-        supplierId: userData.value.id,
         isSales: '1',
+        supplier_id: supplier_id.value,
         date: dateRangeArray.value
     }
 
@@ -260,6 +275,16 @@ const stateProduct = async state_id => {
     return true
 
 }
+
+
+const getSuppliers = computed(() => {
+    return suppliers.value.map((supplier) => {
+        return {
+          title: supplier.user.user_detail.store_name ?? (supplier.company_name ?? (supplier.user.name + ' ' + (supplier.user.last_name ?? ''))),
+          value: supplier.user_id,
+        }
+    })
+})
 
 const editProduct = id => {
     router.push({ name : 'dashboard-products-products-edit-id', params: { id: id } })
@@ -533,7 +558,7 @@ const removeProduct = async () => {
           <!-- 👉 Select Status -->
           <VCol
             cols="12"
-            sm="4"
+            :sm="rol === 'Proveedor' ? '4' : '3'"
           >
             <AppSelect
               v-model="selectedStatus"
@@ -541,13 +566,14 @@ const removeProduct = async () => {
               :items="status"
               clearable
               clear-icon="tabler-x"
+              disabled
             />
           </VCol>
 
           <!-- 👉 Select Category -->
           <VCol
             cols="12"
-            sm="4"
+            :sm="rol === 'Proveedor' ? '4' : '3'"
           >
             <VAutocomplete
               id="selectCategory"
@@ -596,12 +622,26 @@ const removeProduct = async () => {
           <!-- 👉 Select Detail  -->
           <VCol
             cols="12"
-            sm="4"
+            :sm="rol === 'Proveedor' ? '4' : '3'"
           >
             <AppSelect
               v-model="selectedDetail"
               placeholder="Tipo de venta"
               :items="typesales"
+              clearable
+              clear-icon="tabler-x"
+            />
+          </VCol>
+
+          <VCol
+            cols="12"
+            sm="3"
+            v-if="rol !== 'Proveedor'"
+          >
+            <VAutocomplete
+              v-model="supplier_id"
+              placeholder="Proveedores"
+              :items="getSuppliers"
               clearable
               clear-icon="tabler-x"
             />
