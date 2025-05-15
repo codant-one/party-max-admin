@@ -17,6 +17,21 @@ class Category extends Model
 
     protected $guarded = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function (Category $category) {//generate slug
+            $category->slug = $category->getSlug();
+        });
+
+        static::saved(function (Category $category) {//generate slug to subcategories
+            foreach ($category->children as $child) {
+                $child->save();
+            }
+        });
+    }
+
     /**** Relationship ****/
     public function category_type() {
         return $this->belongsTo(CategoryType::class, 'category_type_id', 'id');
@@ -56,14 +71,6 @@ class Category extends Model
 
     public function children() {
         return $this->hasMany(Category::class, 'category_id');
-    }
-
-    public function recursiveItems() {
-        return $this->children()->with('recursiveItems');
-    }
-
-    public static function getRecursiveItems($category_id = null) {
-        return self::with('recursiveItems')->where('category_id', $category_id)->get();
     }
 
     public function productColors() {
@@ -125,52 +132,26 @@ class Category extends Model
     }
 
     /**** Public methods ****/
-    public static function getSlug($request) {
+    public function getSlug(): string
+    {
+        $segments = [ Str::slug($this->name) ];
+        $category = $this->category;
 
-        $categories = self::get()->toArray();
-    
-        $grandfather = '';
-        $father = '';
-    
-        if($request->is_category) {
-            $result = [];
-            $category_id = intval($request->category_id);
-                
-            $result = array_filter($categories, function ($element) use ($category_id) {
-                return $element['id'] === $category_id;
-            });
-    
-            $result = array_values($result)[0];
-    
-            if(!is_null($result['category_id'])) {
-                $result2 = [];
-                $category_id = $result['category_id'];
-                $result2 = array_filter($categories, function ($element) use ($category_id) {
-                    return $element['id'] === $category_id;
-                });
-    
-                // Convertir el resultado nuevamente en un array indexado
-                $result2 = array_values($result2)[0];
-    
-                $grandfather = Str::slug($result2['name']) . '/';
-                $father = Str::slug($result['name']) . '/';
-            } else {
-                $father = Str::slug($result['name']) . '/';
-            }
+        while ($category) {
+            array_unshift($segments, Str::slug($category->name));
+            $category = $category->category;
         }
-    
-        return $grandfather . $father . Str::slug($request->name);
+
+        return implode('/', $segments);
     }
 
     public static function createCategory($request) {
-        
-        $slug = self::getSlug($request);
 
         $category = self::create([
             'category_type_id' => $request->category_type_id,
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
-            'slug' => $slug,
+            'slug' => '',
             'keywords' => $request->keywords === 'null' ? null : $request->keywords
         ]);
 
@@ -178,45 +159,13 @@ class Category extends Model
     }
 
     public static function updateCategory($request, $category) {
-        $slug = self::getSlug($request);
 
         $category->update([
             'category_type_id' => $request->category_type_id,
             'category_id' => ($request->is_category) ? $request->category_id : null,
             'name' => $request->name,
-            'slug' => $slug,
             'keywords' => $request->keywords === 'null' ? null : $request->keywords
         ]);
-
-        if(!($request->is_category)){
-            $subcategories = self::where('category_id', $category->id)->get();
-
-            foreach($subcategories as $subcategory) {
-                $request->request->remove('name');
-                $request->request->add(['is_category' =>  1]);
-                $request->request->add(['category_id' => intval($category->id)]);
-                $request->request->add(['name' => $subcategory->name]);
-                $slug_ = self::getSlug($request);
-
-                $category_ = self::find($subcategory->id);
-                $category_->slug = $slug_;
-                $category_->update();
-
-                $children = self::where('category_id', $subcategory->id)->get();
-
-                foreach($children as $c) {
-                    $request->request->remove('name');
-                    $request->request->remove('category_id');
-                    $request->request->add(['category_id' => intval($subcategory->id)]);
-                    $request->request->add(['name' => $c->name]);
-                    $slug_ = self::getSlug($request);
-    
-                    $category_ = self::find($c->id);
-                    $category_->slug = $slug_;
-                    $category_->update();
-                }
-            }
-        }
 
         return $category;
     }
