@@ -15,6 +15,7 @@ use App\Models\Brand;
 use App\Models\State;
 use App\Models\ServiceTag;
 use App\Models\ServiceList;
+use App\Models\ServiceVideo;
 use App\Models\Cupcake;
 
 class Service extends Model
@@ -68,6 +69,11 @@ class Service extends Model
     public function orderDetails()
     {
         return $this->hasMany(OrderDetail::class, 'service_id');
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(ServiceVideo::class, 'service_id','id');
     }
 
     /**** Scopes ****/
@@ -331,6 +337,28 @@ class Service extends Model
         }
     }
 
+    public static function createServiceVideos($service_id, $request) {
+        foreach(explode(",", $request->video) as $url) {
+            if($url !== '' && $url !== null)
+                ServiceVideo::create([
+                    'service_id' => $service_id,
+                    'url' => $url
+                ]);
+        }
+    }
+    
+    public static function updateServiceVideos($service_id, $request) {
+        ServiceVideo::where('service_id', $service_id)->delete();
+
+        foreach(explode(",", $request->video) as $url) {
+            if($url !== '' && $url !== null)
+                ServiceVideo::create([
+                    'service_id' => $service_id,
+                    'url' => $url
+                ]);
+        }
+    }
+
     public static function createService($request) {
  
         $user_id = 
@@ -354,6 +382,7 @@ class Service extends Model
         self::createServiceCategories($service->id, $request);
         self::createServiceImages($service->id, $request);
         self::createServiceOrder($service->id);
+        self::createServiceVideos($service->id, $request);
 
         if($request->isCupcake === 'true')
             self::createCupcakes($service->id, $request);
@@ -431,6 +460,7 @@ class Service extends Model
         self::updateServiceTags($service->id, $request);
         self::updateServiceCategories($service->id, $request);
         self::updateServiceImages($service->id, $request);
+        self::updateServiceVideos($service->id, $request);
         self::createServiceOrder($service->id);
 
         if($request->isCupcake === 'true')

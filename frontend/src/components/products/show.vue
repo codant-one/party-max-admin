@@ -62,7 +62,7 @@ const radioContent = ref([])
 const selectedColor = ref(null)
 const tab = ref('1')
 
-watchEffect(() => {
+watchEffect(async () => {
     if (props.isDrawerOpen) {
         if (!(Object.entries(props.product).length === 0) && props.product.constructor === Object) {
             imageAux.value = [{ image : props.product.image }]
@@ -88,7 +88,6 @@ watchEffect(() => {
             title.value = props.product.name
             description.value = props.product.single_description
             sku.value = props.product.colors[0]?.sku ?? null
-            videos.value = props.product.videos.map(video => video.url)
             selling_price.value = props.product.selling_price ?? 0
             sales.value = props.product.sales ?? 0
             comments.value = props.product.comments ?? 0
@@ -103,6 +102,20 @@ watchEffect(() => {
             height.value = props.product.detail.height
             deep.value = props.product.detail.deep
             material.value = props.product.detail.material
+
+            videos.value = props.product.videos.map(u => ({
+                type: 'video',
+                url: u.url,
+                thumb: '/assets/video-placeholder.png',
+            }))
+
+            await Promise.all(
+                videos.value.map(async slide => {
+                if (slide.type === 'video') {
+                    slide.thumb = await loadVideoThumbnail(slide.url);
+                }
+                })
+            );
         }
     }
 })
@@ -111,13 +124,31 @@ const mediaSlides = computed(() => {
   const imgs = productImages.value.map(i => ({
     type: 'image',
     url: themeConfig.settings.urlStorage + i.image,
+    thumb: themeConfig.settings.urlStorage + i.image
   }));
   const vids = videos.value.map(u => ({
     type: 'video',
-    url: u,
+    url: u.url,
+    thumb: u.thumb
   }));
   return [...imgs, ...vids];
 });
+
+const loadVideoThumbnail = async (url) => {
+    const yt = url.match(
+        /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+    );
+    if (yt) {
+        return `https://img.youtube.com/vi/${yt[1]}/mqdefault.jpg`;
+    }
+
+    const vm = url.match(/vimeo\.com\/(\d+)/);
+    if (vm) {
+        return `https://vumbnail.com/${vm[1]}.jpg`;
+    }
+
+    return '/assets/video-placeholder.png';
+}
 
 const closeProductDetailDialog = function() {
     thumbsSwiper.value = null
@@ -159,14 +190,6 @@ const buildEmbedUrl = (url) => {
   if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
   return url;
 }
-
-const getVideoThumbnail = (url) =>{
-  const yt = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
-  );
-  if (yt) return `https://img.youtube.com/vi/${yt[1]}/mqdefault.jpg`;
-  return '/assets/video-placeholder.png';
-}
 </script>
 
 <template>
@@ -200,7 +223,7 @@ const getVideoThumbnail = (url) =>{
                                     />
                                     <img
                                         v-else
-                                        :src="getVideoThumbnail(slide.url)"
+                                        :src="slide.thumb"
                                         :alt="'thumbnail-'+index"
                                         class="thumb-media"
                                     />
@@ -208,14 +231,6 @@ const getVideoThumbnail = (url) =>{
                             </swiper>
                         </div>
                         <div class="d-block d-md-none">
-                            <!-- <Carousel id="gallery" :items-to-show="1" :wrap-around="false" v-model="currentSlide">
-                                <Slide v-for="(picture, index) in productImages" :key="index">
-                                    <div class="carousel__item">
-                                        <img :src="themeConfig.settings.urlStorage + picture.image" />
-                                    </div>
-                                </Slide>
-                            </Carousel> -->
-
                             <Carousel
                                 id="thumbnails"
                                 :items-to-show="(mediaSlides.length > 4 ) ? 4 : mediaSlides.length"
@@ -484,7 +499,7 @@ const getVideoThumbnail = (url) =>{
         width: 120px;
         border-radius: 16px !important;
     }
-    .carousel__item img{
+    .carousel__item img {
         width: 100%;
         height: 120px;
         border-radius: 16px !important;

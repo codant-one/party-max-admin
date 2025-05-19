@@ -182,6 +182,7 @@ async function fetchData() {
       estimated_delivery_time.value = product.value.estimated_delivery_time
       
       optionCounter.value = product.value.colors.length
+      videoCounter.value = product.value.videos.length
     }
     
     isRequestOngoing.value = false
@@ -510,7 +511,7 @@ const onSubmit = () => {
             </VCardText>
           </VCard>
 
-           <VCard
+          <VCard
             title="Videos"
             class="mb-6"
           >

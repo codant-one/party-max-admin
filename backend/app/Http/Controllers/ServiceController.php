@@ -41,6 +41,7 @@ class ServiceController extends Controller
                             'user.supplier',
                             'state',
                             'tags',
+                            'videos',
                             'cupcakes.cake_size.cake_type'
                         ])
                         ->order($request->category_id)
@@ -140,6 +141,7 @@ class ServiceController extends Controller
                 'user.supplier',
                 'state',
                 'tags',
+                'videos',
                 'cupcakes.cake_size.cake_type'
             ])->find($id);
 
@@ -179,7 +181,8 @@ class ServiceController extends Controller
                 'user.userDetail',
                 'user.supplier',
                 'state',
-                'tags'
+                'tags',
+                'videos'
             ])->find($service->id);
 
             if (!$service)
