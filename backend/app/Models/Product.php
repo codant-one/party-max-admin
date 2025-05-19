@@ -16,6 +16,7 @@ use App\Models\ProductImage;
 use App\Models\ProductColor;
 use App\Models\ProductTag;
 use App\Models\ProductList;
+use App\Models\ProductVideo;
 use App\Models\User;
 use App\Models\Brand;
 use App\Models\State;
@@ -522,6 +523,28 @@ class Product extends Model
         }
     }
 
+    public static function createProductVideos($product_id, $request) {
+        foreach(explode(",", $request->video) as $url) {
+            if($url !== '' && $url !== null)
+                ProductVideo::create([
+                    'product_id' => $product_id,
+                    'url' => $url
+                ]);
+        }
+    }
+    
+    public static function updateProductVideos($product_id, $request) {
+        ProductVideo::where('product_id', $product_id)->delete();
+
+        foreach(explode(",", $request->video) as $url) {
+            if($url !== '' && $url !== null)
+                ProductVideo::create([
+                    'product_id' => $product_id,
+                    'url' => $url
+                ]);
+        }
+    }
+
     public static function updateProductColors($product_id, $request) {
         $productColors = ProductColor::where('product_id', $product_id)->get();
 
@@ -642,6 +665,7 @@ class Product extends Model
         self::createProductDetails($product->id, $request);
         self::createProductTags($product->id, $request);
         self::createProductColors($product->id, $request);
+        self::createProductVideos($product->id, $request);
         self::createProductOrder($product->id);
 
         return $product;
@@ -672,6 +696,7 @@ class Product extends Model
         self::updateProductDetails($product->id, $request);
         self::updateProductTags($product->id, $request);
         self::updateProductColors($product->id, $request);
+        self::updateProductVideos($product->id, $request);
         self::updateProductOrder($product->id);
 
         return $product;

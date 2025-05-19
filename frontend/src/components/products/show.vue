@@ -37,6 +37,7 @@ const thumbsSwiper = ref(null);
 const title = ref('')
 const description = ref(null)
 const sku = ref('')
+const videos = ref('')
 const selling_price = ref(null)
 const sales =  ref(null)
 const comments = ref(null)
@@ -87,6 +88,7 @@ watchEffect(() => {
             title.value = props.product.name
             description.value = props.product.single_description
             sku.value = props.product.colors[0]?.sku ?? null
+            videos.value = props.product.videos.map(video => video.url)
             selling_price.value = props.product.selling_price ?? 0
             sales.value = props.product.sales ?? 0
             comments.value = props.product.comments ?? 0
@@ -104,6 +106,18 @@ watchEffect(() => {
         }
     }
 })
+
+const mediaSlides = computed(() => {
+  const imgs = productImages.value.map(i => ({
+    type: 'image',
+    url: themeConfig.settings.urlStorage + i.image,
+  }));
+  const vids = videos.value.map(u => ({
+    type: 'video',
+    url: u,
+  }));
+  return [...imgs, ...vids];
+});
 
 const closeProductDetailDialog = function() {
     thumbsSwiper.value = null
@@ -135,6 +149,24 @@ const chanceRadio = (value) => {
         stock.value = seleted?.stock
     }
 }
+
+const buildEmbedUrl = (url) => {
+  const yt = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+  );
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vm = url.match(/vimeo\.com\/(\d+)/);
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  return url;
+}
+
+const getVideoThumbnail = (url) =>{
+  const yt = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+  );
+  if (yt) return `https://img.youtube.com/vi/${yt[1]}/mqdefault.jpg`;
+  return '/assets/video-placeholder.png';
+}
 </script>
 
 <template>
@@ -160,8 +192,18 @@ const chanceRadio = (value) => {
                                 @swiper="setThumbsSwiper"
                                 class="mySwiper"
                             >
-                                <swiper-slide v-for="(picture, index) in productImages" :key="index">
-                                    <img :src="themeConfig.settings.urlStorage + picture.image" />
+                                <swiper-slide v-for="(slide, index) in mediaSlides" :key="index">
+                                    <img 
+                                        v-if="slide.type === 'image'"
+                                        :src="slide.url" 
+                                        :alt="'image-'+index"
+                                    />
+                                    <img
+                                        v-else
+                                        :src="getVideoThumbnail(slide.url)"
+                                        :alt="'thumbnail-'+index"
+                                        class="thumb-media"
+                                    />
                                 </swiper-slide>
                             </swiper>
                         </div>
@@ -176,20 +218,31 @@ const chanceRadio = (value) => {
 
                             <Carousel
                                 id="thumbnails"
-                                :items-to-show="(productImages.length > 4 ) ? 4 : productImages.length"
+                                :items-to-show="(mediaSlides.length > 4 ) ? 4 : mediaSlides.length"
                                 :wrap-around="true"
                                 v-model="currentSlide"
                                 ref="carousel"
                             >
-                                <Slide v-for="(picture, index) in productImages" :key="index">
+                                <Slide v-for="(slide, index) in mediaSlides" :key="index">
                                     <div class="carousel__item border-img p-1" @click="slideTo(index)">
-                                        <img :src="themeConfig.settings.urlStorage + picture.image" />
+                                        <img 
+                                            v-if="slide.type === 'image'"
+                                            :src="slide.url" 
+                                            :alt="'image-'+index"
+                                        />
+                                        <iframe
+                                            v-else
+                                            :src="buildEmbedUrl(slide.url)"
+                                            frameborder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen
+                                        />
                                     </div>
                                 </Slide>
                             </Carousel>
                         </div>
                     </VCol>
-                    <VCol md="3" cols="12">
+                    <VCol md="4" cols="12">
                         <div class="d-none d-md-block">
                             <swiper
                                 :scrollbar="{
@@ -200,13 +253,24 @@ const chanceRadio = (value) => {
                                 :modules="modules"
                                 class="mySwiper2 border-img"
                             >
-                                <swiper-slide v-for="(picture, index) in productImages" :key="index">
-                                    <img :src="themeConfig.settings.urlStorage + picture.image" />
+                                <swiper-slide v-for="(slide, index) in mediaSlides" :key="index">
+                                    <img 
+                                        v-if="slide.type === 'image'"
+                                        :src="slide.url" 
+                                        :alt="'slide-'+index"
+                                    />
+                                    <iframe
+                                        v-else
+                                        :src="buildEmbedUrl(slide.url)"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                    />
                                 </swiper-slide>
                             </swiper>
                         </div>
                     </VCol>
-                    <VCol md="8" cols="12">
+                    <VCol md="7" cols="12">
                         <VCardTitle class="text-h6 title-truncate py-0 text-uppercase"> {{ title }} </VCardTitle>
                         <VCardSubtitle v-if="store" class="subtitle-truncate mb-3"> 
                             <span><strong class="me-2">Tienda:</strong> {{ store }}</span>
@@ -404,9 +468,26 @@ const chanceRadio = (value) => {
         }
     }
 
-    .carousel__item img {
+    .thumb-media {
+        width: 100% !important;
+        object-fit: cover !important;
+        border-radius: 8px !important;
+    }
+
+    .carousel__item  {
+        min-height: 120px;
+        margin: 0 2px;
+    }
+
+    .carousel__item iframe {
+        height: 120px;
+        width: 120px;
+        border-radius: 16px !important;
+    }
+    .carousel__item img{
         width: 100%;
-        padding: 0 10px;
+        height: 120px;
+        border-radius: 16px !important;
     }
 
     .swiper-vertical > .swiper-pagination-bullets .swiper-pagination-bullet, .swiper-pagination-vertical.swiper-pagination-bullets .swiper-pagination-bullet {
@@ -470,7 +551,7 @@ const chanceRadio = (value) => {
         opacity: 1;
     }
 
-    .swiper-slide img {
+    .swiper-slide img, .swiper-slide iframe {
         display: block;
         width: 100%;
         height: 100%;

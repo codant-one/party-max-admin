@@ -10,6 +10,7 @@ import { useBrandsStores } from '@/stores/useBrands'
 import { useTagsStores } from '@/stores/useTags'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { QuillEditor } from '@vueup/vue-quill'
+import { Player, DefaultUi, Youtube, Vimeo, Video} from '@vime/vue-next';
 import ImageUploader from 'quill-image-uploader'
 import FileInput from "@/components/common/FileInput.vue";
 import router from '@/router'
@@ -27,6 +28,7 @@ const emitter = inject("emitter")
 const isRequestOngoing = ref(true)
 
 const optionCounter = ref(null)
+const videoCounter = ref(1)
 
 const categories = ref([])
 const listColors = ref([])
@@ -45,6 +47,7 @@ const tag_id = ref()
 const color_id = ref([])
 const category_id = ref([])
 const sku = ref([])
+const video = ref([])
 const product_files = ref([])
 const brand_id = ref()
 const user_id = ref(null)
@@ -133,6 +136,7 @@ async function fetchData() {
       });
       sku.value = product.value.colors.map(color => color.sku)
       stock.value = product.value.colors.map(color => color.stock)
+      video.value = product.value.videos.map(video => video.url)
 
       product.value.colors.forEach(async function callback(value, index) { 
           let files = []
@@ -278,6 +282,41 @@ const removeColor = id => {
   }
 }
 
+const removeVideo = id => {
+  if(videoCounter.value > 1) {
+    videoCounter.value--
+    video.value.splice(id, 1)
+  }
+}
+
+const providers = computed(() =>
+  video.value.map((url) => {
+    if (url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/)) {
+      return 'youtube';
+    }
+    if (url.match(/vimeo\.com\/(\d+)/)) {
+      return 'vimeo';
+    }
+    if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+      return 'file';
+    }
+    return null;
+  })
+);
+
+
+const mediaIds = computed(() =>
+  video.value.map((url) => {
+    const yt = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/
+    );
+    if (yt) return yt[1];
+    const vm = url.match(/vimeo\.com\/(\d+)/);
+    if (vm) return vm[1];
+    return '';
+  })
+);
+
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -317,6 +356,9 @@ const onSubmit = () => {
             formData.append('sku', sku.value)
             formData.append('product_files', product_files.value)
             formData.append('stock', stock.value)
+
+            //product_videos
+            formData.append('video', video.value)
 
             product_files.value.forEach(function callback(value, index) {
                 value.forEach(function callback(image, i) {
@@ -465,6 +507,81 @@ const onSubmit = () => {
                     />
                 </VCol>
               </VRow>
+            </VCardText>
+          </VCard>
+
+           <VCard
+            title="Videos"
+            class="mb-6"
+          >
+            <VCardText>
+              <template
+                v-for="i in videoCounter"
+                :key="i"
+              >
+                <VRow class="mb-2">                  
+                  <VCol
+                    cols="12"
+                    md="7"
+                  >
+                    <AppTextField
+                      v-model="video[i-1]"
+                      placeholder="ENLACE"
+                    />
+                  </VCol>  
+                  
+                  <VCol
+                    cols="12"
+                    md="4"
+                    v-if="providers[i-1]"
+                  >
+                    <Player style="width: 100%;">
+                      <Youtube
+                        v-if="providers[i-1] === 'youtube'"
+                        :video-id="mediaIds[i-1]"
+                      />
+                      <Vimeo
+                        v-else-if="providers[i-1] === 'vimeo'"
+                        :video-id="mediaIds[i-1]"
+                      />
+                      <Video
+                        v-else-if="providers[i-1] === 'file'"
+                      >
+                        <source
+                          :src="video[i-1]"
+                          type="video/mp4"
+                        />
+                      </Video>
+                      <DefaultUi />
+                    </Player>
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="1"
+                    v-if="videoCounter > 1"
+                  >
+                    <!-- 👉 Item Actions -->
+                    <div class="d-flex">
+                      <VSpacer />
+                      <VBtn
+                        icon="tabler-x"
+                        variant="tonal"
+                        color="primary"
+                        size="x-small"
+                        @click="removeVideo(i-1)"
+                      />
+                    </div>
+                  </VCol>
+                </VRow>
+              </template>
+
+              <VBtn
+                class="mt-2"
+                v-if="video[video.length-1]"
+                @click="videoCounter++"
+              >
+                Agregar enlace
+              </VBtn>
             </VCardText>
           </VCard>
 

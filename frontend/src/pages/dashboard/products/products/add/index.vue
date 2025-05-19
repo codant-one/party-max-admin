@@ -454,7 +454,7 @@ const onSubmit = () => {
                 <VRow class="mb-2">                  
                   <VCol
                     cols="12"
-                    md="8"
+                    md="7"
                   >
                     <AppTextField
                       v-model="video[i-1]"
@@ -464,12 +464,10 @@ const onSubmit = () => {
                   
                   <VCol
                     cols="12"
-                    md="3"
+                    md="4"
                     v-if="providers[i-1]"
-                  >  
-                  providers{{ providers[i-1] }} -
-                    mediaIds{{ mediaIds[i-1] }}
-                    <Player style="width: 100%; height: 200px;">
+                  >
+                    <Player style="width: 100%;">
                       <Youtube
                         v-if="providers[i-1] === 'youtube'"
                         :video-id="mediaIds[i-1]"

@@ -48,6 +48,7 @@ class ProductController extends Controller
                             'user.supplier',
                             'state',
                             'tags',
+                            'videos',
                             'orderDetails'
                         ])
                         ->sales($request->date)
@@ -161,7 +162,8 @@ class ProductController extends Controller
                 'detail', 
                 'user.userDetail', 
                 'state',
-                'tags'
+                'tags',
+                'videos'
             ])->find($id);
 
             if (!$product)
@@ -200,7 +202,8 @@ class ProductController extends Controller
                 'detail', 
                 'user', 
                 'state',
-                'tags'
+                'tags',
+                'videos'
             ])->find($product->id);
 
             if (!$product)
