@@ -60,7 +60,12 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 5000,
-    cssCodeSplit: false 
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true,
+      }
+    }
   },
   optimizeDeps: {
     exclude: ['vuetify'],
