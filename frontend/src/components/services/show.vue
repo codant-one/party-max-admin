@@ -181,33 +181,9 @@ const buildEmbedUrl = (url) => {
                             </swiper>
                         </div>
                         <div class="d-block d-md-none">
-                            <Carousel 
-                                id="gallery" 
-                                :items-to-show="1" 
-                                :wrap-around="false" 
-                                v-model="currentSlide">
-
-                                <Slide v-for="(slide, index) in mediaSlides" :key="index">
-                                    <div class="carousel__item border-img p-1">
-                                        <img 
-                                            v-if="slide.type === 'image'"
-                                            :src="slide.url" 
-                                            :alt="'image-'+index"
-                                        />
-                                        <iframe
-                                            v-else
-                                            :src="buildEmbedUrl(slide.url)"
-                                            frameborder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowfullscreen
-                                        />
-                                    </div>
-                                </Slide>
-                            </Carousel>
-
                             <Carousel
                                 id="thumbnails"
-                                :items-to-show="(serviceImages.length > 4 ) ? 4 : serviceImages.length"
+                                :items-to-show="(mediaSlides.length > 2 ) ? 2 : mediaSlides.length"
                                 :wrap-around="true"
                                 v-model="currentSlide"
                                 ref="carousel"
@@ -398,6 +374,7 @@ const buildEmbedUrl = (url) => {
 
     .carousel__item  {
         min-height: 120px;
+        min-width: 120px;
         margin: 0 2px;
     }
 

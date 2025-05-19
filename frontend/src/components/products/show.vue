@@ -200,7 +200,7 @@ const buildEmbedUrl = (url) => {
         persistent>
         <DialogCloseBtn @click="closeProductDetailDialog" />
 
-        <VCard title="Detalle producto">
+        <VCard title="Detalle producto" min-height="500">
             <VCardText>
                 <VRow>
                     <VCol md="1" cols="12">
@@ -233,7 +233,7 @@ const buildEmbedUrl = (url) => {
                         <div class="d-block d-md-none">
                             <Carousel
                                 id="thumbnails"
-                                :items-to-show="(mediaSlides.length > 4 ) ? 4 : mediaSlides.length"
+                                :items-to-show="(mediaSlides.length > 2 ) ? 2 : mediaSlides.length"
                                 :wrap-around="true"
                                 v-model="currentSlide"
                                 ref="carousel"
@@ -491,6 +491,7 @@ const buildEmbedUrl = (url) => {
 
     .carousel__item  {
         min-height: 120px;
+        min-width: 120px;
         margin: 0 2px;
     }
 
