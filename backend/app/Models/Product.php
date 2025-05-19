@@ -80,6 +80,11 @@ class Product extends Model
         return $this->hasMany(Review::class, 'product_id','id');
     }
 
+    public function videos()
+    {
+        return $this->hasMany(ProductVideo::class, 'product_id','id');
+    }
+
     // Relación con los detalles de las órdenes (order_details)
     public function orderDetails()
     {
@@ -424,8 +429,6 @@ class Product extends Model
     }
 
     public static function createProductOrder($product_id) {
-        ProductList::where('product_id', $product_id)->delete();
-        
         $product = Product::with('colors.categories')->find($product_id);
         
         $categories = collect($product->colors)
@@ -446,6 +449,38 @@ class Product extends Model
             ProductList::create([
                 'product_id' => $product_id,
                 'category_id' => $category['category_id'],
+                'order_id' => $order_id ? $order_id + 1 : 1
+            ]);
+        }
+    }
+
+    public static function updateProductOrder($product_id) {
+        
+        $product = Product::with('colors.categories')->find($product_id);
+        
+        $categoryIds = collect($product->colors)
+            ->flatMap(fn($color) => $color->categories)
+            ->pluck('category_id')
+            ->unique()
+            ->toArray();
+        
+        $existingCategoryIds = 
+            ProductList::where('product_id', $product_id)
+                ->pluck('category_id')
+                ->toArray();
+        
+        $categories = array_diff($categoryIds, $existingCategoryIds);
+        
+        foreach($categories as $category_id) {
+            $order_id = 
+                ProductList::where('category_id', $category_id)
+                           ->latest('order_id')
+                           ->first()
+                           ->order_id ?? 0;
+
+            ProductList::create([
+                'product_id' => $product_id,
+                'category_id' => $category_id,
                 'order_id' => $order_id ? $order_id + 1 : 1
             ]);
         }
@@ -637,7 +672,7 @@ class Product extends Model
         self::updateProductDetails($product->id, $request);
         self::updateProductTags($product->id, $request);
         self::updateProductColors($product->id, $request);
-        self::createProductOrder($product->id);
+        self::updateProductOrder($product->id);
 
         return $product;
     }

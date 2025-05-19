@@ -1,5 +1,5 @@
 {
-    "name": "mira-que-buen-precio-backoffice",
+    "name": "partymax",
     "version": "7.0.1",
     "scripts": {
         "dev": "npm run build:icons && vite --host",
@@ -19,6 +19,9 @@
         "@tiptap/extension-underline": "^2.1.12",
         "@tiptap/starter-kit": "^2.1.12",
         "@tiptap/vue-3": "^2.1.12",
+        "@videojs-player/vue": "^1.0.0",
+        "@vime/core": "^5.4.1",
+        "@vime/vue-next": "^5.4.1",
         "@vueup/vue-quill": "^1.2.0",
         "@vueuse/core": "^10.5.0",
         "@vueuse/math": "^10.5.0",

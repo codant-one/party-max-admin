@@ -15,6 +15,8 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import VueClipboard from 'vue-clipboard2'
 
+import '@vime/core/themes/default.css';
+
 loadFonts()
 
 window.axios = axios
