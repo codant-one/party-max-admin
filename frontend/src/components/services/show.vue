@@ -189,7 +189,7 @@ const buildEmbedUrl = (url) => {
                                 ref="carousel"
                             >
                                 <Slide v-for="(slide, index) in mediaSlides" :key="index">
-                                    <div class="carousel__item border-img p-1" @click="slideTo(index)">
+                                    <div class="carousel__item border-img" @click="slideTo(index)">
                                         <img 
                                             v-if="slide.type === 'image'"
                                             :src="slide.url" 
