@@ -196,6 +196,7 @@ class MiscellaneousController extends Controller
                                 'colors.categories.category', 
                                 'tags.tag',
                                 'detail',
+                                'videos',
                                 'reviews.client.user'
                               ])
                               ->where('slug', $slug)
@@ -474,6 +475,7 @@ class MiscellaneousController extends Controller
                                 'images',
                                 'categories.category', 
                                 'tags.tag',
+                                'videos',
                                 'cupcakes.cake_size.cake_type'
                               ])
                               ->where('slug', $slug)

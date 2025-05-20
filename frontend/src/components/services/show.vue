@@ -97,7 +97,7 @@ const mediaSlides = computed(() => {
     url: u.url,
     thumb: u.thumb
   }));
-  return [...imgs, ...vids];
+  return [...vids, ...imgs];
 });
 
 const loadVideoThumbnail = async (url) => {
@@ -383,6 +383,7 @@ const buildEmbedUrl = (url) => {
         width: 120px;
         border-radius: 16px !important;
     }
+    
     .carousel__item img {
         width: 100%;
         height: 120px;
