@@ -54,12 +54,12 @@
                                             <span style="display: block; font-size: 22px; color: #0a1b33; margin-left: 40px;">
                                                 {{ ucwords(strtolower($service['service_name'])) }}
                                             </span>
-                                            @if($service['flavor'])
+                                            @if($service['flavor'] && $service['service_is_full'])
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 Sabor: {{ $service['flavor'] }}
                                             </span>
                                             @endif
-                                            @if($service['filling'])
+                                            @if($service['filling'] && $service['service_is_full'])
                                             <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                                                 Relleno: {{ $service['filling'] }}
                                             </span>

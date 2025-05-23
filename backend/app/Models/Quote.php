@@ -141,6 +141,7 @@ class Quote extends Model
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_price' => $detail->price,
                     'service_total' => $detail->total *  $detail->quantity,
                     'service_image' => asset('storage/' . $detail->service->image),

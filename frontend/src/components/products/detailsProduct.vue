@@ -329,9 +329,11 @@ const colors = (id) => {
                     </VCol>
                     <VCol cols="12" md="5">
                         <VImg
-                            :height="200"
+                            :height="220"
+                            :width="220"
                             :src="image"
-                            class="mx-auto"
+                            class="mx-auto border-img"
+                            cover
                         />
                     </VCol>
                     <VCol cols="12" md="7">
@@ -503,6 +505,11 @@ const colors = (id) => {
         white-space: break-spaces !important;
     }
 
+    .border-img {
+        border-radius: 16px !important;
+        border: 1px solid #D9D9D9;
+    }
+    
     .header {
         height: 100px;
         display: block;

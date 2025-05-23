@@ -375,7 +375,8 @@ class Service extends Model
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
-            'price' => $request->price === 'null' ? null : $request->price       
+            'price' => $request->price === 'null' ? null : $request->price,
+            'is_full' => $request->is_full
         ]);
 
         self::createServiceTags($service->id, $request);
@@ -454,7 +455,8 @@ class Service extends Model
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
-            'price' => $request->price === 'null' ? null : $request->price 
+            'price' => $request->price === 'null' ? null : $request->price,
+            'is_full' => $request->is_full
         ]);
 
         self::updateServiceTags($service->id, $request);

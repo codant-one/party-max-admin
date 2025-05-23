@@ -220,6 +220,7 @@ class Client extends Model
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor ? $detail->flavor->name : null,
                     'filling' => $detail->filling ? $detail->filling->name : null,
@@ -331,6 +332,7 @@ class Client extends Model
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor ? $detail->flavor->name : null,
                     'filling' => $detail->filling ? $detail->filling->name : null,

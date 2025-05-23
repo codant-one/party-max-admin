@@ -321,6 +321,7 @@ class OrderController extends Controller
                         $serviceInfo = [
                             'service_id' => $detail->service->id,
                             'service_name' => $detail->service->name,
+                            'service_is_full' => $detail->service->is_full,
                             'service_image' => $detail->service->image,
                             'flavor' => $detail->flavor ? $detail->flavor->name : null,
                             'filling' => $detail->filling ? $detail->filling->name : null,
@@ -420,6 +421,7 @@ class OrderController extends Controller
                         $serviceInfo = [
                             'service_id' => $detail->service->id,
                             'service_name' => $detail->service->name,
+                            'service_is_full' => $detail->service->is_full,
                             'service_image' => $detail->service->image,
                             'flavor' => $detail->flavor ? $detail->flavor->name : null,
                             'filling' => $detail->filling ? $detail->filling->name : null,

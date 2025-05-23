@@ -144,6 +144,7 @@ class TestingController extends Controller
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor->name,
                     'filling' => $detail->filling->name,
@@ -219,6 +220,7 @@ class TestingController extends Controller
                     'email' => $email,
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor->name,
                     'filling' => $detail->filling->name,
@@ -325,6 +327,7 @@ class TestingController extends Controller
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor->name,
                     'filling' => $detail->filling->name,
@@ -470,6 +473,7 @@ class TestingController extends Controller
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'flavor' => $detail->flavor->name,
                     'filling' => $detail->filling->name,
@@ -629,6 +633,7 @@ class TestingController extends Controller
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_image' => asset('storage/' . $detail->service->image),
                     'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,
                 ];
@@ -752,6 +757,7 @@ class TestingController extends Controller
                 $serviceInfo = [
                     'service_id' => $detail->service->id,
                     'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
                     'service_price' => $detail->price,
                     'service_total' => $detail->total *  $detail->quantity,
                     'service_image' => asset('storage/' . $detail->service->image),

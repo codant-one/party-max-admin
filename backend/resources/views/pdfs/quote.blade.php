@@ -178,7 +178,7 @@
                             Tamaño: {{ $service['cake_size'] }}
                         </span>
                         @endif
-                        @if($service['flavor'])
+                        @if($service['flavor'] && $service['service_is_full'])
                         <span style="display: block; font-size: 15px; color: #999999; margin-left: 40px;">
                             Sabor: {{ $service['flavor'] }}
                      

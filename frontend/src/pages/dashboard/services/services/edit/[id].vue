@@ -53,6 +53,7 @@ const userData = ref(null)
 const service = ref(null) 
 const tag_id = ref()
 const category_id = ref([])
+const is_full = ref(true)
 const sku = ref([])
 const video = ref([])
 const service_files = ref([])
@@ -135,6 +136,7 @@ async function fetchData() {
 
       sku.value = service.value.sku
       video.value = service.value.videos.map(video => video.url)
+      is_full.value = service.value.is_full === 1 ? true : false
       category_id.value = service.value.categories.map(item => item.category_id)
       selectCategory(category_id.value)
 
@@ -357,7 +359,8 @@ const onSubmit = () => {
             formData.append('sku', sku.value)
             formData.append('price', price.value)
             formData.append('image', image.value)
-
+            formData.append('is_full', is_full.value ? 1 : 0)
+            
             //service_tags
             formData.append('tag_id', tag_id.value)
 
@@ -821,6 +824,16 @@ const onSubmit = () => {
                     </template>
                   </VAutocomplete>
                 </div>
+
+                <label for="wholesale" v-if="isCupcake">¿Servicio disponible para rellenos y sabores?</label>
+                <VCheckbox
+                  v-if="isCupcake"
+                  v-model="is_full"
+                > 
+                  <template #label>
+                    {{ is_full ? 'SI' : 'NO' }}
+                  </template>
+                </VCheckbox>
 
                 <VTextField
                   v-model="price"

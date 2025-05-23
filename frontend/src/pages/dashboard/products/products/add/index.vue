@@ -719,7 +719,6 @@ const onSubmit = () => {
               <label for="wholesale">¿Producto disponible al por mayor?</label>
               <VCheckbox
                 v-model="wholesale"
-                :value=1  
               > 
                 <template #label>
                   {{ wholesale ? 'SI' : 'NO' }}

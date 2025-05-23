@@ -305,10 +305,10 @@ const removeOrder = async () => {
                               <span class="text-body-1 font-weight-medium">
                                 {{ item.service.name }}
                               </span>
-                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0 && item.service.is_full">
                                 Sabor: {{ item.flavor.name }}
                               </span>
-                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">
+                              <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0 && item.service.is_full">
                                 Relleno: {{ item.filling.name }}
                               </span>
                               <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0">

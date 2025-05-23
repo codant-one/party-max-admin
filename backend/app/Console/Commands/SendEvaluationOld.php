@@ -106,6 +106,7 @@ class SendEvaluationOld extends Command
                 } else {
                     $serviceInfo = [
                         'service_id' => $detail->service->id,
+                        'service_is_full' => $detail->service->is_full,
                         'service_name' => $detail->service->name,
                         'service_image' => asset('storage/' . $detail->service->image),
                         'slug' =>env('APP_DOMAIN').'/services/'.$detail->service->slug,

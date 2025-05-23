@@ -245,10 +245,10 @@ const dialogModelValueUpdate = val => {
 
               <VCol cols="12" md="12" class="px-1 py-0 d-flex flex-column" v-if="isCupcake">
                 <div>
-                  <span class="font-weight-medium text-primary text-h6">Sabor:</span>
+                  <span class="font-weight-medium text-primary text-h6" v-if="event.extendedProps.order_detail.service.is_full">Sabor:</span>
                   <span class="text-h6 text-disabled ms-2">{{ flavor }}</span></div>
                 <div>
-                  <span class="font-weight-medium text-primary text-h6">Relleno:</span>
+                  <span class="font-weight-medium text-primary text-h6" v-if="event.extendedProps.order_detail.service.is_full">Relleno:</span>
                   <span class="text-h6 text-disabled ms-2">{{ filling }}</span></div>
                 <div>
                   <span class="font-weight-medium text-primary text-h6">Tamaño:</span>

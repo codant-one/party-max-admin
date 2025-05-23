@@ -170,7 +170,7 @@ async function fetchData() {
       price_for_sale.value = product.value.price_for_sale
       wholesale_price.value = product.value.wholesale_price
       wholesale_min.value = product.value.wholesale_min
-      wholesale.value = product.value.wholesale
+      wholesale.value = product.value.wholesale === 1 ? true : false
 
       avatar.value = product.value.image === null ? '' : themeConfig.settings.urlStorage + product.value.image
 
@@ -786,7 +786,6 @@ const onSubmit = () => {
               <label for="wholesale">¿Producto disponible al por mayor?</label>
               <VCheckbox
                 v-model="wholesale"
-                :value=1  
               > 
                 <template #label>
                   {{ wholesale ? 'SI' : 'NO' }}

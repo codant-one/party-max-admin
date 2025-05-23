@@ -68,7 +68,7 @@ watchEffect(async () => {
             imageAux.value = [{ image : props.product.image }]
 
             categories.value = props.product.colors[0]?.categories.map(item => item.category.name)
-            productImages.value = (props.product.colors[0]?.images.length === 0) ? imageAux.value : props.product.colors[0]?.images
+            productImages.value = props.product.colors[0]?.images
             color.value = props.product.colors[0]?.color.name
             stock.value = props.product.colors[0]?.stock
 
@@ -131,7 +131,12 @@ const mediaSlides = computed(() => {
     url: u.url,
     thumb: u.thumb
   }));
-  return [...vids, ...imgs];
+  const main = {
+    type: 'image',
+    url: themeConfig.settings.urlStorage + imageAux.value[0].image,
+    thumb: themeConfig.settings.urlStorage + imageAux.value[0].image
+  }
+  return [...vids, main, ...imgs];
 });
 
 const loadVideoThumbnail = async (url) => {
@@ -213,13 +218,14 @@ const buildEmbedUrl = (url) => {
                                 :freeMode="true"
                                 :watchSlidesProgress="true"
                                 @swiper="setThumbsSwiper"
-                                class="mySwiper"
+                                class="mySwiper pt-0"
                             >
                                 <swiper-slide v-for="(slide, index) in mediaSlides" :key="index">
                                     <img 
                                         v-if="slide.type === 'image'"
                                         :src="slide.url" 
                                         :alt="'image-'+index"
+                                        class="thumb-media"
                                     />
                                     <img
                                         v-else
@@ -233,7 +239,7 @@ const buildEmbedUrl = (url) => {
                         <div class="d-block d-md-none">
                             <Carousel
                                 id="thumbnails"
-                                :items-to-show="(mediaSlides.length > 2 ) ? 2 : mediaSlides.length"
+                                :items-to-show="1"
                                 :wrap-around="true"
                                 v-model="currentSlide"
                                 ref="carousel"
@@ -244,6 +250,7 @@ const buildEmbedUrl = (url) => {
                                             v-if="slide.type === 'image'"
                                             :src="slide.url" 
                                             :alt="'image-'+index"
+                                            class="thumb-media-fill"
                                         />
                                         <iframe
                                             v-else
@@ -257,33 +264,32 @@ const buildEmbedUrl = (url) => {
                             </Carousel>
                         </div>
                     </VCol>
-                    <VCol md="4" cols="12">
-                        <div class="d-none d-md-block">
-                            <swiper
-                                :scrollbar="{
-                                    hide: true,
-                                }"
-                                :spaceBetween="10"
-                                :thumbs="{ swiper: thumbsSwiper }"
-                                :modules="modules"
-                                class="mySwiper2 border-img"
-                            >
-                                <swiper-slide v-for="(slide, index) in mediaSlides" :key="index">
-                                    <img 
-                                        v-if="slide.type === 'image'"
-                                        :src="slide.url" 
-                                        :alt="'slide-'+index"
-                                    />
-                                    <iframe
-                                        v-else
-                                        :src="buildEmbedUrl(slide.url)"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen
-                                    />
-                                </swiper-slide>
-                            </swiper>
-                        </div>
+                    <VCol md="4" cols="12"  class="d-none d-md-block">
+                        <swiper
+                            :scrollbar="{
+                                hide: true,
+                            }"
+                            :spaceBetween="10"
+                            :thumbs="{ swiper: thumbsSwiper }"
+                            :modules="modules"
+                            class="mySwiper2 border-img"
+                        >
+                            <swiper-slide v-for="(slide, index) in mediaSlides" :key="index">
+                                <img 
+                                    v-if="slide.type === 'image'"
+                                    :src="slide.url" 
+                                    :alt="'slide-'+index"
+                                    class="thumb-media-fill"
+                                />
+                                <iframe
+                                    v-else
+                                    :src="buildEmbedUrl(slide.url)"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                />
+                            </swiper-slide>
+                        </swiper>
                     </VCol>
                     <VCol md="7" cols="12">
                         <VCardTitle class="text-h6 title-truncate py-0 text-uppercase"> {{ title }} </VCardTitle>
@@ -484,26 +490,31 @@ const buildEmbedUrl = (url) => {
     }
 
     .thumb-media {
+        width: 60px !important;
+        height: 60px !important;
+        object-fit: cover !important;
+        border-radius: 8px !important;
+    }
+
+    .thumb-media-fill {
         width: 100% !important;
         object-fit: cover !important;
         border-radius: 8px !important;
     }
 
     .carousel__item  {
-        min-height: 120px;
-        min-width: 120px;
+        width: 100%;
         margin: 0 2px;
     }
 
     .carousel__item iframe {
-        height: 120px;
-        width: 120px;
+        height: 250px !important;
+        width: 100% !important;
         border-radius: 16px !important;
     }
     
     .carousel__item img {
-        width: 100%;
-        height: 120px;
+        height: 250px !important;
         border-radius: 16px !important;
     }
 
@@ -562,6 +573,8 @@ const buildEmbedUrl = (url) => {
         border-style: solid;
         border-width: 1px;
         border-radius: 8px;
+        width: 60px !important;
+        height: 60px !important;
     }
 
     .mySwiper .swiper-slide-thumb-active {
