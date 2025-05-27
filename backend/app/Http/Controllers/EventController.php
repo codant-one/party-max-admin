@@ -33,7 +33,8 @@ class EventController extends Controller
         try {
 
             $user = Auth()->user();
-            $isAdmin = Auth::user()->getRoleNames()[0] === 'SuperAdmin' || Auth::user()->getRoleNames()[0] === 'Administrador';
+            $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $isAdmin = in_array('administrador', $permissions);
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             $names = explode(',', $request->calendars);
@@ -121,7 +122,8 @@ class EventController extends Controller
         try {
 
             $user = Auth()->user();
-            $isAdmin = Auth::user()->getRoleNames()[0] === 'SuperAdmin' || Auth::user()->getRoleNames()[0] === 'Administrador';
+            $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $isAdmin = in_array('administrador', $permissions);
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             $names = explode(',', $request->calendars);
@@ -337,7 +339,8 @@ class EventController extends Controller
             ];
 
             $user = Auth()->user();
-            $isAdmin = Auth::user()->getRoleNames()[0] === 'SuperAdmin' || Auth::user()->getRoleNames()[0] === 'Administrador';
+            $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $isAdmin = in_array('administrador', $permissions);
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             if($isAdmin)
@@ -427,7 +430,8 @@ class EventController extends Controller
     public function getPendings(): JsonResponse
     {
         $user = Auth()->user();
-        $isAdmin = Auth::user()->getRoleNames()[0] === 'SuperAdmin' || Auth::user()->getRoleNames()[0] === 'Administrador';
+        $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+        $isAdmin = in_array('administrador', $permissions);
         $idAdmin = ($isAdmin) ? $user->id : 0;
 
         if($isAdmin)
