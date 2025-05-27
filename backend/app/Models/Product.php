@@ -418,7 +418,7 @@ class Product extends Model
     }
 
     /**** Public methods ****/
-    public static function createProductCategories($product_color_id, $key, $request) {
+    public static function createProductCategories($product_color_id, $key, $request, $product_id) {
         $categories = json_decode($request->category_id, true);
 
         foreach($categories[$key] as $category_id) {
@@ -427,6 +427,9 @@ class Product extends Model
                 'category_id' => $category_id
             ]);
         }
+
+        // elimnina las categorias que no estan
+        ProductList::where('product_id', $product_id)->whereNotIn('category_id', $categories[$key])->delete();
     }
 
     public static function createProductOrder($product_id) {
@@ -519,7 +522,7 @@ class Product extends Model
             ]);
 
             self::createProductImages($product_color->id, $key, $request);
-            self::createProductCategories($product_color->id, $key, $request);
+            self::createProductCategories($product_color->id, $key, $request, $product_id);
         }
     }
 
@@ -583,7 +586,7 @@ class Product extends Model
             $product_color->categories()->delete();
 
             self::createProductImages($product_color->id, $key, $request);
-            self::createProductCategories($product_color->id, $key, $request);
+            self::createProductCategories($product_color->id, $key, $request, $product_id);
         }
 
         $colors = 
