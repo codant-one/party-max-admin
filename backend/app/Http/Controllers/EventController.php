@@ -34,7 +34,7 @@ class EventController extends Controller
 
             $user = Auth()->user();
             $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-            $isAdmin = Auth::user()->getRoleNames()[0] === 'SuperAdmin';
+            $isAdmin = in_array('administrador', $permissions);
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             $names = explode(',', $request->calendars);
