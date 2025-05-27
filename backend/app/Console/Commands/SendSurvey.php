@@ -84,7 +84,7 @@ class SendSurvey extends Command
                 ])->find($item->id); 
             
             $link = 'https://docs.google.com/forms/d/1m3TVPc3rD2ECSnx4B2A6ZQqkCxFwdN-NSFR-UNcEJ5A/edit';
-            $subject = 'Tu opinión es importante para nosotros. Cuéntanos tu experiencia';
+            $subject = 'Tu opinión es importante para nosotros. Cuéntanos tu experiencia';
 
             if($order->client) {
                 $user = $order->client->user->name . ' ' . $order->client->user->last_name;
