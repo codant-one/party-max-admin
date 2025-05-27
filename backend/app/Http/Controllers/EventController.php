@@ -34,7 +34,7 @@ class EventController extends Controller
 
             $user = Auth()->user();
             $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-            $isAdmin = in_array('administrador', $permissions);
+            $isAdmin = in_array('administrador', $permissions) || Auth::user()->getRoleNames()[0] === 'Administrador';
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             $names = explode(',', $request->calendars);
@@ -123,7 +123,7 @@ class EventController extends Controller
 
             $user = Auth()->user();
             $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-            $isAdmin = in_array('administrador', $permissions);
+            $isAdmin = in_array('administrador', $permissions) || Auth::user()->getRoleNames()[0] === 'Administrador';
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             $names = explode(',', $request->calendars);
@@ -340,7 +340,7 @@ class EventController extends Controller
 
             $user = Auth()->user();
             $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-            $isAdmin = in_array('administrador', $permissions);
+            $isAdmin = in_array('administrador', $permissions) || Auth::user()->getRoleNames()[0] === 'Administrador';
             $idAdmin = ($isAdmin) ? $user->id : 0;
 
             if($isAdmin)
@@ -431,7 +431,7 @@ class EventController extends Controller
     {
         $user = Auth()->user();
         $permissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-        $isAdmin = in_array('administrador', $permissions);
+        $isAdmin = in_array('administrador', $permissions) || Auth::user()->getRoleNames()[0] === 'Administrador';
         $idAdmin = ($isAdmin) ? $user->id : 0;
 
         if($isAdmin)
