@@ -376,7 +376,8 @@ class Service extends Model
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
             'price' => $request->price === 'null' ? null : $request->price,
-            'is_full' => $request->is_full
+            'is_full' => $request->is_full,
+            'estimated_delivery_time' => $request->estimated_delivery_time
         ]);
 
         self::createServiceTags($service->id, $request);
@@ -456,7 +457,8 @@ class Service extends Model
             'description' => $request->description === 'null' ? null : $request->description,
             'sku' => $request->sku,
             'price' => $request->price === 'null' ? null : $request->price,
-            'is_full' => $request->is_full
+            'is_full' => $request->is_full,
+            'estimated_delivery_time' => $request->estimated_delivery_time
         ]);
 
         self::updateServiceTags($service->id, $request);

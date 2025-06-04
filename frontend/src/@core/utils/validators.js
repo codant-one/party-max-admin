@@ -156,3 +156,11 @@ export const fileMineValidator = value => {
   
   return true
 }
+
+export const nonNegativeValidator = value => {
+  return Number(value) >= 0 ? true : 'Debe ser mayor o igual a 0'
+}
+
+export const positiveValidator = value => {
+  return Number(value) >= 1 ? true : 'Debe ser mayor o igual a 1'
+}

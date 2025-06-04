@@ -2,7 +2,7 @@
 
 import { inject } from "vue"
 import { themeConfig } from '@themeConfig'
-import { requiredValidator } from '@validators'
+import { requiredValidator, nonNegativeValidator } from '@validators'
 import { useServicesStores } from '@/stores/useServices'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { useBrandsStores } from '@/stores/useBrands'
@@ -67,6 +67,7 @@ const image = ref('')
 const avatar = ref('')
 const filename = ref([])
 const isCupcake = ref(false)
+const estimated_delivery_time = ref([])
 
 const modules = {
   name: 'imageUploader',
@@ -137,6 +138,8 @@ async function fetchData() {
       sku.value = service.value.sku
       video.value = service.value.videos.map(video => video.url)
       is_full.value = service.value.is_full === 1 ? true : false
+      estimated_delivery_time.value = service.value.estimated_delivery_time
+
       category_id.value = service.value.categories.map(item => item.category_id)
       selectCategory(category_id.value)
 
@@ -360,6 +363,7 @@ const onSubmit = () => {
             formData.append('price', price.value)
             formData.append('image', image.value)
             formData.append('is_full', is_full.value ? 1 : 0)
+            formData.append('estimated_delivery_time', estimated_delivery_time.value)
             
             //service_tags
             formData.append('tag_id', tag_id.value)
@@ -844,7 +848,17 @@ const onSubmit = () => {
                   :style="{
                     display: isCupcake ? 'none' : 'block'
                   }"
-                />             
+                />         
+                
+                <VTextField
+                  type="number"
+                  v-model="estimated_delivery_time"
+                  label="Tiempo de entrega (días)"
+                  placeholder="Tiempo estimado de entrega"
+                  min="1"
+                  :rules="[requiredValidator, nonNegativeValidator]"
+                />
+
               </div>
             </VCardText>
           </VCard>
