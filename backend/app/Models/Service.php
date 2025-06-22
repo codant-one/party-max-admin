@@ -85,7 +85,8 @@ class Service extends Model
                         ->from('services as s')
                         ->join('service_lists as sl', 's.id', '=', 'sl.service_id')
                         ->where('sl.category_id', $categoryId)
-                        ->whereColumn('s.id', 'services.id');
+                        ->whereColumn('s.id', 'services.id')
+                        ->limit(1);
                     }]);
    
     }
