@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\EventRequest;
 
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 

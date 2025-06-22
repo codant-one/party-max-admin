@@ -179,7 +179,8 @@ class Product extends Model
                         ->from('products as p')
                         ->join('product_lists as pl', 'p.id', '=', 'pl.product_id')
                         ->where('pl.category_id', $categoryId)
-                        ->whereColumn('p.id', 'products.id');
+                        ->whereColumn('p.id', 'products.id')
+                        ->limit(1);
                     }]);
    
     }
