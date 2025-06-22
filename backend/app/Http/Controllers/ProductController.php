@@ -340,7 +340,7 @@ class ProductController extends Controller
     {
         try {
 
-            $product = Product::find($id);
+            $product = Product::withTrashed()->find($id);
         
             if (!$product)
                 return response()->json([

@@ -10,11 +10,13 @@ import { useBrandsStores } from '@/stores/useBrands'
 import { useTagsStores } from '@/stores/useTags'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { QuillEditor } from '@vueup/vue-quill'
+import { Cropper } from 'vue-advanced-cropper'
 import { Player, DefaultUi, Youtube, Vimeo, Video} from '@vime/vue-next';
 import ImageUploader from 'quill-image-uploader'
 import FileInput from "@/components/common/FileInput.vue";
 import router from '@/router'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import 'vue-advanced-cropper/dist/style.css'
 
 const productsStores = useProductsStores()
 const colorsStores = useColorsStores()
@@ -58,8 +60,10 @@ const wholesale_price = ref('')
 const wholesale_min = ref(6)
 const wholesale = ref(false)
 const stock = ref([])
+const cropper = ref()
+const imageOld = ref('')
+const imageCropped = ref(null)
 const image = ref('')
-const avatar = ref('')
 const filename = ref([])
 const width = ref([])
 const height = ref([])
@@ -146,9 +150,8 @@ const onImageSelected = event => {
 
   resizeImage(file, 1200, 1200, 1)
     .then(async blob => {
-        image.value = blob
         let r = await blobToBase64(blob)
-        avatar.value = 'data:image/jpeg;base64,' + r
+        imageCropped.value = 'data:image/jpeg;base64,' + r
     })
 }
 
@@ -256,11 +259,44 @@ const mediaIds = computed(() =>
   })
 );
 
+const dataURLtoBlob = (dataURL) => {
+  const [header, base64] = dataURL.split(',');
+  const mimeMatch = header.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png'; 
+  const binary = atob(base64);
+  const len = binary.length;
+  const u8arr = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    u8arr[i] = binary.charCodeAt(i);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
+const onCropChange = (coordinates) => {
+    // console.log('coordinates', coordinates)
+}
+
+const resetImage = () => {
+  imageCropped.value = null
+  imageOld.value = null
+}
+
 const onSubmit = () => {
 
   refForm.value?.validate().then(({ valid }) => {
       isValid.value = valid
       if (valid) {
+
+        if (cropper.value) {
+          const result = cropper.value.getResult({
+                mime: 'image/png',
+                quality: 1,
+                fillColor: 'transparent'
+            });
+            const blob = dataURLtoBlob(result.canvas.toDataURL("image/png"));
+
+            imageOld.value = blob 
+        }
 
           let formData = new FormData()
 
@@ -275,7 +311,7 @@ const onSubmit = () => {
           formData.append('wholesale', wholesale.value ? 1 : 0)
           formData.append('wholesale_price', wholesale_price.value)
           formData.append('wholesale_min', wholesale_min.value)
-          formData.append('image', image.value)
+          formData.append('image', imageOld.value)
 
           //product_details
           formData.append('width', width.value)
@@ -672,23 +708,27 @@ const onSubmit = () => {
             class="mb-6"
           >
             <VCardText>
-              <VImg
-                v-if="avatar !== null"
-                :src="avatar"
-                :height="200"
-                aspect-ratio="16/9"
-                class="border-img mb-2"
-                :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+              <Cropper
+                ref="cropper"
+                class="cropper-container"
+                preview-class="cropper-preview"
+                background-class="cropper-background"
+                :src="imageCropped"
+                :stencil-props="{
+                  aspectRatio: 1/1,
+                  previewClass: 'cropper-preview-circle'
+                }"
+                @change="onCropChange"
               />
 
               <VFileInput
                 v-model="filename"
                 label="Imagen"
-                class="mb-2"
+                class="mt-5"
                 accept="image/png, image/jpeg, image/bmp, image/webp"
                 prepend-icon="tabler-camera"
                 @change="onImageSelected"
-                @click:clear="avatar = null"
+                @click:clear="resetImage"
                 :rules="[requiredValidator]"
               />
             </VCardText>
@@ -827,6 +867,36 @@ const onSubmit = () => {
 </template>
 
 <style lang="scss">
+
+  ::v-deep .vue-simple-handler {
+    background: #9966FF !important;
+  }
+    
+  ::v-deep .cropper-preview-circle {
+    border: dashed 1px #9966FF
+  }
+
+  ::v-deep .cropper-background,
+  :v-deep .vue-advanced-cropper__foreground {
+    background-color: transparent !important;
+  }
+
+  .cropper-container {
+    width: 100%;
+    height: 250px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cropper-preview {
+    width: 250px;
+    height: 250px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
   .inventory-card{
     .v-radio-group,
     .v-checkbox {

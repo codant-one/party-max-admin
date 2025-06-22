@@ -507,7 +507,8 @@ class Service extends Model
     public static function updateStatesService($request, $service) {
 
         $service->update([
-            'state_id' => $request->state_id
+            'state_id' => $request->state_id,
+            'deleted_at' => null
         ]);  
 
         return $service;

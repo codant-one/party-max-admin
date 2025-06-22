@@ -21,6 +21,7 @@ const emit = defineEmits([
     'download',
     'updateLink',
     'show',
+    'activeProduct',
     'editProduct',
     'deleteProduct'
 ])
@@ -86,6 +87,10 @@ const open = (link) =>{
 
 const show = (id) => {
     emit('show', id)
+}
+
+const activeProduct = (id) => {
+    emit('activeProduct', id)
 }
 
 const editProduct = (id) => {
@@ -160,6 +165,23 @@ const colors = (id) => {
             </template>
             <template #append class="d-flex align-end">
                 <div class="d-flex align-end me-n2">
+                    <VBtn
+                        v-if="$can('editar','productos') && state.id === 5"
+                        icon
+                        color="default"
+                        size="x-small"
+                        variant="plain"
+                        @click="activeProduct(id)">
+                        <VTooltip
+                            open-on-focus
+                            location="top"
+                            activator="parent">
+                            Activar
+                        </VTooltip>
+                        <VIcon
+                            :size="22"
+                            icon="tabler-check"/>
+                    </VBtn>
                     <VBtn
                         v-if="$can('editar','productos')"
                         icon

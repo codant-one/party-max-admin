@@ -11,10 +11,12 @@ import { useSuppliersStores } from '@/stores/useSuppliers'
 import { useMiscellaneousStores } from '@/stores/useMiscellaneous'
 import { QuillEditor } from '@vueup/vue-quill'
 import { Player, DefaultUi, Youtube, Vimeo, Video} from '@vime/vue-next';
+import { Cropper } from 'vue-advanced-cropper'
 import ImageUploader from 'quill-image-uploader'
 import FileInput from "@/components/common/FileInput.vue";
 import router from '@/router'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import 'vue-advanced-cropper/dist/style.css'
 
 const servicesStores = useServicesStores()
 const categoriesStores = useCategoriesStores()
@@ -63,11 +65,16 @@ const name = ref(null)
 const single_description = ref(' ')
 const description = ref(' ')
 const price = ref(null)
+const cropper = ref()
+const imageOld = ref('')
+const imageCropped = ref(null)
 const image = ref('')
 const avatar = ref('')
 const filename = ref([])
 const isCupcake = ref(false)
 const estimated_delivery_time = ref([])
+
+const isConfirmChangeImageVisible = ref(false)
 
 const modules = {
   name: 'imageUploader',
@@ -144,7 +151,7 @@ async function fetchData() {
       selectCategory(category_id.value)
 
       optionCounter.value = service.value.cupcakes.length
-      videoCounter.value = service.value.videos.length
+      videoCounter.value = service.value.videos.length === 0 ? 1 : service.value.videos.length
 
       service.value.cupcakes.forEach(async function callback(value, index) { 
         prices.value[index] = value.price
@@ -179,7 +186,7 @@ async function fetchData() {
       description.value = service.value.description
       price.value = service.value.price
 
-      avatar.value = service.value.image === null ? '' : themeConfig.settings.urlStorage + service.value.image
+      image.value = service.value.image === null ? '' : themeConfig.settings.urlStorage + service.value.image
 
     }
     
@@ -205,9 +212,8 @@ const onImageSelected = event => {
 
   resizeImage(file, 1200, 1200, 1)
     .then(async blob => {
-        image.value = blob
         let r = await blobToBase64(blob)
-        avatar.value = 'data:image/jpeg;base64,' + r
+        imageCropped.value = 'data:image/jpeg;base64,' + r
     })
 }
 
@@ -345,6 +351,43 @@ const mediaIds = computed(() =>
   })
 );
 
+const dataURLtoBlob = (dataURL) => {
+  const [header, base64] = dataURL.split(',');
+  const mimeMatch = header.match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png'; 
+  const binary = atob(base64);
+  const len = binary.length;
+  const u8arr = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    u8arr[i] = binary.charCodeAt(i);
+  }
+  return new Blob([u8arr], { type: mime });
+}
+
+const onCropChange = (coordinates) => {
+  // console.log('coordinates', coordinates)
+}
+
+const resetImage = () => {
+  imageCropped.value = null
+  imageOld.value = null
+}
+
+const cropImage = async () => {
+    if (cropper.value) {
+        const result = cropper.value.getResult({
+            mime: 'image/png',
+            quality: 1,
+            fillColor: 'transparent'
+        });
+        const blob = dataURLtoBlob(result.canvas.toDataURL("image/png"));
+
+        imageOld.value = blob 
+        image.value = result.canvas.toDataURL("image/png")
+        isConfirmChangeImageVisible.value = false     
+    }
+}
+
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -361,7 +404,7 @@ const onSubmit = () => {
             formData.append('description', description.value)
             formData.append('sku', sku.value)
             formData.append('price', price.value)
-            formData.append('image', image.value)
+            formData.append('image', imageOld.value)
             formData.append('is_full', is_full.value ? 1 : 0)
             formData.append('estimated_delivery_time', estimated_delivery_time.value)
             
@@ -714,24 +757,16 @@ const onSubmit = () => {
 
         <VCol md="4" cols="12">
           <VCard title="Imagen Principal" class="mb-6">
-            <VCardText>
-              <VImg
-                v-if="avatar !== null"
-                :src="avatar"
-                :height="200"
-                aspect-ratio="16/9"
-                class="border-img mb-2"
-              />
-
-              <VFileInput
-                v-model="filename"
-                label="Imagen"
-                class="mb-2"
-                accept="image/png, image/jpeg, image/bmp, image/webp"
-                prepend-icon="tabler-camera"
-                @change="onImageSelected"
-                @click:clear="avatar = null"
-              />
+            <VCardText class="text-center">
+              <VBadge 
+                  @click="isConfirmChangeImageVisible = true"
+                  class="cursor-pointer"
+                  color="success">
+                  <template #badge>
+                      <VIcon icon="tabler-pencil" />
+                  </template>
+                  <VImg :src="image" class="store-img" cover/>
+              </VBadge>
             </VCardText>
           </VCard>
 
@@ -865,10 +900,115 @@ const onSubmit = () => {
         </VCol>
       </VRow>
     </VForm>
+
+    <!-- 👉 Confirm change image -->
+    <VDialog
+      v-model="isConfirmChangeImageVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmChangeImageVisible = !isConfirmChangeImageVisible" />
+
+      <!-- Dialog Content -->
+       <VForm
+          ref="refVForm"
+          @submit.prevent="cropImage"
+        >
+        <VCard title="Cambiar imagen">
+          <VDivider />
+          <VCardText>
+            La imagen que selecciones y recortes aparecerá como imagen principal.
+          </VCardText>
+          <VCardText class="d-flex flex-column gap-2">
+              <VRow>
+                  <VCol cols="12" md="12">
+                      <Cropper
+                          v-if="imageCropped"
+                          ref="cropper"
+                          class="cropper-container"
+                          preview-class="cropper-preview"
+                          background-class="cropper-background"
+                          :src="imageCropped"
+                          :stencil-props="{
+                              aspectRatio: 1/1,
+                              previewClass: 'cropper-preview-circle'
+                          }"
+                          @change="onCropChange"
+                      />
+
+                  </VCol>
+                  <VCol cols="12" md="12">
+                      <VFileInput 
+                          v-model="filename"
+                          label="Imagen"
+                          class="mb-2"
+                          accept="image/png, image/jpeg, image/bmp, image/webp"
+                          prepend-icon="tabler-camera"
+                          @change="onImageSelected"
+                          :rules="[requiredValidator]"
+                          @click:clear="resetImage"
+                      />
+                  </VCol>
+              </VRow>
+          </VCardText>
+
+          <VCardText class="d-flex justify-end gap-3 flex-wrap">
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              @click="isConfirmChangeImageVisible = false">
+                Cancelar
+            </VBtn>
+            <VBtn type="submit"> 
+                Guardar
+            </VBtn>
+          </VCardText>
+        </VCard>
+      </VForm>
+    </VDialog>
   </section>
 </template>
 
 <style lang="scss">
+
+  .store-img {
+    width: 300px;
+    height: 300px;
+    max-width: 300px;
+    border-radius: 8px;
+    background-color: #F5F5F5;
+  }
+
+  ::v-deep .vue-simple-handler {
+    background: #9966FF !important;
+  }
+    
+  ::v-deep .cropper-preview-circle {
+    border: dashed 1px #9966FF
+  }
+
+  ::v-deep .cropper-background,
+  ::v-deep .vue-advanced-cropper__foreground {
+    background-color: transparent !important;
+  }
+
+  .cropper-container {
+    width: 100%;
+    height: 250px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .cropper-preview {
+    width: 250px;
+    height: 250px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 1rem;
+  }
+
   .inventory-card{
     .v-radio-group,
     .v-checkbox {

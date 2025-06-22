@@ -319,7 +319,7 @@ class ServiceController extends Controller
     {
         try {
 
-            $service = Service::find($id);
+            $service = Service::withTrashed()->find($id);
         
             if (!$service)
                 return response()->json([

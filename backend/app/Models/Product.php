@@ -760,7 +760,8 @@ class Product extends Model
     public static function updateStatesProduct($request, $product) {
 
         $product->update([
-            'state_id' => $request->state_id
+            'state_id' => $request->state_id,
+            'deleted_at' => null
         ]);  
 
         return $product;

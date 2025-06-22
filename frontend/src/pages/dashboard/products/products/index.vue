@@ -26,6 +26,7 @@ const selectedProduct = ref({})
 
 const isProductDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
+const isConfirmActiveDialogVisible = ref(false)
 
 const favourite = ref(null)
 const archived = ref(null)
@@ -210,6 +211,11 @@ const showStateDialog = (productData, id) => {
     selectedProduct.value = { ...productData }
 }
 
+const showActiveDialog = id => {
+  isConfirmActiveDialogVisible.value = true
+  selectedProduct.value = products.value.filter((element) => element.id === id )[0]
+}
+
 const showDeleteDialog = productData => {
   isConfirmDeleteDialogVisible.value = true
   selectedProduct.value = { ...productData }
@@ -382,6 +388,32 @@ const showAlert = function(alert) {
 
 const closeDropdown = () => { 
   document.getElementById("selectCategory").blur()
+}
+
+const activeProduct = async () => {
+
+    isConfirmActiveDialogVisible.value = false
+    
+    let res = await productsStores.updateState({ state_id: 3 }, selectedProduct.value.id)
+    selectedProduct.value = {}
+    
+    advisor.value = {
+        type: res.data.success ? 'success' : 'error',
+        message: res.data.success ? 'Producto activado!' : res.data.message,
+        show: true
+    }
+
+    await fetchData()
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
+
+    return true
 }
 
 const removeProduct = async () => {
@@ -725,6 +757,7 @@ const downloadCSV = async () => {
                     @download="download"
                     @updateLink="updateLink"
                     @show="showProduct"
+                    @activeProduct="showActiveDialog"
                     @editProduct="editProduct"
                     @deleteProduct="deleteProduct"
                   />
@@ -865,6 +898,23 @@ const downloadCSV = async () => {
                       icon="mdi-cart-off" />
                   </VBtn>
                   <VBtn
+                    v-if="$can('editar', 'productos') && product.state_id === 5"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showActiveDialog(product.id)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Activar
+                    </VTooltip>
+                    <VIcon
+                      size="22"
+                      icon="tabler-check" />
+                  </VBtn>
+                  <VBtn
                     v-if="$can('editar', 'productos') && product.state_id !== 4"
                     icon
                     size="x-small"
@@ -937,6 +987,36 @@ const downloadCSV = async () => {
     <show 
       v-model:isDrawerOpen="isProductDetailDialog"
       :product="selectedProduct"/>
+
+    <!-- 👉 Confirm Active -->
+    <VDialog
+      v-model="isConfirmActiveDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmActiveDialogVisible = !isConfirmActiveDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Activar Producto">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de activar el producto <strong>{{ selectedProduct.title }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmActiveDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="activeProduct">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
 
     <!-- 👉 Confirm Delete -->
     <VDialog

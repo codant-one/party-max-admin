@@ -26,6 +26,7 @@ const selectedService = ref({})
 
 const isServiceDetailDialog = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
+const isConfirmActiveDialogVisible = ref(false)
 
 const favourite = ref(null)
 const archived = ref(null)
@@ -179,6 +180,11 @@ const showStateDialog = (serviceData, id) => {
     isConfirmApproveDialogVisible.value = true
     state_id.value = id
     selectedService.value = { ...serviceData }
+}
+
+const showActiveDialog = id => {
+  isConfirmActiveDialogVisible.value = true
+  selectedService.value = services.value.filter((element) => element.id === id )[0]
 }
 
 const showDeleteDialog = serviceData => {
@@ -353,6 +359,32 @@ const showAlert = function(alert) {
 
 const closeDropdown = () => { 
   document.getElementById("selectCategory").blur()
+}
+
+const activeService = async () => {
+
+    isConfirmActiveDialogVisible.value = false
+    
+    let res = await servicesStores.updateState({ state_id: 3 }, selectedService.value.id)
+    selectedService.value = {}
+    
+    advisor.value = {
+        type: res.data.success ? 'success' : 'error',
+        message: res.data.success ? 'Servicio activado!' : res.data.message,
+        show: true
+    }
+
+    await fetchData()
+
+    setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+    }, 3000)
+
+    return true
 }
 
 const removeService = async () => {
@@ -669,6 +701,7 @@ const downloadCSV = async () => {
                     @download="download"
                     @updateLink="updateLink"
                     @show="showService"
+                    @activeService="showActiveDialog"
                     @editService="editService"
                     @deleteService="deleteService"
                   />
@@ -806,6 +839,23 @@ const downloadCSV = async () => {
                       size="22"
                       icon="mdi-cart-off" />
                   </VBtn>
+                   <VBtn
+                    v-if="$can('editar', 'servicios') && service.state_id === 5"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showActiveDialog(service.id)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Activar
+                    </VTooltip>
+                    <VIcon
+                      size="22"
+                      icon="tabler-check" />
+                  </VBtn>
                   <VBtn
                     v-if="$can('editar', 'servicios') && service.state_id !== 4"
                     icon
@@ -879,6 +929,36 @@ const downloadCSV = async () => {
     <show 
       v-model:isDrawerOpen="isServiceDetailDialog"
       :service="selectedService"/>
+
+    <!-- 👉 Confirm Active -->
+    <VDialog
+      v-model="isConfirmActiveDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmActiveDialogVisible = !isConfirmActiveDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Activar Servicio">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de activar el servicio <strong>{{ selectedService.title }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmActiveDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="activeService">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
 
     <!-- 👉 Confirm Delete -->
     <VDialog
