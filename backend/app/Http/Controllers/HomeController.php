@@ -93,7 +93,7 @@ class HomeController extends Controller
                 }
             }
 
-            $recommendations = Product::with(['user.userDetail', 'user.supplier', 'colors'])
+            $recommendations = Product::with(['user.userDetail', 'user.supplier', 'firstColor:id,product_id,in_stock,stock'])
                                       ->where('favourite', true)
                                       ->orderBy('created_at', 'desc')
                                       ->limit(5)
@@ -114,7 +114,7 @@ class HomeController extends Controller
                         $tag_id = $productTag->tag_id;
 
                         $recommendations = 
-                                Product::with(['user.userDetail', 'user.supplier', 'tags', 'colors'])
+                                Product::with(['user.userDetail', 'user.supplier', 'tags', 'firstColor:id,product_id,in_stock,stock'])
                                         ->whereHas('tags', function($query) use ($tag_id) {
                                             $query->where('tag_id', $tag_id);
                                         })
@@ -136,12 +136,12 @@ class HomeController extends Controller
             $data['mostSold'] = [];
         
             // Get the 10 most recent products
-            $latestProducts = Product::with(['user.userDetail', 'user.supplier', 'colors'])
+            $latestProducts = Product::with(['user.userDetail', 'user.supplier', 'firstColor:id,product_id,in_stock,stock'])
                                      ->orderBy('id', 'desc')
                                      ->limit(10)
                                      ->get();
         
-            $bestSellers = Product::with(['user.userDetail', 'user.supplier', 'colors'])
+            $bestSellers = Product::with(['user.userDetail', 'user.supplier', 'firstColor:id,product_id,in_stock,stock'])
                                   ->bestSellers()
                                   ->orderBy('count', 'desc')
                                   ->limit(10)

@@ -92,8 +92,12 @@ class Product extends Model
         return $this->hasManyThrough(OrderDetail::class, ProductColor::class, 'product_id', 'product_color_id');
     }
 
-    protected static function boot()
+    public function firstColor()
     {
+        return $this->hasOne(ProductColor::class, 'product_id','id')->orderBy('id');
+    }
+
+    protected static function boot() {
         parent::boot();
 
         static::deleting(function ($product) {
@@ -102,8 +106,7 @@ class Product extends Model
     }
 
     /**** Scopes ****/
-    public function scopeSales($query, $date = null)
-    {
+    public function scopeSales($query, $date = null) {
         return 
             $query->addSelect(['count_sales' => function($q) use ($date) {
                 $q->selectRaw('SUM(od.quantity)')
@@ -144,8 +147,7 @@ class Product extends Model
             }]);
     }
 
-    public function scopeIsFavorite($query)
-    {
+    public function scopeIsFavorite($query) {
         return $query->addSelect(['is_favorite' => function($q) {
             if (Auth::check()) {
                 $q->selectRaw('count(*)')
@@ -159,8 +161,7 @@ class Product extends Model
    
     }
 
-    public function scopeBestSellers($query)
-    {
+    public function scopeBestSellers($query) {
         return  $query->addSelect(['count' => function ($q) {
                     $q->selectRaw('count(p.id)')
                       ->from('products as p')
@@ -171,8 +172,7 @@ class Product extends Model
                 }]);   
     }
 
-    public function scopeOrder($query, $categoryId = null)
-    {
+    public function scopeOrder($query, $categoryId = null) {
         if(!is_null($categoryId))
             return  $query->addSelect(['category_order_id' => function ($q) use ($categoryId) {
                         $q->selectRaw('pl.order_id')
@@ -185,8 +185,7 @@ class Product extends Model
    
     }
 
-    public function scopeFavorites($query)
-    {
+    public function scopeFavorites($query) {
         return  $query->addSelect(['likes' => function ($q){
                     $q->selectRaw('COUNT(p.id)')
                       ->from('products as p')
@@ -195,8 +194,7 @@ class Product extends Model
                 }]);
     }
 
-    public function scopeSelling($query)
-    {
+    public function scopeSelling($query) {
         return  $query->addSelect(['selling_price' => function ($q){
                     $q->selectRaw('COUNT(p.id)')
                         ->from('products as p')
@@ -211,8 +209,7 @@ class Product extends Model
                 }]);
     }
 
-    public function scopeSalesPrice($query)
-    {
+    public function scopeSalesPrice($query) {
         return  $query->addSelect(['sales_price' => function ($q){
                 $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
                         ->from('products as p')
@@ -224,8 +221,7 @@ class Product extends Model
                 }]);
     }
 
-    public function scopeMinStock($query)
-    {
+    public function scopeMinStock($query) {
         return  $query->addSelect(['min_stock' => function ($q){
                 $q->selectRaw('MIN(pc.stock)')
                         ->from('products as p')
@@ -234,12 +230,40 @@ class Product extends Model
                 }]);
     }
 
-    public function scopeComments($query)
-    {
+    public function scopeComments($query) {
         return  $query->addSelect(['comments' => function ($q){
                     $q->selectRaw('COUNT(p.id)')
                         ->from('products as p')
                         ->join('reviews as r', 'r.product_id', '=', 'p.id')
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+    public function scopeStore($query) {
+        return  $query->addSelect(['store' => function ($q){
+                    $q->selectRaw('d.store_name')
+                        ->from('products as p')
+                        ->join('users as u', 'u.id', '=', 'p.user_id')
+                        ->join('user_details as d', 'u.id', '=', 'd.user_id')
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+    public function scopeCompany($query) {
+        return  $query->addSelect(['company' => function ($q){
+                    $q->selectRaw('s.company_name')
+                        ->from('products as p')
+                        ->join('users as u', 'u.id', '=', 'p.user_id')
+                        ->join('suppliers as s', 'u.id', '=', 's.user_id')
+                        ->whereColumn('p.id', 'products.id');
+                }]);
+    }
+
+     public function scopeUserProduct($query) {
+        return  $query->addSelect(['user' => function ($q){
+                    $q->selectRaw("CONCAT(u.name, ' ', u.last_name)")
+                        ->from('products as p')
+                        ->join('users as u', 'u.id', '=', 'p.user_id')
                         ->whereColumn('p.id', 'products.id');
                 }]);
     }

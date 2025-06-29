@@ -92,49 +92,14 @@ class MiscellaneousController extends Controller
         try {
 
             $limit = $request->has('limit') ? $request->limit : 12;
-            $wholesale = 0;
-
-            /* ANTES
-            $query = Product::with([
-                                'user.userDetail', 
-                                'user.supplier', 
-                                'order',
-                                'colors'
-                            ])
-                            ->where('products.state_id', 3)
-                            ->applyFilters(
-                                $request->only([
-                                    'searchPublic',
-                                    'orderByField',
-                                    'orderBy',
-                                    'category',
-                                    'subcategory',
-                                    'fathercategory',
-                                    'colorId',
-                                    'min',
-                                    'max',
-                                    'wholesalers',
-                                    'sortBy',
-                                    'rating'
-                                ])
-                            )
-                            ->isFavorite();
-
-            $count = $query->count();
-                           
-            $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            */
-
             $cacheKey = 'products_' . md5(serialize($request->all()));
 
             $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
               
-                $query = Product::with([
-                                'user.userDetail', 
-                                'user.supplier', 
-                                'order',
-                                'colors'
-                            ])
+                $query = Product::select(
+                            'id', 'user_id','wholesale_price', 'price_for_sale', 'name', 'image',
+                            'rating', 'single_description', 'slug', 'wholesale_min')
+                            ->with(['firstColor:id,product_id,in_stock,stock'])
                             ->where('products.state_id', 3)
                             ->applyFilters(
                                 $request->only([
@@ -152,10 +117,13 @@ class MiscellaneousController extends Controller
                                     'rating'
                                 ])
                             )
-                            ->isFavorite();
+                            ->isFavorite()
+                            ->store()
+                            ->company()
+                            ->userProduct();
 
-                $count = $query->count();
                 $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+                $count = $products->total();
 
                 return [
                     'count' => $count,
@@ -184,8 +152,6 @@ class MiscellaneousController extends Controller
     public function productDetail($slug): JsonResponse
     {
         try {
-    
-            $wholesale = 0;
 
             $product = Product::with([
                                 'user.userDetail', 
@@ -203,7 +169,12 @@ class MiscellaneousController extends Controller
                               ->first();
 
             $recommendations = 
-                Product::with(['user.userDetail', 'user.supplier', 'colors'])
+                Product::with([
+                            'user:id,name,last_name',
+                            'user.userDetail:user_id,store_name', 
+                            'user.supplier:user_id,company_name',
+                            'firstColor:id,product_id,in_stock,stock'
+                        ])
                        ->where('favourite', true)
                        ->orderBy('created_at', 'desc')
                        ->limit(5)
@@ -218,7 +189,13 @@ class MiscellaneousController extends Controller
                     $tag_id = $productTag->tag_id;
 
                     $recommendations = 
-                            Product::with(['user.userDetail', 'user.supplier', 'tags', 'colors'])
+                            Product::with([
+                                        'user:id,name,last_name',
+                                        'user.userDetail:user_id,store_name', 
+                                        'user.supplier:user_id,company_name',
+                                        'tags', 
+                                        'firstColor:id,product_id,in_stock,stock'
+                                    ])
                                    ->whereHas('tags', function($query) use ($tag_id) {
                                         $query->where('tag_id', $tag_id);
                                    })
@@ -422,7 +399,6 @@ class MiscellaneousController extends Controller
                 $query = Service::with([
                     'user.userDetail', 
                     'user.supplier',
-                    'order',
                     'cupcakes.cake_size.cake_type'
                 ])
                 ->where('services.state_id', 3)
@@ -441,9 +417,9 @@ class MiscellaneousController extends Controller
                 )
                 ->isFavorite();
 
-                $count = $query->count();
                 $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-
+                $count = $services->total();
+                
                 return [
                     'count' => $count,
                     'services' => $services
