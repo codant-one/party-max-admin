@@ -90,57 +90,66 @@ class MiscellaneousController extends Controller
     public function products(Request $request): JsonResponse
     {
         try {
-
             $limit = $request->has('limit') ? $request->limit : 12;
-            $cacheKey = 'products_' . md5(serialize($request->all()));
 
-            $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
-              
-                $query = Product::select(
-                            'id', 'user_id','wholesale_price', 'price_for_sale', 'name', 'image',
-                            'rating', 'single_description', 'slug', 'wholesale_min')
-                            ->with(['firstColor:id,product_id,in_stock,stock'])
-                            ->where('products.state_id', 3)
-                            ->applyFilters(
-                                $request->only([
-                                    'searchPublic',
-                                    'orderByField',
-                                    'orderBy',
-                                    'category',
-                                    'subcategory',
-                                    'fathercategory',
-                                    'colorId',
-                                    'min',
-                                    'max',
-                                    'wholesalers',
-                                    'sortBy',
-                                    'rating'
-                                ])
-                            )
-                            ->isFavorite()
-                            ->store()
-                            ->company()
-                            ->userProduct();
+            // Cache keys
+            $baseKey = md5(serialize($request->except('page')));
+            $pageKey = 'products_page_' . $request->get('page', 1) . '_' . $baseKey;
+            $countKey = 'products_total_' . $baseKey;
 
-                $products = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-                $count = $products->total();
+            // Filtros
+            $filters = $request->only([
+                'searchPublic',
+                'orderByField',
+                'orderBy',
+                'category',
+                'subcategory',
+                'fathercategory',
+                'colorId',
+                'min',
+                'max',
+                'wholesalers',
+                'sortBy',
+                'rating'
+            ]);
 
-                return [
-                    'count' => $count,
-                    'products' => $products
-                ];
+            // Cache del conteo total (sin paginación)
+            $count = Cache::remember($countKey, now()->addMinutes(1), function () use ($filters) {
+                return Product::where('products.state_id', 3)
+                    ->applyFilters($filters)
+                    ->isFavorite()
+                    ->store()
+                    ->company()
+                    ->userProduct()
+                    ->count();
+            });
+
+            // Cache de productos paginados
+            $products = Cache::remember($pageKey, now()->addMinutes(2), function () use ($filters, $limit) {
+                return Product::select(
+                        'id', 'user_id', 'wholesale_price', 'price_for_sale', 'name', 'image',
+                        'rating', 'single_description', 'slug', 'wholesale_min'
+                    )
+                    ->with(['firstColor:id,product_id,in_stock,stock'])
+                    ->where('products.state_id', 3)
+                    ->applyFilters($filters)
+                    ->isFavorite()
+                    ->store()
+                    ->company()
+                    ->userProduct()
+                    ->paginate($limit); // se mantiene paginate()
             });
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'colors' => Color::where('name', '<>', 'Ninguno')->get(),
-                    'products' => $data['products'],
-                    'productsTotalCount' => $data['count']
+                    'products' => $products,
+                    'productsTotalCount' => $count
                 ]
             ], 200);
 
-        } catch(\Illuminate\Database\QueryException $ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => 'database_error',
@@ -148,6 +157,7 @@ class MiscellaneousController extends Controller
             ], 500);
         }
     }
+
 
     public function productDetail($slug): JsonResponse
     {
