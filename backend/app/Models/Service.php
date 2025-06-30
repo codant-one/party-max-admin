@@ -71,14 +71,18 @@ class Service extends Model
         return $this->hasMany(OrderDetail::class, 'service_id');
     }
 
+    public function firstCupcake()
+    {
+        return $this->hasOne(Cupcake::class, 'service_id','id')->orderBy('price');
+    }
+
     public function videos()
     {
         return $this->hasMany(ServiceVideo::class, 'service_id','id');
     }
 
     /**** Scopes ****/
-    public function scopeOrder($query, $categoryId = null)
-    {
+    public function scopeOrder($query, $categoryId = null) {
         if(!is_null($categoryId))
             return  $query->addSelect(['category_order_id' => function ($q) use ($categoryId) {
                         $q->selectRaw('sl.order_id')
@@ -91,8 +95,7 @@ class Service extends Model
    
     }
 
-    public function scopeSelling($query)
-    {
+    public function scopeSelling($query) {
         return  $query->addSelect(['selling_price' => function ($q){
                     $q->selectRaw('COUNT(s.id)')
                         ->from('services as s')
@@ -106,8 +109,7 @@ class Service extends Model
                 }]);
     }
 
-    public function scopeSalesPrice($query)
-    {
+    public function scopeSalesPrice($query) {
         return  $query->addSelect(['sales_price' => function ($q){
                 $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
                         ->from('services as s')
@@ -118,8 +120,7 @@ class Service extends Model
                 }]);
     }
 
-    public function scopeComments($query)
-    {
+    public function scopeComments($query) {
         return  $query->addSelect(['comments' => function ($q){
                     $q->selectRaw('COUNT(s.id)')
                         ->from('services as s')
@@ -128,8 +129,7 @@ class Service extends Model
                 }]);
     }
 
-    public function scopeFavorites($query)
-    {
+    public function scopeFavorites($query) {
         return  $query->addSelect(['likes' => function ($q){
                     $q->selectRaw('COUNT(s.id)')
                       ->from('services as s')
@@ -138,8 +138,7 @@ class Service extends Model
                 }]);
     }
 
-    public function scopeIsFavorite($query)
-    {
+    public function scopeIsFavorite($query) {
         return $query->addSelect(['is_favorite' => function($q) {
             if (Auth::check()) {
                 $q->selectRaw('count(*)')
@@ -151,6 +150,35 @@ class Service extends Model
             }
         }]);
    
+    }
+
+    public function scopeStore($query) {
+        return  $query->addSelect(['store' => function ($q){
+                    $q->selectRaw('d.store_name')
+                        ->from('services as s')
+                        ->join('users as u', 'u.id', '=', 's.user_id')
+                        ->join('user_details as d', 'u.id', '=', 'd.user_id')
+                        ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeCompany($query) {
+        return  $query->addSelect(['company' => function ($q){
+                    $q->selectRaw('su.company_name')
+                        ->from('services as s')
+                        ->join('users as u', 'u.id', '=', 's.user_id')
+                        ->join('suppliers as su', 'u.id', '=', 'su.user_id')
+                        ->whereColumn('s.id', 'services.id');
+                }]);
+    }
+
+    public function scopeUserService($query) {
+        return  $query->addSelect(['user' => function ($q){
+                    $q->selectRaw("CONCAT(u.name, ' ', u.last_name)")
+                        ->from('services as s')
+                        ->join('users as u', 'u.id', '=', 's.user_id')
+                        ->whereColumn('s.id', 'services.id');
+                }]);
     }
 
     public function scopeWhereSearch($query, $search) {

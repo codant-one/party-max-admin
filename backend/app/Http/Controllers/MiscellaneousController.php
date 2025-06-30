@@ -40,7 +40,7 @@ class MiscellaneousController extends Controller
     
             if($category)
                 $products = 
-                    Product::with(['user.userDetail', 'user.supplier', 'colors.categories'])
+                    Product::with(['user.userDetail', 'user.supplier', 'colors.categories', 'firstColor:id,product_id,in_stock,stock'])
                            ->whereHas('colors.categories', function($query) use ($category) {
                                 $query->where('category_id', $category->id);
                            })
@@ -114,7 +114,7 @@ class MiscellaneousController extends Controller
             ]);
 
             // Cache del conteo total (sin paginación)
-            $count = Cache::remember($countKey, now()->addMinutes(1), function () use ($filters) {
+            $count = Cache::remember($countKey, now()->addMinutes(2), function () use ($filters) {
                 return Product::where('products.state_id', 3)
                     ->applyFilters($filters)
                     ->isFavorite()
@@ -125,7 +125,7 @@ class MiscellaneousController extends Controller
             });
 
             // Cache de productos paginados
-            $products = Cache::remember($pageKey, now()->addMinutes(2), function () use ($filters, $limit) {
+            $products = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
                 return Product::select(
                         'id', 'user_id', 'wholesale_price', 'price_for_sale', 'name', 'image',
                         'rating', 'single_description', 'slug', 'wholesale_min'
@@ -157,7 +157,6 @@ class MiscellaneousController extends Controller
             ], 500);
         }
     }
-
 
     public function productDetail($slug): JsonResponse
     {
@@ -371,80 +370,61 @@ class MiscellaneousController extends Controller
     public function services(Request $request): JsonResponse
     {
         try {
-
             $limit = $request->has('limit') ? $request->limit : 12;
 
-            /*ANTES
-            $query = Service::with([
-                                'user.userDetail', 
-                                'user.supplier',
-                                'order',
-                                'cupcakes.cake_size.cake_type'
-                            ])
-                            ->where('services.state_id', 3)
-                            ->applyFilters(
-                                $request->only([
-                                    'orderByField',
-                                    'orderBy',
-                                    'category',
-                                    'subcategory',
-                                    'fathercategory',
-                                    'min',
-                                    'max',
-                                    'sortBy',
-                                    'rating'
-                                ])
-                            )
-                            ->isFavorite();
+            // Cache keys
+            $baseKey = md5(serialize($request->except('page')));
+            $pageKey = 'services_page_' . $request->get('page', 1) . '_' . $baseKey;
+            $countKey = 'services_total_' . $baseKey;
 
-            $count = $query->count();
-                           
-            $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-            */
+            // Filtros
+            $filters = $request->only([
+                'orderByField',
+                'orderBy',
+                'category',
+                'subcategory',
+                'fathercategory',
+                'min',
+                'max',
+                'sortBy',
+                'rating'
+            ]);
 
-            $cacheKey = 'services_' . md5(serialize($request->all()));
+            // Cache del conteo total
+            $count = Cache::remember($countKey, now()->addMinutes(2), function () use ($filters) {
+                return Service::where('services.state_id', 3)
+                    ->applyFilters($filters)
+                    ->isFavorite()
+                    ->store()
+                    ->company()
+                    ->userService()
+                    ->count();
+            });
 
-            $data = Cache::remember($cacheKey, now()->addMinutes(1), function () use ($request, $limit) {
-
-                $query = Service::with([
-                    'user.userDetail', 
-                    'user.supplier',
-                    'cupcakes.cake_size.cake_type'
-                ])
-                ->where('services.state_id', 3)
-                ->applyFilters(
-                    $request->only([
-                        'orderByField',
-                        'orderBy',
-                        'category',
-                        'subcategory',
-                        'fathercategory',
-                        'min',
-                        'max',
-                        'sortBy',
-                        'rating'
-                    ])
-                )
-                ->isFavorite();
-
-                $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
-                $count = $services->total();
-                
-                return [
-                    'count' => $count,
-                    'services' => $services
-                ];
+            // Cache del listado paginado
+            $services = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
+                return Service::select(
+                        'id', 'user_id', 'image', 'price', 'name', 'rating', 'single_description', 'slug'
+                    )
+                    ->with(['firstCupcake:id,service_id,price'])
+                    ->where('services.state_id', 3)
+                    ->applyFilters($filters)
+                    ->isFavorite()
+                    ->store()
+                    ->company()
+                    ->userService()
+                    ->paginate($limit);
             });
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'services' => $data['services'],
-                    'servicesTotalCount' => $data['count']              
+                    'services' => $services,
+                    'servicesTotalCount' => $count
                 ]
             ], 200);
 
-        } catch(\Illuminate\Database\QueryException $ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => 'database_error',
