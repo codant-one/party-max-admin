@@ -44,6 +44,7 @@ class ServiceController extends Controller
                             'videos',
                             'cupcakes.cake_size.cake_type'
                         ])
+                        ->sales($request->date)
                         ->order($request->category_id)
                         ->selling()
                         ->salesPrice()
@@ -59,20 +60,32 @@ class ServiceController extends Controller
                                 'discarded',
                                 'state_id',
                                 'category_id',
-                                'supplierId'
+                                'supplierId',
+                                'supplier_id',
+                                'type_sales',
+                                'isSales'
                             ])
                         )
                         ->withTrashed();
             
             $count = $query->count();
-            
+            $totalSum = $request->isSales === '1' ? number_format($query->sum('sales_total'), 2) : 0;
             $services = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+
+            $data = [
+                'ordersTotalCount' => Order::count(),
+                'ordersClient' => Order::distinct('client_id')->count('client_id'),
+                'ordersSales' => Order::sum('total'),
+                'suppliersTotalCount' => Supplier::count(),
+                'totalSum' => $totalSum
+            ];
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'services' => $services,
-                    'servicesTotalCount' => $count
+                    'servicesTotalCount' => $count,
+                    'data' => $data
                 ]
             ]);
 

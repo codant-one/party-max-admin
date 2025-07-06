@@ -82,6 +82,45 @@ class Service extends Model
     }
 
     /**** Scopes ****/
+    public function scopeSales($query, $date = null) {
+        return 
+            $query->addSelect(['count_sales' => function($q) use ($date) {
+                $q->selectRaw('SUM(od.quantity)')
+                  ->from('services as s')
+                  ->join('order_details as od', 's.id', '=', 'od.service_id')
+                  ->join('orders as o', 'o.id', '=', 'od.order_id')
+                  ->whereColumn('s.id', 'services.id')
+                  ->where([
+                    ['s.state_id', 3],
+                    ['o.payment_state_id', 4]
+                  ]);
+
+                if($date !== null) {
+                    if(count($date) === 2)
+                        $q->whereBetween('o.date', $date);
+                    else 
+                        $q->where('o.date', $date[0]);
+                }
+            }])->addSelect(['sales_total' => function($q) use ($date) {
+                $q->selectRaw('SUM(od.total)')
+                  ->from('services as s')
+                  ->join('order_details as od', 's.id', '=', 'od.service_id')
+                  ->join('orders as o', 'o.id', '=', 'od.order_id')
+                  ->whereColumn('s.id', 'services.id')
+                  ->where([
+                    ['s.state_id', 3],
+                    ['o.payment_state_id', 4]
+                  ]);
+
+                if($date !== null) {
+                    if(count($date) === 2)
+                        $q->whereBetween('o.date', $date);
+                    else 
+                        $q->where('o.date', $date[0]);
+                }
+            }]);
+    }
+
     public function scopeOrder($query, $categoryId = null) {
         if(!is_null($categoryId))
             return  $query->addSelect(['category_order_id' => function ($q) use ($categoryId) {
@@ -230,10 +269,18 @@ class Service extends Model
 
         if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
             $query->where('user_id', Auth::user()->id);
+        } else {
+            if($filters->get('supplier_id')) {
+                $query->where('user_id', $filters->get('supplier_id'));
+            }
         }
  
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));
+        }
+
+        if($filters->get('isSales')) {
+            $query->having('count_sales', '>', 0);
         }
 
         if ($filters->get('favourite') !== null) {
