@@ -197,9 +197,9 @@ async function fetchData() {
 }
 
 const changeDate = () => {
-
     if(date.value !== null) {
         dateRangeArray.value = date.value.split(' a ')
+        dateRangeArray.value = dateRangeArray.value[0] === '' ? null : dateRangeArray.value
         fetchData()
     }
 }
