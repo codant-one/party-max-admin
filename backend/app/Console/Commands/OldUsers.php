@@ -51,7 +51,7 @@ class OldUsers extends Command
 
     private function sendForm() {
 
-        $users = OldUser::limit(2)->get();
+        $users = OldUser::all();
 
         foreach($users as $user){
             $this->info('sending mail #'. $user->first_name . ' ' . $user->last_name);
