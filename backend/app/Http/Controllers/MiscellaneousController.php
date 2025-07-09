@@ -129,7 +129,7 @@ class MiscellaneousController extends Controller
                 return Product::select(
                         'products.id', 'products.user_id', 'products.wholesale_price', 'products.price_for_sale', 
                         'products.name', 'products.image', 'products.rating', 'products.single_description',
-                        'products.slug', 'products.wholesale_min'
+                        'products.slug', 'products.wholesale_min', 'products.order_id'
                     )
                     ->with(['firstColor:id,product_id,in_stock,stock'])
                     ->where('products.state_id', 3)
@@ -138,6 +138,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
+                    ->distinct('products.id')
                     ->paginate($limit); // se mantiene paginate()
             });
 
@@ -406,7 +407,8 @@ class MiscellaneousController extends Controller
             $services = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
                 return Service::select(
                         'services.id', 'services.user_id', 'services.image', 'services.price', 
-                        'services.name', 'services.rating', 'services.single_description', 'services.slug'
+                        'services.name', 'services.rating', 'services.single_description', 
+                        'services.slug', 'services.order_id'
                     )
                     ->with(['firstCupcake:id,service_id,price'])
                     ->where('services.state_id', 3)
@@ -415,6 +417,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userService()
+                    ->distinct('services.id')
                     ->paginate($limit);
             });
 

@@ -290,7 +290,8 @@ class Product extends Model
 
     public function scopeWhereCategorySlug($query, $search) {
 
-        $query->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
+        $query->addSelect('pl.order_id')
+              ->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
               ->join('categories as c', 'c.id', '=', 'pl.category_id')
               ->where('c.slug', $search)
               ->limit(1);
