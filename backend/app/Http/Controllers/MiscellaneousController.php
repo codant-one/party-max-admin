@@ -121,7 +121,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
-                    ->groupBy('products.id')
+                    ->distinct('products.id')
                     ->count();
             });
 
@@ -138,7 +138,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
-                    ->groupBy('products.id')
+                    ->distinct('id')
                     ->paginate($limit); // se mantiene paginate()
             });
 
@@ -400,7 +400,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userService()
-                    ->groupBy('services.id')
+                    ->distinct('services.id')
                     ->count();
             });
 
@@ -416,7 +416,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userService()
-                    ->groupBy('services.id')
+                    ->distinct('id')
                     ->paginate($limit);
             });
 
