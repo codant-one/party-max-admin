@@ -127,8 +127,9 @@ class MiscellaneousController extends Controller
             // Cache de productos paginados
             $products = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
                 return Product::select(
-                        'id', 'user_id', 'wholesale_price', 'price_for_sale', 'name', 'image',
-                        'rating', 'single_description', 'slug', 'wholesale_min'
+                        'products.id', 'products.user_id', 'products.wholesale_price', 'products.price_for_sale', 
+                        'products.name', 'products.image', 'products.rating', 'products.single_description',
+                        'products.slug', 'products.wholesale_min'
                     )
                     ->with(['firstColor:id,product_id,in_stock,stock'])
                     ->where('products.state_id', 3)
@@ -137,7 +138,6 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
-                    ->groupBy('products.id')
                     ->paginate($limit); // se mantiene paginate()
             });
 

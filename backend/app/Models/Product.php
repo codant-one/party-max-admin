@@ -290,10 +290,10 @@ class Product extends Model
 
     public function scopeWhereCategorySlug($query, $search) {
 
-        $query->select('products.*')
-              ->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
+        $query->join('product_lists as pl', 'pl.product_id', '=', 'products.id')
               ->join('categories as c', 'c.id', '=', 'pl.category_id')
-              ->where('c.slug', $search);
+              ->where('c.slug', $search)
+              ->limit(1);
     }
 
     public function scopeWhereColor($query, $colorIds) {
@@ -326,14 +326,8 @@ class Product extends Model
                         break;
                 }
             }
-        } else {
-            if ($orderByField === 'pl.order_id') {
-                $query->selectRaw('MAX(pl.order_id) as max_order_id');
-                $query->orderBy('max_order_id', $orderBy);
-            } else {
-                $query->orderByRaw('(IFNULL(' . $orderByField . ', products.id)) ' . $orderBy);
-            }
-        }
+        } else
+            $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
     }
  
     public function scopeApplyFilters($query, array $filters) {
