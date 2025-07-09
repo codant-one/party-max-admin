@@ -121,6 +121,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
+                    ->distinct('products.id')
                     ->count();
             });
 
@@ -400,6 +401,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userService()
+                    ->distinct('services.id')
                     ->count();
             });
 
