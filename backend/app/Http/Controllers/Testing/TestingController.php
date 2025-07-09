@@ -724,6 +724,49 @@ class TestingController extends Controller
         return view('emails.clients.send_survey', compact('data'));
     }
 
+    public function infoOldUser() {
+
+        $orderId = 65;
+
+        $order = 
+            Order::with([
+                'billing',
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link = 'https://docs.google.com/forms/d/e/1FAIpQLSdlWHxJpLQRQa9koGYwjCpCM8U4c-gyaogPff6vHo226zAxKQ/viewform';
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+        }
+
+        $text = 'Hola <strong>'.$user.'</strong>🎈,<br>';
+        $text .= 'En Party Max, celebrar tiene premio 🎁. <br> ';
+        $text .= 'Solo falta un paso: completa este formulario y recibe un 10% de descuento en tu primera compra.<br>';
+        $text .= '✨ Productos únicos, servicios increíbles y todo lo que necesitas para que tu evento sea inolvidable… ¡en un solo lugar!<br>';
+
+        $text2 = '(Fácil, rápido y sin compromiso)<br><br>';
+        $text2 .= 'Nos encanta ser parte de tu próxima celebración 🎊<br>';
+        $text2 .= 'Party Max<br>';
+        $text2 .= 'Donde la fiesta comienza';
+
+        $buttonText = '✏️ Completar formulario';
+
+        $data = [
+            'link' => $link,
+            'title' => '',
+            'text' => $text,
+            'text2' => $text2,
+            'buttonText' => $buttonText
+        ];
+
+        return view('emails.clients.old_users', compact('data'));
+    }
+
     public function pdfs() {
 
         $quote = Quote::with(

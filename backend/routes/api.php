@@ -351,3 +351,4 @@ Route::post('party-recommendations', [AIAgentController::class, 'getRecommendati
 Route::get('sendEvaluation', [TestingController::class , 'sendEvaluation'])->name('sendEvaluation');
 Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendSurvey');
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
+Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
