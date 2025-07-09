@@ -233,10 +233,10 @@ class Service extends Model
 
     public function scopeWhereCategorySlug($query, $search) {
 
-        $query->select('services.*')
-              ->join('service_lists as sl', 'sl.service_id', '=', 'services.id')
+        $query->join('service_lists as sl', 'sl.service_id', '=', 'services.id')
               ->join('categories as c', 'c.id', '=', 'sl.category_id')
-              ->where('c.slug', $search);
+              ->where('c.slug', $search)
+              ->limit(1);
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy, $filters) {

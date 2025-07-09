@@ -405,7 +405,8 @@ class MiscellaneousController extends Controller
             // Cache del listado paginado
             $services = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
                 return Service::select(
-                        'id', 'user_id', 'image', 'price', 'name', 'rating', 'single_description', 'slug'
+                        'services.id', 'services.user_id', 'services.image', 'services.price', 
+                        'services.name', 'services.rating', 'services.single_description', 'services.slug'
                     )
                     ->with(['firstCupcake:id,service_id,price'])
                     ->where('services.state_id', 3)
