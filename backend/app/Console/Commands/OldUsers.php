@@ -51,7 +51,8 @@ class OldUsers extends Command
 
     private function sendForm() {
 
-        $users = OldUser::limit(2)->get();
+        $users = OldUser::all();
+        $count = 0;
 
         foreach($users as $user){
             $this->info('sending mail #'. $user->first_name . ' ' . $user->last_name);
@@ -89,6 +90,8 @@ class OldUsers extends Command
                         $message->to($email)->subject($subject);
                 });
 
+                $count++;
+
             } catch (\Exception $e){
                 $message = 'Error e-mail evaluation: ';
                 $responseMail = $e->getMessage();
@@ -98,6 +101,6 @@ class OldUsers extends Command
             
         }
 
-        $this->info('Emails sent');
+        $this->info('Emails sent ('.$count.')');
     }
 }

@@ -744,7 +744,7 @@ class TestingController extends Controller
             $email = $order->billing->email;
         }
 
-        $text = 'Hola <strong>'.$user.'</strong>🎈,<br>';
+        $text = 'Hola <strong>Steffani Castro</strong>🎈,<br>';
         $text .= 'En Party Max, celebrar tiene premio 🎁. <br> ';
         $text .= 'Solo falta un paso: completa este formulario y recibe un 10% de descuento en tu primera compra.<br>';
         $text .= '✨ Productos únicos, servicios increíbles y todo lo que necesitas para que tu evento sea inolvidable… ¡en un solo lugar!<br>';
