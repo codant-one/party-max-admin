@@ -137,6 +137,7 @@ class MiscellaneousController extends Controller
                     ->store()
                     ->company()
                     ->userProduct()
+                    ->groupBy('products.id')
                     ->paginate($limit); // se mantiene paginate()
             });
 

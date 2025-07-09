@@ -326,8 +326,14 @@ class Product extends Model
                         break;
                 }
             }
-        } else
-            $query->orderByRaw('(IFNULL('. $orderByField .', products.id)) '. $orderBy);
+        } else {
+            if ($orderByField === 'pl.order_id') {
+                $query->selectRaw('MAX(pl.order_id) as max_order_id');
+                $query->orderBy('max_order_id', $orderBy);
+            } else {
+                $query->orderByRaw('(IFNULL(' . $orderByField . ', products.id)) ' . $orderBy);
+            }
+        }
     }
  
     public function scopeApplyFilters($query, array $filters) {
