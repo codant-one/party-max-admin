@@ -51,7 +51,7 @@ class OldUsers extends Command
 
     private function sendForm() {
 
-        $users = OldUser::all();
+        $users = OldUser::where('id', 4)->get();
         $count = 0;
 
         foreach($users as $user){

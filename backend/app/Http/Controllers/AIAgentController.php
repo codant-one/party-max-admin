@@ -19,76 +19,114 @@ class AIAgentController extends Controller
         ]);
         
         // Obtener productos y servicios relevantes
-        $products = $this->getRelevantProducts($validated);     
+        $products = $this->getRelevantProducts($validated); 
+        $services = $this->getRelevantServices($validated); 
+
         // Preparar el contexto para OpenAI
-        $context = $this->prepareContext($validated, $products);
+        $context = $this->prepareContext($validated, $products, $services);
         
         // Llamar a la API de OpenAI
         $response = $this->callOpenAI($context);
         
         return response()->json([
             'recommendations' => $response,
-            'products' => $products,
+            'Productos' => $products,
+            'Servicios' => $services
         ]);
     }
     
     private function getRelevantProducts($criteria)
     {
         return 
-            Product::select('id', 'name', 'description', 'price')
-                   ->with(['colors.categories.category'])
-                        ->whereHas('colors.categories.category', function($q) use ($criteria) {
-                            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
-                        })
-                   ->get();
+            Product::with([
+                'user.userDetail', 
+                'user.supplier', 
+                'firstColor:id,product_id,in_stock,stock', 
+                'colors.categories.category'
+            ])->whereHas('colors.categories.category', function($q) use ($criteria) {
+                $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+            })
+            ->get();
     }
     
     private function getRelevantServices($criteria)
     {
-        // Similar al método anterior, pero para servicios
-        return Service::query()
-            // Filtros similares adaptados a servicios
-            ->limit(10)
-            ->get();
+        return Service::with([
+            'user.userDetail', 
+            'user.supplier',
+            'firstCupcake:id,service_id,price', 
+            'categories.category'
+        ])->whereHas('categories.category', function($q) use ($criteria) {
+            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+        })
+        ->store()
+        ->company()
+        ->get();
     }
     
-    /*private function getRelevantTrends($criteria)
-    {
-        return Trend::query()
-            ->where('event_type', $criteria['event_type'])
-            ->orWhere('theme', $criteria['theme'])
-            ->latest()
-            ->limit(5)
-            ->get(['title', 'description']);
-    }*/
-    
-    private function prepareContext($criteria, $products)
+    private function prepareContext($criteria, $products, $services)
     {
         // Formatear productos para incluir en el prompt
-        $productsText = $products->map(function ($product) {
-            return "- ID: " . utf8_encode($product->id) . 
-                   ", Nombre: " . utf8_encode($product->name) . 
-                   ", Precio: " . utf8_encode($product->price) . 
-                   ", Descripción: " . utf8_encode(substr($product->description, 0, 100)) . "...";
+        $productsText = $products->isEmpty()
+            ? "No se encontraron productos directamente relacionados con la temática, pero puedes sugerir alternativas creativas que mantengan la esencia del evento."
+            : $products->map(function ($product) {
+                return "Nombre: " . utf8_encode($product->name) . ", Precio: " . utf8_encode($product->price_for_sale);
+        })->join("\n");
+    
+        // Formatear servicios para incluir en el prompt
+        $servicesText = $services->isEmpty()
+            ? "No se encontraron servicios directamente relacionados con la temática, pero puedes sugerir ideas o servicios generales que mejoren la experiencia del evento."
+            : $services->map(function ($service) {
+                return "Nombre: " . utf8_encode($service->name) . ", Precio: " . utf8_encode($service->price);
         })->join("\n");
 
         // Construir el prompt completo
-        return "Eres un asesor experto en planificación de fiestas en Colombia. Ayuda al cliente a organizar una fiesta con estas características:
+        return <<<EOT
+        Eres Festín 🎉, el asistente virtual de un marketplace especializado en fiestas en Colombia. Ayudas a personas a planificar celebraciones inolvidables usando inteligencia artificial. Solo puedes recomendar productos y servicios disponibles en el catálogo proporcionado.
         
-        DETALLES DE LA FIESTA:
+        DETALLES DEL EVENTO:
         - Número de invitados: {$criteria['guests']}
         - Tipo de celebración: {$criteria['event_type']}
         - Temática deseada: {$criteria['theme']}
         
-        PRODUCTOS DISPONIBLES:
+        CATÁLOGO DE PRODUCTOS:
         {$productsText}
         
-        Por favor, recomienda una selección de productos y servicios específicos de los listados anteriormente que serían ideales para esta fiesta. Organiza tu respuesta en secciones:
-        1. Concepto general para la fiesta
-        2. Productos recomendados (usa los IDs exactos)
-        3. Servicios sugeridos (usa los IDs exactos)
-        4. Tips adicionales basados en tendencias actuales
-        5. Estimación de presupuesto total";
+        CATÁLOGO DE SERVICIOS:
+        {$servicesText}
+        
+        INSTRUCCIONES:
+        Organiza la propuesta con los siguientes bloques, usando siempre subtítulos con emojis y negrilla como se muestra. Usa listas numeradas (1., 2., 3.) y evita guiones (-) o listas sin formato.
+
+        **🎈 Concepto general**  
+        Un párrafo breve describiendo el estilo o energía de la fiesta.
+
+        **🛍️ Productos recomendados**  
+        Lista de 3 a 6 productos con este formato:  
+        **1. [NOMBRE DEL PRODUCTO]** - Breve descripción del por qué es ideal.
+
+        **🛠️ Servicios recomendados**  
+        Lista de 2 a 4 servicios con este formato:  
+        **1. [NOMBRE DEL SERVICIO]** - Justificación clara.
+
+        **💡 Tips extra de Festín**  
+        Usa viñetas con emojis para dar consejos rápidos y útiles.
+
+        **💰 Estimación de presupuesto**  
+        Para cada producto o servicio, usa este formato:  
+        **[NOMBRE DEL PRODUCTO] - (CANTIDAD DESCRIPTIVA = PRECIO COP)**  
+        Por ejemplo:  
+        PLATO TEMÁTICA VALLENATA X 12 - (3 paquetes = 3.000 COP)
+
+        Finaliza con una línea en bold de **Total estimado: XX.XXX COP**
+        No muestres operaciones matemáticas como “x 1” o “3 x 1000”.
+        
+        IMPORTANTE:
+        - No inventes productos o servicios fuera del catálogo.
+        - Usa un tono amable y festivo, pero profesional.
+        - Organiza la respuesta claramente para que pueda ser usada directamente en el sitio web.
+        
+        EOT;
     }
     
     private function callOpenAI($context)
@@ -96,7 +134,7 @@ class AIAgentController extends Controller
         $result = OpenAI::chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => 'Eres un asistente virtual especializado en planificación de fiestas colombianas que trabaja para un marketplace de productos y servicios para celebraciones. Tu objetivo es ofrecer recomendaciones personalizadas y específicas usando solo los productos y servicios disponibles en el catálogo.'],
+                ['role' => 'system', 'content' => 'Eres Festín 🎉, un asistente virtual divertido y experto en planificación de fiestas en Colombia. Tu misión es crear ideas personalizadas para celebraciones usando exclusivamente el catálogo de productos y servicios proporcionado. No inventes elementos que no estén listados. Sé claro, útil y creativo.'],
                 ['role' => 'user', 'content' => $context]
             ],
             'temperature' => 0.7,
