@@ -120,6 +120,13 @@ class AIAgentController extends Controller
 
         Finaliza con una línea en bold de **Total estimado: XX.XXX COP**
         No muestres operaciones matemáticas como “x 1” o “3 x 1000”.
+
+        IMAGEN ILUSTRATIVA:
+        Proporciona una descripcion que no se va a mostrar en la sugerencia final, esta descripcion tiene que ser detallada para generar una imagen realista de como se veria la fiesta unicamente con los productos que sugeriste. Usa este formato exacto:
+        ```json
+        {
+        "descripcion_imagen": "Genera una imágen que muestre como se veria la fiesta con los productos que sugeriste, haz un ambiente adecuado tanto para el tipo de evento {$criteria['event_type']} y la tematica de la fiesta ({$criteria['theme']}). Hazla como si fuera una fotografia real tomada por cualquiera de los invitados de la fiesta, no uses texto en la imagen."
+        }
         
         IMPORTANTE:
         - No inventes productos o servicios fuera del catálogo.
@@ -132,14 +139,37 @@ class AIAgentController extends Controller
     private function callOpenAI($context)
     {
         $result = OpenAI::chat()->create([
-            'model' => 'gpt-4o-mini',
+            'model' => 'gpt-4-turbo',
             'messages' => [
                 ['role' => 'system', 'content' => 'Eres Festín 🎉, un asistente virtual divertido y experto en planificación de fiestas en Colombia. Tu misión es crear ideas personalizadas para celebraciones usando exclusivamente el catálogo de productos y servicios proporcionado. No inventes elementos que no estén listados. Sé claro, útil y creativo.'],
                 ['role' => 'user', 'content' => $context]
             ],
             'temperature' => 0.7,
+            'response_format' => ['type' => 'text']
+
         ]);
         
-        return $result->choices[0]->message->content;
+        $response = $result->choices[0]->message->content;
+        
+        // Extracción del JSON
+        if (preg_match('/```json\s*({.+?})\s*```/s', $response, $matches)) {
+            $jsonData = json_decode($matches[1], true);
+            
+            $imageResponse = OpenAI::images()->create([
+                'model' => 'dall-e-3',
+                'prompt' => $jsonData['descripcion_imagen'] . 
+                        " Estilo: Fotografía profesional. Sin texto ni logos.",
+                'size' => '1024x1024',
+                'quality' => 'hd',
+                'style' => 'natural'
+            ]);
+            
+            $imageUrl = $imageResponse->data[0]->url;
+        }
+        
+        return [
+            'text_response' => preg_replace('/```json.+?```/s', '', $response),
+            'image_url' => $imageUrl ?? null
+        ];
     }
 }
