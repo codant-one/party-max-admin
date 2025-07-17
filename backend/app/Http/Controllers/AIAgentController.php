@@ -37,27 +37,39 @@ class AIAgentController extends Controller
     
     private function getRelevantProducts($criteria)
     {
+        $keywords = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+
         return 
             Product::with([
                 'user.userDetail', 
                 'user.supplier', 
                 'firstColor:id,product_id,in_stock,stock', 
                 'colors.categories.category'
-            ])->whereHas('colors.categories.category', function($q) use ($criteria) {
-                $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+            ])->whereHas('colors.categories.category', function($q) use ($keywords) {
+                $q->where(function($query) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
+                    }
+                });
             })
             ->get();
     }
     
     private function getRelevantServices($criteria)
     {
+        $keywords = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+
         return Service::with([
             'user.userDetail', 
             'user.supplier',
             'firstCupcake:id,service_id,price', 
             'categories.category'
-        ])->whereHas('categories.category', function($q) use ($criteria) {
-            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+        ])->whereHas('categories.category', function($q) use ($keywords) {
+            $q->where(function($query) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
+                }
+            });
         })
         ->store()
         ->company()
