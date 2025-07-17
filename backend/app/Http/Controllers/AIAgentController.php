@@ -37,7 +37,9 @@ class AIAgentController extends Controller
     
     private function getRelevantProducts($criteria)
     {
-        $keywords = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $words = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $keywords = array_values(array_diff($words, $stopWords));
 
         return 
             Product::with([
@@ -57,7 +59,9 @@ class AIAgentController extends Controller
     
     private function getRelevantServices($criteria)
     {
-        $keywords = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $words = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $keywords = array_values(array_diff($words, $stopWords));
 
         return Service::with([
             'user.userDetail', 
