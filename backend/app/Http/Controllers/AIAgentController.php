@@ -122,13 +122,10 @@ class AIAgentController extends Controller
         No muestres operaciones matemáticas como “x 1” o “3 x 1000”.
 
         IMAGEN ILUSTRATIVA:
-        Proporciona una descripción que no se mostrará en la sugerencia final.  
-        Esta descripción debe ser detallada y realista para generar una imagen.  
-
-        Usa este formato exacto:
+        Proporciona una descripcion que no se va a mostrar en la sugerencia final, esta descripcion tiene que ser detallada para generar una imagen realista de como se veria la fiesta unicamente con los productos que sugeriste. Usa este formato exacto:
         ```json
         {
-            "descripcion_imagen": "Genera una imágen que muestre como se veria la fiesta con los productos y servicios que sugeriste, haz un ambiente adecuado tanto para el tipo de evento {$criteria['event_type']} y la tematica de la fiesta ({$criteria['theme']}). Hazla como si fuera una fotografia real tomada por cualquiera de los invitados de la fiesta, no uses texto en la imagen."
+            "descripcion_imagen": "Genera una imágen que muestre como se veria la fiesta con los productos que sugeriste, haz un ambiente adecuado tanto para el tipo de evento {$criteria['event_type']} y la tematica de la fiesta ({$criteria['theme']}). Hazla como si fuera una fotografia real tomada por cualquiera de los invitados de la fiesta, no uses texto en la imagen."
         }
 
         IMPORTANTE:
@@ -160,36 +157,28 @@ class AIAgentController extends Controller
             'response_format' => ['type' => 'text']
 
         ]);
-        
+            
         $response = $result->choices[0]->message->content;
         
         // Extracción del JSON
-        $imageDescription = null;
-
         if (preg_match('/```json\s*({.+?})\s*```/s', $response, $matches)) {
             $jsonData = json_decode($matches[1], true);
-            if (json_last_error() === JSON_ERROR_NONE && !empty($jsonData['descripcion_imagen'])) {
-                $imageDescription = $jsonData['descripcion_imagen'];
-            }
-        }
-
-        if ($imageDescription) {
+            
             $imageResponse = OpenAI::images()->create([
                 'model' => 'dall-e-3',
-                'prompt' => $jsonData['descripcion_imagen'],
-                'size' => '1792x1024', // Banner horizontal
+                'prompt' => $jsonData['descripcion_imagen'] . 
+                        " Estilo: Fotografía profesional. Sin texto ni logos.",
+                'size' => '1792x1024',
                 'quality' => 'hd',
                 'style' => 'natural'
-            ], [
-                'timeout' => 60 // tiempo en segundos
             ]);
-
+            
             $imageUrl = $imageResponse->data[0]->url;
         }
+        
         return [
-
-            'image_url' => $imageUrl ?? null,
-            'text_response' => preg_replace('/```json.+?```/s', '', $response)
+            'text_response' => preg_replace('/```json.+?```/s', '', $response),
+            'image_url' => $imageUrl ?? null
         ];
     }
 }
