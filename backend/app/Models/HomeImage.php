@@ -20,7 +20,10 @@ class HomeImage extends Model
         
         $home_image = self::create([
             'is_slider' => $request->is_slider,
-            'url' => $request->url
+            'url' => $request->url,
+            'title' => $request->title === 'null' ? null : $request->title,
+            'text' => $request->text === 'null' ? null : $request->text,
+            'button_text' => $request->button_text === 'null' ? null : $request->button_text
         ]);
 
         return $home_image;
@@ -30,7 +33,10 @@ class HomeImage extends Model
 
         $home_image->update([
             'is_slider' => $request->is_slider,
-            'url' => $request->url
+            'url' => $request->url,            
+            'title' => $request->title === 'null' ? null : $request->title,
+            'text' => $request->text === 'null' ? null : $request->text,
+            'button_text' => $request->button_text === 'null' ? null : $request->button_text
         ]);
 
         return $home_image;
