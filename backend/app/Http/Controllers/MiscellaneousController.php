@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -548,6 +549,18 @@ class MiscellaneousController extends Controller
     {
         try {
 
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => env('RECAPTCHA_SECRET_KEY'),
+                'response' => $request->recaptcha_token
+            ]);
+        
+            if (!$response->json('success')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de verificación reCAPTCHA.'
+                ], 422);
+            }
+
             $subject = 'Nuevo mensaje de contacto';
             $text = '<strong>Nombre:</strong> ' . $request->name . '<br>';
             $text .= '<strong>Email:</strong> ' . $request->email. '<br>';
@@ -569,7 +582,8 @@ class MiscellaneousController extends Controller
             });
 
             return response()->json([
-                'success' => true
+                'success' => true,
+                'response' => $response->json()
             ], 200);
 
         } catch (\Exception $e){
