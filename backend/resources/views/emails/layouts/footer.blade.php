@@ -24,9 +24,14 @@
                                 <!-- <td align="center" valign="top" width="null" style="padding:0;margin:0;padding-right:10px">
                                     <img src="{{ asset('/images/subtract.png') }}" alt="Subtract" title="Subtract" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                                 </td> -->
-                                <td align="center" valign="top" width="null" style="padding:0;margin:0">
+                                <td align="center" valign="top" width="null" style="padding:0;margin:0;padding-right:10px">
                                     <a href="https://www.facebook.com/partymaxcolombia" target="_blank">
                                         <img src="{{ asset('/images/facebook.png') }}" alt="Facebook" title="Facebook" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                    </a>
+                                </td>
+                                <td align="center" valign="top" width="null" style="padding:0;margin:0">
+                                    <a href="https://wa.link/wvdoxg" target="_blank">
+                                        <img src="{{ asset('/images/whatsapp.svg') }}" alt="Whatsapp" title="Whatsapp" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                                     </a>
                                 </td>
                             </tr>

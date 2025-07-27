@@ -543,5 +543,44 @@ class MiscellaneousController extends Controller
             ], 500);
         }
     }
+
+    public function contactUs(Request $request): JsonResponse
+    {
+        try {
+
+            $subject = 'Nuevo mensaje de contacto';
+            $text = '<strong>Nombre:</strong> ' . $request->name . '<br>';
+            $text .= '<strong>Email:</strong> ' . $request->email. '<br>';
+            $text .= '<strong>Mensaje:</strong> ' . $request->message;
+
+            $data = [
+                'email' => $request->email,
+                'title' => 'Nuevo mensaje de contacto',
+                'text' => $text,
+                'buttonText' => 'Responder ahora'
+            ];
+
+            \Mail::send(
+                'emails.admin.contact'
+                , ['data' => $data]
+                , function ($message) use ($subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to(env('MAIL_TO_CONTACT'))->subject($subject);
+            });
+
+            return response()->json([
+                'success' => true
+            ], 200);
+
+        } catch (\Exception $e){
+            $responseMail = $e->getMessage();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'email_error',
+                'exception' => $responseMail
+            ], 500);
+        } 
+    }
     
 }

@@ -308,6 +308,7 @@ Route::group([
     Route::get('cupcakes', [MiscellaneousController::class, 'cupcakes']);
     Route::get('ips', [MiscellaneousController::class, 'ips']);
     Route::post('quotes', [QuoteController::class, 'store']);
+    Route::post('contactUs', [MiscellaneousController::class, 'contactUs']);
 });
 
 //Shopping-Cart
@@ -352,3 +353,4 @@ Route::get('sendEvaluation', [TestingController::class , 'sendEvaluation'])->nam
 Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendSurvey');
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
 Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
+Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contactUs');
