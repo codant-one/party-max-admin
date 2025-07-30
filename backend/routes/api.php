@@ -300,6 +300,7 @@ Route::group([
     Route::get('products', [MiscellaneousController::class, 'products']);
     Route::get('colors', [MiscellaneousController::class, 'colors']);
     Route::get('products/{slug}', [MiscellaneousController::class, 'productDetail']);
+    Route::get('products/meta/{slug}', [MiscellaneousController::class, 'productDetailMeta']);
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);

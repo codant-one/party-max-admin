@@ -247,6 +247,28 @@ class MiscellaneousController extends Controller
         }
     }
 
+    public function productDetailMeta($slug): JsonResponse
+    {
+        try {
+
+            $product = Product::select('id', 'name', 'image', 'slug')->where('slug', $slug)->first();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'product' => $product
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
     public function faqs(): JsonResponse
     {
         try {
