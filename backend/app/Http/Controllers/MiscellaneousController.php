@@ -219,22 +219,11 @@ class MiscellaneousController extends Controller
 
             }
 
-            $keywords = ($product) ?
-                $product->colors
-                    ->flatMap(fn($color) => $color->categories->pluck('category'))
-                    ->unique('id')
-                    ->pluck('keywords')
-                    ->flatten()
-                    ->unique()
-                    ->values()
-                : '';
-
             return response()->json([
                 'success' => true,
                 'data' => [
                     'product' => $product,
-                    'recommendations' => $recommendations,
-                    'keywords' => $keywords
+                    'recommendations' => $recommendations
                 ]
             ], 200);
 
@@ -251,12 +240,23 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $product = Product::select('id', 'name', 'image', 'slug')->where('slug', $slug)->first();
+            $product = Product::select('id', 'name', 'image', 'slug', 'price_for_sale')->where('slug', $slug)->first();
+
+            $keywords = ($product) ?
+                $product->colors
+                    ->flatMap(fn($color) => $color->categories->pluck('category'))
+                    ->unique('id')
+                    ->pluck('keywords')
+                    ->flatten()
+                    ->unique()
+                    ->values()
+                : '';
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'product' => $product
+                    'product' => $product,
+                    'keywords' => $keywords
                 ]
             ], 200);
 
