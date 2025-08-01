@@ -523,6 +523,37 @@ class MiscellaneousController extends Controller
         }
     }
 
+    public function serviceDetailMeta($slug): JsonResponse
+    {
+        try {
+
+            $service = Service::select('id', 'name', 'image', 'slug', 'price')->where('slug', $slug)->first();
+ 
+            $keywords = ($service) ?
+                $service->categories
+                    ->pluck('keywords')
+                    ->flatten()
+                    ->unique()
+                    ->values()
+                : '';
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'service' => $service,
+                    'keywords' => $keywords
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
     public function cupcakes(Request $request): JsonResponse
     {
         try {

@@ -306,6 +306,7 @@ Route::group([
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
     Route::get('services', [MiscellaneousController::class, 'services']);
     Route::get('services/{slug}', [MiscellaneousController::class, 'serviceDetail']);
+    Route::get('services/meta/{slug}', [MiscellaneousController::class, 'serviceDetailMeta']);
     Route::get('cupcakes', [MiscellaneousController::class, 'cupcakes']);
     Route::get('ips', [MiscellaneousController::class, 'ips']);
     Route::post('quotes', [QuoteController::class, 'store']);
