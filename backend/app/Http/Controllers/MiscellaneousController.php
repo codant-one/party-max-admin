@@ -527,10 +527,11 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $service = Service::select('id', 'name', 'image', 'slug', 'price')->where('slug', $slug)->first();
+            $service = Service::with(['categories.category'])->select('id', 'name', 'image', 'slug', 'price')->where('slug', $slug)->first();
  
             $keywords = ($service) ?
                 $service->categories
+                    ->pluck('category')
                     ->pluck('keywords')
                     ->flatten()
                     ->unique()
