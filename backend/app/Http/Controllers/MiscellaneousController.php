@@ -218,12 +218,23 @@ class MiscellaneousController extends Controller
                 }
 
             }
+            
+            $keywords = ($product) ?
+                $product->colors
+                    ->flatMap(fn($color) => $color->categories->pluck('category'))
+                    ->unique('id')
+                    ->pluck('keywords')
+                    ->flatten()
+                    ->unique()
+                    ->values()
+                : '';
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'product' => $product,
-                    'recommendations' => $recommendations
+                    'recommendations' => $recommendations,
+                    'keywords' => $keywords
                 ]
             ], 200);
 
