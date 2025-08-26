@@ -819,4 +819,42 @@ class TestingController extends Controller
         return view('pdfs.quote', compact('quote', 'products', 'services') );
     }
 
+    public function contactUs() {
+
+        $orderId = 65;
+
+        $order = 
+            Order::with([
+                'billing',
+                'client.user.userDetail'
+            ])->find($orderId); 
+
+        $link = 'https://docs.google.com/forms/d/1m3TVPc3rD2ECSnx4B2A6ZQqkCxFwdN-NSFR-UNcEJ5A/edit';
+
+        if($order->client) {
+            $user = $order->client->user->name . ' ' . $order->client->user->last_name;
+            $email = $order->client->user->email;
+        } else {
+            $user = $order->billing->name . ' ' . $order->billing->last_name;
+            $email = $order->billing->email;
+        }
+
+        $message = 'esto es un mensaje de prueba';
+
+        $text = '<strong>Nombre:</strong> ' . $user . '<br>';
+        $text .= '<strong>Email:</strong> ' . $email . '<br>';
+        $text .= '<strong>Mensaje:</strong> ' . $message;
+
+        $buttonText = 'Responder ahora';
+        $link = `mailto:$email?subject=Respuesta a tu mensaje de contacto`;
+        $data = [
+            'email' => $email,
+            'title' => 'Nuevo mensaje de contacto',
+            'text' => $text,
+            'buttonText' => $buttonText
+        ];
+
+        return view('emails.admin.contact', compact('data'));
+    }
+
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 use App\Models\Category;
 use App\Models\Product;
@@ -217,7 +218,7 @@ class MiscellaneousController extends Controller
                 }
 
             }
-
+            
             $keywords = ($product) ?
                 $product->colors
                     ->flatMap(fn($color) => $color->categories->pluck('category'))
@@ -233,6 +234,39 @@ class MiscellaneousController extends Controller
                 'data' => [
                     'product' => $product,
                     'recommendations' => $recommendations,
+                    'keywords' => $keywords
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function productDetailMeta($slug): JsonResponse
+    {
+        try {
+
+            $product = Product::select('id', 'name', 'image', 'slug', 'price_for_sale')->where('slug', $slug)->first();
+
+            $keywords = ($product) ?
+                $product->colors
+                    ->flatMap(fn($color) => $color->categories->pluck('category'))
+                    ->unique('id')
+                    ->pluck('keywords')
+                    ->flatten()
+                    ->unique()
+                    ->values()
+                : '';
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'product' => $product,
                     'keywords' => $keywords
                 ]
             ], 200);
@@ -500,6 +534,38 @@ class MiscellaneousController extends Controller
         }
     }
 
+    public function serviceDetailMeta($slug): JsonResponse
+    {
+        try {
+
+            $service = Service::with(['categories.category'])->select('id', 'name', 'image', 'slug', 'price')->where('slug', $slug)->first();
+ 
+            $keywords = ($service) ?
+                $service->categories
+                    ->pluck('category')
+                    ->pluck('keywords')
+                    ->flatten()
+                    ->unique()
+                    ->values()
+                : '';
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'service' => $service,
+                    'keywords' => $keywords
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
     public function cupcakes(Request $request): JsonResponse
     {
         try {
@@ -542,6 +608,58 @@ class MiscellaneousController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function contactUs(Request $request): JsonResponse
+    {
+        try {
+
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => env('RECAPTCHA_SECRET_KEY'),
+                'response' => $request->recaptcha_token
+            ]);
+        
+            if (!$response->json('success')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de verificación reCAPTCHA.'
+                ], 422);
+            }
+
+            $subject = 'Nuevo mensaje de contacto';
+            $text = '<strong>Nombre:</strong> ' . $request->name . '<br>';
+            $text .= '<strong>Email:</strong> ' . $request->email. '<br>';
+            $text .= '<strong>Mensaje:</strong> ' . $request->message;
+
+            $data = [
+                'email' => $request->email,
+                'title' => 'Nuevo mensaje de contacto',
+                'text' => $text,
+                'buttonText' => 'Responder ahora'
+            ];
+
+            \Mail::send(
+                'emails.admin.contact'
+                , ['data' => $data]
+                , function ($message) use ($subject) {
+                    $message->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $message->to(env('MAIL_TO_CONTACT'))->subject($subject);
+            });
+
+            return response()->json([
+                'success' => true,
+                'response' => $response->json()
+            ], 200);
+
+        } catch (\Exception $e){
+            $responseMail = $e->getMessage();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'email_error',
+                'exception' => $responseMail
+            ], 500);
+        } 
     }
     
 }

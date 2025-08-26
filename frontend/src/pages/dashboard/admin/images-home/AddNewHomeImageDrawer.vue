@@ -32,6 +32,9 @@ const is_slider = ref(null)
 const filename = ref([])
 const filename_mobile = ref([])
 const url = ref(null)
+const title = ref(null)
+const text = ref(null)
+const button_text = ref(null)
 const isValid =  ref(null)
 const isEdit = ref(false)
 
@@ -49,6 +52,9 @@ watchEffect(async() => {
             avatar.value = themeConfig.settings.urlStorage + props.image.image
             avatar_mobile.value = themeConfig.settings.urlStorage + props.image.mobile
             url.value = props.image.url
+            title.value = props.image.title
+            text.value = props.image.text
+            button_text.value = props.image.button_text
             is_slider.value = props.image.is_slider === 1 ? true : false
         }
     }
@@ -67,6 +73,9 @@ const closeNavigationDrawer = () => {
     mobile.value = ''
     is_slider.value = 0
     url.value = ''
+    title.value = ''
+    text.value = ''
+    button_text.value = ''
     filename.value = []
     filename_mobile.value = []
 
@@ -179,7 +188,10 @@ const onSubmit = () => {
       formData.append('id', id.value)
       formData.append('is_slider', (is_slider.value === true) ? 1 : 0)
       formData.append('url', url.value)
-
+      formData.append('title', title.value)
+      formData.append('text', text.value)
+      formData.append('button_text', button_text.value)
+      
       emit('imageData', { data: formData, id: id.value }, isEdit.value ? 'update' : 'create')
       emit('update:isDrawerOpen', false)
 
@@ -237,7 +249,7 @@ const handleDrawerModelValueUpdate = val => {
             @submit.prevent="onSubmit"
           >
             <VRow>
-              <VCol cols="12" class="pt-0 pb-2">
+              <VCol cols="12" md="8" class="py-0">
                 <span>Desktop</span>
                 <VImg
                     v-if="avatar !== null"
@@ -248,11 +260,11 @@ const handleDrawerModelValueUpdate = val => {
                     :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
                   />
               </VCol>
-              <VCol cols="12" class="py-0">
+              <VCol cols="12" md="4" class="py-0 file">
                 <VFileInput
                   v-model="filename"
                   label="Desktop"
-                  class="mb-2"
+                  class="mb-2 mt-2"
                   accept="image/png, image/jpeg, image/bmp, image/webp"
                   prepend-icon="tabler-camera"
                   @change="onImageSelected"
@@ -260,7 +272,7 @@ const handleDrawerModelValueUpdate = val => {
                    :rules="isEdit ? [] : [requiredValidator]"
                 />
               </VCol>
-              <VCol cols="12" class="pt-0 pb-2">
+              <VCol cols="12" md="8" class="py-0">
                 <span>Mobile</span>
                 <VImg
                     v-if="avatar_mobile !== null"
@@ -271,11 +283,11 @@ const handleDrawerModelValueUpdate = val => {
                     :class="((filename_mobile.length === 0 && isValid === false)) ? 'border-error' : ''"
                   />
               </VCol>
-              <VCol cols="12" class="py-0">
+              <VCol cols="12" md="4" class="py-0 file">
                 <VFileInput
                   v-model="filename_mobile"
                   label="Mobile"
-                  class="mb-2"
+                  class="mb-2 mt-2"
                   accept="image/png, image/jpeg, image/bmp, image/webp"
                   prepend-icon="tabler-camera"
                   @change="onMobileSelected"
@@ -291,16 +303,37 @@ const handleDrawerModelValueUpdate = val => {
                   :rules="[requiredValidator]"
                 />
               </VCol>
-              <VCol cols="7" class="py-0"></VCol>
-              <VCol cols="5" class="py-0">
+              <VCol cols="12" class="py-0">
+                <AppTextField
+                  v-model="title"
+                  label="Título"
+                  placeholder="Título"
+                />
+              </VCol>
+              <VCol cols="12" class="py-0">
+                <AppTextField
+                  v-model="text"
+                  label="Texto"
+                  placeholder="Texto"
+                />
+              </VCol>
+              <VCol cols="12" class="py-0">
+                <AppTextField
+                  v-model="button_text"
+                  label="Texto del boton"
+                  placeholder="Texto del boton"
+                />
+              </VCol>
+              <VCol cols="12" md="7" class="py-0"></VCol>
+              <VCol cols="12" md="5" class="py-0">
                 <VCheckbox
                   v-model="is_slider"
                   :label="capitalizedLabel('Pertenece al Slider?')"
-                  class="ms-5"
+                  class="ms-md-5"
                 />
                 </VCol>
               <!-- 👉 Submit and Cancel -->
-              <VCol cols="12">
+              <VCol cols="12" class="py-0">
                 <VBtn
                   type="submit"
                   class="me-3"
@@ -325,16 +358,25 @@ const handleDrawerModelValueUpdate = val => {
 </template>
 
 <style scoped>
-    .border-img {
-        border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
-        border-radius: 6px;
-    }
+  .file:deep(.v-field__input) {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 200px; /* Ajusta según el ancho que desees */
+    display: inline-block;
+    vertical-align: middle;
+  }
 
-    .border-img .v-img__img--contain {
-        padding: 10px;
-    }
+  .border-img {
+      border: 1.8px solid rgba(var(--v-border-color), var(--v-border-opacity));
+      border-radius: 6px;
+  }
 
-    .border-error {
-        border: 1.8px solid rgb(var(--v-theme-error));
-    }
+  .border-img .v-img__img--contain {
+      padding: 10px;
+  }
+
+  .border-error {
+      border: 1.8px solid rgb(var(--v-theme-error));
+  }
 </style>

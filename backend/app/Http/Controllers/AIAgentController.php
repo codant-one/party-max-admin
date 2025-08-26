@@ -37,30 +37,48 @@ class AIAgentController extends Controller
     
     private function getRelevantProducts($criteria)
     {
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $words = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $keywords = array_values(array_diff($words, $stopWords));
+
         return 
             Product::with([
                 'user.userDetail', 
                 'user.supplier', 
                 'firstColor:id,product_id,in_stock,stock', 
                 'colors.categories.category'
-            ])->whereHas('colors.categories.category', function($q) use ($criteria) {
-                $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+            ])->whereHas('colors.categories.category', function($q) use ($keywords) {
+                $q->where(function($query) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
+                    }
+                });
             })
+            ->limit(11)
             ->get();
     }
     
     private function getRelevantServices($criteria)
     {
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $words = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
+        $keywords = array_values(array_diff($words, $stopWords));
+
         return Service::with([
             'user.userDetail', 
             'user.supplier',
             'firstCupcake:id,service_id,price', 
             'categories.category'
-        ])->whereHas('categories.category', function($q) use ($criteria) {
-            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $criteria['theme'] . '%']);
+        ])->whereHas('categories.category', function($q) use ($keywords) {
+            $q->where(function($query) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
+                }
+            });
         })
         ->store()
         ->company()
+        ->limit(11)
         ->get();
     }
     
@@ -125,9 +143,9 @@ class AIAgentController extends Controller
         Proporciona una descripcion que no se va a mostrar en la sugerencia final, esta descripcion tiene que ser detallada para generar una imagen realista de como se veria la fiesta unicamente con los productos que sugeriste. Usa este formato exacto:
         ```json
         {
-        "descripcion_imagen": "Genera una imágen que muestre como se veria la fiesta con los productos que sugeriste, haz un ambiente adecuado tanto para el tipo de evento {$criteria['event_type']} y la tematica de la fiesta ({$criteria['theme']}). Hazla como si fuera una fotografia real tomada por cualquiera de los invitados de la fiesta, no uses texto en la imagen."
+            "descripcion_imagen": "Genera una imágen que muestre como se veria la fiesta con los productos que sugeriste, haz un ambiente adecuado tanto para el tipo de evento {$criteria['event_type']} y la tematica de la fiesta ({$criteria['theme']}). Hazla como si fuera una fotografia real tomada por cualquiera de los invitados de la fiesta, no uses texto en la imagen."
         }
-        
+
         IMPORTANTE:
         - No inventes productos o servicios fuera del catálogo.
         - Usa un tono amable y festivo, pero profesional.
@@ -141,14 +159,23 @@ class AIAgentController extends Controller
         $result = OpenAI::chat()->create([
             'model' => 'gpt-4-turbo',
             'messages' => [
-                ['role' => 'system', 'content' => 'Eres Festín 🎉, un asistente virtual divertido y experto en planificación de fiestas en Colombia. Tu misión es crear ideas personalizadas para celebraciones usando exclusivamente el catálogo de productos y servicios proporcionado. No inventes elementos que no estén listados. Sé claro, útil y creativo.'],
-                ['role' => 'user', 'content' => $context]
+                [
+                    'role' => 'system', 
+                    'content' => 'Eres Festín 🎉, un asistente virtual experto en fiestas en Colombia. 
+                 Tus respuestas SIEMPRE deben basarse en los productos y servicios del catálogo. 
+                 Cuando generes la descripción para la imagen, debes mencionar únicamente los productos o servicios sugeridos antes y colocarlos en un ambiente realista. 
+                 No inventes elementos que no estén en el catálogo.'],
+                [
+                    'role' => 'user', 
+                    'content' => $context
+                ]
             ],
+           
             'temperature' => 0.7,
             'response_format' => ['type' => 'text']
 
         ]);
-        
+            
         $response = $result->choices[0]->message->content;
         
         // Extracción del JSON
@@ -159,7 +186,7 @@ class AIAgentController extends Controller
                 'model' => 'dall-e-3',
                 'prompt' => $jsonData['descripcion_imagen'] . 
                         " Estilo: Fotografía profesional. Sin texto ni logos.",
-                'size' => '1024x1024',
+                'size' => '1792x1024',
                 'quality' => 'hd',
                 'style' => 'natural'
             ]);

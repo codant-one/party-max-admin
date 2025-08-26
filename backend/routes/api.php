@@ -300,14 +300,17 @@ Route::group([
     Route::get('products', [MiscellaneousController::class, 'products']);
     Route::get('colors', [MiscellaneousController::class, 'colors']);
     Route::get('products/{slug}', [MiscellaneousController::class, 'productDetail']);
+    Route::get('products/meta/{slug}', [MiscellaneousController::class, 'productDetailMeta']);
     Route::get('faqs/all', [MiscellaneousController::class, 'faqs']);
     Route::get('blogs/populars', [MiscellaneousController::class, 'popularsBlogs']);
     Route::get('blogs/{slug}', [MiscellaneousController::class, 'blogDetail']);
     Route::get('services', [MiscellaneousController::class, 'services']);
     Route::get('services/{slug}', [MiscellaneousController::class, 'serviceDetail']);
+    Route::get('services/meta/{slug}', [MiscellaneousController::class, 'serviceDetailMeta']);
     Route::get('cupcakes', [MiscellaneousController::class, 'cupcakes']);
     Route::get('ips', [MiscellaneousController::class, 'ips']);
     Route::post('quotes', [QuoteController::class, 'store']);
+    Route::post('contactUs', [MiscellaneousController::class, 'contactUs']);
 });
 
 //Shopping-Cart
@@ -352,3 +355,4 @@ Route::get('sendEvaluation', [TestingController::class , 'sendEvaluation'])->nam
 Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendSurvey');
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
 Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
+Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contactUs');
