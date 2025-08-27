@@ -190,33 +190,35 @@ class MiscellaneousController extends Controller
                         ])
                        ->where('favourite', true)
                        ->orderBy('created_at', 'desc')
+                       ->inRandomOrder() 
                        ->limit(5)
                        ->get();
 
-            // Validate if the user is authenticated
-            if (Auth::check()) {
 
-                $productTag = ProductTag::where('product_id', $product->id)->first();
-                    
-                if ($productTag) {
-                    $tag_id = $productTag->tag_id;
-
-                    $recommendations = 
-                            Product::with([
-                                        'user:id,name,last_name',
-                                        'user.userDetail:user_id,store_name', 
-                                        'user.supplier:user_id,company_name',
-                                        'tags', 
-                                        'firstColor:id,product_id,in_stock,stock'
-                                    ])
-                                   ->whereHas('tags', function($query) use ($tag_id) {
-                                        $query->where('tag_id', $tag_id);
-                                   })
-                                   ->orderBy('created_at', 'desc')
-                                   ->limit(5)
-                                   ->get();
+            // Get the first category of the first color of the product
+            $firstCategoryId = null;
+            if ($product->colors->isNotEmpty()) {
+                $firstColor = $product->colors->first();
+                if ($firstColor->categories->isNotEmpty()) {
+                    $firstCategoryId = $firstColor->categories->first()->category_id;
                 }
-
+            }
+                
+            if ($firstCategoryId) {
+                $recommendations = 
+                        Product::with([
+                                    'user:id,name,last_name',
+                                    'user.userDetail:user_id,store_name', 
+                                    'user.supplier:user_id,company_name',
+                                    'firstColor:id,product_id,in_stock,stock'
+                                ])
+                            ->whereHas('colors.categories', function($query) use ($firstCategoryId) {
+                                    $query->where('category_id', $firstCategoryId);
+                            })
+                            ->where('id', '!=', $product->id) // Exclude the current product
+                            ->inRandomOrder()
+                            ->limit(5)
+                            ->get();
             }
             
             $keywords = ($product) ?
@@ -497,24 +499,23 @@ class MiscellaneousController extends Controller
                        ->limit(5)
                        ->get();
 
-            // Validate if the user is authenticated
-            if (Auth::check()) {
 
-                $serviceTag = ServiceTag::where('service_id', $service->id)->first();
-                    
-                if ($serviceTag) {
-                    $tag_id = $serviceTag->tag_id;
-
-                    $recommendations = 
-                        Service::with(['user.userDetail', 'user.supplier', 'tags', 'cupcakes.cake_size.cake_type'])
-                               ->whereHas('tags', function($query) use ($tag_id) {
-                                    $query->where('tag_id', $tag_id);
-                               })
-                               ->orderBy('created_at', 'desc')
-                               ->limit(5)
-                               ->get();
-                }
-
+            // Get the first category of service
+            $firstCategoryId = null;
+            if ($service->categories->isNotEmpty()) {
+                $firstCategoryId = $service->categories->first()->category_id;
+            }
+                
+            if ($firstCategoryId) {
+                $recommendations = 
+                    Service::with(['user.userDetail', 'user.supplier', 'cupcakes.cake_size.cake_type'])
+                           ->whereHas('categories', function($query) use ($firstCategoryId) {
+                                $query->where('category_id', $firstCategoryId);
+                           })
+                           ->where('id', '!=', $service->id) // Exclude the current service
+                           ->inRandomOrder()
+                           ->limit(5)
+                           ->get();
             }
 
             return response()->json([
