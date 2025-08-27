@@ -25,7 +25,13 @@ class Coupon extends Model
 
     /**** Scopes ****/
     public function scopeWhereSearch($query, $search) {
-        $query->where('code', 'LIKE', '%' . $search . '%');
+        $query->where('code', 'LIKE', '%' . $search . '%')
+              ->orWhereHas('client.user', function ($q) use ($search) {
+                  $q->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('username', 'LIKE', '%' . $search . '%')
+                    ->orWhere('email', 'LIKE', '%' . $search . '%');
+              });
     }
 
     public function scopeWhereOrder($query, $orderByField, $orderBy) {
