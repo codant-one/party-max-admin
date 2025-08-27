@@ -41,21 +41,20 @@ class AIAgentController extends Controller
         $words = preg_split('/\s+/', strtolower(trim($criteria['theme'])));
         $keywords = array_values(array_diff($words, $stopWords));
 
-        return 
-            Product::with([
-                'user.userDetail', 
-                'user.supplier', 
-                'firstColor:id,product_id,in_stock,stock', 
-                'colors.categories.category'
-            ])->whereHas('colors.categories.category', function($q) use ($keywords) {
-                $q->where(function($query) use ($keywords) {
-                    foreach ($keywords as $word) {
-                        $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
-                    }
+        return Product::with([
+            'user.userDetail', 
+            'user.supplier', 
+            'firstColor:id,product_id,in_stock,stock', 
+            'colors.categories.category'
+        ])->where(function($query) use ($keywords) {
+            foreach ($keywords as $word) {
+                $query->whereHas('colors.categories.category', function($q) use ($word) {
+                    $q->whereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
                 });
-            })
-            ->limit(11)
-            ->get();
+            }
+        })
+        ->limit(11)
+        ->get();
     }
     
     private function getRelevantServices($criteria)
@@ -69,12 +68,12 @@ class AIAgentController extends Controller
             'user.supplier',
             'firstCupcake:id,service_id,price', 
             'categories.category'
-        ])->whereHas('categories.category', function($q) use ($keywords) {
-            $q->where(function($query) use ($keywords) {
-                foreach ($keywords as $word) {
-                    $query->orWhereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
-                }
-            });
+        ])->where(function($query) use ($keywords) {
+            foreach ($keywords as $word) {
+                $query->whereHas('categories.category', function($q) use ($word) {
+                    $q->whereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
+                });
+            }
         })
         ->store()
         ->company()
