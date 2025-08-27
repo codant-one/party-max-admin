@@ -276,10 +276,27 @@ class Product extends Model
     }
 
     public function scopeWhereSearchPublic($query, $search) {
-        $query->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $search . '%'])
-              ->orWhereHas('colors.categories.category', function ($q) use ($search) {
-                  $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
-              });
+        $search = strtolower($search);
+        $words = preg_split('/\s+/', $search, -1, PREG_SPLIT_NO_EMPTY);
+        
+        // Lista de conectores/common words a ignorar
+        $stopWords = ['de', 'en', 'y', 'o', 'la', 'el', 'los', 'las', 'un', 'una', 'con', 'para', 'por'];
+        
+        // Filtrar palabras, removiendo conectores
+        $searchWords = array_filter($words, function($word) use ($stopWords) {
+            return !in_array($word, $stopWords) && strlen($word) > 2;
+        });
+        
+        return $query->where(function($q) use ($searchWords) {
+            foreach ($searchWords as $word) {
+                $q->where(function($innerQuery) use ($word) {
+                    $innerQuery->whereRaw('LOWER(products.name) LIKE ?', ['%' . $word . '%'])
+                            ->orWhereHas('colors.categories.category', function ($categoryQuery) use ($word) {
+                                $categoryQuery->whereRaw('LOWER(keywords) LIKE ?', ['%' . $word . '%']);
+                            });
+                });
+            }
+        });
     }
 
     public function scopeWhereCategory($query, $search) {
