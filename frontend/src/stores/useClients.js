@@ -75,6 +75,20 @@ export const useClientsStores = defineStore('clients', {
                 })
          
         },
+        updateState(data, id) {
+            this.setLoading(true)
+
+            return Clients.updateState(data, id)
+                .then((response) => {
+                    let pos = this.clients.findIndex((item) => item.id === response.data.data.client.id)
+                    this.clients[pos] = response.data.data.client
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+        },
         deleteClient(id) {
             this.setLoading(true)
 

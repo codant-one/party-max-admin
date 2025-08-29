@@ -23,6 +23,7 @@ const totalPages = ref(1)
 const totalClients = ref(0)
 const isRequestOngoing = ref(true)
 const isAddNewClientDrawerVisible = ref(false)
+const isConfirmActiveDialogVisible = ref(false)
 const isConfirmDeleteDialogVisible = ref(false)
 const selectedClient = ref({})
 const listCountries = ref([])
@@ -34,6 +35,26 @@ const advisor = ref({
   message: '',
   show: false
 })
+
+const resolveStatus = statusMsg => {
+  if (statusMsg === 2)
+    return {
+      text: 'Activo',
+      color: 'success',
+    }
+  if (statusMsg === 5)
+    return {
+      text: 'Eliminado',
+      color: 'warning',
+    }
+}
+
+const status = ref([
+  { title: 'Activo', value: 2 },
+  { title: 'Eliminado', value: 5 },
+])
+
+const selectedStatus = ref(2)
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
@@ -80,7 +101,8 @@ async function fetchData() {
     orderByField: 'sales',
     orderBy: 'desc',
     limit: rowPerPage.value,
-    page: currentPage.value
+    page: currentPage.value,
+    state_id: selectedStatus.value
   }
 
   isRequestOngoing.value = true
@@ -105,6 +127,10 @@ const editClient = clientData => {
     selectedClient.value = { ...clientData }
 }
 
+const showActiveDialog = id => {
+  isConfirmActiveDialogVisible.value = true
+  selectedClient.value = clients.value.filter((element) => element.id === id )[0]
+}
 
 const showDeleteDialog = clientData => {
   isConfirmDeleteDialogVisible.value = true
@@ -113,6 +139,33 @@ const showDeleteDialog = clientData => {
 
 const seeClient = clientData => {
   router.push({ name : 'dashboard-admin-clients-id', params: { id: clientData.id } })
+}
+
+const activeClient = async () => {
+
+  isConfirmActiveDialogVisible.value = false
+
+  let res = await clientsStores.updateState({ state_id: 2 }, selectedClient.value.id)
+  selectedClient.value = {}
+  console.log(res)
+  advisor.value = {
+    type: res.data.success ? 'success' : 'error',
+    message: res.data.success ? 'Cliente activado!' : res.data.message,
+    show: true
+  }
+
+  await fetchData()
+
+  setTimeout(() => {
+    advisor.value = {
+      type: '',
+      message: '',
+      show: false
+    }
+  }, 3000)
+
+  return true
+
 }
 
 const removeClient = async () => {
@@ -292,7 +345,21 @@ const getFlagCountry = country => {
           {{ advisor.message }}
         </v-alert>
 
-        <v-card title="">
+        <v-card title="Filtros">
+
+          <VCol
+            cols="12"
+            sm="3"
+          >
+            <AppSelect
+              v-model="selectedStatus"
+              placeholder="Estados"
+              :items="status"
+              clearable
+              clear-icon="tabler-x"
+            />
+          </VCol>
+
           <v-card-text class="d-flex flex-wrap py-4 gap-4">
             <div
               class="me-3"
@@ -349,6 +416,7 @@ const getFlagCountry = country => {
                 <th scope="col"> PAÍS </th>
                 <th scope="col"> PEDIDOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
+                <th scope="col"> STATUS </th>
                 <th scope="col" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">
                   ACCIONES
                 </th>
@@ -398,6 +466,13 @@ const getFlagCountry = country => {
                 <td>
                   <span class="text-body-1 font-weight-medium text-high-emphasis">$ {{ formatNumber(client.sales) ?? '0.00' }}</span>
                 </td>
+                <td> 
+                  <VChip
+                    v-bind="resolveStatus(client.state_id)"
+                    density="default"
+                    label
+                  />
+                </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">      
                   <VBtn
@@ -420,11 +495,29 @@ const getFlagCountry = country => {
                     />
                   </VBtn> 
                   <VBtn
+                    v-if="$can('editar', 'clientes') && client.state_id === 5"
+                    icon
+                    size="x-small"
+                    color="default"
+                    variant="text"
+                    @click="showActiveDialog(client.id)">
+                    <VTooltip
+                      open-on-focus
+                      location="top"
+                      activator="parent">
+                      Activar
+                    </VTooltip>
+                    <VIcon
+                      size="22"
+                      icon="tabler-check" />
+                  </VBtn>
+                  <VBtn
                     v-if="$can('editar', 'clientes')"
                     icon
                     size="x-small"
                     color="default"
                     variant="text"
+                    :disabled="client.state_id === 5"
                     @click="editClient(client)">
                     <VTooltip
                       open-on-focus
@@ -443,6 +536,7 @@ const getFlagCountry = country => {
                     size="x-small"
                     color="default"
                     variant="text"
+                    :disabled="client.state_id === 5"
                     @click="showDeleteDialog(client)">
                     <VTooltip
                       open-on-focus
@@ -495,6 +589,36 @@ const getFlagCountry = country => {
       :provinces="listProvinces"
       :genders="listGenders"
       @client-data="submitForm"/>
+
+    <!-- 👉 Confirm Active -->
+    <VDialog
+      v-model="isConfirmActiveDialogVisible"
+      persistent
+      class="v-dialog-sm" >
+      <!-- Dialog close btn -->
+        
+      <DialogCloseBtn @click="isConfirmActiveDialogVisible = !isConfirmActiveDialogVisible" />
+
+      <!-- Dialog Content -->
+      <VCard title="Activar Producto">
+        <VDivider class="mt-4"/>
+        <VCardText>
+          Está seguro de activar al cliente <strong>{{ selectedClient.user.name }}</strong>?.
+        </VCardText>
+
+        <VCardText class="d-flex justify-end gap-3 flex-wrap">
+          <VBtn
+            color="secondary"
+            variant="tonal"
+            @click="isConfirmActiveDialogVisible = false">
+              Cancelar
+          </VBtn>
+          <VBtn @click="activeClient">
+              Aceptar
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
 
     <!-- 👉 Confirm Delete -->
     <VDialog

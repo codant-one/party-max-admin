@@ -218,7 +218,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
        Route::post('/', [ClientController::class, 'profile']);
        Route::post('/changeAvatar', [ClientController::class, 'changeAvatar']);
        Route::post('/changePassword', [ClientController::class, 'changePassword']);
-       Route::post('/changePhone', [ClientController::class, 'changePhone']);       
+       Route::post('/changePhone', [ClientController::class, 'changePhone']);
+    });
+
+    //Clients
+    Route::group(['prefix' => 'clients'], function () {        
+       Route::put('/updateStates/{id}', [ClientController::class, 'updateStates']);   
     });
 
     //Favorites

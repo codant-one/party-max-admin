@@ -41,20 +41,27 @@ class ClientController extends Controller
         
             $query = Client::with(['user.userDetail.province.country', 'gender', 'orders'])
                            ->withCount(['orders'])
-                           ->sales()
-                           ->applyFilters(
-                                $request->only([
-                                    'search',
-                                    'orderByField',
-                                    'orderBy'
-                                ])
-                            );
+                           ->sales();
+
+            if ($request->state_id == 5) {
+                $query = $query->onlyTrashed();
+            }
+
+            $query = $query->applyFilters(
+                $request->only([
+                    'search',
+                    'orderByField',
+                    'orderBy',
+                    'state_id'
+                ])
+            );
 
             $count = $query->applyFilters(
                         $request->only([
                             'search',
                             'orderByField',
-                            'orderBy'
+                            'orderBy',
+                            'state_id'
                         ])
                     )->count();
 
@@ -217,6 +224,37 @@ class ClientController extends Controller
                 'exception' => $ex->getMessage()
             ], 500);
         }
+    }
+
+    public function updateStates(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $client = Client::withTrashed()->find($id);
+
+            if (!$client)
+                return response()->json([
+                    'success' => false,
+                    'feedback' => 'not_found',
+                    'message' => 'Cliente no encontrado'
+                ], 404);
+
+            $client->updateStatesClient($request, $client); 
+
+            return response()->json([
+                'success' => true,
+                'data' => [ 
+                    'client' => $client
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }       
     }
 
     /**

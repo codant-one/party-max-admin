@@ -21,6 +21,10 @@ class Clients {
     delete(id){
         return axios.delete(`/clients/${id}`)
     }
+
+    updateState(data, id) {
+        return axios.put(`/clients/updateStates/${id}`, data)
+    }
     
 }
 

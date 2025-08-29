@@ -28,7 +28,7 @@ class Client extends Model
     }
 
     public function user() {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')->withTrashed();
     }
 
     public function addresses() {
@@ -87,6 +87,10 @@ class Client extends Model
             $orderBy = $filters->get('orderBy') ? $filters->get('orderBy') : 'asc';
             $query->whereOrder($field, $orderBy);
         }
+
+        if ($filters->get('state_id')) {
+            $query->where('state_id', $filters->get('state_id'));
+        }
     }
 
     public function scopePaginateData($query, $limit) {
@@ -122,6 +126,22 @@ class Client extends Model
         User::updateUser($request, $user);
 
         return $client;
+    }
+
+    public static function updateStatesClient($request, $client) {
+        
+        $user = User::withTrashed()->find($client->user_id);
+        if ($user && $user->trashed()) {
+            $user->restore();
+        }
+
+        $client->update([
+            'state_id' => $request->state_id,
+            'deleted_at' => null
+        ]);
+
+        return $client;
+
     }
 
     public static function deleteClient($id) {
