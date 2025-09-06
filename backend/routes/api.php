@@ -279,6 +279,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::group(['prefix' => 'coupons'], function () {
         Route::get('show/{id}', [CouponController::class, 'couponsbyclient']);
         Route::get('show-coupon/{code}', [CouponController::class, 'couponbyCode']);
+        Route::post('store', [CouponController::class, 'store']);
     });
 
 });

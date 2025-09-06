@@ -1,12 +1,15 @@
 <script setup>
 
 import { useCouponsStores } from '@/stores/useCoupons'
+import { useClientsStores } from '@/stores/useClients'
 import { excelParser } from '@/plugins/csv/excelParser'
 import { themeConfig } from '@themeConfig'
 import { avatarText, formatNumber } from '@/@core/utils/formatters'
+import AddNewCouponDrawer from './AddNewCouponDrawer.vue'
 import router from '@/router'
 
 const couponsStores = useCouponsStores()
+const clientsStores = useClientsStores()
 
 const coupons = ref([])
 const searchQuery = ref('')
@@ -16,7 +19,10 @@ const totalPages = ref(1)
 const totalCoupons = ref(0)
 const isRequestOngoing = ref(true)
 const isConfirmDeleteDialogVisible = ref(false)
+const isAddNewCouponDrawerVisible = ref(false)
 const selectedCoupon = ref({})
+
+const listClients = ref([])
 
 const advisor = ref({
   type: '',
@@ -32,10 +38,24 @@ const paginationData = computed(() => {
   return `Mostrando ${ firstIndex } hasta ${ lastIndex } de ${ totalCoupons.value } registros`
 })
 
+const loadClients = () => {
+  listClients.value = clientsStores.getClients
+}
+
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPages.value)
     currentPage.value = totalPages.value
+
+  if (!isAddNewCouponDrawerVisible.value)
+    selectedCoupon.value = {}
+})
+
+onMounted(async () => {
+
+  await clientsStores.fetchClients()
+
+  loadClients()
 })
 
 watchEffect(fetchData)
@@ -124,6 +144,48 @@ const resolveOrders = data => {
     return  'text-error' 
   if (data.type === 2)
     return  'text-secondary' 
+}
+
+const submitForm = async (client, method) => {
+  isRequestOngoing.value = true
+
+  if (method === 'update') {
+    client.data.append('_method', 'PUT')
+    submitUpdate(client)
+    return
+  }
+
+  submitCreate(client.data)
+}
+
+const submitCreate = couponData => {
+  couponsStores.addCoupon(couponData)
+    .then(async res => {
+
+      advisor.value = {
+        type: res.data.success ? 'success' : 'error',
+        message: res.data.success ? 'Cupón creado!' : res.data.message,
+        show: true
+      }
+
+      await fetchData()
+
+      setTimeout(() => {
+        advisor.value = {
+          type: '',
+          message: '',
+          show: false
+        }
+      }, 3000)
+
+      isRequestOngoing.value = false
+
+      return true
+    })
+    .catch(err => {
+      console.error(err)
+      isRequestOngoing.value = false
+    })
 }
 
 const downloadCSV = async () => {
@@ -217,6 +279,14 @@ const downloadCSV = async () => {
                 @click="downloadCSV">
                 Exportar
               </VBtn>
+            </div>
+
+            <div class="d-flex align-center">
+              <v-btn
+                prepend-icon="tabler-plus"
+                @click="isAddNewCouponDrawerVisible = true">
+                  Agregar Cupon
+              </v-btn>
             </div>
 
             <v-spacer />
@@ -364,6 +434,14 @@ const downloadCSV = async () => {
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- 👉 Add New Coupon -->
+    <AddNewCouponDrawer
+      v-model:isDrawerOpen="isAddNewCouponDrawerVisible"
+      :coupon="selectedCoupon"
+      :clients="listClients"
+      @coupon-data="submitForm"
+    />
 
     <!-- 👉 Confirm Delete -->
     <VDialog
