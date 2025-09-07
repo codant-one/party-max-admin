@@ -64,7 +64,24 @@ class CouponController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        //
+        try {
+
+            $coupon = Coupon::createCoupon($request);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'coupon' => $coupon
+                ]
+            ], 201);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     /**

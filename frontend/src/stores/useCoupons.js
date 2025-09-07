@@ -32,6 +32,19 @@ export const useCouponsStores = defineStore('coupons', {
                 })
             
         },
+        addCoupon(data) {
+            this.setLoading(true)
+
+            return Coupons.create(data)
+                .then((response) => {
+                    this.coupons.push(response.data.data.coupon)
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+        },
         showCoupon(id) {
             this.setLoading(true)
 

@@ -58,6 +58,20 @@ class Coupon extends Model
         return $query->paginate($limit);
     }
 
+    public static function createCoupon($request) {
+        $coupon = new Coupon();
+        $coupon->client_id = $request->client_id;
+        $coupon->is_percentage = $request->is_percentage;
+        $coupon->description = $request->description;
+        $coupon->code = $request->code;
+        $coupon->amount = $request->amount;
+        $coupon->min_purchase = $request->min_purchase;
+        $coupon->expiration_date = $request->expiration_date;
+        $coupon->save();
+
+        return $coupon;
+    }
+
     public static function updateState($order) {
 
         $order = Order::find($order->id); 

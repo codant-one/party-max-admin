@@ -10,6 +10,10 @@ class Coupons {
         return axios.get(`/coupons/${id}`)
     }
 
+    create(data) {
+        return axios.post('/coupons/store', data)
+    }
+
     delete(id){
         return axios.delete(`/coupons/${id}`)
     }
