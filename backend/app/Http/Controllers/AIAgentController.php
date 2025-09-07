@@ -47,8 +47,9 @@ class AIAgentController extends Controller
             'firstColor:id,product_id,in_stock,stock', 
             'colors.categories.category'
         ])->where(function($query) use ($keywords) {
-            foreach ($keywords as $word) {
-                $query->whereHas('colors.categories.category', function($q) use ($word) {
+            foreach ($keywords as $index => $word) {
+                $method = $index === 0 ? 'whereHas' : 'orWhereHas';
+                $query->{$method}('colors.categories.category', function($q) use ($word) {
                     $q->whereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
                 });
             }
@@ -69,8 +70,9 @@ class AIAgentController extends Controller
             'firstCupcake:id,service_id,price', 
             'categories.category'
         ])->where(function($query) use ($keywords) {
-            foreach ($keywords as $word) {
-                $query->whereHas('categories.category', function($q) use ($word) {
+            foreach ($keywords as $index => $word) {
+                $method = $index === 0 ? 'whereHas' : 'orWhereHas';
+                $query->{$method}('categories.category', function($q) use ($word) {
                     $q->whereRaw('LOWER(keywords) LIKE ?', ["%{$word}%"]);
                 });
             }

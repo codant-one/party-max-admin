@@ -131,8 +131,10 @@ class Client extends Model
     public static function updateStatesClient($request, $client) {
         
         $user = User::withTrashed()->find($client->user_id);
+
         if ($user && $user->trashed()) {
             $user->restore();
+            $user->assignRole('Cliente');
         }
 
         $client->update([
@@ -151,6 +153,9 @@ class Client extends Model
     public static function deleteClients($ids) {
         foreach ($ids as $id) {
             $client = self::find($id);
+            $client->state_id = 5;
+            $client->save();
+
             $user = User::find($client->user_id);
 
             $client->delete();
