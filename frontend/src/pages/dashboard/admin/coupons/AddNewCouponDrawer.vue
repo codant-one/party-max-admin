@@ -21,7 +21,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:isDrawerOpen',
-  'clientData',
+  'couponData',
 ])
 
 const isFormValid = ref(false)
@@ -40,7 +40,7 @@ const is_used = ref(0)
 
 const isEdit = ref(false)
 const getTitle = computed(() => {
-  return isEdit.value ? 'Actualizar Cupon': 'Agregar Cupon'
+  return isEdit.value ? 'Actualizar Cupón': 'Agregar Cupón'
 })
 
 const closeNavigationDrawer = () => {
@@ -63,6 +63,10 @@ const closeNavigationDrawer = () => {
   })
 }
 
+const handleDrawerModelValueUpdate = val => {
+  emit('update:isDrawerOpen', val)
+}
+
 const onSubmit = () => {
   form.value.validate().then(({ valid }) => {
     if (valid) {
@@ -78,7 +82,7 @@ const onSubmit = () => {
       formData.append('order_id', order_id.value)
       formData.append('is_used', is_used.value)
 
-      emit('coupon-data', {data: formData, id: id.value}, isEdit.value ? 'update' : 'create')
+      emit('couponData', {data: formData, id: id.value}, isEdit.value ? 'update' : 'create')
 
       closeNavigationDrawer()
     }
@@ -94,6 +98,7 @@ const onSubmit = () => {
     location="end"
     class="scrollable-content"
     :model-value="props.isDrawerOpen"
+    @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
      <div class="d-flex align-center pa-6 pb-1">
@@ -134,7 +139,7 @@ const onSubmit = () => {
                 <VTextField
                   v-model="code"
                   :rules="[requiredValidator]"
-                  label="Codigo"
+                  label="Código"
                 />
               </VCol>
 
@@ -142,16 +147,21 @@ const onSubmit = () => {
                 <VTextField
                   v-model="description"
                   :rules="[requiredValidator]"
-                  label="Descripcion"
+                  label="Descripción"
                 />
               </VCol>
               
               <VCol cols="6">
                 <VTextField
                   v-model="amount"
-                  :rules="[requiredValidator]"
                   label="Monto"
                   type="number"
+                  :rules="[
+                    requiredValidator,
+                    v => (!is_percentage && v > 500000) ? 'El monto máximo es 500000' : true,
+                    v => (is_percentage && v > 100) ? 'El porcentaje máximo es 100%' : true,
+                  ]"
+                  :max="is_percentage ? 100 : 500000"
                 />
               </VCol>
 
@@ -159,8 +169,9 @@ const onSubmit = () => {
                 <VTextField
                   v-model="min_purchase"
                   :rules="[requiredValidator]"
-                  label="Monto Minimo de Compra"
+                  label="Monto mínimo de compra"
                   type="number"
+                  :disabled="is_percentage ? true : false"
                 />
               </VCol>
 
@@ -168,7 +179,7 @@ const onSubmit = () => {
                 <VTextField
                   v-model="expiration_date"
                   :rules="[requiredValidator]"
-                  label="Fecha de Expiracion"
+                  label="Fecha de expiración"
                   type="date"
                 />
               </VCol>
@@ -176,7 +187,7 @@ const onSubmit = () => {
               <VCol cols="6">
                 <VCheckbox
                   v-model="is_percentage"
-                  label="Es Porcentaje?"
+                  label="Es porcentaje?"
                 />
               </VCol>
   
@@ -184,7 +195,7 @@ const onSubmit = () => {
                 <v-autocomplete
                   v-model="client"
                   :items="props.clients"
-                  :item-title="item => item && item.user ? `${item.user.name} ${item.user.last_name}` : 'Sin nombre'"
+                  :item-title="item => item && item.user ? `${item.user.name} ${item.user.last_name ?? ''}` : 'Sin nombre'"
                   item-value="id"
                   :rules="[requiredValidator]"
                   label="Cliente"

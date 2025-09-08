@@ -6,11 +6,15 @@ import { format, parseISO } from 'date-fns';
 import { avatarText } from '@/@core/utils/formatters'
 import { themeConfig } from '@themeConfig'
 import { es } from 'date-fns/locale';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import mastercard from '@images/cards/mastercard.png'
 import visa from '@images/cards/visa.png'
 import pse from '@images/cards/pse.png'
 import nequi from '@images/cards/nequi.png'
 import router from '@/router'
+
+dayjs.extend(customParseFormat);
 
 const route = useRoute()
 const ordersStores = useOrdersStores()
@@ -48,7 +52,7 @@ async function fetchData() {
       if(coupon.value.is_percentage)// es porcentaje
         discount.value = ((order.value.sub_total * coupon.value.amount) / 100).toFixed(2)
       else
-         discount.value = coupon.value.amount.toFixed(2)
+         discount.value = Number(coupon.value.amount).toFixed(2)
     }
 
     date.value = order.value.created_at
@@ -304,6 +308,9 @@ const removeOrder = async () => {
                             <div class="d-flex flex-column align-start">
                               <span class="text-body-1 font-weight-medium">
                                 {{ item.service.name }}
+                              </span>
+                              <span class="text-sm text-disabled">
+                                Fecha de entrega: {{ dayjs(item.date, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD hh:mm A') }}
                               </span>
                               <span class="text-sm text-disabled" v-if="item.service.cupcakes.length > 0 && item.service.is_full">
                                 Sabor: {{ item.flavor.name }}

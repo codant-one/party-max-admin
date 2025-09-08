@@ -74,7 +74,7 @@ class CouponController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'coupon' => $coupon
+                    'coupon' => Coupon::with(['client.user', 'order'])->find($coupon->id)
                 ]
             ], 201);
 

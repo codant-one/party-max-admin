@@ -43,6 +43,7 @@ class EventController extends Controller
 
             $query = Event::with([
                             'category', 
+                            'order_detail',
                             'order_detail.service.cupcakes',
                             'order_detail.service.user',
                             'order_detail.flavor',
@@ -436,9 +437,21 @@ class EventController extends Controller
         $idAdmin = ($isAdmin) ? $user->id : 0;
 
         if($isAdmin)
-            $count = Event::where('state_id', 4)->count();
+            $count = Event::where('state_id', 4)
+            ->whereHas('order_detail', function ($q) {
+                $q->whereHas('order', function ($q) {
+                    return $q->where('payment_state_id', 4)
+                             ->where('shipping_state_id', 1);
+                });
+            })->count();
         else
             $count = Event::where('state_id', 4)
+                ->whereHas('order_detail', function ($q) {
+                    $q->whereHas('order', function ($q) {
+                        return $q->where('payment_state_id', 4)
+                                ->where('shipping_state_id', 1);
+                    });
+                })
                 ->whereHas('order_detail', function ($q) {
                     $q->whereHas('service', function ($q) {
                         return $q->where('user_id', Auth()->user()->id)
