@@ -170,17 +170,38 @@ class ReviewController extends Controller
     {
         try {
 
-            $review = Review::find($request->ids);
+            $reviews = Review::find($request->ids);
 
-            if (!$review)
+            if (!$reviews)
                 return response()->json([
                     'sucess' => false,
                     'message' => 'Not found',
                     'message' => 'Review no encontrado'
                 ], 404);
 
+            $productIds = [];
+            $serviceIds = [];
+
+            foreach ($reviews as $review) {
+                if ($review->product_id) {
+                    $productIds[] = $review->product_id;
+                }
+                if ($review->service_id) {
+                    $serviceIds[] = $review->service_id;
+                }
+            }
+
             Review::deleteReviews($request->ids);
-            Product::calculateRating($request->product_id);
+
+            // Actualiza el rating de cada producto afectado
+            foreach (array_unique($productIds) as $productId) {
+                Product::calculateRating($productId);
+            }
+
+            // Actualiza el rating de cada servicio afectado
+            foreach (array_unique($serviceIds) as $serviceId) {
+                Service::calculateRating($serviceId);
+            }
             
             return response()->json([
                 'success' => true

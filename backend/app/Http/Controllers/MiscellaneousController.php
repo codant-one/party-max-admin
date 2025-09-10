@@ -487,7 +487,8 @@ class MiscellaneousController extends Controller
                                 'categories.category', 
                                 'tags.tag',
                                 'videos',
-                                'cupcakes.cake_size.cake_type'
+                                'cupcakes.cake_size.cake_type',
+                                'reviews.client.user'
                               ])
                               ->where('slug', $slug)
                               ->first();

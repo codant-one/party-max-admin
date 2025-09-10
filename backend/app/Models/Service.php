@@ -61,6 +61,11 @@ class Service extends Model
         return $this->hasMany(ServiceList::class, 'order_id','id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'service_id','id');
+    }
+
     public function cupcakes()
     {
         return $this->hasMany(Cupcake::class, 'service_id');
@@ -601,7 +606,14 @@ class Service extends Model
         }
 
         $service = Service::find($service_id);
-        $service->rating = $sum/(count($reviews));//average
+
+        // Evita la división por cero
+        if (count($reviews) > 0) {
+            $service->rating = $sum / count($reviews);
+        } else {
+            $service->rating = null; 
+        }
+        
         $service->update();
     }
 
