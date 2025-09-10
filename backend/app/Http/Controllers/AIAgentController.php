@@ -54,7 +54,6 @@ class AIAgentController extends Controller
                 });
             }
         })
-        ->limit(11)
         ->get();
     }
     
@@ -79,7 +78,6 @@ class AIAgentController extends Controller
         })
         ->store()
         ->company()
-        ->limit(11)
         ->get();
     }
     
