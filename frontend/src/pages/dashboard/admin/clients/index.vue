@@ -146,8 +146,7 @@ const activeClient = async () => {
   isConfirmActiveDialogVisible.value = false
 
   let res = await clientsStores.updateState({ state_id: 2 }, selectedClient.value.id)
-  selectedClient.value = {}
-  console.log(res)
+
   advisor.value = {
     type: res.data.success ? 'success' : 'error',
     message: res.data.success ? 'Cliente activado!' : res.data.message,
@@ -155,7 +154,8 @@ const activeClient = async () => {
   }
 
   await fetchData()
-
+  selectedClient.value = {}
+  
   setTimeout(() => {
     advisor.value = {
       type: '',
@@ -345,21 +345,7 @@ const getFlagCountry = country => {
           {{ advisor.message }}
         </v-alert>
 
-        <v-card title="Filtros">
-
-          <VCol
-            cols="12"
-            sm="3"
-          >
-            <AppSelect
-              v-model="selectedStatus"
-              placeholder="Estados"
-              :items="status"
-              clearable
-              clear-icon="tabler-x"
-            />
-          </VCol>
-
+        <v-card>
           <v-card-text class="d-flex flex-wrap py-4 gap-4">
             <div
               class="me-3"
@@ -385,6 +371,14 @@ const getFlagCountry = country => {
             <v-spacer />
 
             <div class="d-flex align-center flex-wrap gap-4">
+              <AppSelect
+                v-model="selectedStatus"
+                placeholder="Estados"
+                :items="status"
+                clearable
+                clear-icon="tabler-x"
+                style="width: 200px;"
+              />
               <!-- 👉 Search  -->
               <div class="search">
                 <VTextField
@@ -600,10 +594,10 @@ const getFlagCountry = country => {
       <DialogCloseBtn @click="isConfirmActiveDialogVisible = !isConfirmActiveDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Activar Producto">
+      <VCard title="Activar Cliente">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de activar al cliente <strong>{{ selectedClient.user.name }}</strong>?.
+          Está seguro de activar al cliente <strong>{{ selectedClient.user.name }} {{ selectedClient.user.last_name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">
@@ -633,7 +627,7 @@ const getFlagCountry = country => {
       <VCard title="Eliminar Cliente">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar el Cliente <strong>{{ selectedClient.user.name }}</strong>?.
+          Está seguro de eliminar el Cliente <strong>{{ selectedClient.user.name }} {{ selectedClient.user.last_name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">

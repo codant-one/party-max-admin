@@ -52,8 +52,7 @@ watchEffect(() => {
 })
 
 onMounted(async () => {
-
-  await clientsStores.fetchClients()
+  await clientsStores.fetchClients({ limit: -1 })
 
   loadClients()
 })
@@ -146,16 +145,16 @@ const resolveOrders = data => {
     return  'text-secondary' 
 }
 
-const submitForm = async (client, method) => {
+const submitForm = async (coupon, method) => {
   isRequestOngoing.value = true
 
   if (method === 'update') {
-    client.data.append('_method', 'PUT')
-    submitUpdate(client)
+    coupon.data.append('_method', 'PUT')
+    submitUpdate(coupon)
     return
   }
 
-  submitCreate(client.data)
+  submitCreate(coupon.data)
 }
 
 const submitCreate = couponData => {
@@ -285,7 +284,7 @@ const downloadCSV = async () => {
               <v-btn
                 prepend-icon="tabler-plus"
                 @click="isAddNewCouponDrawerVisible = true">
-                  Agregar Cupon
+                  Agregar Cupón
               </v-btn>
             </div>
 

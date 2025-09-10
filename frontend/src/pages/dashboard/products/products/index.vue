@@ -476,6 +476,9 @@ const downloadCSV = async () => {
     const cleanName = cleanText(element.name)
     const originalDescriptionText = `Descubre nuestro '${element.name}' en PARTYMAX. ¡El complemento perfecto para celebrar con estilo! Ideal para fiestas, noches especiales o cualquier ocasión que merezca brillar. ✨.`
     const cleanDescriptionText = cleanText(originalDescriptionText);
+    const categoryNames = element.colors[0]?.categories
+        ?.map(cat => cat.category?.name) // Extrae solo el nombre
+        .filter(Boolean);
 
     let data = {
       id: `PRODUCT_${element.id}`,
@@ -485,7 +488,8 @@ const downloadCSV = async () => {
       price: element.price_for_sale.toFixed(2) + ' COP',
       image_link: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
       link: themeConfig.settings.urlDomain + 'products/' + element.slug,
-      brand: 'PARTYMAX'
+      brand: 'PARTYMAX',
+      product_type: categoryNames?.join(', ')
     }
           
     dataArray.push(data)

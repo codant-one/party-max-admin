@@ -1,6 +1,8 @@
 <script setup>
 
 import { useCouponsStores } from '@/stores/useCoupons'
+import { formatNumber } from '@/@core/utils/formatters'
+import { useClipboard } from '@vueuse/core';
 import serpentina from '@images/serpentina.png';
 import router from '@/router'
 
@@ -8,6 +10,7 @@ const route = useRoute()
 const couponsStores = useCouponsStores()
 const coupon = ref([])
 const backgroundStyle = ref({})
+const cp = useClipboard()
 
 const advisor = ref({
   type: '',
@@ -37,6 +40,21 @@ async function fetchData() {
   }
 
   isRequestOngoing.value = false
+}
+
+const copy = (data) => {
+  
+  cp.copy(data)
+
+  advisor.value.type = 'success'
+  advisor.value.show = true
+  advisor.value.message = 'Código copiado!'
+
+  setTimeout(() => {
+      advisor.value.show = false
+      advisor.value.type = ''
+      advisor.value.message = ''
+  }, 5000)
 }
 
 const back = () => {
@@ -141,13 +159,13 @@ const back = () => {
                         <router-link
                             v-if="coupon.is_used"
                             :to="{
-                                name: 'detail_pusher',
+                                name: 'dashboard-admin-orders-id',
                                 params: {
                                     id: coupon.order_id
                                 }
                             }"
                             class="tw-no-underline">
-                            <VBtn class="btn-order tw-text-tertiary">
+                            <VBtn size="x-small" class="btn-xs p-1 tw-text-tertiary">
                                 Ver pedido
                             </VBtn>       
                         </router-link>

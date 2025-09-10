@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Str;
 
 use App\Models\Order;
+use App\Models\Event;
 
 class updateOrderPaymentState extends Command
 {
@@ -53,9 +54,17 @@ class updateOrderPaymentState extends Command
         
         foreach ($ordersPending as $item) {
 
-            $order = Order::find($item->id);
+            $order = Order::with(['details'])->find($item->id);
 
             if($order) {
+                foreach($order->details as $detail) {
+                    $event = Event::where('order_detail_id', $detail->id)->first();
+                    if($event) {
+                        $event->state_id = 6;
+                        $event->save();
+                    }
+                }
+
                 $order->update([
                     'payment_state_id' => 2
                 ]);  

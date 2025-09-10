@@ -41,11 +41,8 @@ class ClientController extends Controller
         
             $query = Client::with(['user.userDetail.province.country', 'gender', 'orders'])
                            ->withCount(['orders'])
-                           ->sales();
-
-            if ($request->state_id == 5) {
-                $query = $query->onlyTrashed();
-            }
+                           ->sales()
+                           ->withTrashed();
 
             $query = $query->applyFilters(
                 $request->only([
@@ -167,6 +164,7 @@ class ClientController extends Controller
                             ])
                             ->withCount(['orders'])
                             ->sales()
+                            ->withTrashed()
                             ->find($id);
 
             if (!$client)

@@ -30,6 +30,9 @@ class CouponController extends Controller
             $limit = $request->has('limit') ? $request->limit : 10;
         
             $query = Coupon::with(['client.user', 'order'])
+                        ->whereHas('client', function ($q) {
+                            $q->whereNull('deleted_at');
+                        })
                         ->applyFilters(
                             $request->only([
                                 'search',
@@ -71,7 +74,7 @@ class CouponController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'coupon' => $coupon
+                    'coupon' => Coupon::with(['client.user', 'order'])->find($coupon->id)
                 ]
             ], 201);
 
