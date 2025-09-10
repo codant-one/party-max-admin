@@ -591,6 +591,20 @@ class Service extends Model
         return $service;
     }
 
+    public static function calculateRating($service_id) {
+
+        $reviews = Review::where('service_id', $service_id)->get();
+        $sum = 0;
+
+        foreach($reviews as $review){
+            $sum = $sum + $review->rating;
+        }
+
+        $service = Service::find($service_id);
+        $service->rating = $sum/(count($reviews));//average
+        $service->update();
+    }
+
     public static function deleteServices($ids) {
         foreach ($ids as $id) {
             $service = self::find($id);
