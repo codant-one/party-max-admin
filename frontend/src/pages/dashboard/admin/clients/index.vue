@@ -407,7 +407,6 @@ const getFlagCountry = country => {
               <tr>
                 <th scope="col"> NOMBRE </th>
                 <th scope="col"> USUARIO </th>
-                <th scope="col"> PAÍS </th>
                 <th scope="col"> PEDIDOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
                 <th scope="col"> STATUS </th>
@@ -444,16 +443,6 @@ const getFlagCountry = country => {
                   </div>
                 </td>
                 <td class="text-wrap"> {{ client.user.username }} </td>
-                <td class="text-wrap"> 
-                  <VAvatar
-                    start
-                    size="25"
-                    :image="getFlagCountry(client.user.user_detail.province.country.name)"
-                  />
-                  <span class="text-body-2 ms-2">
-                    {{ client.user.user_detail.province.country.name }} 
-                  </span>
-                </td>
                 <td>
                   {{ client.orders_count }}
                 </td>
