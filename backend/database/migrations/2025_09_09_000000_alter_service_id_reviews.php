@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::table('reviews', function (Blueprint $table) {
             $table->unsignedBigInteger('product_id')->nullable()->change();
-            $table->bigInteger('service_id')->after('product_id')->default(null);
+            $table->unsignedBigInteger('service_id')->nullable()->after('product_id');
+
+            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
         });
     }
 
@@ -23,6 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('reviews', function (Blueprint $table) {
+            $table->dropColumn('product_id');
             $table->dropColumn('service_id');
         });
     }
