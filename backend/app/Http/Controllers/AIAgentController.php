@@ -46,7 +46,9 @@ class AIAgentController extends Controller
             'user.supplier', 
             'firstColor:id,product_id,in_stock,stock', 
             'colors.categories.category'
-        ])->where(function($query) use ($keywords) {
+        ])
+        ->select('products.*')
+        ->where(function($query) use ($keywords) {
             foreach ($keywords as $index => $word) {
                 $method = $index === 0 ? 'whereHas' : 'orWhereHas';
                 $query->{$method}('colors.categories.category', function($q) use ($word) {
