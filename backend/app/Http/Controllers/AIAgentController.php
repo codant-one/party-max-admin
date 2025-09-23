@@ -73,7 +73,9 @@ class AIAgentController extends Controller
             'user.supplier',
             'firstCupcake:id,service_id,price', 
             'categories.category'
-        ])->where(function($query) use ($keywords) {
+        ])
+        ->select('services.*')
+        ->where(function($query) use ($keywords) {
             foreach ($keywords as $index => $word) {
                 $method = $index === 0 ? 'whereHas' : 'orWhereHas';
                 $query->{$method}('categories.category', function($q) use ($word) {
@@ -83,7 +85,9 @@ class AIAgentController extends Controller
         })
         ->store()
         ->company()
+        ->join('service_lists as sl', 'services.id', '=', 'sl.service_id')
         ->orderBy('services.order_id', 'asc')
+        ->distinct('services.id') 
         ->get();
     }
     
