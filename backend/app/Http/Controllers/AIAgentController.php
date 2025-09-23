@@ -54,7 +54,8 @@ class AIAgentController extends Controller
                 });
             }
         })
-        ->orderBy('products.order_id', 'asc')
+        ->join('product_lists as pl', 'products.id', '=', 'pl.product_id')
+        ->orderBy('pl.order_id', 'asc')
         ->get();
     }
     
