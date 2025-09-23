@@ -56,6 +56,7 @@ class AIAgentController extends Controller
         })
         ->join('product_lists as pl', 'products.id', '=', 'pl.product_id')
         ->orderBy('pl.order_id', 'asc')
+        ->distinct('products.id') 
         ->get();
     }
     
