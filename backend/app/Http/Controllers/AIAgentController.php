@@ -54,7 +54,7 @@ class AIAgentController extends Controller
                 });
             }
         })
-        ->orderBy('order_id')
+        ->orderBy('products.order_id', 'asc')
         ->get();
     }
     
@@ -79,7 +79,7 @@ class AIAgentController extends Controller
         })
         ->store()
         ->company()
-        ->orderBy('order_id')
+        ->orderBy('services.order_id', 'asc')
         ->get();
     }
     
