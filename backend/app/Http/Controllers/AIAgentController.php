@@ -47,7 +47,7 @@ class AIAgentController extends Controller
             'firstColor:id,product_id,in_stock,stock', 
             'colors.categories.category'
         ])
-        ->select('products.*')
+        ->select('products.*', 'pl.order_id')
         ->where(function($query) use ($keywords) {
             foreach ($keywords as $index => $word) {
                 $method = $index === 0 ? 'whereHas' : 'orWhereHas';
@@ -74,7 +74,7 @@ class AIAgentController extends Controller
             'firstCupcake:id,service_id,price', 
             'categories.category'
         ])
-        ->select('services.*')
+        ->select('services.*', 'sl.order_id')
         ->where(function($query) use ($keywords) {
             foreach ($keywords as $index => $word) {
                 $method = $index === 0 ? 'whereHas' : 'orWhereHas';
