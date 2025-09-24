@@ -49,7 +49,7 @@ class ServiceController extends Controller
                         ->selling()
                         ->salesPrice()
                         ->favorites()
-                        // ->comments()
+                        ->comments()
                         ->applyFilters(
                             $request->only([
                                 'search',
