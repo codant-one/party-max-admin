@@ -362,7 +362,7 @@ class OrderController extends Controller
             $orders = Order::with([
                                 'details.product_color.product.reviews', 
                                 'details.product_color.color',
-                                'details.service',
+                                'details.service.reviews',
                                 'details.cake_size',
                                 'details.flavor',
                                 'details.filling',
@@ -418,6 +418,9 @@ class OrderController extends Controller
                 
                         $orderInfo['products'][] = $productInfo;
                     } else {
+                        $review = 
+                            $detail->service->reviews->firstWhere('client_id', $order->client_id);
+
                         $serviceInfo = [
                             'service_id' => $detail->service->id,
                             'service_name' => $detail->service->name,
@@ -428,7 +431,7 @@ class OrderController extends Controller
                             'cake_size' => $detail->cake_size ? $detail->cake_size->name : null,
                             'slug' => $detail->service->slug,
                             'quantity' => $detail->quantity,
-                            'rating' => 0
+                            'rating' => $review ? $review->rating : 0
                         ];
 
                         $orderInfo['services'][] = $serviceInfo;
