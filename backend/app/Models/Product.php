@@ -292,8 +292,7 @@ class Product extends Model
         }
     
         $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%'])
-              ->orWhereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
         });
     }
         
