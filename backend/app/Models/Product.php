@@ -275,7 +275,7 @@ class Product extends Model
         });
     }
 
-   /*public function scopeWhereSearchPublic($query, $search) {
+    public function scopeWhereSearchPublic($query, $search) {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
     
@@ -294,44 +294,7 @@ class Product extends Model
         $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
             $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
         });
-    }*/
-
-    public function scopeWhereSearchPublic($query, $search)
-{
-    // 1. Limpiamos los términos de búsqueda (esto estaba bien)
-    $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
-    $terms = explode(' ', $search);
-
-    $terms = array_filter($terms, function ($term) use ($stopWords) {
-        return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
-    });
-
-    // Si no hay términos de búsqueda válidos, no hacemos nada.
-    if (empty($terms)) {
-        return $query;
-    }
-
-    // 2. LA CLAVE: Envolvemos TODA la lógica de búsqueda en un solo ->where()
-    // Esto crea el paréntesis ( ... ) en el SQL que necesitamos.
-    return $query->where(function ($mainQuery) use ($terms, $search) {
-
-        // 3. Condición A: El nombre del producto debe contener TODOS los términos.
-        $mainQuery->where(function ($nameQuery) use ($terms) {
-            foreach ($terms as $term) {
-                $nameQuery->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
-            }
-        });
-
-        // 4. Condición B: O, el producto debe estar relacionado con una categoría que coincida.
-        $mainQuery->orWhereHas('colors.categories.category', function ($categoryQuery) use ($search) {
-            $categoryQuery->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%'])
-                  ->orWhereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
-            });
-        });
-    });
-}
-        
+    }        
 
     public function scopeWhereCategory($query, $search) {
         $query->whereHas('colors.categories', function ($q) use ($search) {
