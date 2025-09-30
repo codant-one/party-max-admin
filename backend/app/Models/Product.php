@@ -277,25 +277,40 @@ class Product extends Model
 
     public function scopeWhereSearchPublic($query, $search) {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
-        $terms = explode(' ', $search);
     
+        // Normalizar y separar términos (evita múltiples espacios)
+        $terms = preg_split('/\s+/', trim($search));
         $terms = array_filter($terms, function ($term) use ($stopWords) {
-            return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
+            $t = mb_strtolower(trim($term));
+            return $t !== '' && !in_array($t, $stopWords, true);
         });
     
-        if (!empty($terms)) {
-            $query->where(function ($q) use ($terms) {
-                foreach ($terms as $term) {
-                    $q->where(function ($sub) use ($term) {
-                        $sub->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%'])
-                            ->orWhereHas('colors.categories.category', function ($cat) use ($term) {
-                                $cat->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $term . '%'])
-                                    ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $term . '%']);
-                            });
-                    });
-                }
-            });
+        if (empty($terms)) {
+            return $query;
         }
+    
+        // Cada término debe cumplirse (AND entre términos).
+        $query->where(function ($q) use ($terms) {
+            foreach ($terms as $term) {
+                $term = mb_strtolower($term);
+    
+                // Para cada término, el match puede ocurrir en products.name
+                // o en la relación categories (name o keywords).
+                $q->where(function ($sub) use ($term) {
+                    // match en el nombre del producto
+                    $sub->whereRaw('LOWER(products.name) LIKE ?', ['%' . $term . '%'])
+                        // O match en la relación (correlacionada al producto)
+                        ->orWhere(function ($orRel) use ($term) {
+                            $orRel->whereHas('colors.categories.category', function ($cat) use ($term) {
+                                $cat->whereRaw('LOWER(name) LIKE ?', ['%' . $term . '%'])
+                                    ->orWhereRaw('LOWER(keywords) LIKE ?', ['%' . $term . '%']);
+                            });
+                        });
+                });
+            }
+        });
+    
+        return $query;
     }
     
 
