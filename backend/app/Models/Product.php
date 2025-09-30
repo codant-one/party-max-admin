@@ -291,7 +291,7 @@ class Product extends Model
             });
         }
     
-        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
+        $query->whereHas('colors.categories.category', function ($q) use ($search) {
             $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
         });
     }        
