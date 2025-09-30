@@ -365,7 +365,6 @@ Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contact
 
 // --- RUTA DE PRUEBA DEFINITIVA ---
 // Borrar después de usar
-use Illuminate\Http\Request;
 use App\Models\Product; // Asegúrate de que la ruta a tu modelo sea correcta
 
 Route::get('/debug-search', function (Request $request) {
