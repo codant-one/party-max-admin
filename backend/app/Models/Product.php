@@ -279,29 +279,24 @@ class Product extends Model
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
     
-        // Filtrar términos vacíos y stopwords
         $terms = array_filter($terms, function ($term) use ($stopWords) {
             return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
         });
     
-        // Agrupamos toda la lógica en un solo where
-        $query->where(function ($q) use ($terms, $search) {
-            // Condición por nombre de producto
-            if (!empty($terms)) {
-                $q->where(function ($q2) use ($terms) {
-                    foreach ($terms as $term) {
-                        $q2->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
-                    }
-                });
-            }
-    
-            // Condición por categorías relacionadas
-            $q->orWhereHas('colors.categories.category', function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%'])
-                   ->orWhereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+        if (!empty($terms)) {
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                }
             });
+        }
+    
+        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
+            $q->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%'])
+              ->orWhereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
         });
-    }     
+    }
+        
 
     public function scopeWhereCategory($query, $search) {
         $query->whereHas('colors.categories', function ($q) use ($search) {
