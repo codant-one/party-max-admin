@@ -115,7 +115,7 @@ class MiscellaneousController extends Controller
             ]);
 
             // Cache del conteo total (sin paginación)
-            $count = Cache::remember($countKey, now()->addMinutes(2), function () use ($filters) {
+            $count = Cache::remember($countKey, now()->addMinutes(1), function () use ($filters) {
                 return Product::where('products.state_id', 3)
                     ->applyFilters($filters)
                     ->isFavorite()
@@ -133,6 +133,7 @@ class MiscellaneousController extends Controller
                         'products.name', 'products.image', 'products.rating', 'products.single_description',
                         'products.slug', 'products.wholesale_min', 'products.order_id'
                     )
+                    ->with(['colors.categories.category:id,name,keywords'])
                     ->with(['firstColor:id,product_id,in_stock,stock'])
                     ->where('products.state_id', 3)
                     ->applyFilters($filters)
