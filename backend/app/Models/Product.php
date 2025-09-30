@@ -279,30 +279,6 @@ class Product extends Model
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
     
-        // Eliminar stopwords y vacíos
-        $terms = array_filter($terms, function ($term) use ($stopWords) {
-            return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
-        });
-    
-        // Si hay términos de búsqueda
-        if (!empty($terms)) {
-            $query->where(function ($q) use ($terms) {
-                foreach ($terms as $term) {
-                    // Cada término debe cumplirse (AND implícito)
-                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
-                }
-            });
-        }
-    
-        // Búsqueda en categorías con el search completo
-        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
-        });
-    }
-    public function scopeWhereSearchPublic($query, $search) {
-        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
-        $terms = explode(' ', $search);
-    
         $terms = array_filter($terms, function ($term) use ($stopWords) {
             return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
         });
