@@ -275,7 +275,7 @@ class Product extends Model
         });
     }
 
-    public function scopeWhereSearchPublic($query, $search) {
+   /*public function scopeWhereSearchPublic($query, $search) {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
     
@@ -293,6 +293,33 @@ class Product extends Model
     
         $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
             $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+        });
+    }*/
+
+    public function scopeWhereSearchPublic($query, $search) {
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $terms = explode(' ', $search);
+    
+        $terms = array_filter($terms, function ($term) use ($stopWords) {
+            return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
+        });
+    
+        // Englobar toda la lógica en un solo 'where' para que no interfiera con otras condiciones
+        $query->where(function ($mainQuery) use ($terms, $search) {
+            // Búsqueda por nombre de producto
+            if (!empty($terms)) {
+                $mainQuery->where(function ($q) use ($terms) {
+                    foreach ($terms as $term) {
+                        $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                    }
+                });
+            }
+    
+            // Búsqueda por categorías con OR
+            $mainQuery->orWhereHas('colors.categories.category', function ($q) use ($search) {
+                $q->whereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%'])
+                  ->orWhereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+            });
         });
     }
         
