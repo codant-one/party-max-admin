@@ -362,36 +362,3 @@ Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendS
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
 Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
 Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contactUs');
-
-// --- RUTA DE PRUEBA DEFINITIVA ---
-// Borrar después de usar
-use App\Models\Product; // Asegúrate de que la ruta a tu modelo sea correcta
-
-Route::get('/debug-search', function (Request $request) {
-    // El término exacto que te da problemas
-    $searchTerm = 'halloween'; 
-    
-    // El nombre exacto del producto que no debería aparecer
-    $problematicProductName = 'Vaso Happy Birthday Destellos Dorado *10 Unidades';
-
-    // Construimos la consulta EXACTAMENTE como en tu controlador
-    $query = Product::where('products.state_id', 3)
-        ->applyFilters(['searchPublic' => $searchTerm]); // Aplicamos SÓLO el filtro de búsqueda
-
-    // OBTENEMOS EL SQL CRUDO
-    $sql = $query->toSql();
-    $bindings = $query->getBindings();
-    $fullSql = vsprintf(str_replace('?', "'%s'", $sql), $bindings);
-
-    // Ejecutamos la consulta y buscamos el producto problemático
-    $all_results = $query->get(['products.id', 'products.name']);
-    $problematic_product_found = $all_results->firstWhere('name', $problematicProductName);
-
-    // Mostramos toda la información para el diagnóstico
-    dd([
-        'PASO_1_SQL_GENERADO' => $fullSql,
-        'PASO_2_PRODUCTO_PROBLEMATICO_ENCONTRADO' => $problematic_product_found ? $problematic_product_found->toArray() : 'No, no se encontró con la consulta aislada.',
-        'PASO_3_TOTAL_DE_PRODUCTOS_ENCONTRADOS' => $all_results->count(),
-        'PASO_4_LISTA_COMPLETA_DE_NOMBRES' => $all_results->pluck('name')->toArray(),
-    ]);
-});
