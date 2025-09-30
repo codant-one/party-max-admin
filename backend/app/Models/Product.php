@@ -290,6 +290,10 @@ class Product extends Model
                 }
             });
         }
+    
+        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
+            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+        });
     }        
 
     public function scopeWhereCategory($query, $search) {
