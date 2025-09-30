@@ -275,43 +275,40 @@ class Product extends Model
         });
     }
 
-    public function scopeWhereSearchPublic($query, $search) {
+    public function scopeWhereSearchPublic($query, $search)
+    {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
-    
-        // Normalizar y separar términos (evita múltiples espacios)
+
+        // Normalizar términos
         $terms = preg_split('/\s+/', trim($search));
         $terms = array_filter($terms, function ($term) use ($stopWords) {
             $t = mb_strtolower(trim($term));
             return $t !== '' && !in_array($t, $stopWords, true);
         });
-    
+
         if (empty($terms)) {
             return $query;
         }
-    
-        // Cada término debe cumplirse (AND entre términos).
+
         $query->where(function ($q) use ($terms) {
             foreach ($terms as $term) {
                 $term = mb_strtolower($term);
-    
-                // Para cada término, el match puede ocurrir en products.name
-                // o en la relación categories (name o keywords).
+
                 $q->where(function ($sub) use ($term) {
-                    // match en el nombre del producto
+                    // Coincidencia en el nombre del producto
                     $sub->whereRaw('LOWER(products.name) LIKE ?', ['%' . $term . '%'])
-                        // O match en la relación (correlacionada al producto)
-                        ->orWhere(function ($orRel) use ($term) {
-                            $orRel->whereHas('colors.categories.category', function ($cat) use ($term) {
-                                $cat->whereRaw('LOWER(name) LIKE ?', ['%' . $term . '%'])
-                                    ->orWhereRaw('LOWER(keywords) LIKE ?', ['%' . $term . '%']);
-                            });
+                        // O coincidencia en categorías asociadas
+                        ->orWhereHas('colors.categories.category', function ($cat) use ($term) {
+                            $cat->whereRaw('LOWER(name) LIKE ?', ['%' . $term . '%'])
+                                ->orWhereRaw('LOWER(keywords) LIKE ?', ['%' . $term . '%']);
                         });
                 });
             }
         });
-    
+
         return $query;
     }
+
     
 
     public function scopeWhereCategory($query, $search) {
