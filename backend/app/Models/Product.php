@@ -286,18 +286,18 @@ class Product extends Model
         if (!empty($terms)) {
             $query->where(function ($q) use ($terms) {
                 foreach ($terms as $term) {
-                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                    $q->where(function ($sub) use ($term) {
+                        $sub->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%'])
+                            ->orWhereHas('colors.categories.category', function ($cat) use ($term) {
+                                $cat->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $term . '%'])
+                                    ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $term . '%']);
+                            });
+                    });
                 }
             });
         }
-
-        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->where(function ($q2) use ($search) {
-                $q2->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
-                   ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
-            });
-        });
     }
+    
 
     public function scopeWhereCategory($query, $search) {
         $query->whereHas('colors.categories', function ($q) use ($search) {
