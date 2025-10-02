@@ -460,7 +460,8 @@ const downloadCSV = async () => {
       image_link: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
       link: themeConfig.settings.urlDomain + 'services/' + element.slug,
       brand: 'PARTYMAX',
-      product_type: categoryNames?.join(', ')
+      product_type: categoryNames?.join(', '),
+      condition: 'new'
     }
           
     dataArray.push(data)
