@@ -53,7 +53,8 @@ use App\Http\Controllers\{
     IpController,
     AIAgentController,
     QuoteController,
-    CouponController
+    CouponController,
+    InvoiceController
 };
 
 /*
@@ -120,6 +121,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('ips', IpController::class);
     Route::apiResource('quotes', QuoteController::class);
     Route::apiResource('coupons', CouponController::class);
+    Route::apiResource('invoices', InvoiceController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -280,6 +282,13 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::get('show/{id}', [CouponController::class, 'couponsbyclient']);
         Route::get('show-coupon/{code}', [CouponController::class, 'couponbyCode']);
         Route::post('store', [CouponController::class, 'store']);
+    });
+
+    //Invoices
+    Route::group(['prefix' => 'invoices'], function () {
+        Route::post('delete', [InvoiceController::class, 'delete']);
+        Route::get('pending/all', [InvoiceController::class, 'pending']);
+        Route::get('users/{id}', [InvoiceController::class, 'invoicesByUser']);
     });
 
 });

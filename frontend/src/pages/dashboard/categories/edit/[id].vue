@@ -396,6 +396,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 0)"
                                             @click:clear="avatars[0] = avatarsOld[0]"
+                                            :rules="[requiredValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 1 -->
@@ -408,6 +409,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
+                                            :rules="[requiredValidator]"
                                             :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
@@ -456,6 +458,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 1)"
                                             @click:clear="avatars[1] = avatarsOld[1]"
+                                            :rules="[requiredValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 2 --> 
@@ -467,6 +470,7 @@ const onSubmit = () => {
                                             :items="categories_"
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
+                                            :rules="[requiredValidator]"
                                             autocomplete="off"
                                             :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
@@ -516,6 +520,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 2)"
                                             @click:clear="avatars[2] = avatarsOld[2]"
+                                            :rules="[requiredValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 3 -->
@@ -528,6 +533,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
+                                            :rules="[requiredValidator]"
                                             :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item
@@ -576,6 +582,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 3)"
                                             @click:clear="avatars[3] = avatarsOld[3]"
+                                            :rules="[requiredValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 4 -->
@@ -588,6 +595,7 @@ const onSubmit = () => {
                                             :item-title="item => item.name"
                                             :item-value="item => item.id"
                                             autocomplete="off"
+                                            :rules="[requiredValidator]"
                                             :menu-props="{ maxHeight: '300px' }">
                                             <template v-slot:item="{ props, item }">
                                                 <v-list-item

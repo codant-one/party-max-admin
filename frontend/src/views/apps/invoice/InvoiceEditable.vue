@@ -1,0 +1,494 @@
+<script setup>
+
+import InvoiceProductEdit from "@/components/invoice/InvoiceProductEdit.vue"
+import { usePaymentsStores } from '@/views/dashboard/payments/usePayments'
+import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
+import { themeConfig } from '@themeConfig'
+import { formatNumber } from '@/@core/utils/formatters'
+import { requiredValidator } from '@validators'
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true,
+  },
+  users: {
+    type: Object,
+    required: true,
+  },
+  user: {
+    type: Object,
+    required: true,
+  },
+  total: {
+    type: Number,
+    required: true,
+  },
+  id: {
+    type: Number,
+    required: true,
+  },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: true
+  }
+})
+
+const paymentsStores = usePaymentsStores()
+
+const emit = defineEmits([
+  'push',
+  'remove',
+  'delete',
+  'setting',
+  'data',
+  'edit'
+])
+
+const users = ref(props.users)
+const user = ref(props.user)
+const total = ref(props.total)
+const disabled = ref(props.disabled)
+const payment = ref(null)
+
+const invoice = ref({
+  id: props.id,
+  start: null,
+  end: null,
+  note: null,
+  payment_type: null,
+  reference: null,
+  image: [],
+  payments: props.data
+})
+
+watch(props.data, val => {
+  invoice.value.payments = val
+})
+
+watch(() => props.total, (val) => {
+  total.value = val
+})
+
+const startDateTimePickerConfig = computed(() => {
+
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+
+  const formatToISO = (date) => date.toISOString().split('T')[0];
+
+
+  const config = {
+    dateFormat: 'Y-m-d',
+    position: 'auto right',
+    disable: [
+      {
+        from: formatToISO(tomorrow),
+        to: '2099-12-31' // Una fecha futura lejana para bloquear indefinidamente
+      }
+    ]
+  }
+
+  return config
+})
+
+
+const resolvePrice = (data) => {
+  const priceMapping = {
+    video_id: 'videos',
+    title_optimization_id: 'optimizations',
+    ia_image_id: 'images',
+    redaction_id: 'redactions',
+    task_id: 'tasks'
+  };
+
+  const key = Object.keys(priceMapping).find(k => data[k] !== null);
+
+  if (key) {
+    const priceKey = priceMapping[key];
+    const price = payment.value[priceKey];
+    total.value += price;
+    return price
+  }
+
+  return 0;
+};
+
+const selectUser = async() => {
+
+  invoice.value.payments = []
+  payment.value = []
+  total.value = 0
+
+  const response = await paymentsStores.paymentsByUser(user.value.id)
+  
+  payment.value = response.user_payment
+  invoice.value.payments = response.payments.map(payment => ({
+    ...payment,
+    total: resolvePrice(payment),
+    disabled: true
+  }));
+    
+  if(Number(user.value.id)) {
+    const userInvoice = response.users.filter(element => element.user_id === user.value.id)
+    user.value = userInvoice[0].user
+  } else {
+    user.value = {}
+  }
+
+  invoice.value.user_id = user.value.id
+
+  emit('data', invoice.value)
+}
+
+// 👉 Add item function
+const addItem = () => {
+  emit('push', {
+    id: 0,
+    disabled: false,
+    state_id: 6,
+    video_id: null,
+    title_optimization_id: null,
+    ia_image_id: null,
+    redaction_id: null,
+    task_id: null,
+    description: null,
+    total: 0
+  })
+}
+
+const removeProduct = id => {
+  emit('remove', id)
+}
+
+const deleteProduct = id => {
+  emit('delete', id)
+}
+
+const settingProduct = id => {
+  emit('setting', id)
+}
+
+const inputData = () => {
+  emit('data', invoice.value)
+}
+</script>
+
+<template>
+  <VCard class="pa-10">
+    <VCardText class="d-flex flex-wrap justify-space-between flex-column flex-sm-row print-row bg-var-theme-background rounded">
+      <div class="ma-sm-4">
+        <div class="d-flex align-center mb-6">
+          <!-- 👉 Logo -->
+          <VNodeRenderer
+            :nodes="themeConfig.app.logo"
+            class="me-3"
+          />
+
+          <!-- 👉 Title -->
+          <h6 class="font-weight-bold text-capitalize text-h4">
+            {{ themeConfig.app.title }}
+          </h6>
+        </div>
+
+        <!-- 👉 Address -->
+        <p class="mb-0">
+          Office 149, 450 South Brand Brooklyn
+        </p>
+        <p class="mb-0">
+          San Diego County, CA 91905, USA
+        </p>
+        <p class="mb-0">
+          +1 (123) 456 7891, +44 (876) 543 2198
+        </p>
+      </div>
+
+      <!-- 👉 Right Content -->
+      <div class="mt-4 ma-sm-4 text-right">
+        <!-- 👉 Invoice Id -->
+        <h6 class="d-flex align-center font-weight-medium justify-sm-end text-xl mb-1">
+          <span class="me-2 text-h6">
+            Factura:
+          </span>
+
+          <span>
+            <VTextField
+              v-model="invoice.id"
+              disabled
+              prefix="#"
+              density="compact"
+              style="inline-size: 10.5rem;"
+            />
+          </span>
+        </h6>
+
+        <!-- 👉 Issue Date -->
+        <div class="d-flex align-center justify-sm-end mb-1 text-right">
+          <span class="me-2">
+            Fecha de emisión:
+          </span>
+
+          <span style="inline-size: 10.5rem;">
+            <AppDateTimePicker
+              :key="JSON.stringify(startDateTimePickerConfig)"
+              v-model="invoice.start"
+              density="compact"
+              placeholder="YYYY-MM-DD"
+              :rules="[requiredValidator]"
+              :config="startDateTimePickerConfig"
+              @input="inputData"
+              clearable
+            />
+          </span>
+        </div>
+
+        <!-- 👉 Due Date -->
+        <div class="d-flex align-center justify-sm-end mb-0">
+          <span class="me-2">
+            Fecha de vencimiento:
+          </span>
+
+          <span style="min-inline-size: 10.5rem;">
+            <AppDateTimePicker
+              :key="JSON.stringify(startDateTimePickerConfig)"
+              v-model="invoice.end"
+              density="compact"
+              placeholder="YYYY-MM-DD"
+              :rules="[requiredValidator]"
+              :config="startDateTimePickerConfig"
+              @input="inputData"
+              clearable
+            />
+          </span>
+        </div>
+      </div>
+    </VCardText>
+    <!-- !SECTION -->
+
+    <VCardText class="d-flex flex-wrap justify-space-between flex-column flex-sm-row gap-y-5 gap-4 px-0">
+      <div
+        class="my-sm-4"
+      >
+        <h6 class="text-h6 font-weight-medium mb-6">
+          Facturar a:
+        </h6>
+
+        <VAutocomplete
+          v-model="user.id"
+          :items="users"
+          item-title="full_name"
+          item-value="id"
+          placeholder="Usuarios"
+          class="mb-3"
+          :disabled="disabled"
+          style="width: 300px"
+          :rules="[requiredValidator]"
+          @update:modelValue="selectUser"
+          clearable
+        />
+        <p class="mb-0">
+          <span class="font-weight-bold">Nombre: </span> {{ user.name }} {{ user.last_name }}
+        </p>
+        <p class="mb-0">
+          <span class="font-weight-bold">Organización: </span> {{ user.organization }}
+        </p>
+        <p
+          v-if="user.address"
+          class="mb-0"
+        >
+          <span class="font-weight-bold">Dirección: </span>{{ user.address }}, {{ user.country }}
+        </p>
+        <p class="mb-0">
+          <span class="font-weight-bold">Teléfono: </span> {{ user.phone }}
+        </p>
+        <p class="mb-0">
+          <span class="font-weight-bold">E-mail: </span> {{ user.email }}
+        </p>
+      </div>
+
+      <div class="mt-4 my-sm-4" style="width: 400px">
+        <h6 class="text-h6 font-weight-medium mb-6">
+          Enviar a:
+        </h6>
+        <table class="w-100">
+          <tbody>
+            <tr>
+              <td class="font-weight-bold pb-2">
+                Total:
+              </td>
+              <td class="font-weight-bold pb-2 text-end">
+                $ {{ formatNumber(total) }}
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-2 font-weight-bold">
+                Tipo de pago:
+              </td>
+              <td class="pb-2 w-70 text-end">
+                <VTextField
+                  v-model="invoice.payment_type"
+                  placeholder="Tipo de pago"
+                  label="Tipo de pago"
+                  :rules="[requiredValidator]"
+                  @input="inputData"
+                  clearable
+                />
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-2 font-weight-bold">
+                Referencia:
+              </td>
+              <td class="pb-2 w-70">
+                <VTextField
+                  v-model="invoice.reference"
+                  placeholder="Referencia"
+                  label="Referencia"
+                  :rules="[requiredValidator]"
+                  @input="inputData"
+                  clearable
+                />
+              </td>
+            </tr>
+            <tr>
+              <td class="pb-0 font-weight-bold">
+                Imagen:
+              </td>
+              <td class="pb-0 w-70">
+                <VFileInput
+                  v-model="invoice.image"
+                  accept="image/*,application/pdf"
+                  value=""
+                  prepend-icon="tabler-paperclip"
+                  @change="inputData"
+                  >
+                  <template #selection="{ fileNames }">
+                    <template
+                      v-for="fileName in fileNames"
+                      :key="fileName">
+                      <VChip
+                        label
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        class="me-2">
+                        {{ fileName }}
+                      </VChip>
+                    </template>
+                  </template>
+                </VFileInput>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </VCardText>
+
+    <VDivider />
+
+    <!-- 👉 Add purchased products -->
+    <VCardText class="add-products-form px-0">
+      <div
+        v-for="(product, index) in invoice.payments"
+        :key="product.id"
+        class="my-4"
+      >
+        <InvoiceProductEdit
+          v-if="product.state_id !== 3"
+          :id="index"
+          :data="product"
+          @remove-product="removeProduct"
+          @delete-product="deleteProduct"
+          @setting-product="settingProduct"
+          @edit-product="$emit('edit')"
+        />
+      </div>
+
+      <div class="mt-4">
+        <VBtn @click="addItem">
+          Agregar pago
+        </VBtn>
+      </div>
+    </VCardText>
+
+    <VDivider />
+
+    <!-- 👉 Total Amount -->
+    <VCardText class="d-flex justify-space-between flex-wrap flex-column flex-sm-row px-0">
+      <VSpacer />
+      <div class="my-4">
+        <table class="w-100">
+          <tbody>
+            <tr>
+              <td class="pe-16">
+                Subtotal:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  $ {{ formatNumber(total) }}
+                </h6>
+              </td>
+            </tr>
+            <tr>
+              <td class="pe-16">
+                Descuento:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  $0.00
+                </h6>
+              </td>
+            </tr>
+            <tr>
+              <td class="pe-16">
+                Impuesto:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  $0.00
+                </h6>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <VDivider class="mt-4 mb-3" />
+
+        <table class="w-100">
+          <tbody>
+            <tr>
+              <td class="pe-16">
+                Total:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  ${{ formatNumber(total) }}
+                </h6>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </VCardText>
+
+    <VCardText class="mb-sm-4 px-0">
+      <p class="font-weight-medium text-sm text-high-emphasis mb-2">
+        Nota:
+      </p>
+      <VTextarea
+        v-model="invoice.note"
+        placeholder="Escribe una nota aquí (opcional)..."
+        @input="inputData"
+        :rows="2"
+      />
+    </VCardText>
+  </VCard>
+</template>
+
+<style scoped>
+  .w-70 {
+    width: 70% !important;
+  }
+</style>

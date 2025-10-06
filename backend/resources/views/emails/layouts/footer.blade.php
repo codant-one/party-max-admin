@@ -31,7 +31,7 @@
                                 </td>
                                 <td align="center" valign="top" width="null" style="padding:0;margin:0">
                                     <a href="https://wa.link/wvdoxg" target="_blank">
-                                        <img src="{{ asset('/images/whatsapp.svg') }}" alt="Whatsapp" title="Whatsapp" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
+                                        <img src="{{ asset('/images/whatsapp.png') }}" alt="Whatsapp" title="Whatsapp" width="31" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic">
                                     </a>
                                 </td>
                             </tr>

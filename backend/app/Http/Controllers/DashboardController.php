@@ -73,7 +73,7 @@ class DashboardController extends Controller
 
                     $product->stock_percentage = $stock_percentage;
                     $product->lowest_color_stock = $stock;
-                    $product->sku = $color->sku;
+                    $product->sku = $color->sku ?? null;
 
                     return $product;
                 })

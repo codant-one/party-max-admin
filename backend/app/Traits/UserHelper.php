@@ -8,9 +8,13 @@ use App\Models\Client;
 use App\Models\Supplier;
 use App\Models\ProductLike;
 use App\Models\Product;
+use App\Models\Service;
+use App\Models\OrderDetail;
+use App\Models\ProductColor;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 
@@ -42,6 +46,43 @@ trait UserHelper
 
     public function products() {
         return $this->hasMany(Product::class, 'user_id');
+    }
+
+    public function services() {
+        return $this->hasMany(Service::class, 'user_id');
+    }
+
+    public function productOrderDetails() {
+        return $this->hasManyDeep(
+            OrderDetail::class,
+            [Product::class, ProductColor::class],
+            [
+                'user_id',        // FK en products que apunta a users.id
+                'product_id',     // FK en product_colors que apunta a products.id
+                'product_color_id' // FK en order_details que apunta a product_colors.id
+            ],
+            [
+                'id', // PK en users
+                'id', // PK en products
+                'id'  // PK en product_colors
+            ]
+        );
+    }
+
+    public function serviceOrderDetails()
+    {
+        return $this->hasManyDeep(
+            OrderDetail::class,
+            [Service::class],
+            [
+                'user_id',   // FK en services → users.id
+                'service_id' // FK en order_details → services.id
+            ],
+            [
+                'id', // PK en users
+                'id'  // PK en services
+            ]
+        );
     }
 
     /**** Public methods ****/
@@ -155,6 +196,11 @@ trait UserHelper
                     $query->where('name', 'LIKE', '%' . $term . '%');
                 });
             })
+            ->orWhereHas('supplier', function ($q) use ($term) {
+                $q->where(function ($query) use ($term) {
+                    $query->where('company_name', 'LIKE', '%' . $term . '%');
+                });
+            })
             ->orWhere('name', 'LIKE', '%' . $term . '%')
             ->orWhere('email', 'LIKE', '%' . $term . '%');
         }
@@ -166,6 +212,16 @@ trait UserHelper
     
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
+
+        if ($filters->get('invoices')) {
+            if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
+                $query->where('id', Auth::user()->id);
+            } else {
+                if($filters->get('user_id')) {
+                    $query->where('id', $filters->get('user_id'));
+                }
+            }
+        }
 
         if ($filters->get('search')) {
             $query->whereSearch($filters->get('search'));

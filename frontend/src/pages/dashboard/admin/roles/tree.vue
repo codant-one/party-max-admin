@@ -106,6 +106,20 @@ const closeTreeDialog  = function(){
                             <strong>Ventas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de ventas</code>
                         </li>
                         <li class="n2">
+                            <strong>Facturación</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de facturación</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Facturas</strong>&emsp;/&emsp;<code>Permite la creación de facturas</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Facturas</strong>&emsp;/&emsp;<code>Permite la edición de facturas</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Facturas</strong>&emsp;/&emsp;<code>Permite la eliminación de facturas</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Remisiones</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de remisiones</code>
                         </li>
                         <ul class="tab">
