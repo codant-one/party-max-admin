@@ -159,8 +159,8 @@ async function fetchData() {
       price: element.cupcakes.length > 0 ? element.cupcakes[0].price : element.price,
       originalLink: themeConfig.settings.urlDomain + 'services/' + element.slug,
       categories: element.categories.map(item => item.category.name),// Utiliza map para extraer los nombres de las categorías
-      rating: element.rating,//agregar mas adelante informacion
-      comments: 0,//agregar mas adelante informacion
+      rating: element.rating,
+      comments: element.comments,
       sales: element.sales_price,
       selling_price: element.selling_price,
       likes: element.likes
@@ -460,7 +460,8 @@ const downloadCSV = async () => {
       image_link: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
       link: themeConfig.settings.urlDomain + 'services/' + element.slug,
       brand: 'PARTYMAX',
-      product_type: categoryNames?.join(', ')
+      product_type: categoryNames?.join(', '),
+      condition: 'new'
     }
           
     dataArray.push(data)

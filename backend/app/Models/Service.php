@@ -61,6 +61,11 @@ class Service extends Model
         return $this->hasMany(ServiceList::class, 'order_id','id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'service_id','id');
+    }
+
     public function cupcakes()
     {
         return $this->hasMany(Cupcake::class, 'service_id');
@@ -589,6 +594,27 @@ class Service extends Model
         ]);  
 
         return $service;
+    }
+
+    public static function calculateRating($service_id) {
+
+        $reviews = Review::where('service_id', $service_id)->get();
+        $sum = 0;
+
+        foreach($reviews as $review){
+            $sum = $sum + $review->rating;
+        }
+
+        $service = Service::find($service_id);
+
+        // Evita la división por cero
+        if (count($reviews) > 0) {
+            $service->rating = $sum / count($reviews);
+        } else {
+            $service->rating = null; 
+        }
+        
+        $service->update();
     }
 
     public static function deleteServices($ids) {

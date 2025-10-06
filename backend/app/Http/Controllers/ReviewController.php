@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Review;
 use App\Models\Product;
+use App\Models\Service;
 use App\Models\OrderDetail;
 
 class ReviewController extends Controller
@@ -36,18 +37,30 @@ class ReviewController extends Controller
 
             $review = Review::createReview($request);
 
-            Product::calculateRating($request->product_id);
+            if ($request->product_id) {                
+                Product::calculateRating($request->product_id);
 
-            $details = 
-                OrderDetail::with(['product_color.product'])
-                        ->where('order_id', $request->order_id)
-                        ->whereHas('product_color.product', function ($query) use ($request) {
-                            $query->where('id', $request->product_id);
-                        })
-                        ->first();
-                        
-            if ($details) {
-                $details->update(['is_rating' => 1]);
+                $details = OrderDetail::with(['product_color.product'])
+                    ->where('order_id', $request->order_id)
+                    ->whereHas('product_color.product', function ($query) use ($request) {
+                        $query->where('id', $request->product_id);
+                    })
+                    ->first();
+
+                if ($details) {
+                    $details->update(['is_rating' => 1]);
+                }
+            }
+
+            if ($request->service_id) {
+                Service::calculateRating($request->service_id);
+
+                $details = OrderDetail::where('order_id', $request->order_id)
+                    ->where('service_id', $request->service_id)
+                    ->first();
+                if ($details) {
+                    $details->update(['is_rating' => 1]);
+                }
             }
             
             return response()->json([
@@ -99,18 +112,31 @@ class ReviewController extends Controller
                 ], 404);
 
             $review = $review->updateReview($request, $review);
-            Product::calculateRating($request->product_id);
+            
+            if ($request->has('product_id') && $request->product_id) {
+                Product::calculateRating($request->product_id);
 
-            $details = 
-                OrderDetail::with(['product_color.product'])
-                        ->where('order_id', $request->order_id)
-                        ->whereHas('product_color.product', function ($query) use ($request) {
-                            $query->where('id', $request->product_id);
-                        })
-                        ->first();
+                $details = OrderDetail::with(['product_color.product'])
+                    ->where('order_id', $request->order_id)
+                    ->whereHas('product_color.product', function ($query) use ($request) {
+                        $query->where('id', $request->product_id);
+                    })
+                    ->first();
 
-            if ($details) {
-                $details->update(['is_rating' => 1]);
+                if ($details) {
+                    $details->update(['is_rating' => 1]);
+                }
+            }
+
+            if ($request->has('service_id') && $request->service_id) {
+                Service::calculateRating($request->service_id);
+
+                $details = OrderDetail::where('order_id', $request->order_id)
+                    ->where('service_id', $request->service_id)
+                    ->first();
+                if ($details) {
+                    $details->update(['is_rating' => 1]);
+                }
             }
 
             return response()->json([
@@ -144,17 +170,38 @@ class ReviewController extends Controller
     {
         try {
 
-            $review = Review::find($request->ids);
+            $reviews = Review::find($request->ids);
 
-            if (!$review)
+            if (!$reviews)
                 return response()->json([
                     'sucess' => false,
                     'message' => 'Not found',
                     'message' => 'Review no encontrado'
                 ], 404);
 
+            $productIds = [];
+            $serviceIds = [];
+
+            foreach ($reviews as $review) {
+                if ($review->product_id) {
+                    $productIds[] = $review->product_id;
+                }
+                if ($review->service_id) {
+                    $serviceIds[] = $review->service_id;
+                }
+            }
+
             Review::deleteReviews($request->ids);
-            Product::calculateRating($request->product_id);
+
+            // Actualiza el rating de cada producto afectado
+            foreach (array_unique($productIds) as $productId) {
+                Product::calculateRating($productId);
+            }
+
+            // Actualiza el rating de cada servicio afectado
+            foreach (array_unique($serviceIds) as $serviceId) {
+                Service::calculateRating($serviceId);
+            }
             
             return response()->json([
                 'success' => true
@@ -175,17 +222,23 @@ class ReviewController extends Controller
         try {
             
             $product = Product::find($id);
+            $service = Service::find($id); // <-- busca el servicio por ID
 
-            $review = Review::where([
-                ['product_id', $id],
-                ['client_id', $request->client_id]
-            ])->first();
+            $review = Review::where(function ($query) use ($id, $request) {
+                $query->where('client_id', $request->client_id)
+                    ->where(function ($q) use ($id) {
+                        $q->where('product_id', $id)
+                            ->orWhere('service_id', $id);
+                    });
+            })->first();
+
 
             return response()->json([
                 'success' => true,
                 'data' => [ 
                     'review' => $review,
-                    'product' => $product
+                    'product' => $product,
+                    'service' => $service
                 ]
             ], 200);
 

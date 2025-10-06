@@ -23,13 +23,20 @@ class Review extends Model
 
      /**** Public methods ****/
     public static function createReview($request) {
-        $review = self::create([
-            'product_id' => $request->product_id,
+        $data = [
             'client_id' => $request->client_id,
             'rating' => $request->rating,
             'date' => now(),
             'comments' => $request->comments === 'null' ? null : $request->comments
-        ]);
+        ];
+
+        if ($request->has('product_id')) {
+            $data['product_id'] = $request->product_id;
+        } elseif ($request->has('service_id')) {
+            $data['service_id'] = $request->service_id;
+        }
+
+        $review = self::create($data);
 
         return $review;
     }

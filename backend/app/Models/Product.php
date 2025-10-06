@@ -276,15 +276,25 @@ class Product extends Model
     }
 
     public function scopeWhereSearchPublic($query, $search) {
-        foreach (explode(' ', $search) as $index => $term) {
-            $query->{$index === 0 ? 'where' : 'orWhere'}(function ($q) use ($term) {
-                $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%'])
-                  ->orWhereHas('colors.categories.category', function ($q2) use ($term) {
-                      $q2->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $term . '%']);
-                  });
+        $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
+        $terms = explode(' ', $search);
+    
+        $terms = array_filter($terms, function ($term) use ($stopWords) {
+            return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
+        });
+    
+        if (!empty($terms)) {
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                }
             });
         }
-    }
+    
+        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
+            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+        });
+    }        
 
     public function scopeWhereCategory($query, $search) {
         $query->whereHas('colors.categories', function ($q) use ($search) {
