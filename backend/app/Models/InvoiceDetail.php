@@ -9,8 +9,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
-class PaymentDetail extends Model
+class InvoiceDetail extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $fillable = ['invoice_id',
+        'order_id',
+        'product_id',    
+        'service_id',
+        'price',
+        'quantity',
+        'total'
+    ];
 
 }
