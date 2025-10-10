@@ -5,7 +5,7 @@ import Pending from './pending.vue'
 import Finished from './finished.vue'
 import Toaster from "@/components/common/Toaster.vue";
 
-const currentTab = ref(0)
+const currentTab = ref(1)
 
 </script>
 

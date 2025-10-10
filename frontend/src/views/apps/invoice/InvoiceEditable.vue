@@ -1,7 +1,7 @@
 <script setup>
 
 import InvoiceProductEdit from "@/components/invoice/InvoiceProductEdit.vue"
-import { usePaymentsStores } from '@/views/dashboard/payments/usePayments'
+import { useInvoicesStores } from '@/stores/useInvoices'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { formatNumber } from '@/@core/utils/formatters'
@@ -35,7 +35,7 @@ const props = defineProps({
   }
 })
 
-const paymentsStores = usePaymentsStores()
+const invoicesStores = useInvoicesStores()
 
 const emit = defineEmits([
   'push',
@@ -85,7 +85,7 @@ const startDateTimePickerConfig = computed(() => {
     position: 'auto right',
     disable: [
       {
-        from: formatToISO(tomorrow),
+        from: '2099-12-30', // Una fecha futura lejana para bloquear indefinidamente //formatToISO(tomorrow),
         to: '2099-12-31' // Una fecha futura lejana para bloquear indefinidamente
       }
     ]
@@ -119,28 +119,32 @@ const resolvePrice = (data) => {
 const selectUser = async() => {
 
   invoice.value.payments = []
-  payment.value = []
   total.value = 0
 
-  const response = await paymentsStores.paymentsByUser(user.value.id)
+  const response = await invoicesStores.invoicesByUser(user.value.id)
   
-  payment.value = response.user_payment
-  invoice.value.payments = response.payments.map(payment => ({
-    ...payment,
-    total: resolvePrice(payment),
-    disabled: true
-  }));
+  if(response.success) {
+    invoice.value.payments = response.data.payments.map(payment => ({
+      ...payment,
+      disabled: true
+    }));
     
-  if(Number(user.value.id)) {
-    const userInvoice = response.users.filter(element => element.user_id === user.value.id)
-    user.value = userInvoice[0].user
-  } else {
-    user.value = {}
+    // Actualizar datos del usuario
+    user.value = {
+      ...response.data.user,
+      full_name: `${response.data.user.name} ${response.data.user.last_name}`
+    }
+
+    // Calcular total
+    total.value = 0
+    invoice.value.payments.forEach(element => {
+      if(element.state_id !== 3)
+        total.value += Number(element.total)
+    });
+
+    invoice.value.user_id = user.value.id
+    emit('data', invoice.value)
   }
-
-  invoice.value.user_id = user.value.id
-
-  emit('data', invoice.value)
 }
 
 // 👉 Add item function
@@ -183,7 +187,7 @@ const inputData = () => {
         <div class="d-flex align-center mb-6">
           <!-- 👉 Logo -->
           <VNodeRenderer
-            :nodes="themeConfig.app.logo"
+            :nodes="themeConfig.app.logoFull"
             class="me-3"
           />
 
@@ -273,7 +277,7 @@ const inputData = () => {
       >
         <h6 class="text-h6 font-weight-medium mb-6">
           Facturar a:
-        </h6>
+        </h6> 
 
         <VAutocomplete
           v-model="user.id"
@@ -292,7 +296,7 @@ const inputData = () => {
           <span class="font-weight-bold">Nombre: </span> {{ user.name }} {{ user.last_name }}
         </p>
         <p class="mb-0">
-          <span class="font-weight-bold">Organización: </span> {{ user.organization }}
+          <span class="font-weight-bold">Organización: </span> {{ user.supplier.company_name }}
         </p>
         <p
           v-if="user.address"
@@ -301,7 +305,7 @@ const inputData = () => {
           <span class="font-weight-bold">Dirección: </span>{{ user.address }}, {{ user.country }}
         </p>
         <p class="mb-0">
-          <span class="font-weight-bold">Teléfono: </span> {{ user.phone }}
+          <span class="font-weight-bold">Teléfono: </span> {{ user.supplier.phone_contact }}
         </p>
         <p class="mb-0">
           <span class="font-weight-bold">E-mail: </span> {{ user.email }}
@@ -406,11 +410,11 @@ const inputData = () => {
         />
       </div>
 
-      <div class="mt-4">
+      <!-- <div class="mt-4">
         <VBtn @click="addItem">
           Agregar pago
         </VBtn>
-      </div>
+      </div> -->
     </VCardText>
 
     <VDivider />

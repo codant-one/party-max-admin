@@ -2,12 +2,11 @@
 
 import { integerValidator, requiredValidator } from '@/@core/utils/validators'
 import { useInvoicesStores } from '@/stores/useInvoices'
-import { useBillingsStores } from '@/views/dashboard/billings/useBillings'
 import InvoiceEditable from '@/views/apps/invoice/InvoiceEditable.vue'
 import router from '@/router'
 
 const invoicesStores = useInvoicesStores()
-const billingsStores = useBillingsStores()
+//const billingsStores = useBillingsStores()
 const route = useRoute()
 
 const emitter = inject("emitter")
@@ -44,22 +43,29 @@ async function fetchData() {
       const response = await invoicesStores.invoicesByUser(Number(route.params.id))
       
       console.log('response', response)
-      /*last_record.value = response.last_record + 1
-      payment.value = response.user_payment
-
-      invoiceData.value = response.payments.map(payment => ({
-        ...payment,
-        total: resolvePrice(payment),
-        disabled: true
-      }));
       
-      users.value = response.users.map(element => ({
-        ...element.user,
-        full_name: `${element.user.name} ${element.user.last_name}`
-      }));
+      if(response.success) {
+        last_record.value = response.data.last_record + 1
+        
+        // Procesar los productos/servicios para la factura
+        invoiceData.value = response.data.payments.map(payment => ({
+          ...payment,
+          disabled: true
+        }));
+        
+        // Configurar el usuario
+        user.value = {
+          ...response.data.user,
+          full_name: `${response.data.user.name} ${response.data.user.last_name}`
+        }
 
-      const userInvoice = response.users.filter(element => element.user_id === Number(route.params.id))
-      user.value = userInvoice[0].user*/
+        // Calcular el total inicial
+        total.value = 0
+        invoiceData.value.forEach(element => {
+          if(element.state_id !== 3)
+            total.value += Number(element.total)
+        });
+      }
 
       isRequestOngoing.value = false
     }
@@ -114,7 +120,6 @@ const deleteProduct = id => {
 
 const removeProduct = id => {
   seeDialogRemove.value = true
-  invoiceData.value[id].reason = null
   selectedInvoice.value = { ...invoiceData.value[id] }
 }
 
@@ -140,7 +145,6 @@ const onSubmitRemove = () => {
 
 const settingProduct = id => {
   seeDialogSetting.value = true
-  invoiceData.value[id].reason = null
   selectedInvoice.value = { ...invoiceData.value[id] }
 }
 
@@ -181,11 +185,13 @@ const onSubmit = () => {
       formData.append('total', total.value)
       formData.append('user_id', Number(route.params.id))
 
-      invoice.value.payments.forEach((element) => {
-        formData.append(`payments[]`, JSON.stringify(element));
-      });
+      invoiceData.value
+        .filter(element => element.state_id !== 3)
+        .forEach((element) => {
+          formData.append(`payments[]`, JSON.stringify(element));
+        });
 
-      billingsStores.addBilling(formData)
+      invoicesStores.addInvoice(formData)
         .then((res) => {
           let data = {
             message: 'Factura creada con éxito',
@@ -329,14 +335,7 @@ const onSubmit = () => {
               :rules="[requiredValidator, integerValidator]"
             />      
           </VCardText>
-          <VCardText>
-            <VTextarea
-              v-model="selectedInvoice.reason"
-              label="RAZÓN DEL AJUSTE"
-              rows="2"
-              :rules="[requiredValidator]"
-            />      
-          </VCardText>
+          
           <VCardText class="d-flex justify-end gap-3 flex-wrap">
             <VBtn
               color="secondary"
@@ -373,14 +372,7 @@ const onSubmit = () => {
             Esta seguro que desea eliminar el pago <strong>{{ selectedInvoice.description }}</strong>?
           </VCardText>
 
-          <VCardText>
-            <VTextarea
-              v-model="selectedInvoice.reason"
-              label="RAZÓN DE LA ELIMINACIÓN"
-              rows="2"
-              :rules="[requiredValidator]"
-            />      
-          </VCardText>
+        
 
           <VCardText class="d-flex justify-end gap-3 flex-wrap">
             <VBtn 
