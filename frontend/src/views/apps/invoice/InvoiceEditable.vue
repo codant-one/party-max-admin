@@ -28,6 +28,25 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  start: {
+    type: String,
+    required: false,
+    default: ""
+  },
+  end: {
+    type: String,
+    required: false,
+    default: ""
+  },
+  note: {
+    type: String,
+    required: false,
+    default: ""
+  },
+  typeInvoice: {
+    type: String,
+    required: true
+  },
   disabled: {
     type: Boolean,
     required: false,
@@ -50,13 +69,14 @@ const users = ref(props.users)
 const user = ref(props.user)
 const total = ref(props.total)
 const disabled = ref(props.disabled)
+const typeInvoice = ref(props.typeInvoice)
 const payment = ref(null)
 
 const invoice = ref({
   id: props.id,
-  start: null,
-  end: null,
-  note: null,
+  start: props.start,
+  end: props.end,
+  note: props.note,
   payment_type: null,
   reference: null,
   image: [],
@@ -244,6 +264,7 @@ const inputData = () => {
               :config="startDateTimePickerConfig"
               @input="inputData"
               clearable
+              :disabled="typeInvoice !== '0'"
             />
           </span>
         </div>
@@ -264,6 +285,7 @@ const inputData = () => {
               :config="startDateTimePickerConfig"
               @input="inputData"
               clearable
+              :disabled="typeInvoice !== '0'"
             />
           </span>
         </div>
@@ -312,9 +334,11 @@ const inputData = () => {
         </p>
       </div>
 
-      <div class="mt-4 my-sm-4" style="width: 400px">
+      <div 
+        v-if="typeInvoice == '1'"
+        class="mt-4 my-sm-4" style="width: 400px">
         <h6 class="text-h6 font-weight-medium mb-6">
-          Enviar a:
+          Datos del pago:
         </h6>
         <table class="w-100">
           <tbody>
@@ -341,6 +365,7 @@ const inputData = () => {
                 />
               </td>
             </tr>
+            
             <tr>
               <td class="pb-2 font-weight-bold">
                 Referencia:
@@ -403,6 +428,7 @@ const inputData = () => {
           v-if="product.state_id !== 3"
           :id="index"
           :data="product"
+          :typeInvoice="typeInvoice"
           @remove-product="removeProduct"
           @delete-product="deleteProduct"
           @setting-product="settingProduct"
@@ -486,6 +512,7 @@ const inputData = () => {
         placeholder="Escribe una nota aquí (opcional)..."
         @input="inputData"
         :rows="2"
+        :disabled="typeInvoice !== '0'"
       />
     </VCardText>
   </VCard>

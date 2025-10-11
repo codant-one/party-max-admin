@@ -32,6 +32,51 @@ export const useInvoicesStores = defineStore('invoices', {
                 })
             
         },
+        fetchByPay(params) {
+            this.setLoading(true)
+            
+            return Invoices.byPay(params)
+                .then((response) => {
+                    this.invoices = response.data.data.invoices.data
+                    this.last_page = response.data.data.invoices.last_page
+                    this.invoicesTotalCount = response.data.data.invoicesTotalCount
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
+        fetchPaid(params) {
+            this.setLoading(true)
+            
+            return Invoices.paid(params)
+                .then((response) => {
+                    this.invoices = response.data.data.invoices.data
+                    this.last_page = response.data.data.invoices.last_page
+                    this.invoicesTotalCount = response.data.data.invoicesTotalCount
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
+        fetchAll(params) {
+            this.setLoading(true)
+            
+            return Invoices.all(params)
+                .then((response) => {
+                    this.invoices = response.data.data.invoices.data
+                    this.last_page = response.data.data.invoices.last_page
+                    this.invoicesTotalCount = response.data.data.invoicesTotalCount
+                })
+                .catch(error => console.log(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+            
+        },
         fetchInvoices(params) {
             this.setLoading(true)
             
@@ -104,10 +149,10 @@ export const useInvoicesStores = defineStore('invoices', {
                     this.setLoading(false)
                 })  
         },
-        invoicesByUser(id) {
+        invoicesByUser(id, type=0, invoice_id=null) {
             this.setLoading(true)
             
-            return Invoices.invoicesByUser(id)
+            return Invoices.invoicesByUser(id, type, invoice_id)
                 .then((response) => {
                     return Promise.resolve(response.data)
                 })
@@ -116,5 +161,20 @@ export const useInvoicesStores = defineStore('invoices', {
                     this.setLoading(false)
                 })
         },
+        updatePayment(data) {
+            this.setLoading(true)
+            
+            return Invoices.updatePayment(data)
+                .then((response) => {
+                    let pos = this.invoices.findIndex((item) => item.id === response.data.data.invoice.id)
+                    this.invoices[pos] = response.data.data.invoice
+                    return Promise.resolve(response)
+                })
+                .catch(error => Promise.reject(error))
+                .finally(() => {
+                    this.setLoading(false)
+                })
+         
+        }
     }
 })

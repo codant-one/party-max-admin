@@ -2,10 +2,11 @@
 
 import All from './all.vue'
 import Pending from './pending.vue'
-import Finished from './finished.vue'
+import ByPay from './bypay.vue'
+import Paid from './paid.vue'
 import Toaster from "@/components/common/Toaster.vue";
 
-const currentTab = ref(1)
+const currentTab = ref(0)
 
 </script>
 
@@ -17,19 +18,26 @@ const currentTab = ref(1)
         grow
         stacked
     >
-      <VTab>
+      <!-- <VTab>
           <VIcon
               icon="mdi-file-document-multiple-outline"
               class="mb-2"
           />
           <span>Todas</span>
-      </VTab>
+      </VTab> -->
       <VTab>
           <VIcon
               icon="mdi-file-document-alert"
               class="mb-2"
           />
           <span>Pendientes</span>
+      </VTab>
+      <VTab>
+          <VIcon
+              icon="mdi-file-document-check"
+              class="mb-2"
+          />
+          <span>Por pagar</span>
       </VTab>
       <VTab>
           <VIcon
@@ -45,9 +53,10 @@ const currentTab = ref(1)
         v-model="currentTab"
         class="mt-5"
     >
-        <VWindowItem><All /></VWindowItem>
+        <!-- <VWindowItem><All /></VWindowItem> -->
         <VWindowItem><Pending /></VWindowItem>
-        <VWindowItem><Finished /></VWindowItem>
+        <VWindowItem><ByPay /></VWindowItem>
+        <VWindowItem><Paid /></VWindowItem>
     </VWindow>
   </section>
 </template>

@@ -27,28 +27,34 @@ const user = ref(null)
 const invoice = ref(null)
 const total = ref(0)
 const last_record = ref(0)
+const start = ref()
+const end = ref()
+const note = ref()
+const typeInvoice = ref(1)
 const isRequestOngoing = ref(true)
 
 const seeDialogRemove = ref(false)
 const seeDialogSetting = ref(false)
 const selectedInvoice = ref({})
-const typeInvoice = ref('0')
 
 watchEffect(fetchData)
 
 async function fetchData() {
-
-    typeInvoice.value = "0"
+    typeInvoice.value = '1'
 
     if(Number(route.params.id)) { 
 
       isRequestOngoing.value = true
-      const response = await invoicesStores.invoicesByUser(Number(route.params.id))
+      const response = await invoicesStores.invoicesByUser(Number(route.params.id), Number(1), route.query.invoice)
       
       console.log('response', response)
       
       if(response.success) {
-        last_record.value = response.data.last_record + 1
+        last_record.value = response.data.invoice.invoice_id
+        start.value = response.data.invoice.start
+        end.value = response.data.invoice.end
+        note.value = response.data.invoice.note
+        
         
         // Procesar los productos/servicios para la factura
         invoiceData.value = response.data.payments.map(payment => ({
@@ -179,25 +185,16 @@ const onSubmit = () => {
 
       let formData = new FormData()
 
-      formData.append('start', invoice.value.start)
-      formData.append('end', invoice.value.end)
       formData.append('payment_type', invoice.value.payment_type)
       formData.append('reference', invoice.value.reference)
       formData.append('image', invoice.value.image[0])
-      formData.append('note', invoice.value.note)
-      formData.append('total', total.value)
-      formData.append('user_id', Number(route.params.id))
+      formData.append('id', Number(route.query.invoice))
 
-      invoiceData.value
-        .filter(element => element.state_id !== 3)
-        .forEach((element) => {
-          formData.append(`payments[]`, JSON.stringify(element));
-        });
 
-      invoicesStores.addInvoice(formData)
+      invoicesStores.updatePayment({id: Number(route.query.invoice), data: formData})
         .then((res) => {
           let data = {
-            message: 'Factura creada con éxito',
+            message: 'Factura actualizada con éxito',
             error: false
           }
 
@@ -266,6 +263,9 @@ const onSubmit = () => {
           :user="user"
           :total="total"
           :id="last_record"
+          :start="start"
+          :end="end"
+          :note="note"
           :typeInvoice="typeInvoice"
           @push="addProduct"
           @remove="removeProduct"
@@ -290,7 +290,7 @@ const onSubmit = () => {
               class="mb-2"
               type="submit"
             >
-              Generar
+              Registrar pago
             </VBtn>
 
             <!-- 👉 Preview -->

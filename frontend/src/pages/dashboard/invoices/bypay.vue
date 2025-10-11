@@ -54,7 +54,7 @@ watchEffect(fetchData)
 async function fetchData() {
   let params = {
     search: searchQuery.value,
-    orderByField: 'users.id',
+    orderByField: 'invoices.id',
     orderBy: 'desc',
     status: 6,
     limit: rowPerPage.value,
@@ -64,7 +64,7 @@ async function fetchData() {
   }
 
   isRequestOngoing.value = true
-  await invoicesStores.fetchAll(params)
+  await invoicesStores.fetchByPay(params)
   invoices.value = invoicesStores.getInvoices
   totalPages.value = invoicesStores.last_page
   totalInvoices.value = invoicesStores.invoicesTotalCount
@@ -144,7 +144,7 @@ const statusMap = (code) => {
 }
 
 const addInvoiceByUser = invoiceData => {
-  router.push({ name : 'dashboard-invoices-add-id', params: { id: invoiceData.id } })
+  router.push({ name : 'dashboard-invoices-pay-id', params: { id: invoiceData.user.id }, query: {invoice: invoiceData.id } })
 }
 
 </script>
@@ -163,7 +163,7 @@ const addInvoiceByUser = invoiceData => {
       </VCard>
     </VDialog>
 
-    <VCard title="Facturas (todas)">
+    <VCard title="Facturas (sin pago)">
       <VCardText class="d-flex align-center flex-wrap gap-4">
         <div class="d-flex align-center">
           <span class="text-no-wrap me-3">Ver:</span>
@@ -192,6 +192,7 @@ const addInvoiceByUser = invoiceData => {
         <thead>
           <tr>
             <th scope="col"> ESTATUS </th>
+            <th scope="col"> FACTURA # </th>
             <th scope="col"> EMPRESA </th>
             <th scope="col"> CONTACTO </th>
             <th scope="col"> PRODUCTOS </th>
@@ -213,26 +214,31 @@ const addInvoiceByUser = invoiceData => {
                 <p class="mb-0"> Total: {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}</p>
               </VTooltip>
             </td>
+            <td class="text-wrap" >
+              <div class="d-flex flex-column">
+                <span class="font-weight-medium">{{ invoice.invoice_id }}</span>
+              </div>
+            </td>
             <td class="text-wrap">
               <div class="d-flex align-center gap-x-3">
-                <VAvatar :variant="invoice.avatar ? 'outlined' : 'tonal'" size="38">
-                  <VImg v-if="invoice.avatar" style="border-radius: 50%;" :src="themeConfig.settings.urlStorage + invoice.avatar" />
-                  <span v-else>{{ avatarText(invoice.name) }}</span>
+                <VAvatar :variant="invoice.user.avatar ? 'outlined' : 'tonal'" size="38">
+                  <VImg v-if="invoice.user.avatar" style="border-radius: 50%;" :src="themeConfig.settings.urlStorage + invoice.user.avatar" />
+                  <span v-else>{{ avatarText(invoice.user.name) }}</span>
                 </VAvatar>
                 <div class="d-flex flex-column">
-                  <span class="font-weight-medium cursor-pointer text-primary" @click="seeSupplier(invoice.supplier)">
-                    {{ invoice.supplier?.company_name }}
+                  <span class="font-weight-medium cursor-pointer text-primary" @click="seeSupplier(invoice.user.supplier)">
+                    {{ invoice.user.supplier?.company_name }}
                   </span>
-                  <span class="text-sm text-disabled" v-if="invoice.supplier?.document">
-                    {{  invoice.supplier.document?.type.code }}: {{  invoice.supplier.document?.main_document }}
+                  <span class="text-sm text-disabled" v-if="invoice.user.supplier?.document">
+                    {{  invoice.user.supplier.document?.type.code }}: {{  invoice.user.supplier.document?.main_document }}
                   </span>
                 </div>
               </div>
             </td>
             <td class="text-wrap">
               <div class="d-flex flex-column">
-                <span class="font-weight-medium">{{ invoice.name }} {{ invoice.last_name ?? '' }}</span>
-                <span class="text-sm text-disabled">{{ invoice.email }}</span>
+                <span class="font-weight-medium">{{ invoice.user.name }} {{ invoice.user.last_name ?? '' }}</span>
+                <span class="text-sm text-disabled">{{ invoice.user.email }}</span>
               </div>
             </td>
             <td class="text-wrap" style="width: 150px;">

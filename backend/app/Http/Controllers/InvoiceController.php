@@ -143,6 +143,258 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     */
+    public function bypay(Request $request): JsonResponse
+    {
+        try {
+
+            $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
+        
+            $query = Invoice::with([
+                'user.supplier.document.type',
+                'orders'
+            ])
+            ->whereHas('user.roles', fn($q) => $q->where('name', 'Proveedor'))
+            ->whereNull('payment_date')
+            ->applyFilters(
+                $request->only([
+                    'search',
+                    'orderByField',
+                    'orderBy',
+                    'invoices',
+                    'user_id'
+                ]))
+                ->withCount([
+                    'orders as products_invoice_bypay_count' => fn($q) =>
+                        $q->whereNull('payment_date')
+                            ->whereNotNull('product_color_id'),
+                    'orders as services_invoice_bypay_count' => fn($q) =>
+                        $q->whereNull('payment_date')
+                            ->whereNotNull('service_id')
+                ])
+                ->withSum(['orders as products_bypay_total' => fn($q) =>
+                    $q->whereNull('payment_date')
+                        ->whereNotNull('product_color_id')
+                ], 'total')
+                ->withSum(['orders as services_bypay_total' => fn($q) =>
+                    $q->whereNull('payment_date')
+                        ->whereNotNull('service_id')
+                ], 'total')
+                ->addSelect(['unpaid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                    ->whereColumn('id', 'invoices.id')
+                    ->whereNull('payment_date')
+                ])
+            ->withTrashed()
+            ->havingRaw('unpaid_invoices_count > 0');               
+            
+            $count = $query->count();
+            $invoices = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoices' => $invoices,
+                    'invoicesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function paid(Request $request): JsonResponse
+    {
+        try {
+
+            $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
+        
+            $query = Invoice::with([
+                    'user.supplier.document.type',
+                    'orders'
+                ])
+                ->whereHas('user.roles', fn($q) => $q->where('name', 'Proveedor'))
+                ->whereNotNull('payment_date')
+                ->applyFilters(
+                    $request->only([
+                        'search',
+                        'orderByField',
+                        'orderBy',
+                        'invoices',
+                        'user_id'
+                    ]))
+                    ->withCount([
+                        'orders as products_invoice_paid_count' => fn($q) =>
+                            $q->whereNotNull('payment_date')
+                                ->whereNotNull('product_color_id'),
+                        'orders as services_invoice_paid_count' => fn($q) =>
+                            $q->whereNotNull('payment_date')
+                                ->whereNotNull('service_id')
+                    ])
+                    ->withSum(['orders as products_paid_total' => fn($q) =>
+                        $q->whereNotNull('payment_date')
+                            ->whereNotNull('product_color_id')
+                    ], 'total')
+                    ->withSum(['orders as services_paid_total' => fn($q) =>
+                        $q->whereNotNull('payment_date')
+                            ->whereNotNull('service_id')
+                    ], 'total')
+                // Invoices counts by payment state
+                ->addSelect(['paid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                    ->whereColumn('id', 'invoices.id')
+                    ->whereNotNull('payment_date')
+                ])
+            ->withTrashed()
+            ->havingRaw('paid_invoices_count > 0');               
+            
+            $count = $query->count();
+            $invoices = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoices' => $invoices,
+                    'invoicesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource from All Invoices Status.
+     */
+    public function all(Request $request): JsonResponse
+    {
+        try {
+
+            $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
+        
+            $query = User::with([
+                'supplier.document.type',
+            ])
+            ->whereHas('roles', fn($q) => $q->where('name', 'Proveedor'))
+            ->applyFilters(
+                $request->only([
+                    'search',
+                    'orderByField',
+                    'orderBy',
+                    'invoices',
+                    'user_id'
+                ]))
+            // Pending (is_invoice = 0) counts
+            ->withCount([
+                
+                'products as products_count' => fn($q) =>
+                    $q->where('state_id', 3)
+                      ->whereHas('colors.orders', fn($q2) =>
+                        $q2->where('is_invoice', 0)
+                           ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                    ),
+                'services as services_count' => fn($q) =>
+                    $q->where('state_id', 3)
+                      ->whereHas('orderDetails', fn($q2) =>
+                        $q2->where('is_invoice', 0)
+                           ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                    ),
+                'productOrderDetails as products_invoice_bypay_count' => fn($q) =>
+                    $q->where('is_invoice', 1)
+                        ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                        ->whereHas('invoice', fn($pq) => $pq->whereNull('payment_date')),
+                'serviceOrderDetails as services_invoice_bypay_count' => fn($q) =>
+                    $q->where('is_invoice', 1)
+                        ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                        ->whereHas('invoice', fn($pq) => $pq->whereNull('payment_date')),
+                'productOrderDetails as products_invoice_paid_count' => fn($q) =>
+                    $q->where('is_invoice', 1)
+                        ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                        ->whereHas('invoice', fn($pq) => $pq->whereNotNull('payment_date')),
+                'serviceOrderDetails as services_invoice_paid_count' => fn($q) =>
+                    $q->where('is_invoice', 1)
+                        ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                        ->whereHas('invoice', fn($pq) => $pq->whereNotNull('payment_date')),
+            ])
+            ->withSum(['productOrderDetails as products_total' => fn($q) =>
+                $q->where('is_invoice', 0)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('product_color.product', fn($pq) => $pq->where('state_id', 3))
+            ], 'total')
+            ->withSum(['serviceOrderDetails as services_total' => fn($q) =>
+                $q->where('is_invoice', 0)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('service', fn($sq) => $sq->where('state_id', 3))
+            ], 'total')
+            ->withSum(['productOrderDetails as products_bypay_total' => fn($q) =>
+                $q->where('is_invoice', 1)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('product_color.product', fn($pq) => $pq->where('state_id', 3))
+                ->whereHas('invoice', fn($pq) => $pq->whereNull('payment_date'))
+            ], 'total')
+            ->withSum(['serviceOrderDetails as services_bypay_total' => fn($q) =>
+                $q->where('is_invoice', 1)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('service', fn($sq) => $sq->where('state_id', 3))
+                ->whereHas('invoice', fn($pq) => $pq->whereNull('payment_date'))
+            ], 'total')
+            ->withSum(['productOrderDetails as products_paid_total' => fn($q) =>
+                $q->where('is_invoice', 1)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('product_color.product', fn($pq) => $pq->where('state_id', 3))
+                ->whereHas('invoice', fn($pq) => $pq->whereNotNull('payment_date'))
+            ], 'total')
+            ->withSum(['serviceOrderDetails as services_paid_total' => fn($q) =>
+                $q->where('is_invoice', 1)
+                ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                ->whereHas('service', fn($sq) => $sq->where('state_id', 3))
+                ->whereHas('invoice', fn($pq) => $pq->whereNotNull('payment_date'))
+            ], 'total')
+            // Invoices counts by payment state
+            ->addSelect(['unpaid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                ->whereColumn('user_id', 'users.id')
+                ->whereNull('payment_date')
+            ])
+            ->addSelect(['paid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                ->whereColumn('user_id', 'users.id')
+                ->whereNotNull('payment_date')
+            ])
+            ->withTrashed()
+            ->havingRaw('products_count > 0 OR services_count > 0 OR unpaid_invoices_count > 0 OR paid_invoices_count > 0');
+            
+            $count = $query->count();
+            $invoices = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoices' => $invoices,
+                    'invoicesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request): JsonResponse
@@ -155,12 +407,12 @@ class InvoiceController extends Controller
                 'user_id' => 'required|exists:users,id',
                 'start' => 'required|date',
                 'end' => 'required|date|after:start',
-                'payment_type' => 'required|string',
-                'reference' => 'required|string',
+                // 'payment_type' => 'required|string',
+                // 'reference' => 'required|string',
                 'total' => 'required|numeric|min:0',
                 'payments' => 'required|array|min:1',
                 'note' => 'nullable|string',
-                'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+                // 'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
             ]);
 
             // Determinar correlativo por usuario (invoice_id)
@@ -178,21 +430,22 @@ class InvoiceController extends Controller
                 'discount' => '0.00',
                 'total' => $request->total,
                 'payment_type' => $request->payment_type,
+                'payment_date' => null,
                 'reference' => $request->reference,
                 'image' => null,
                 'note' => $request->note
             ]);
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
+            // if ($request->hasFile('image')) {
+            //     $image = $request->file('image');
 
-                $path = 'invoices';
+            //     $path = 'invoices';
 
-                $file_data = uploadFile($image, $path);
+            //     $file_data = uploadFile($image, $path);
 
-                $invoice->image = $file_data['filePath'];
-                $invoice->update();
-            }
+            //     $invoice->image = $file_data['filePath'];
+            //     $invoice->update();
+            // }
 
             // Procesar los pagos/productos/servicios
             foreach ($request->payments as $payment) {
@@ -273,16 +526,75 @@ class InvoiceController extends Controller
             ], 500);
         }
     }
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+
+            $invoice = Invoice::find($id);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoice' => $invoice
+                ]
+            ]);
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProductRequest $request, Product $product): JsonResponse
+    public function updatePayment(Request $request, $id): JsonResponse
     {
         try {
 
-            //
+            // Validar datos requeridos
+            $request->validate([
+                'payment_type' => 'required|string',
+                'reference' => 'required|string',
+                'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+            ]);
 
+            $invoice = Invoice::find($id);
+
+            if (!$invoice) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encuentra la factura'
+                ], 404);
+            }
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+
+                $path = 'invoices';
+
+                $file_data = uploadFile($image, $path);
+
+                $invoice->image = $file_data['filePath'];
+            }
+
+            $invoice->payment_date = now()->toDateString();
+
+            $invoice->fill($request->except(['id', 'image', 'payment_date']));
+            $invoice->update();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoice' => $invoice
+                ]
+            ]);
         } catch(\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
@@ -311,8 +623,32 @@ class InvoiceController extends Controller
         }
     }
 
-    public function invoicesByUser($id) : JsonResponse
+    public function invoicesByUser($id, $type, $invoice_id) : JsonResponse
     {
+        $is_invoice = 0;
+        $is_payment = false;
+
+        switch($type) {
+            case 0:
+                $is_invoice = 0;
+                $is_payment = false;
+                $invoice_id = null;
+                break;
+            case 1:
+                $is_invoice = 1;
+                $is_payment = false;
+                break;
+            case 2:
+                $is_invoice = 1;
+                $is_payment = true;
+                break;
+            default:
+                $is_invoice = 0;
+                $is_payment = false;
+                $invoice_id = null;
+                break;
+        }
+
         $user = 
             User::with('supplier.document.type')
                 ->where('id', $id)
@@ -325,11 +661,13 @@ class InvoiceController extends Controller
             $user->products()
                 ->where('state_id', 3)
                 ->whereHas('colors.orders', fn($q) =>
-                    $q->where('is_invoice', 0)
+                    $q->where('is_invoice', $is_invoice)
+                    ->where('invoice_id', $invoice_id)
                     ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
                 )
                 ->with(['colors.orders' => fn($q) =>
-                    $q->where('is_invoice', 0)
+                    $q->where('is_invoice', $is_invoice)
+                    ->where('invoice_id', $invoice_id)
                     ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
                 ])
                 ->get();
@@ -339,11 +677,13 @@ class InvoiceController extends Controller
             $user->services()
                 ->where('state_id', 3)
                 ->whereHas('orderDetails', fn($q) =>
-                    $q->where('is_invoice', 0)
+                    $q->where('is_invoice', $is_invoice)
+                    ->where('invoice_id', $invoice_id)
                     ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
                 )
                 ->with(['orderDetails' => fn($q) =>
-                    $q->where('is_invoice', 0)
+                    $q->where('is_invoice', $is_invoice)
+                    ->where('invoice_id', $invoice_id)
                     ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
                 ])
                 ->get();
@@ -392,6 +732,11 @@ class InvoiceController extends Controller
             }
         }
 
+        $invoice = null;
+        if ($is_invoice === 1){
+            $invoice = Invoice::where('id', $invoice_id)->first();
+        }
+
         // Determinar correlativo por usuario (invoice_id)
         $nextInvoiceId = (int) \App\Models\Invoice::where('user_id', $id)->max('invoice_id') ?? 0;
 
@@ -403,6 +748,7 @@ class InvoiceController extends Controller
                 'products' => $products,
                 'services' => $services,
                 'payments' => $invoiceProducts,
+                'invoice' => $invoice,
                 'last_record' => $nextInvoiceId //Ultimo numero de factura de ese usuario
             ]
         ]);

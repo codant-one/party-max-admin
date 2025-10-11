@@ -10,6 +10,18 @@ class Invoices {
         return axios.get('invoices/pending/all', {params})
     }
 
+    byPay(params) {
+        return axios.get('invoices/bypay/all', {params})
+    }
+
+    paid(params) {
+        return axios.get('invoices/paid/all', {params})
+    }
+
+    all(params) {
+        return axios.get('invoices/all/all', {params})
+    }
+
     create(data) {
         return axios.post('/invoices', data)
     }
@@ -19,15 +31,23 @@ class Invoices {
     }
 
     update(data) {
-        return axios.post(`/invoices/${data.id}`, data.data)
+        return axios.put(`/invoices/${data.id}`, data.data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
     }
 
     delete(id){
         return axios.delete(`/invoices/${id}`)
     }
 
-    invoicesByUser(id) {
-        return axios.get(`/invoices/users/${id}`)
+    invoicesByUser(id, type=0, invoice_id=null) {
+        return axios.get(`/invoices/users/${id}/${type}/${invoice_id}`)
+    }
+
+    updatePayment(data) {
+        return axios.post(`/invoices/updatepayment/${data.id}`, data.data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
     }
     
 }

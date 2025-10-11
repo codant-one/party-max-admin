@@ -16,6 +16,15 @@ class Invoice extends Model
     protected $guarded = [];
 
     /**** Relationship ****/
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id','id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(OrderDetail::class, 'invoice_id','id');
+    }
     
 
     /**** Scopes ****/

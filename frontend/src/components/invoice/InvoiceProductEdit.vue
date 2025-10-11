@@ -12,6 +12,10 @@ const props = defineProps({
   data: {
     type: Object,
     required: true
+  },
+  typeInvoice: {
+    type: String,
+    required: true
   }
 })
 
@@ -23,6 +27,7 @@ const emit = defineEmits([
 ])
 
 const localProductData = ref(props.data)
+const typeInvoice = ref(props.typeInvoice)
 
 
 const fetchData =() => {
@@ -187,9 +192,16 @@ const resolveType = data => {
     <!-- 👉 Item Actions -->
     <div class="d-flex flex-column justify-space-between border-s pa-0">
       <VBtn 
+        v-if="typeInvoice == '0'"
         icon="tabler-x"
         variant="text"
         @click="removeProduct">
+        
+      </VBtn>
+      <VBtn 
+        v-if="typeInvoice !== '0'"
+        variant="text">
+        
       </VBtn>
 
       <!-- <VBtn 
