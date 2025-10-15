@@ -298,31 +298,24 @@ class Product extends Model
             });
         });
 
-        // Order primarily by the matched category id (if any), then by the product list order
-        $query->addSelect([
-            'matched_category_id' => function ($sub) use ($search) {
-                $sub->selectRaw('MIN(categories.id)')
-                    ->from('product_categories')
-                    ->join('product_colors as pc', 'pc.id', '=', 'product_categories.product_color_id')
-                    ->join('categories', 'categories.id', '=', 'product_categories.category_id')
-                    ->whereColumn('pc.product_id', 'products.id')
-                    ->where(function ($w) use ($search) {
-                        $w->whereRaw('LOWER(categories.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
-                          ->orWhereRaw('LOWER(categories.name) LIKE LOWER(?)', ['%' . $search . '%']);
-                    });
-            }
-        ]);
-
-        $query->addSelect([
-            'matched_order_id' => function ($sub) {
-                $sub->selectRaw('MIN(order_id)')
-                    ->from('product_lists')
-                    ->whereColumn('product_lists.product_id', 'products.id');
-            }
-        ]);
-
-        // Ensure results with a matched category come first, then by category id, then by order id
-        $query->orderByRaw('(matched_category_id IS NULL) ASC')
+        // Join chain to expose matched category for ordering
+        $query->leftJoin('product_colors as pco', 'pco.product_id', '=', 'products.id')
+              ->leftJoin('product_categories as pca', 'pca.product_color_id', '=', 'pco.id')
+              ->leftJoin('categories as c', function ($join) use ($search) {
+                  $join->on('c.id', '=', 'pca.category_id')
+                       ->where(function ($w) use ($search) {
+                           $w->whereRaw('LOWER(c.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
+                             ->orWhereRaw('LOWER(c.name) LIKE LOWER(?)', ['%' . $search . '%']);
+                       });
+              })
+              ->leftJoin('product_lists as pl', function ($join) {
+                  $join->on('pl.product_id', '=', 'products.id')
+                       ->on('pl.category_id', '=', 'c.id');
+              })
+              ->addSelect(\DB::raw('MIN(c.id) as matched_category_id'))
+              ->addSelect(\DB::raw('MIN(pl.order_id) as matched_order_id'))
+              ->groupBy('products.id')
+              ->orderByRaw('(matched_category_id IS NULL) ASC')
               ->orderBy('matched_category_id', 'asc')
               ->orderBy('matched_order_id', 'asc');
     }        
