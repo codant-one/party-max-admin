@@ -296,28 +296,9 @@ class Product extends Model
                 $categoryQuery->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
                              ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
             });
-        });
-
-        // Join chain to expose matched category for ordering
-        $query->leftJoin('product_colors as pco', 'pco.product_id', '=', 'products.id')
-              ->leftJoin('product_categories as pca', 'pca.product_color_id', '=', 'pco.id')
-              ->leftJoin('categories as c', function ($join) use ($search) {
-                  $join->on('c.id', '=', 'pca.category_id')
-                       ->where(function ($w) use ($search) {
-                           $w->whereRaw('LOWER(c.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
-                             ->orWhereRaw('LOWER(c.name) LIKE LOWER(?)', ['%' . $search . '%']);
-                       });
-              })
-              ->leftJoin('product_lists as pl', function ($join) {
-                  $join->on('pl.product_id', '=', 'products.id')
-                       ->on('pl.category_id', '=', 'c.id');
-              })
-              ->addSelect(\DB::raw('MIN(c.id) as matched_category_id'))
-              ->addSelect(\DB::raw('MIN(pl.order_id) as matched_order_id'))
-              ->groupBy('products.id')
-              ->orderByRaw('(matched_category_id IS NULL) ASC')
-              ->orderBy('matched_category_id', 'asc')
-              ->orderBy('matched_order_id', 'asc');
+        })->leftJoin('product_lists', 'products.id', '=', 'product_lists.product_id')
+          ->orderBy('category_id', 'asc')
+          ->orderBy('product_lists.order_id', 'asc');
     }        
 
     public function scopeWhereCategory($query, $search) {
