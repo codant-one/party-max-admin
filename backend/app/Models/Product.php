@@ -296,9 +296,35 @@ class Product extends Model
                 $categoryQuery->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
                              ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
             });
-        })->leftJoin('product_lists', 'products.id', '=', 'product_lists.product_id')
-          ->orderBy('category_id', 'asc')
-          ->orderBy('product_lists.order_id', 'asc');
+        });
+
+        // Order primarily by the matched category id (if any), then by the product list order
+        $query->addSelect([
+            'matched_category_id' => function ($sub) use ($search) {
+                $sub->selectRaw('MIN(categories.id)')
+                    ->from('product_categories')
+                    ->join('product_colors as pc', 'pc.id', '=', 'product_categories.product_color_id')
+                    ->join('categories', 'categories.id', '=', 'product_categories.category_id')
+                    ->whereColumn('pc.product_id', 'products.id')
+                    ->where(function ($w) use ($search) {
+                        $w->whereRaw('LOWER(categories.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
+                          ->orWhereRaw('LOWER(categories.name) LIKE LOWER(?)', ['%' . $search . '%']);
+                    });
+            }
+        ]);
+
+        $query->addSelect([
+            'matched_order_id' => function ($sub) {
+                $sub->selectRaw('MIN(order_id)')
+                    ->from('product_lists')
+                    ->whereColumn('product_lists.product_id', 'products.id');
+            }
+        ]);
+
+        // Ensure results with a matched category come first, then by category id, then by order id
+        $query->orderByRaw('(matched_category_id IS NULL) ASC')
+              ->orderBy('matched_category_id', 'asc')
+              ->orderBy('matched_order_id', 'asc');
     }        
 
     public function scopeWhereCategory($query, $search) {
