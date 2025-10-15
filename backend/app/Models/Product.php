@@ -292,8 +292,13 @@ class Product extends Model
         }
     
         $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
-        });
+            $q->where(function ($categoryQuery) use ($search) {
+                $categoryQuery->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
+                             ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
+            });
+        })->leftJoin('product_lists', 'products.id', '=', 'product_lists.product_id')
+          ->orderBy('category_id', 'asc')
+          ->orderBy('product_lists.order_id', 'asc');
     }        
 
     public function scopeWhereCategory($query, $search) {
