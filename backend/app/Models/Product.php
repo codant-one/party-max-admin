@@ -281,35 +281,15 @@ class Product extends Model
 
         // Normalización básica para búsquedas: quita acentos y mapea ñ->n, todo en minúsculas
         $normalizePhp = function (string $text): string {
-            $map = [
-                'Á' => 'a','À' => 'a','Ä' => 'a','Â' => 'a','á' => 'a','à' => 'a','ä' => 'a','â' => 'a',
-                'É' => 'e','È' => 'e','Ë' => 'e','Ê' => 'e','é' => 'e','è' => 'e','ë' => 'e','ê' => 'e',
-                'Í' => 'i','Ì' => 'i','Ï' => 'i','Î' => 'i','í' => 'i','ì' => 'i','ï' => 'i','î' => 'i',
-                'Ó' => 'o','Ò' => 'o','Ö' => 'o','Ô' => 'o','ó' => 'o','ò' => 'o','ö' => 'o','ô' => 'o',
-                'Ú' => 'u','Ù' => 'u','Ü' => 'u','Û' => 'u','ú' => 'u','ù' => 'u','ü' => 'u','û' => 'u',
-                'Ñ' => 'n','ñ' => 'n'
-            ];
-            return mb_strtolower(strtr($text, $map));
+            // Solo mapea ñ->n y pasa a minúsculas; acentos los maneja COLLATE
+            $text = str_replace(['Ñ','ñ'], ['n','n'], $text);
+            return mb_strtolower($text);
         };
 
         // Expresión SQL para normalizar columnas (minúsculas, sin acentos, ñ->n)
         $normalizeSql = function (string $column): string {
-            return "LOWER(".
-                   // Ñ/ñ
-                   "REPLACE(REPLACE(".
-                     // Vocales con acentos comunes en español
-                     "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(".
-                       // A/a
-                       "REPLACE(REPLACE($column, 'Á','A'), 'á','a'),".
-                       // E/e
-                       "'É','E'), 'é','e'),".
-                       // I/i
-                       "'Í','I'), 'í','i'),".
-                       // O/o
-                       "'Ó','O'), 'ó','o'),".
-                       // U/u (incluye Ü/ü)
-                       "'Ú','U'), 'ú','u'), 'Ü','U'), 'ü','u'),".
-                     "'Ñ','N'), 'ñ','n'))";
+            // Case/accent insensitive via COLLATE; mapea ñ/Ñ -> n/N
+            return "(LOWER(REPLACE(REPLACE($column,'Ñ','N'),'ñ','n')) COLLATE utf8mb4_general_ci)";
         };
     
         $terms = array_filter($terms, function ($term) use ($stopWords) {
@@ -320,7 +300,7 @@ class Product extends Model
             $query->where(function ($q) use ($terms, $normalizePhp, $normalizeSql) {
                 foreach ($terms as $term) {
                     $normalized = $normalizePhp($term);
-                    $q->whereRaw($normalizeSql('products.name') . ' LIKE LOWER(?)', ['%' . $normalized . '%']);
+                    $q->whereRaw($normalizeSql('products.name') . ' LIKE ?', ['%' . $normalized . '%']);
                 }
             });
         }
@@ -328,8 +308,8 @@ class Product extends Model
         $query->orWhereHas('colors.categories.category', function ($q) use ($search, $normalizePhp, $normalizeSql) {
             $normalized = $normalizePhp($search);
             $q->where(function ($categoryQuery) use ($normalized, $normalizeSql) {
-                $categoryQuery->whereRaw($normalizeSql('keywords') . ' LIKE LOWER(?)', ['%' . $normalized . '%'])
-                              ->orWhereRaw($normalizeSql('name') . ' LIKE LOWER(?)', ['%' . $normalized . '%']);
+                $categoryQuery->whereRaw($normalizeSql('keywords') . ' LIKE ?', ['%' . $normalized . '%'])
+                              ->orWhereRaw($normalizeSql('name') . ' LIKE ?', ['%' . $normalized . '%']);
             });
         });
 
@@ -342,31 +322,9 @@ class Product extends Model
                 $join->on('pl.product_id', '=', 'pco.product_id')
                      ->on('pl.category_id', '=', 'c.id');
             })
-            ->where(function ($w) use ($normalizedSearch) {
-                $w->whereRaw(
-                    "LOWER(".
-                    "REPLACE(REPLACE(".
-                      "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(".
-                        "REPLACE(REPLACE(c.keywords, 'Á','A'), 'á','a'),".
-                        "'É','E'), 'é','e'),".
-                        "'Í','I'), 'í','i'),".
-                        "'Ó','O'), 'ó','o'),".
-                        "'Ú','U'), 'ú','u'), 'Ü','U'), 'ü','u'),".
-                      "'Ñ','N'), 'ñ','n')) LIKE LOWER(?)",
-                    ['%' . $normalizedSearch . '%']
-                )
-                ->orWhereRaw(
-                    "LOWER(".
-                    "REPLACE(REPLACE(".
-                      "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(".
-                        "REPLACE(REPLACE(c.name, 'Á','A'), 'á','a'),".
-                        "'É','E'), 'é','e'),".
-                        "'Í','I'), 'í','i'),".
-                        "'Ó','O'), 'ó','o'),".
-                        "'Ú','U'), 'ú','u'), 'Ü','U'), 'ü','u'),".
-                      "'Ñ','N'), 'ñ','n')) LIKE LOWER(?)",
-                    ['%' . $normalizedSearch . '%']
-                );
+            ->where(function ($w) use ($normalizedSearch, $normalizeSql) {
+                $w->whereRaw($normalizeSql('c.keywords') . ' LIKE ?', ['%' . $normalizedSearch . '%'])
+                  ->orWhereRaw($normalizeSql('c.name') . ' LIKE ?', ['%' . $normalizedSearch . '%']);
             })
             ->selectRaw('pco.product_id as product_id, MIN(c.category_id) as matched_parent_category_id, MIN(pl.order_id) as matched_order_id')
             ->groupBy('pco.product_id');
