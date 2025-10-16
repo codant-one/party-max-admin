@@ -198,7 +198,7 @@ class MiscellaneousController extends Controller
 
             // Get the first category of the first color of the product
             $firstCategoryId = null;
-            if ($product->colors->isNotEmpty()) {
+            if ($product && $product->colors->isNotEmpty()) {
                 $firstColor = $product->colors->first();
                 if ($firstColor->categories->isNotEmpty()) {
                     $firstCategoryId = $firstColor->categories->first()->category_id;

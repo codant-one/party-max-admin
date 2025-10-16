@@ -64,7 +64,9 @@ class OrderController extends Controller
                 'outforDeliveryShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 2]])->count(),
                 'sentShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 3]])->count(),
                 'deliveredShipping' => Order::where([['payment_state_id', 4], ['shipping_state_id', 4]])->count(),
-                'orderInfo' => User::productsCount()->ordersCount()->sales()->find(Auth::user()->id)
+                'orderInfo' => (Auth::check()
+                    ? User::productsCount()->ordersCount()->sales()->find(Auth::id())
+                    : null)
             ];
 
             return response()->json([

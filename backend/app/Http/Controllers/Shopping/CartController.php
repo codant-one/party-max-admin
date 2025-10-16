@@ -37,7 +37,11 @@ class CartController extends Controller
                         'product.user.supplier',
                         'images'
                     ])->find($productColorId);
-            
+
+                    if (!$product || !$product->product || !$product->product->user) {
+                        continue;
+                    }
+
                     $product->product = $product->product;
                     $product->user = $product->product->user;
                     $product->user_detail = $product->product->user->userDetail;
@@ -70,6 +74,10 @@ class CartController extends Controller
                         'user.supplier',
                         'cupcakes.cake_size.cake_type'
                     ])->find($serviceId);
+
+                    if (!$service || !$service->user) {
+                        continue;
+                    }
 
                     $service->user_detail = $service->user->userDetail;
                     $service->cake_size_id = (int)$cakeSizeId;
