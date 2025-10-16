@@ -296,9 +296,31 @@ class Product extends Model
                 $categoryQuery->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
                              ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
             });
-        })->leftJoin('product_lists', 'products.id', '=', 'product_lists.product_id')
-          ->orderBy('category_id', 'asc')
-          ->orderBy('product_lists.order_id', 'asc');
+        });
+
+        // Build derived table with matched category and order per product for stable ordering with DISTINCT
+        $orderingSub = \DB::table('product_colors as pco')
+            ->join('product_categories as pca', 'pca.product_color_id', '=', 'pco.id')
+            ->join('categories as c', 'c.id', '=', 'pca.category_id')
+            ->leftJoin('product_lists as pl', function ($join) {
+                $join->on('pl.product_id', '=', 'pco.product_id')
+                     ->on('pl.category_id', '=', 'c.id');
+            })
+            ->where(function ($w) use ($search) {
+                $w->whereRaw('LOWER(c.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
+                  ->orWhereRaw('LOWER(c.name) LIKE LOWER(?)', ['%' . $search . '%']);
+            })
+            ->selectRaw('pco.product_id as product_id, MIN(c.category_id) as matched_parent_category_id, MIN(pl.order_id) as matched_order_id')
+            ->groupBy('pco.product_id');
+
+        $query->leftJoinSub($orderingSub, 'ord', function ($join) {
+                $join->on('ord.product_id', '=', 'products.id');
+            })
+            ->addSelect('ord.matched_parent_category_id')
+            ->addSelect('ord.matched_order_id')
+            ->orderByRaw('(ord.matched_parent_category_id IS NULL) ASC')
+            ->orderBy('ord.matched_parent_category_id', 'asc')
+            ->orderBy('ord.matched_order_id', 'asc');
     }        
 
     public function scopeWhereCategory($query, $search) {
