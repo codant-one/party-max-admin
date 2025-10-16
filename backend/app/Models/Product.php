@@ -278,22 +278,65 @@ class Product extends Model
     public function scopeWhereSearchPublic($query, $search) {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
+
+        // Normalización básica para búsquedas: quita acentos y mapea ñ->n, todo en minúsculas
+        $normalizePhp = function (string $text): string {
+            // Solo mapea ñ->n y pasa a minúsculas; acentos los maneja COLLATE
+            $text = str_replace(['Ñ','ñ'], ['n','n'], $text);
+            return mb_strtolower($text);
+        };
+
+        // Expresión SQL para normalizar columnas (minúsculas, sin acentos, ñ->n)
+        $normalizeSql = function (string $column): string {
+            // Case/accent insensitive via COLLATE; mapea ñ/Ñ -> n/N
+            return "(LOWER(REPLACE(REPLACE($column,'Ñ','N'),'ñ','n')) COLLATE utf8mb4_general_ci)";
+        };
     
         $terms = array_filter($terms, function ($term) use ($stopWords) {
             return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
         });
     
         if (!empty($terms)) {
-            $query->where(function ($q) use ($terms) {
+            $query->where(function ($q) use ($terms, $normalizePhp, $normalizeSql) {
                 foreach ($terms as $term) {
-                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                    $normalized = $normalizePhp($term);
+                    $q->whereRaw($normalizeSql('products.name') . ' LIKE ?', ['%' . $normalized . '%']);
                 }
             });
         }
     
-        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%']);
+        $query->orWhereHas('colors.categories.category', function ($q) use ($search, $normalizePhp, $normalizeSql) {
+            $normalized = $normalizePhp($search);
+            $q->where(function ($categoryQuery) use ($normalized, $normalizeSql) {
+                $categoryQuery->whereRaw($normalizeSql('keywords') . ' LIKE ?', ['%' . $normalized . '%'])
+                              ->orWhereRaw($normalizeSql('name') . ' LIKE ?', ['%' . $normalized . '%']);
+            });
         });
+
+        // Build derived table with matched category and order per product for stable ordering with DISTINCT
+        $normalizedSearch = $normalizePhp($search);
+        $orderingSub = \DB::table('product_colors as pco')
+            ->join('product_categories as pca', 'pca.product_color_id', '=', 'pco.id')
+            ->join('categories as c', 'c.id', '=', 'pca.category_id')
+            ->leftJoin('product_lists as pl', function ($join) {
+                $join->on('pl.product_id', '=', 'pco.product_id')
+                     ->on('pl.category_id', '=', 'c.id');
+            })
+            ->where(function ($w) use ($normalizedSearch, $normalizeSql) {
+                $w->whereRaw($normalizeSql('c.keywords') . ' LIKE ?', ['%' . $normalizedSearch . '%'])
+                  ->orWhereRaw($normalizeSql('c.name') . ' LIKE ?', ['%' . $normalizedSearch . '%']);
+            })
+            ->selectRaw('pco.product_id as product_id, MIN(c.category_id) as matched_parent_category_id, MIN(pl.order_id) as matched_order_id')
+            ->groupBy('pco.product_id');
+
+        $query->leftJoinSub($orderingSub, 'ord', function ($join) {
+                $join->on('ord.product_id', '=', 'products.id');
+            })
+            ->addSelect('ord.matched_parent_category_id')
+            ->addSelect('ord.matched_order_id')
+            ->orderByRaw('(ord.matched_parent_category_id IS NULL) ASC')
+            ->orderBy('ord.matched_parent_category_id', 'asc')
+            ->orderBy('ord.matched_order_id', 'asc');
     }        
 
     public function scopeWhereCategory($query, $search) {
