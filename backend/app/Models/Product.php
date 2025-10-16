@@ -278,27 +278,49 @@ class Product extends Model
     public function scopeWhereSearchPublic($query, $search) {
         $stopWords = ['e', 'de', 'la', 'el', 'los', 'las', 'y', 'a', 'en', 'para'];
         $terms = explode(' ', $search);
+
+        // Normalización básica para búsquedas: quita acentos y mapea ñ->n, todo en minúsculas
+        $normalizePhp = function (string $text): string {
+            $map = [
+                'Á' => 'a','À' => 'a','Ä' => 'a','Â' => 'a','á' => 'a','à' => 'a','ä' => 'a','â' => 'a',
+                'É' => 'e','È' => 'e','Ë' => 'e','Ê' => 'e','é' => 'e','è' => 'e','ë' => 'e','ê' => 'e',
+                'Í' => 'i','Ì' => 'i','Ï' => 'i','Î' => 'i','í' => 'i','ì' => 'i','ï' => 'i','î' => 'i',
+                'Ó' => 'o','Ò' => 'o','Ö' => 'o','Ô' => 'o','ó' => 'o','ò' => 'o','ö' => 'o','ô' => 'o',
+                'Ú' => 'u','Ù' => 'u','Ü' => 'u','Û' => 'u','ú' => 'u','ù' => 'u','ü' => 'u','û' => 'u',
+                'Ñ' => 'n','ñ' => 'n'
+            ];
+            return mb_strtolower(strtr($text, $map));
+        };
+
+        // Expresión SQL para normalizar columnas (minúsculas, sin acentos, ñ->n)
+        $normalizeSql = function (string $column): string {
+            return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($column, 'Ñ', 'N'), 'ñ', 'n'), 'Á', 'A'), 'á', 'a'), 'É', 'E'), 'é', 'e'), 'Í', 'I'))".
+                   "";
+        };
     
         $terms = array_filter($terms, function ($term) use ($stopWords) {
             return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
         });
     
         if (!empty($terms)) {
-            $query->where(function ($q) use ($terms) {
+            $query->where(function ($q) use ($terms, $normalizePhp, $normalizeSql) {
                 foreach ($terms as $term) {
-                    $q->whereRaw('LOWER(products.name) LIKE LOWER(?)', ['%' . $term . '%']);
+                    $normalized = $normalizePhp($term);
+                    $q->whereRaw($normalizeSql('products.name') . ' LIKE ?', ['%' . $normalized . '%']);
                 }
             });
         }
     
-        $query->orWhereHas('colors.categories.category', function ($q) use ($search) {
-            $q->where(function ($categoryQuery) use ($search) {
-                $categoryQuery->whereRaw('LOWER(keywords) LIKE LOWER(?)', ['%' . $search . '%'])
-                             ->orWhereRaw('LOWER(name) LIKE LOWER(?)', ['%' . $search . '%']);
+        $query->orWhereHas('colors.categories.category', function ($q) use ($search, $normalizePhp, $normalizeSql) {
+            $normalized = $normalizePhp($search);
+            $q->where(function ($categoryQuery) use ($normalized, $normalizeSql) {
+                $categoryQuery->whereRaw($normalizeSql('keywords') . ' LIKE ?', ['%' . $normalized . '%'])
+                              ->orWhereRaw($normalizeSql('name') . ' LIKE ?', ['%' . $normalized . '%']);
             });
         });
 
         // Build derived table with matched category and order per product for stable ordering with DISTINCT
+        $normalizedSearch = $normalizePhp($search);
         $orderingSub = \DB::table('product_colors as pco')
             ->join('product_categories as pca', 'pca.product_color_id', '=', 'pco.id')
             ->join('categories as c', 'c.id', '=', 'pca.category_id')
@@ -306,9 +328,9 @@ class Product extends Model
                 $join->on('pl.product_id', '=', 'pco.product_id')
                      ->on('pl.category_id', '=', 'c.id');
             })
-            ->where(function ($w) use ($search) {
-                $w->whereRaw('LOWER(c.keywords) LIKE LOWER(?)', ['%' . $search . '%'])
-                  ->orWhereRaw('LOWER(c.name) LIKE LOWER(?)', ['%' . $search . '%']);
+            ->where(function ($w) use ($normalizedSearch) {
+                $w->whereRaw("LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.keywords, 'Ñ','N'), 'ñ','n'), 'Á','A'), 'á','a'), 'É','E'), 'é','e'), 'Í','I')) LIKE ?", ['%' . $normalizedSearch . '%'])
+                  ->orWhereRaw("LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.name, 'Ñ','N'), 'ñ','n'), 'Á','A'), 'á','a'), 'É','E'), 'é','e'), 'Í','I')) LIKE ?", ['%' . $normalizedSearch . '%']);
             })
             ->selectRaw('pco.product_id as product_id, MIN(c.category_id) as matched_parent_category_id, MIN(pl.order_id) as matched_order_id')
             ->groupBy('pco.product_id');
