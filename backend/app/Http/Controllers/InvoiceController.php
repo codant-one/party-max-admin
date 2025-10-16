@@ -15,6 +15,11 @@ use App\Models\OrderDetail;
 use App\Models\User;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\Product;
+use App\Models\Service;
+use Illuminate\Support\Str;
+
+use PDF;
 
 class InvoiceController extends Controller
 {
@@ -145,6 +150,70 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function suppliers(Request $request): JsonResponse
+    {
+        try {
+
+            $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
+        
+            $query = Invoice::with([
+                'user.supplier.document.type',
+                'orders'
+            ])
+            ->where('user_id', auth()->id())
+            ->applyFilters(
+                $request->only([
+                    'search',
+                    'orderByField',
+                    'orderBy',
+                    'invoices',
+                    'user_id'
+                ]))
+                ->withCount([
+                    'orders as products_invoice_bypay_count' => fn($q) =>
+                        $q->whereNull('payment_date')
+                            ->whereNotNull('product_color_id'),
+                    'orders as services_invoice_bypay_count' => fn($q) =>
+                        $q->whereNull('payment_date')
+                            ->whereNotNull('service_id')
+                ])
+                ->withSum(['orders as products_bypay_total' => fn($q) =>
+                    $q->whereNull('payment_date')
+                        ->whereNotNull('product_color_id')
+                ], 'total')
+                ->withSum(['orders as services_bypay_total' => fn($q) =>
+                    $q->whereNull('payment_date')
+                        ->whereNotNull('service_id')
+                ], 'total')
+                ->addSelect(['unpaid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                    ->whereColumn('id', 'invoices.id')
+                    ->whereNull('payment_date')
+                ])
+            ->withTrashed();               
+            
+            $count = $query->count();
+            $invoices = ($limit == -1) ? $query->paginate($query->count()) : $query->paginate($limit);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'invoices' => $invoices,
+                    'invoicesTotalCount' => $count
+                ]
+            ]);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+              'success' => false,
+              'message' => 'database_error',
+              'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
     public function bypay(Request $request): JsonResponse
     {
         try {
@@ -156,6 +225,7 @@ class InvoiceController extends Controller
                 'orders'
             ])
             ->whereHas('user.roles', fn($q) => $q->where('name', 'Proveedor'))
+            ->where('user_id', auth()->id())
             ->whereNull('payment_date')
             ->applyFilters(
                 $request->only([
@@ -475,6 +545,66 @@ class InvoiceController extends Controller
                 }
             }
 
+            // Generar y guardar PDF de la factura
+            $invoiceFull = Invoice::with([
+                'user.supplier.document.type',
+                'orders.product_color.product',
+                'orders.product_color.color',
+                'orders.service',
+                'orders.cake_size',
+                'orders.flavor',
+                'orders.filling'
+            ])->find($invoice->id);
+
+            $products = [];
+            $services = [];
+
+            foreach ($invoiceFull->orders as $detail) {
+                if ($detail->product_color) {
+                    $products[] = [
+                        'product_id' => $detail->product_color->product->id,
+                        'product_name' => $detail->product_color->product->name,
+                        'product_image' => asset('storage/' . $detail->product_color->product->image),
+                        'color' => optional($detail->product_color->color)->name,
+                        'slug' => env('APP_DOMAIN').'/products/'. $detail->product_color->product->slug,
+                        'quantity' => $detail->quantity,
+                        'product_price' => $detail->price,
+                        'product_total' => $detail->total,
+                    ];
+                } elseif ($detail->service) {
+                    $services[] = [
+                        'service_id' => $detail->service->id,
+                        'service_name' => $detail->service->name,
+                        'service_is_full' => $detail->service->is_full,
+                        'service_image' => asset('storage/' . $detail->service->image),
+                        'flavor' => optional($detail->flavor)->name,
+                        'filling' => optional($detail->filling)->name,
+                        'cake_size' => optional($detail->cake_size)->name,
+                        'slug' => env('APP_DOMAIN').'/services/'. $detail->service->slug,
+                        'quantity' => $detail->quantity,
+                        'service_price' => $detail->price,
+                        'service_total' => $detail->total,
+                    ];
+                }
+            }
+
+            $date = now()->format('YmdHis');
+            $dir = storage_path('app/public/pdfs');
+            if (!file_exists($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $filename = 'invoice-'.Str::slug((string) $invoice->id).'-'.$date.'.pdf';
+            $fullPath = $dir.'/'.$filename;
+
+            PDF::loadView('pdfs.invoice', [
+                'invoice' => $invoiceFull,
+                'products' => $products,
+                'services' => $services
+            ])->save($fullPath);
+
+            $invoice->pdf = 'pdfs/'.$filename;
+            $invoice->save();
+
             DB::commit();
 
             return response()->json([
@@ -707,7 +837,8 @@ class InvoiceController extends Controller
                         'total' => $orderDetail->total,
                         'image' => $product->image,
                         'disabled' => true,
-                        'state_id' => 6 // Estado activo para facturación
+                        'state_id' => 6, // Estado activo para facturación
+                        'sku' => $color->sku,
                     ];
                 }
             }
@@ -727,7 +858,8 @@ class InvoiceController extends Controller
                     'total' => $orderDetail->total,
                     'image' => $service->image,
                     'disabled' => true,
-                    'state_id' => 6 // Estado activo para facturación
+                    'state_id' => 6, // Estado activo para facturación
+                    'sku' => $service->sku
                 ];
             }
         }
@@ -752,6 +884,62 @@ class InvoiceController extends Controller
                 'last_record' => $nextInvoiceId //Ultimo numero de factura de ese usuario
             ]
         ]);
+    }
+
+    public function pdf($id)
+    {
+        try {
+            $invoice = Invoice::with([
+                'user.supplier.document.type',
+                'orders.product_color.product',
+                'orders.product_color.color',
+                'orders.service',
+                'orders.cake_size',
+                'orders.flavor',
+                'orders.filling'
+            ])->findOrFail($id);
+
+            $products = [];
+            $services = [];
+
+            foreach ($invoice->orders as $detail) {
+                if ($detail->product_color) {
+                    $products[] = [
+                        'product_id' => $detail->product_color->product->id,
+                        'product_name' => $detail->product_color->product->name,
+                        'product_image' => asset('storage/' . $detail->product_color->product->image),
+                        'color' => optional($detail->product_color->color)->name,
+                        'slug' => env('APP_DOMAIN').'/products/'. $detail->product_color->product->slug,
+                        'quantity' => $detail->quantity,
+                        'product_price' => $detail->price,
+                        'product_total' => $detail->total,
+                    ];
+                } elseif ($detail->service) {
+                    $services[] = [
+                        'service_id' => $detail->service->id,
+                        'service_name' => $detail->service->name,
+                        'service_is_full' => $detail->service->is_full,
+                        'service_image' => asset('storage/' . $detail->service->image),
+                        'flavor' => optional($detail->flavor)->name,
+                        'filling' => optional($detail->filling)->name,
+                        'cake_size' => optional($detail->cake_size)->name,
+                        'slug' => env('APP_DOMAIN').'/services/'. $detail->service->slug,
+                        'quantity' => $detail->quantity,
+                        'service_price' => $detail->price,
+                        'service_total' => $detail->total,
+                    ];
+                }
+            }
+
+            $pdf = PDF::loadView('pdfs.invoice', compact('invoice', 'products', 'services'));
+            return $pdf->stream('invoice-'.$invoice->id.'.pdf');
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'error_generating_pdf',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
 }

@@ -163,7 +163,7 @@ const addInvoiceByUser = invoiceData => {
       </VCard>
     </VDialog>
 
-    <VCard title="Facturas (sin pago)">
+    <VCard title="Facturas pendientes por pagar">
       <VCardText class="d-flex align-center flex-wrap gap-4">
         <div class="d-flex align-center">
           <span class="text-no-wrap me-3">Ver:</span>

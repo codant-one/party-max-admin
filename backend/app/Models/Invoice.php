@@ -53,9 +53,9 @@ class Invoice extends Model
         }
 
         if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
-            $query->whereHas('details.product_color.product', function ($q) {
+            $query->whereHas('orders.product_color.product', function ($q) {
                 $q->where('user_id', Auth::user()->id);
-            })->orWhereHas('details.service', function ($q) {
+            })->orWhereHas('orders.service', function ($q) {
                 $q->where('user_id', Auth::user()->id);
             });
         }

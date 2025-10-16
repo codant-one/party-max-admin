@@ -297,7 +297,7 @@ const inputData = () => {
       <div
         class="my-sm-4"
       >
-        <h6 class="text-h6 font-weight-medium mb-6">
+        <h6 class="text-h6 font-weight-medium">
           Facturar a:
         </h6> 
 
@@ -307,7 +307,7 @@ const inputData = () => {
           item-title="full_name"
           item-value="id"
           placeholder="Usuarios"
-          class="mb-3"
+          class="d-none mb-3"
           :disabled="disabled"
           style="width: 300px"
           :rules="[requiredValidator]"
@@ -415,15 +415,59 @@ const inputData = () => {
       </div>
     </VCardText>
 
-    <VDivider />
-
     <!-- 👉 Add purchased products -->
     <VCardText class="add-products-form px-0">
+      <!-- eslint-disable vue/no-mutating-props -->
+      <div class="add-products-header mb-4 d-none d-md-flex ps-5 pe-16">
+        <VRow class="font-weight-medium">
+          <VCol
+            cols="12"
+            md="7"
+          >
+            <span class="text-base">
+              DESCRIPCIÓN
+            </span>
+          </VCol>     
+
+          <VCol
+            cols="12"
+            md="1"
+            class="text-center"
+          >
+            <span class="text-base">
+              QTY
+            </span>
+          </VCol>
+
+          <VCol
+            cols="12"
+            md="2"
+            class="text-end"
+          >
+            <span class="text-base">
+              PRECIO
+            </span>
+          </VCol>
+
+          <VCol
+            cols="12"
+            md="2"
+            class="text-end"
+          >
+            <span class="text-base">
+              TOTAL
+            </span>
+          </VCol>
+        </VRow>
+        <div class="d-flex flex-column justify-space-between pa-0" style="width: 1%;"></div>
+      </div>
+
       <div
         v-for="(product, index) in invoice.payments"
         :key="product.id"
         class="my-4"
       >
+      
         <InvoiceProductEdit
           v-if="product.state_id !== 3"
           :id="index"

@@ -289,10 +289,12 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [InvoiceController::class, 'delete']);
         Route::get('pending/all', [InvoiceController::class, 'pending']);
         Route::get('bypay/all', [InvoiceController::class, 'bypay']);
+        Route::get('suppliers/all', [InvoiceController::class, 'suppliers']);
         Route::get('paid/all', [InvoiceController::class, 'paid']);
         Route::get('all/all', [InvoiceController::class, 'all']);
         Route::get('users/{id}/{type}/{invoice_id}', [InvoiceController::class, 'invoicesByUser']);
         Route::post('updatepayment/{id}', [InvoiceController::class, 'updatePayment']);
+        Route::get('pdf/{id}', [InvoiceController::class, 'pdf']);
     });
 
 });

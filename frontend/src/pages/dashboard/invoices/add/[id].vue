@@ -6,7 +6,6 @@ import InvoiceEditable from '@/views/apps/invoice/InvoiceEditable.vue'
 import router from '@/router'
 
 const invoicesStores = useInvoicesStores()
-//const billingsStores = useBillingsStores()
 const route = useRoute()
 
 const emitter = inject("emitter")
@@ -196,6 +195,10 @@ const onSubmit = () => {
 
       invoicesStores.addInvoice(formData)
         .then((res) => {
+          const pdfPath = res?.data?.data?.invoice?.pdf
+          if (pdfPath) {
+            window.open(`/storage/${pdfPath}`, '_blank')
+          }
           let data = {
             message: 'Factura creada con éxito',
             error: false
@@ -258,7 +261,7 @@ const onSubmit = () => {
       <!-- 👉 InvoiceEditable -->
       <VCol
         cols="12"
-        md="9"
+        md="10"
       >
         <InvoiceEditable
           :data="invoiceData"
@@ -279,7 +282,7 @@ const onSubmit = () => {
       <!-- 👉 Right Column: Invoice Action -->
       <VCol
         cols="12"
-        md="3"
+        md="2"
       >
         <VCard class="mb-8">
           <VCardText>
@@ -368,15 +371,13 @@ const onSubmit = () => {
       <DialogCloseBtn @click="seeDialogRemove = false" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar Pago">
+      <VCard title="Eliminar artículo">
         <VForm
           ref="validateRemove"
           @submit.prevent="onSubmitRemove">
           <VCardText>
-            Esta seguro que desea eliminar el pago <strong>{{ selectedInvoice.description }}</strong>?
-          </VCardText>
-
-        
+            Esta seguro que desea eliminar el artículo <strong>{{ selectedInvoice.description }}</strong> de la factura?
+          </VCardText>        
 
           <VCardText class="d-flex justify-end gap-3 flex-wrap">
             <VBtn 

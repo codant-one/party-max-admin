@@ -153,7 +153,7 @@ const addInvoiceByUser = invoiceData => {
             </VCardText>
         </VCard>
         </VDialog>
-        <VCard title="Facturas pendientes">
+        <VCard title="Facturas pendientes por procesar">
             <VCardText class="d-flex align-center flex-wrap gap-4">
                 <div class="d-flex align-center">
                     <span class="text-no-wrap me-3">Ver:</span>
@@ -200,9 +200,6 @@ const addInvoiceByUser = invoiceData => {
                         <th scope="col"> PRODUCTOS </th>
                         <th scope="col"> SERVICIOS </th>
                         <th scope="col"> TOTAL </th>
-                        <th scope="col" v-if="$can('editar','facturas') || $can('eliminar','facturas')">
-                            ACCIONES
-                        </th>
                     </tr>
                 </thead>
                 <!-- 👉 table body -->
@@ -279,29 +276,6 @@ const addInvoiceByUser = invoiceData => {
                         </td>
                         <td> 
                             {{ (parseFloat(invoice.products_total + invoice.services_total)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
-                        </td>
-                        <!-- 👉 Acciones -->
-                        <td class="text-center" style="width: 5rem;" v-if="$can('editar','facturas') || $can('eliminar','facturas')">      
-                            <VBtn
-                                v-if="$can('crear','facturas')"
-                                icon
-                                size="x-small"
-                                color="default"
-                                variant="text"
-                                @click="addInvoiceByUser(invoice)">
-                                       
-                                <VTooltip
-                                    open-on-focus
-                                    location="top"
-                                    activator="parent"
-                                >
-                                    Generar
-                                </VTooltip>
-
-                                <VIcon
-                                    size="22"
-                                    icon="mdi-file-document-edit-outline" />
-                            </VBtn>
                         </td>
                     </tr>
                 </tbody>

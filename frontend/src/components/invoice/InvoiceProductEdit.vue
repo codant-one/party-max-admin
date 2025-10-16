@@ -76,61 +76,6 @@ const resolveType = data => {
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-mutating-props -->
-  <div class="add-products-header mb-4 d-none d-md-flex ps-5 pe-16">
-    <VRow class="font-weight-medium">
-      <VCol
-        cols="12"
-        md="2"
-      >
-        <h6 class="text-sm font-weight-medium">
-          <span class="text-base">
-            IMAGEN
-          </span>
-        </h6>
-      </VCol>
-
-      <VCol
-        cols="12"
-        md="4"
-      >
-        <span class="text-base">
-          DESCRIPCIÓN
-        </span>
-      </VCol>     
-
-      <VCol
-        cols="12"
-        md="2"
-        class="text-center"
-      >
-        <span class="text-base">
-          CANTIDAD
-        </span>
-      </VCol>
-
-      <VCol
-        cols="12"
-        md="2"
-        class="text-center"
-      >
-        <span class="text-base">
-          PRECIO
-        </span>
-      </VCol>
-
-      <VCol
-        cols="12"
-        md="2"
-        class="text-center"
-      >
-        <span class="text-base">
-          TOTAL
-        </span>
-      </VCol>
-    </VRow>
-  </div>
-
   <VCard
     flat
     border
@@ -141,28 +86,25 @@ const resolveType = data => {
       <VRow>
         <VCol
           cols="12"
-          md="2"
+          md="7"
         >
-          <VAvatar
-            size="50"
-            variant="outlined" 
-            rounded
-            :image="imageUrl"
-          />
+          <div class="d-flex align-center gap-x-2">
+            <VAvatar
+              size="75"
+              variant="outlined" 
+              rounded
+              :image="imageUrl"
+            />
+            <div class="d-flex flex-column">
+              <span class="text-body-1 font-weight-medium"> {{ localProductData.description }}</span>
+              <span class="text-sm text-disabled">SKU: {{ localProductData.sku }}</span>
+            </div>
+          </div>
         </VCol>
 
         <VCol
           cols="12"
-          md="4"
-          sm="4"
-        >
-          {{ localProductData.description }}
-        </VCol>
-
-        <VCol
-          cols="12"
-          md="2"
-          sm="4"
+          md="1"
         class="text-center"
       >
           {{ localProductData.quantity }}
@@ -171,7 +113,6 @@ const resolveType = data => {
         <VCol
           cols="12"
           md="2"
-          sm="4"
         class="text-end"
       >
           ${{ formatNumber(localProductData.price) }}
@@ -180,7 +121,6 @@ const resolveType = data => {
         <VCol
           cols="12"
           md="2"
-          sm="4"
         class="text-end"
       >
           ${{ formatNumber(localProductData.total) }}

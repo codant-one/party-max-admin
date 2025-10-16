@@ -49,7 +49,10 @@ class Invoices {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
     }
-    
+
+    suppliers(params) {
+        return axios.get('invoices/suppliers/all', {params})
+    }
 }
 
 const invoices = new Invoices();

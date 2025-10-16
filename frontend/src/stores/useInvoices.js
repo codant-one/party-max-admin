@@ -175,6 +175,16 @@ export const useInvoicesStores = defineStore('invoices', {
                     this.setLoading(false)
                 })
          
+        },
+        fetchSuppliers(params) {
+            this.setLoading(true)
+            
+            return Invoices.suppliers(params)
+                .then((response) => {
+                    this.invoices = response.data.data.invoices.data
+                    this.last_page = response.data.data.invoices.last_page
+                    this.invoicesTotalCount = response.data.data.invoicesTotalCount
+                })
         }
     }
 })
