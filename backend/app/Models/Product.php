@@ -296,6 +296,17 @@ class Product extends Model
             return !in_array(mb_strtolower(trim($term)), $stopWords) && trim($term) !== '';
         });
     
+        // Calcula prioridad por coincidencia de nombre (1 si el nombre coincide con TODOS los términos, 0 en caso contrario)
+        $normalizedTerms = array_map($normalizePhp, $terms);
+        $nameLikeConditions = [];
+        foreach ($normalizedTerms as $t) {
+            $quoted = DB::getPdo()->quote('%' . $t . '%');
+            $nameLikeConditions[] = $normalizeSql('products.name') . ' LIKE ' . $quoted;
+        }
+        $nameMatchCase = !empty($nameLikeConditions)
+            ? ('CASE WHEN (' . implode(' AND ', $nameLikeConditions) . ') THEN 1 ELSE 0 END')
+            : '0';
+
         if (!empty($terms)) {
             $query->where(function ($q) use ($terms, $normalizePhp, $normalizeSql) {
                 foreach ($terms as $term) {
@@ -326,16 +337,18 @@ class Product extends Model
                 $w->whereRaw($normalizeSql('c.keywords') . ' LIKE ?', ['%' . $normalizedSearch . '%'])
                   ->orWhereRaw($normalizeSql('c.name') . ' LIKE ?', ['%' . $normalizedSearch . '%']);
             })
-            ->selectRaw('pco.product_id as product_id, MIN(c.category_id) as matched_parent_category_id, MIN(pl.order_id) as matched_order_id')
+            ->selectRaw('pco.product_id as product_id, MIN(COALESCE(c.category_id, c.id)) as matched_category_key, MIN(pl.order_id) as matched_order_id')
             ->groupBy('pco.product_id');
 
         $query->leftJoinSub($orderingSub, 'ord', function ($join) {
                 $join->on('ord.product_id', '=', 'products.id');
             })
-            ->addSelect('ord.matched_parent_category_id')
+            ->addSelect(DB::raw($nameMatchCase . ' as name_match_priority'))
+            ->addSelect('ord.matched_category_key')
             ->addSelect('ord.matched_order_id')
-            ->orderByRaw('(ord.matched_parent_category_id IS NULL) ASC')
-            ->orderBy('ord.matched_parent_category_id', 'asc')
+            ->distinct()
+            ->orderByDesc('name_match_priority')
+            ->orderBy('ord.matched_category_key', 'asc')
             ->orderBy('ord.matched_order_id', 'asc');
     }        
 
