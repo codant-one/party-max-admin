@@ -24,6 +24,34 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  totalProducts: {
+    type: Number,
+    required: true,
+  },
+  commissionProducts: {
+    type: Number,
+    required: true,
+  },
+  amountCommissionProducts: {
+    type: Number,
+    required: true,
+  },
+  totalServices: {
+    type: Number,
+    required: true,
+  },
+  commissionServices: {
+    type: Number,
+    required: true,
+  },
+  amountCommissionServices: {
+    type: Number,
+    required: true,
+  },
+  totalLessCommission: {
+    type: Number,
+    required: true,
+  },
   id: {
     type: Number,
     required: true,
@@ -68,6 +96,13 @@ const emit = defineEmits([
 const users = ref(props.users)
 const user = ref(props.user)
 const total = ref(props.total)
+const totalProducts = ref(props.totalProducts)
+const commissionProducts = ref(props.commissionProducts)
+const amountCommissionProducts = ref(props.amountCommissionProducts)
+const totalServices = ref(props.totalServices)
+const commissionServices = ref(props.commissionServices)
+const amountCommissionServices = ref(props.amountCommissionServices)
+const totalLessCommission = ref(props.totalLessCommission)
 const disabled = ref(props.disabled)
 const typeInvoice = ref(props.typeInvoice)
 const payment = ref(null)
@@ -89,6 +124,29 @@ watch(props.data, val => {
 
 watch(() => props.total, (val) => {
   total.value = val
+})
+
+watch(() => props.totalProducts, (val) => {
+  totalProducts.value = val
+})
+
+watch(() => props.commissionProducts, (val) => {
+  commissionProducts.value = val
+})
+watch(() => props.amountCommissionProducts, (val) => {
+  amountCommissionProducts.value = val
+})
+watch(() => props.totalServices, (val) => {
+  totalServices.value = val
+})
+watch(() => props.commissionServices, (val) => {
+  commissionServices.value = val
+})
+watch(() => props.amountCommissionServices, (val) => {
+  amountCommissionServices.value = val
+})
+watch(() => props.totalLessCommission, (val) => {
+  totalLessCommission.value = val
 })
 
 const startDateTimePickerConfig = computed(() => {
@@ -418,6 +476,7 @@ const inputData = () => {
     <!-- 👉 Add purchased products -->
     <VCardText class="add-products-form px-0">
       <!-- eslint-disable vue/no-mutating-props -->
+      <!-- Header fijo con títulos -->
       <div class="add-products-header mb-4 d-none d-md-flex ps-5 pe-16">
         <VRow class="font-weight-medium">
           <VCol
@@ -462,22 +521,26 @@ const inputData = () => {
         <div class="d-flex flex-column justify-space-between pa-0" style="width: 1%;"></div>
       </div>
 
-      <div
-        v-for="(product, index) in invoice.payments"
-        :key="product.id"
-        class="my-4"
-      >
-      
-        <InvoiceProductEdit
-          v-if="product.state_id !== 3"
-          :id="index"
-          :data="product"
-          :typeInvoice="typeInvoice"
-          @remove-product="removeProduct"
-          @delete-product="deleteProduct"
-          @setting-product="settingProduct"
-          @edit-product="$emit('edit')"
-        />
+      <!-- Contenedor con scroll solo para los productos -->
+      <div style="max-height: 400px; overflow-y: auto;">
+        <div
+          v-for="(product, index) in invoice.payments"
+          :key="product.id"
+          class="my-4"
+        >
+        
+          <InvoiceProductEdit
+            v-if="product.state_id !== 3"
+            :id="index"
+            :data="product"
+            :typeInvoice="typeInvoice"
+            :supplier="user.supplier"
+            @remove-product="removeProduct"
+            @delete-product="deleteProduct"
+            @setting-product="settingProduct"
+            @edit-product="$emit('edit')"
+          />
+        </div>
       </div>
 
       <!-- <div class="mt-4">
@@ -493,6 +556,7 @@ const inputData = () => {
     <VCardText class="d-flex justify-space-between flex-wrap flex-column flex-sm-row px-0">
       <VSpacer />
       <div class="my-4">
+        <!--
         <table class="w-100">
           <tbody>
             <tr>
@@ -529,16 +593,65 @@ const inputData = () => {
         </table>
 
         <VDivider class="mt-4 mb-3" />
+        -->
 
         <table class="w-100">
           <tbody>
+            <tr>
+              <td class="pe-16">
+                Subtotal Productos:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  {{ formatNumber(totalProducts) }} COP
+                </h6>
+              </td>
+            </tr>
+            <tr>
+              <td class="pe-16">
+                Comisión Productos ({{ formatNumber(commissionProducts) }} %):
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm text-warning">
+                  <span v-if="amountCommissionProducts > 0">-</span> {{ formatNumber( amountCommissionProducts) }} COP
+                </h6>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="pe-16">
+                Subtotal Servicios:
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm">
+                  {{ formatNumber(totalServices) }} COP
+                </h6>
+              </td>
+            </tr>
+            <tr>
+              <td class="pe-16">
+                Comisión Servicios ({{ formatNumber(commissionServices) }} %):
+              </td>
+              <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
+                <h6 class="text-sm text-warning">
+                  <span v-if="amountCommissionServices > 0">-</span> {{ formatNumber( amountCommissionServices) }} COP
+                </h6>
+              </td>
+            </tr>
+
+             <tr>
+              <td colspan="2">
+                <VDivider class="mt-4 mb-3" />
+              </td>
+            </tr>
+
             <tr>
               <td class="pe-16">
                 Total:
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
                 <h6 class="text-sm">
-                  ${{ formatNumber(total) }}
+                  {{ formatNumber(totalLessCommission) }} COP
                 </h6>
               </td>
             </tr>
@@ -547,7 +660,9 @@ const inputData = () => {
       </div>
     </VCardText>
 
-    <VCardText class="mb-sm-4 px-0">
+    <VCardText 
+      v-if="typeInvoice === '1'"
+      class="mb-sm-4 px-0">
       <p class="font-weight-medium text-sm text-high-emphasis mb-2">
         Nota:
       </p>
@@ -556,7 +671,7 @@ const inputData = () => {
         placeholder="Escribe una nota aquí (opcional)..."
         @input="inputData"
         :rows="2"
-        :disabled="typeInvoice !== '0'"
+        :disabled="typeInvoice !== '1'"
       />
     </VCardText>
   </VCard>

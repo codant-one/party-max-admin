@@ -115,7 +115,7 @@ const resolveType = data => {
           md="2"
         class="text-end"
       >
-          ${{ formatNumber(localProductData.price) }}
+          COP {{ formatNumber(localProductData.price) }}
         </VCol>
 
         <VCol
@@ -123,7 +123,7 @@ const resolveType = data => {
           md="2"
         class="text-end"
       >
-          ${{ formatNumber(localProductData.total) }}
+          COP {{ formatNumber(localProductData.total) }}
         </VCol>
 
       </VRow>

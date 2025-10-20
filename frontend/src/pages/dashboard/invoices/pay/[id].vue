@@ -26,11 +26,18 @@ const users = ref([])
 const user = ref(null)
 const invoice = ref(null)
 const total = ref(0)
+const totalProducts = ref(0)
+const totalServices = ref(0)
+const commissionProducts = ref(0)
+const amountCommissionProducts = ref(0)
+const commissionServices = ref(0)
+const amountCommissionServices = ref(0)
+const totalLessCommission = ref(0)
 const last_record = ref(0)
 const start = ref()
 const end = ref()
 const note = ref()
-const typeInvoice = ref(1)
+const typeInvoice = ref("1")
 const isRequestOngoing = ref(true)
 
 const seeDialogRemove = ref(false)
@@ -40,7 +47,7 @@ const selectedInvoice = ref({})
 watchEffect(fetchData)
 
 async function fetchData() {
-    typeInvoice.value = '1'
+    typeInvoice.value = "1"
 
     if(Number(route.params.id)) { 
 
@@ -70,10 +77,26 @@ async function fetchData() {
 
         // Calcular el total inicial
         total.value = 0
+        totalProducts.value = 0
+        totalServices.value = 0
         invoiceData.value.forEach(element => {
-          if(element.state_id !== 3)
+          if(element.state_id !== 3){
             total.value += Number(element.total)
+
+            if(element.type == 'product')
+              totalProducts.value += Number(element.total)
+            
+            if(element.type == 'service')
+              totalServices.value += Number(element.total)
+          }
         });
+
+        commissionProducts.value = Number(user.value.supplier.commission)
+        amountCommissionProducts.value = Number(totalProducts.value * commissionProducts.value / 100)
+        commissionServices.value = Number(user.value.supplier.service_commission)
+        amountCommissionServices.value = Number(totalServices.value * commissionServices.value / 100)
+
+        totalLessCommission.value = Number( total.value - amountCommissionProducts.value - amountCommissionServices.value)
       }
 
       isRequestOngoing.value = false
@@ -111,20 +134,52 @@ const data = (data) => {
 
 const editProduct = () => {
   total.value = 0
+  totalProducts.value = 0
+  totalServices.value = 0
   invoiceData.value.forEach(element => {
-    if(element.state_id !== 3)
+    if(element.state_id !== 3){
       total.value += Number(element.total)
+
+      if(element.type == 'product')
+        totalProducts.value += Number(element.total)
+      
+      if(element.type == 'service')
+        totalServices.value += Number(element.total)
+    }
   });
+
+  commissionProducts.value = Number(user.value.supplier.commission)
+  amountCommissionProducts.value = Number(totalProducts.value * commissionProducts.value / 100)
+  commissionServices.value = Number(user.value.supplier.service_commission)
+  amountCommissionServices.value = Number(totalServices.value * commissionServices.value / 100)
+
+  totalLessCommission.value = Number( total.value - amountCommissionProducts.value - amountCommissionServices.value)
 }
 
 const deleteProduct = id => {
   invoiceData.value?.splice(id, 1)
 
   total.value = 0
+  totalProducts.value = 0
+  totalServices.value = 0
   invoiceData.value.forEach(element => {
-    if(element.state_id !== 3)
+    if(element.state_id !== 3){
       total.value += Number(element.total)
+
+      if(element.type == 'product')
+        totalProducts.value += Number(element.total)
+      
+      if(element.type == 'service')
+        totalServices.value += Number(element.total)
+    }
   });
+
+  commissionProducts.value = Number(user.value.supplier.commission)
+  amountCommissionProducts.value = Number(totalProducts.value * commissionProducts.value / 100)
+  commissionServices.value = Number(user.value.supplier.service_commission)
+  amountCommissionServices.value = Number(totalServices.value * commissionServices.value / 100)
+
+  totalLessCommission.value = Number( total.value - amountCommissionProducts.value - amountCommissionServices.value)
 }
 
 const removeProduct = id => {
@@ -144,10 +199,26 @@ const onSubmitRemove = () => {
       selectedInvoice.value = {}
 
       total.value = 0
+      totalProducts.value = 0
+      totalServices.value = 0
       invoiceData.value.forEach(element => {
-        if(element.state_id !== 3)
+        if(element.state_id !== 3){
           total.value += Number(element.total)
+
+          if(element.type == 'product')
+            totalProducts.value += Number(element.total)
+          
+          if(element.type == 'service')
+            totalServices.value += Number(element.total)
+        }
       });
+
+      commissionProducts.value = Number(user.value.supplier.commission)
+      amountCommissionProducts.value = Number(totalProducts.value * commissionProducts.value / 100)
+      commissionServices.value = Number(user.value.supplier.service_commission)
+      amountCommissionServices.value = Number(totalServices.value * commissionServices.value / 100)
+
+      totalLessCommission.value = Number( total.value - amountCommissionProducts.value - amountCommissionServices.value)
     }
   })
 }
@@ -169,10 +240,26 @@ const onSubmitSetting = () =>{
       selectedInvoice.value = {}
 
       total.value = 0
+      totalProducts.value = 0
+      totalServices.value = 0
       invoiceData.value.forEach(element => {
-        if(element.state_id !== 3)
+        if(element.state_id !== 3){
           total.value += Number(element.total)
+
+          if(element.type == 'product')
+            totalProducts.value += Number(element.total)
+          
+          if(element.type == 'service')
+            totalServices.value += Number(element.total)
+        }
       });
+
+      commissionProducts.value = Number(user.value.supplier.commission)
+      amountCommissionProducts.value = Number(totalProducts.value * commissionProducts.value / 100)
+      commissionServices.value = Number(user.value.supplier.service_commission)
+      amountCommissionServices.value = Number(totalServices.value * commissionServices.value / 100)
+
+      totalLessCommission.value = Number( total.value - amountCommissionProducts.value - amountCommissionServices.value)
     }
   })
 }
@@ -189,6 +276,7 @@ const onSubmit = () => {
       formData.append('reference', invoice.value.reference)
       formData.append('image', invoice.value.image[0])
       formData.append('id', Number(route.query.invoice))
+      formData.append('note', invoice.value.note)
 
 
       invoicesStores.updatePayment({id: Number(route.query.invoice), data: formData})
@@ -262,6 +350,13 @@ const onSubmit = () => {
           :users="users"
           :user="user"
           :total="total"
+          :totalProducts="totalProducts"
+          :commissionProducts="commissionProducts"
+          :amountCommissionProducts="amountCommissionProducts"
+          :totalServices="totalServices"
+          :commissionServices="commissionServices"
+          :amountCommissionServices="amountCommissionServices"
+          :totalLessCommission="totalLessCommission"
           :id="last_record"
           :start="start"
           :end="end"

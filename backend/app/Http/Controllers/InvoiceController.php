@@ -81,15 +81,7 @@ class InvoiceController extends Controller
             $limit = $request->has('limit') ? ($request->limit === 'Todos' ? -1 : $request->limit) : 10;
         
             $query = User::with([
-                'supplier.document.type',
-                'products.colors.orders' => fn($q) =>
-                    $q->where('is_invoice', 0)
-                      ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
-                      ->whereHas('product_color.product', fn($pq) => $pq->where('state_id', 3)),
-                'services.orderDetails' => fn($q) =>
-                    $q->where('is_invoice', 0)
-                      ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
-                      ->whereHas('service', fn($sq) => $sq->where('state_id', 3)),
+                'supplier.document.type'
             ])
             ->whereHas('roles', fn($q) => $q->where('name', 'Proveedor'))
             ->applyFilters(
@@ -101,18 +93,14 @@ class InvoiceController extends Controller
                     'user_id'
                 ]))
             ->withCount([
-                'products as products_count' => fn($q) =>
-                    $q->where('state_id', 3)
-                      ->whereHas('colors.orders', fn($q2) =>
-                        $q2->where('is_invoice', 0)
-                           ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
-                    ),
-                'services as services_count' => fn($q) =>
-                    $q->where('state_id', 3)
-                      ->whereHas('orderDetails', fn($q2) =>
-                        $q2->where('is_invoice', 0)
-                           ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
-                    ),
+                'productOrderDetails as products_count' => fn($q) =>
+                    $q->where('is_invoice', 0)
+                      ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                      ->whereHas('product_color.product', fn($pq) => $pq->where('state_id', 3)),
+                'serviceOrderDetails as services_count' => fn($q) =>
+                    $q->where('is_invoice', 0)
+                      ->whereHas('order', fn($oq) => $oq->where('payment_state_id', 4))
+                      ->whereHas('service', fn($sq) => $sq->where('state_id', 3)),
             ])
             ->withSum(['productOrderDetails as products_total' => fn($q) =>
                 $q->where('is_invoice', 0)
@@ -175,7 +163,13 @@ class InvoiceController extends Controller
                             ->whereNotNull('product_color_id'),
                     'orders as services_invoice_bypay_count' => fn($q) =>
                         $q->whereNull('payment_date')
-                            ->whereNotNull('service_id')
+                            ->whereNotNull('service_id'),
+                    'orders as products_invoice_paid_count' => fn($q) =>
+                            $q->whereNotNull('payment_date')
+                                ->whereNotNull('product_color_id'),
+                    'orders as services_invoice_paid_count' => fn($q) =>
+                            $q->whereNotNull('payment_date')
+                                ->whereNotNull('service_id')
                 ])
                 ->withSum(['orders as products_bypay_total' => fn($q) =>
                     $q->whereNull('payment_date')
@@ -185,9 +179,23 @@ class InvoiceController extends Controller
                     $q->whereNull('payment_date')
                         ->whereNotNull('service_id')
                 ], 'total')
+                ->withSum(['orders as products_paid_total' => fn($q) =>
+                    $q->whereNotNull('payment_date')
+                        ->whereNotNull('product_color_id')
+                ], 'total')
+                ->withSum(['orders as services_paid_total' => fn($q) =>
+                    $q->whereNotNull('payment_date')
+                        ->whereNotNull('service_id')
+                ], 'total')
                 ->addSelect(['unpaid_invoices_count' => Invoice::selectRaw('COUNT(*)')
                     ->whereColumn('id', 'invoices.id')
+                    ->where('user_id', auth()->id())
                     ->whereNull('payment_date')
+                ])
+                ->addSelect(['paid_invoices_count' => Invoice::selectRaw('COUNT(*)')
+                    ->whereColumn('id', 'invoices.id')
+                    ->where('user_id', auth()->id())
+                    ->whereNotNull('payment_date')
                 ])
             ->withTrashed();               
             
@@ -225,7 +233,6 @@ class InvoiceController extends Controller
                 'orders'
             ])
             ->whereHas('user.roles', fn($q) => $q->where('name', 'Proveedor'))
-            ->where('user_id', auth()->id())
             ->whereNull('payment_date')
             ->applyFilters(
                 $request->only([
@@ -289,6 +296,7 @@ class InvoiceController extends Controller
         
             $query = Invoice::with([
                     'user.supplier.document.type',
+                    'admin',
                     'orders'
                 ])
                 ->whereHas('user.roles', fn($q) => $q->where('name', 'Proveedor'))
@@ -480,6 +488,13 @@ class InvoiceController extends Controller
                 // 'payment_type' => 'required|string',
                 // 'reference' => 'required|string',
                 'total' => 'required|numeric|min:0',
+                'totalProducts' => 'required|numeric|min:0',
+                'totalServices' => 'required|numeric|min:0',
+                'commissionProducts' => 'required|numeric|min:0',
+                'amountCommissionProducts' => 'required|numeric|min:0',
+                'commissionServices' => 'required|numeric|min:0',
+                'amountCommissionServices' => 'required|numeric|min:0',
+                'totalLessCommission' => 'required|numeric|min:0',
                 'payments' => 'required|array|min:1',
                 'note' => 'nullable|string',
                 // 'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
@@ -491,7 +506,7 @@ class InvoiceController extends Controller
             // Crear la factura
             $invoice = Invoice::create([
                 'user_id' => $request->user_id,
-                'admin_id' => auth()->id(),
+                'admin_id' => null,
                 'state_id' => 4, // Estado pendiente
                 'invoice_id' => intval($nextInvoiceId),
                 'start' => $request->start,
@@ -499,6 +514,13 @@ class InvoiceController extends Controller
                 'subtotal' => $request->total,
                 'discount' => '0.00',
                 'total' => $request->total,
+                'total_products' => $request->totalProducts,
+                'total_services' => $request->totalServices,
+                'products_commission_percentage' => $request->commissionProducts,
+                'products_commission_amount' => $request->amountCommissionProducts,
+                'services_commission_percentage' => $request->commissionServices,
+                'services_commission_amount' => $request->amountCommissionServices,
+                'total_amount' => $request->totalLessCommission,
                 'payment_type' => $request->payment_type,
                 'payment_date' => null,
                 'reference' => $request->reference,
@@ -687,6 +709,7 @@ class InvoiceController extends Controller
     public function updatePayment(Request $request, $id): JsonResponse
     {
         try {
+            DB::beginTransaction();
 
             // Validar datos requeridos
             $request->validate([
@@ -707,7 +730,7 @@ class InvoiceController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
 
-                $path = 'invoices';
+                $path = 'invoices/';
 
                 $file_data = uploadFile($image, $path);
 
@@ -715,9 +738,79 @@ class InvoiceController extends Controller
             }
 
             $invoice->payment_date = now()->toDateString();
+            $invoice->admin_id = auth()->id();
 
             $invoice->fill($request->except(['id', 'image', 'payment_date']));
+
+            //Se borra el archivo PDF si existe
+            if (!empty($invoice->pdf)) {
+                deleteFile($invoice->pdf);
+                $invoice->pdf = null;
+            }
+
             $invoice->update();
+
+            // Generar y guardar PDF de la factura
+            $invoiceFull = Invoice::with([
+                'user.supplier.document.type',
+                'orders.product_color.product',
+                'orders.product_color.color',
+                'orders.service',
+                'orders.cake_size',
+                'orders.flavor',
+                'orders.filling'
+            ])->find($invoice->id);
+
+            $products = [];
+            $services = [];
+
+            foreach ($invoiceFull->orders as $detail) {
+                if ($detail->product_color) {
+                    $products[] = [
+                        'product_id' => $detail->product_color->product->id,
+                        'product_name' => $detail->product_color->product->name,
+                        'product_image' => asset('storage/' . $detail->product_color->product->image),
+                        'color' => optional($detail->product_color->color)->name,
+                        'slug' => env('APP_DOMAIN').'/products/'. $detail->product_color->product->slug,
+                        'quantity' => $detail->quantity,
+                        'product_price' => $detail->price,
+                        'product_total' => $detail->total,
+                    ];
+                } elseif ($detail->service) {
+                    $services[] = [
+                        'service_id' => $detail->service->id,
+                        'service_name' => $detail->service->name,
+                        'service_is_full' => $detail->service->is_full,
+                        'service_image' => asset('storage/' . $detail->service->image),
+                        'flavor' => optional($detail->flavor)->name,
+                        'filling' => optional($detail->filling)->name,
+                        'cake_size' => optional($detail->cake_size)->name,
+                        'slug' => env('APP_DOMAIN').'/services/'. $detail->service->slug,
+                        'quantity' => $detail->quantity,
+                        'service_price' => $detail->price,
+                        'service_total' => $detail->total,
+                    ];
+                }
+            }
+
+            $date = now()->format('YmdHis');
+            $dir = storage_path('app/public/pdfs');
+            if (!file_exists($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            $filename = 'invoice-'.Str::slug((string) $invoice->id).'-'.$date.'.pdf';
+            $fullPath = $dir.'/'.$filename;
+
+            PDF::loadView('pdfs.invoice', [
+                'invoice' => $invoiceFull,
+                'products' => $products,
+                'services' => $services
+            ])->save($fullPath);
+
+            $invoice->pdf = 'pdfs/'.$filename;
+            $invoice->save();
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,

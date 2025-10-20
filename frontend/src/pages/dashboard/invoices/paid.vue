@@ -147,6 +147,33 @@ const addInvoiceByUser = invoiceData => {
   router.push({ name : 'dashboard-invoices-add-id', params: { id: invoiceData.id } })
 }
 
+const openLink = function (invoiceData) {
+  window.open(themeConfig.settings.urlStorage + invoiceData.pdf)
+}
+
+const paymentReference = function (invoiceData) {
+  window.open(themeConfig.settings.urlStorage + invoiceData.image)
+}
+
+const download = async(invoiceData) => {
+  try {
+    const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + invoiceData.pdf);
+    const blob = await response.blob();
+    
+    const blobUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = invoiceData.pdf.replace('pdfs/', '');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
 </script>
 
 <template>
@@ -256,11 +283,47 @@ const addInvoiceByUser = invoiceData => {
             <td>
               {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}
             </td>
+            <td class="text-wrap">
+              <div class="d-flex flex-column">
+                <span class="font-weight-medium">{{ invoice.admin.name }} {{ invoice.admin.last_name ?? '' }}</span>
+                <span class="text-sm text-disabled">{{ invoice.admin.email }}</span>
+              </div>
+            </td>
             <td class="text-center" style="width: 5rem;" v-if="$can('editar','facturas') || $can('eliminar','facturas')">
-              <!-- <VBtn v-if="$can('crear','facturas')" icon size="x-small" color="default" variant="text" @click="addInvoiceByUser(invoice)">
-                <VTooltip open-on-focus location="top" activator="parent"> Generar </VTooltip>
-                <VIcon size="22" icon="mdi-file-document-edit-outline" />
-              </VBtn> -->
+              <VMenu>
+                <template #activator="{ props }">
+                    <VBtn v-bind="props" icon variant="text" color="default" size="x-small">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="24" height="24" stroke-width="2">
+                        <path d="M12.52 20.924c-.87 .262 -1.93 -.152 -2.195 -1.241a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.088 .264 1.502 1.323 1.242 2.192"></path>
+                        <path d="M19 16v6"></path>
+                        <path d="M22 19l-3 3l-3 -3"></path>
+                        <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+                    </svg>
+                    </VBtn>
+                </template>
+                <VList>
+                    <VListItem @click="openLink(invoice)">
+                        <template #prepend>
+                            <VIcon icon="mdi-file-pdf-box" />
+                        </template>
+                        <VListItemTitle>Ver PDF</VListItemTitle>
+                    </VListItem>
+                    <VListItem @click="download(invoice)">
+                        <template #prepend>
+                          <VIcon icon="mdi-cloud-download-outline"/>
+                        </template>
+                        <VListItemTitle>Descargar</VListItemTitle>
+                    </VListItem>  
+                    <VListItem 
+                      v-if="resolveInvoiceStatusVariantAndIcon(invoice) == 12"
+                      @click="paymentReference(invoice)">
+                        <template #prepend>
+                            <VIcon icon="mdi-file-pdf-box" />
+                        </template>
+                        <VListItemTitle>Comprobante de Pago</VListItemTitle>
+                    </VListItem>              
+                </VList>
+              </VMenu>
             </td>
           </tr>
         </tbody>

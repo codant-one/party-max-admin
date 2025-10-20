@@ -18,9 +18,16 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const totalInvoices = ref(0)
 const isRequestOngoing = ref(true)
+const invoicePendingData = ref([])
 
 const rol = ref(null)
 const userData = ref(null)
+
+const advisor = ref({
+  type: '',
+  message: '',
+  show: false
+})
 
 const paginationData = computed(() => {
   const firstIndex = invoices.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0
@@ -45,6 +52,25 @@ onMounted(async () => {
   if(rol.value !== 'Proveedor') {
     await suppliersStores.fetchSuppliers({limit: -1})
     loadSuppliers()
+  }
+
+  const response = await invoicesStores.invoicesByUser(Number(userData.value.id))
+      
+  console.log('response', response)
+  
+  if(response.success) {   
+    // Procesar los productos/servicios para la factura
+    invoicePendingData.value = response.data.payments.map(payment => ({
+      ...payment,
+      disabled: true
+    }));
+
+    if (invoicePendingData && invoicePendingData.value.length <= 0){
+      advisor.value.show = true
+      advisor.value.type = 'warning'
+      advisor.value.message = 'No existen productos o servicios por facturar'
+    }
+    
   }
 })
 
@@ -79,20 +105,20 @@ const getSuppliers = computed(() => {
 
 const resolveInvoiceStatusVariantAndIcon = (invoice) => {
   // Return status code to reuse the same map as pending.vue
-  if (invoice.unpaid_invoices_count > 0) return 14
-  if (invoice.paid_invoices_count > 0) return 12
+  if (invoice.payment_date === null) return 14
+  else if (invoice.payment_date !== null) return 12
   return 6
 }
 
 const resolveInvoiceProducts = (invoice) => {
   // Return status code to reuse the same map as pending.vue
-  if (invoice.unpaid_invoices_count > 0) {
+  if (invoice.products_invoice_bypay_count > 0) {
     return [
         invoice.products_bypay_total ?? 0,
         parseFloat( (invoice.products_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
         invoice.products_invoice_bypay_count
     ]
-  } else if (invoice.paid_invoices_count > 0) {
+  } else if (invoice.products_invoice_paid_count > 0) {
     return [
         invoice.products_paid_total ?? 0,
         parseFloat( (invoice.products_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
@@ -109,13 +135,13 @@ const resolveInvoiceProducts = (invoice) => {
 
 const resolveInvoiceServices = (invoice) => {
   // Return status code to reuse the same map as pending.vue
-  if (invoice.unpaid_invoices_count > 0) {
+  if (invoice.services_invoice_bypay_count > 0) {
     return [
         invoice.services_bypay_total ?? 0,
         parseFloat( (invoice.services_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
         invoice.services_invoice_bypay_count
     ]
-  } else if (invoice.paid_invoices_count > 0) {
+  } else if (invoice.services_invoice_paid_count > 0) {
     return [
         invoice.services_paid_total ?? 0,
         parseFloat( (invoice.services_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
@@ -148,6 +174,10 @@ const openLink = function (invoiceData) {
   window.open(themeConfig.settings.urlStorage + invoiceData.pdf)
 }
 
+const paymentReference = function (invoiceData) {
+  window.open(themeConfig.settings.urlStorage + invoiceData.image)
+}
+
 const download = async(invoiceData) => {
   try {
     const response = await fetch(themeConfig.settings.urlbase + 'proxy-image?url=' + themeConfig.settings.urlStorage + invoiceData.pdf);
@@ -166,6 +196,20 @@ const download = async(invoiceData) => {
     console.error('Error:', error);
   }
 };
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  
+  //return `${year}-${month}-${day} ${hours}:${minutes}`
+  return `${year}-${month}-${day}`
+}
 
 </script>
 
@@ -192,8 +236,14 @@ const download = async(invoiceData) => {
 
         <VSpacer />
 
+        <VAlert
+          v-if="advisor.show"
+          :type="advisor.type"
+          class="mb-6">       
+          {{ advisor.message }}
+        </VAlert>
         <VBtn
-          v-if="$can('crear','facturas')"
+          v-if="$can('crear','facturas') && invoicePendingData && invoicePendingData.length > 0"
           prepend-icon="tabler-plus"
           :to="{ name: 'dashboard-invoices-add-id', params: { id: userData.id } }">
           Generar Factura
@@ -208,6 +258,8 @@ const download = async(invoiceData) => {
             <th scope="col"> FACTURA # </th>
             <th scope="col"> FECHA DE SOLICITUD </th>
             <th scope="col"> FECHA DE PAGO </th>
+            <th scope="col"> TIPO DE PAGO </th>
+            <th scope="col"> REFERENCIA DEL PAGO </th>
             <th scope="col"> PRODUCTOS </th>
             <th scope="col"> SERVICIOS </th>
             <th scope="col"> TOTAL </th>
@@ -222,11 +274,17 @@ const download = async(invoiceData) => {
                 <span class="font-weight-medium">{{ invoice.invoice_id }}</span>
               </div>
             </td>
-            <td class="text-wrap">
-              {{ invoice.created_at }}
+            <td class="text-wrap text-center">
+              {{ formatDate(invoice.created_at) }}
             </td>
-            <td class="text-wrap">
-              {{ invoice.payment_date }}
+            <td class="text-wrap text-center">
+              {{ formatDate(invoice.payment_date) }}
+            </td>
+            <td class="text-wrap text-center">
+              {{ (invoice.payment_type !== "null") ? invoice.payment_type : '-' }}
+            </td>
+            <td class="text-wrap text-center">
+              {{ (invoice.reference !== "null") ? invoice.reference : '-' }}
             </td>
             <td class="text-wrap" style="width: 150px;">
               <div class="d-flex flex-column">
@@ -279,7 +337,15 @@ const download = async(invoiceData) => {
                           <VIcon icon="mdi-cloud-download-outline"/>
                         </template>
                         <VListItemTitle>Descargar</VListItemTitle>
-                      </VListItem>                
+                    </VListItem>  
+                    <VListItem 
+                      v-if="resolveInvoiceStatusVariantAndIcon(invoice) == 12"
+                      @click="paymentReference(invoice)">
+                        <template #prepend>
+                            <VIcon icon="mdi-file-pdf-box" />
+                        </template>
+                        <VListItemTitle>Comprobante de Pago</VListItemTitle>
+                    </VListItem>              
                 </VList>
                 </VMenu>
             </td>

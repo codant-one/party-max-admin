@@ -21,6 +21,11 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'user_id','id');
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id','id');
+    }
+
     public function orders()
     {
         return $this->hasMany(OrderDetail::class, 'invoice_id','id');

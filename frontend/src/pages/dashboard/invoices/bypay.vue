@@ -258,7 +258,7 @@ const addInvoiceByUser = invoiceData => {
             </td>
             <td class="text-center" style="width: 5rem;" v-if="$can('editar','facturas') || $can('eliminar','facturas')">
               <VBtn v-if="$can('crear','facturas')" icon size="x-small" color="default" variant="text" @click="addInvoiceByUser(invoice)">
-                <VTooltip open-on-focus location="top" activator="parent"> Generar </VTooltip>
+                <VTooltip open-on-focus location="top" activator="parent"> Pagar </VTooltip>
                 <VIcon size="22" icon="mdi-file-document-edit-outline" />
               </VBtn>
             </td>

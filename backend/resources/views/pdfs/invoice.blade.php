@@ -36,7 +36,7 @@
         left: 0;
         right: 0;
         height: 170px;
-        background-image: url('{{ asset('/images/letterhead_footer.jpg') }}');
+        background-image: url('{{ asset('/images/letterhead_header.jpg') }}');
         background-repeat: no-repeat;
         background-position: center;
         background-size: cover;
@@ -70,7 +70,7 @@
       } 
       
       .products_cant {
-        width: 12%;
+        width: 20%;
         text-align: right;
         margin: 5px 0;
       }  
@@ -123,7 +123,10 @@
             <td style="text-align: right; vertical-align: top;">
                 <p class="m-0"><strong>Fecha de solicitud:</strong>  {{$invoice->start}}</p>
                 <p class="m-0"><strong>Fecha de vencimiento:</strong>  {{$invoice->end}}</p>
-                <p class="m-0"><strong>Estado:</strong>  {{ $invoice->payment_date ? 'Pagada' : 'Pendiente' }}</p>
+                @if(!empty($invoice->payment_date))
+                <p class="m-0"><strong>Fecha de pago:</strong>  {{ $invoice->payment_date }}</p>
+                @endif
+                <p class="m-0"><strong>Estado:</strong>  {{ !empty($invoice->payment_date) ? 'Pagada' : 'Pendiente' }}</p>
             </td>
           </tr>
         </table>
@@ -160,10 +163,10 @@
                 {{ $product['quantity'] }}
               </td>
               <td class="products_cant">
-                ${{ formatCurrency($product['product_price']) }}
+                COP {{ formatCurrency($product['product_price']) }}
               </td>
               <td class="products_cant">
-                ${{ formatCurrency($product['product_total']) }}
+                COP {{ formatCurrency($product['product_total']) }}
               </td>
           </tr>
           @endforeach
@@ -203,26 +206,30 @@
                 {{ $service['quantity'] }}
               </td>
               <td class="products_cant">
-                ${{ formatCurrency($service['service_price']) }}
+                COP {{ formatCurrency($service['service_price']) }}
               </td>
               <td class="products_cant">
-                ${{ formatCurrency($service['service_total']) }}
+                COP {{ formatCurrency($service['service_total']) }}
               </td>  
           </tr>
           @endforeach
           <tr class="border-bottom">
             <td class="products_img"></td>
             <td class="products"></td>
-            <td class="products_cant"></td>
-            <td class="products_cant">
-              <p class="text m-0"><strong>Subtotal:</strong></p>
-              <p class="text m-0"><strong>IVA:</strong></p>
+            
+            <td class="products_cant" colspan="2">
+              <p class="text m-0"><strong>Subtotal Productos:</strong></p>
+              <p class="text m-0"><strong>Comisión Productos ({{ $invoice->products_commission_percentage }} %):</strong></p>
+              <p class="text m-0"><strong>Subtotal Servicios:</strong></p>
+              <p class="text m-0"><strong>Comisión Servicios ({{ $invoice->services_commission_percentage }} %):</strong></p>
               <p class="text m-0 text-primary"><strong>Total:</strong></p>
             </td>
             <td class="products_cant" style="padding: 10px 0;">
-              <p class="numbers m-0"><strong>${{ formatCurrency($invoice->subtotal) }}</strong></p>
-              <p class="numbers m-0"><strong>${{ formatCurrency(0) }}</strong></p>
-              <p class="numbers m-0 text-primary"><strong>${{ formatCurrency($invoice->total) }}</strong></p>
+              <p class="numbers m-0"><strong>{{ formatCurrency($invoice->total_products) }} COP</strong></p>
+              <p class="numbers m-0 text-warning"><strong>@if($invoice->products_commission_amount > 0) - @endif {{ formatCurrency($invoice->products_commission_amount) }} COP</strong></p>
+              <p class="numbers m-0"><strong>{{ formatCurrency($invoice->total_services) }} COP</strong></p>
+              <p class="numbers m-0 text-warning"><strong>@if($invoice->services_commission_amount > 0) - @endif {{ formatCurrency($invoice->services_commission_amount) }} COP</strong></p>
+              <p class="numbers m-0 text-primary"><strong>{{ formatCurrency($invoice->total_amount) }} COP</strong></p>
             </td>
           </tr>
           @if($invoice->note)
