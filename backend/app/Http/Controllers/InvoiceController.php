@@ -558,7 +558,7 @@ class InvoiceController extends Controller
                     InvoiceDetail::create([
                         'invoice_id' => $invoice->id,
                         'order_id' => $orderDetail->order_id,
-                        'product_id' => $orderDetail->product_color->product_id,
+                        'product_id' => ($orderDetail->product_color) ? $orderDetail->product_color->product_id : null,
                         'service_id' => $orderDetail->service_id,
                         'price' => $orderDetail->price,
                         'quantity' => $orderDetail->quantity,
