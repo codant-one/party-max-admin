@@ -525,7 +525,7 @@ class InvoiceController extends Controller
                 'payment_date' => null,
                 'reference' => $request->reference,
                 'image' => null,
-                'note' => $request->note
+                'note' => $request->note === '' ? null : $request->note
             ]);
 
             // if ($request->hasFile('image')) {
@@ -715,7 +715,7 @@ class InvoiceController extends Controller
             $request->validate([
                 'payment_type' => 'required|string',
                 'reference' => 'required|string',
-                'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+                //'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
             ]);
 
             $invoice = Invoice::find($id);

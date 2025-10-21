@@ -53,7 +53,7 @@ async function fetchData() {
               Saldo de la Cuenta
             </h4>
             <div>
-              <span class="text-primary text-h4 me-2">COP {{ formatNumber(balance) ?? '0.00' }}</span>
+              <span class="text-primary text-h4 me-2">${{ formatNumber(balance) ?? '0.00' }}</span>
               <span class="text-body-1">Crédito restante</span>
               <p class="mb-0 text-base text-disabled">
                 Saldo de cuenta para el proveedor
@@ -88,7 +88,7 @@ async function fetchData() {
                 Productos + Servicios
               </VChip>
               <p class="mb-0 text-base text-disabled">
-                COP {{ formatNumber(props.customerData.sales) ?? '0.00' }} + COP {{ formatNumber(props.customerData.services) ?? '0.00' }}
+                ${{ formatNumber(props.customerData.sales) ?? '0.00' }} + ${{ formatNumber(props.customerData.services) ?? '0.00' }}
               </p>
             </div>
           </VCardText>

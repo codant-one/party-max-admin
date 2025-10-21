@@ -78,19 +78,19 @@ const websiteAnalytics = [
     slideImg: sliderBar3,
     data: [
       {
-        number: 'COP ' + formatNumber(salesTotal.value.today) ?? '0.00',
+        number: '$ ' + formatNumber(salesTotal.value.today) ?? '0.00',
         text: 'Hoy'
       },
       {
-        number: 'COP ' + formatNumber(salesTotal.value.last_7_days) ?? '0.00',
+        number: '$ ' + formatNumber(salesTotal.value.last_7_days) ?? '0.00',
         text: 'Semana'
       },
       {
-        number: 'COP ' + formatNumber(salesTotal.value.last_30_days) ?? '0.00',
+        number: '$ ' + formatNumber(salesTotal.value.last_30_days) ?? '0.00',
         text: 'Mes'
       },
       {
-        number: 'COP ' + formatNumber(salesTotal.value.year) ?? '0.00',
+        number: '$ ' + formatNumber(salesTotal.value.year) ?? '0.00',
         text: 'Año'
       },
     ],

@@ -4,6 +4,7 @@ import { themeConfig } from '@themeConfig'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { excelParser } from '@/plugins/csv/excelParser'
+import { formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import show from "@/components/products/show.vue";
@@ -571,10 +572,10 @@ const downloadCSV = async () => {
                   <th> #ID </th>
                   <th> PRODUCTO </th>
                   <th class="pe-4"> SKU </th>
-                  <th class="pe-4"> PRECIO </th>
+                  <th class="pe-4 text-end"> PRECIO </th>
                   <th class="pe-4"> QTY </th>
-                  <th class="pe-4"> STATUS </th>
-                  <th scope="pe-4" v-if="
+                  <th class="pe-4 text-center"> STATUS </th>
+                  <th scope="pe-4" class="text-center" v-if="
                     $can('aprobar', 'productos') || 
                     $can('rechazar', 'productos') || 
                     $can('editar', 'productos') || 
@@ -603,14 +604,14 @@ const downloadCSV = async () => {
                         </div>
                         </td>
                         <td> {{ product.colors.find(c => c.stock === product.min_stock)?.sku ?? '--' }} </td>
-                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                        <td class="text-end"> ${{ formatNumber(product.price_for_sale) }}</td>
                         <td> {{ product.min_stock }} </td>
-                        <td> 
-                        <VChip
-                            v-bind="resolveStatus(product.state_id)"
-                            :variant="product.min_stock === 0 ? 'elevated' : 'outlined'"
-                            label
-                        />
+                        <td class="text-center"> 
+                          <VChip
+                              v-bind="resolveStatus(product.state_id)"
+                              :variant="product.min_stock === 0 ? 'elevated' : 'outlined'"
+                              label
+                          />
                         </td>
                         <td class="text-center" style="width: 5rem;" 
                             v-if="$can('aprobar', 'productos') ||

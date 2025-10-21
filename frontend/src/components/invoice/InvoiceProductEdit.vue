@@ -115,7 +115,7 @@ const resolveType = data => {
           md="2"
         class="text-end"
       >
-          COP {{ formatNumber(localProductData.price) }}
+          ${{ formatNumber(localProductData.price) }}
         </VCol>
 
         <VCol
@@ -123,25 +123,18 @@ const resolveType = data => {
           md="2"
         class="text-end"
       >
-          COP {{ formatNumber(localProductData.total) }}
+          ${{ formatNumber(localProductData.total) }}
         </VCol>
 
       </VRow>
     </div>
 
     <!-- 👉 Item Actions -->
-    <div class="d-flex flex-column justify-space-between border-s pa-0">
-      <VBtn 
-        v-if="typeInvoice == '0'"
+    <div class="d-flex flex-column justify-space-between border-s pa-0"  v-if="typeInvoice == '0'">
+      <VBtn
         icon="tabler-x"
         variant="text"
         @click="removeProduct">
-        
-      </VBtn>
-      <VBtn 
-        v-if="typeInvoice !== '0'"
-        variant="text">
-        
       </VBtn>
 
       <!-- <VBtn 

@@ -4,6 +4,7 @@ import { themeConfig } from '@themeConfig'
 import { FreeMode, Navigation, Thumbs, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Carousel, Slide } from 'vue3-carousel'
+import { formatNumber } from '@/@core/utils/formatters'
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -278,7 +279,7 @@ const buildEmbedUrl = (url) => {
                                             <VCol cols="12">
                                                 <div>
                                                     <span class="font-weight-semibold"> Costo: </span>
-                                                    <span>{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                                                    <span>${{ formatNumber(price) }}</span>
                                                 </div>
                                                 <div> 
                                                     <span class="font-weight-semibold"> Envios: </span>

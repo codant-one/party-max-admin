@@ -3,6 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { useReferralsStores } from '@/stores/useReferrals'
 import { useCategoriesStores } from '@/stores/useCategories'
+import { avatarText } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 

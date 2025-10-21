@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\SupplierAccount;
 use App\Models\Quote;
 use App\Models\ProductColor;
+use App\Models\Invoice;
 
 class TestingController extends Controller
 {
@@ -855,6 +856,58 @@ class TestingController extends Controller
         ];
 
         return view('emails.admin.contact', compact('data'));
+    }
+
+    public function invoicesPDF() {
+
+        $invoice = Invoice::with([
+            'user.supplier.document.type',
+            'orders.product_color.product',
+            'orders.product_color.color',
+            'orders.service',
+            'orders.cake_size',
+            'orders.flavor',
+            'orders.filling'
+        ])->find(2);
+
+        
+        $products = [];
+        $services = [];
+
+        foreach ($invoice->orders as $detail) {
+            if ($detail->product_color) {
+                $products[] = [
+                    'product_id' => $detail->product_color->product->id,
+                    'product_name' => $detail->product_color->product->name,
+                    'product_image' => asset('storage/' . $detail->product_color->product->image),
+                    'color' => optional($detail->product_color->color)->name,
+                    'slug' => env('APP_DOMAIN').'/products/'. $detail->product_color->product->slug,
+                    'quantity' => $detail->quantity,
+                    'product_price' => $detail->price,
+                    'product_total' => $detail->total,
+                ];
+            } elseif ($detail->service) {
+                $services[] = [
+                    'service_id' => $detail->service->id,
+                    'service_name' => $detail->service->name,
+                    'service_is_full' => $detail->service->is_full,
+                    'service_image' => asset('storage/' . $detail->service->image),
+                    'flavor' => optional($detail->flavor)->name,
+                    'filling' => optional($detail->filling)->name,
+                    'cake_size' => optional($detail->cake_size)->name,
+                    'slug' => env('APP_DOMAIN').'/services/'. $detail->service->slug,
+                    'quantity' => $detail->quantity,
+                    'service_price' => $detail->price,
+                    'service_total' => $detail->total,
+                ];
+            }
+        }
+
+        return view('pdfs.invoice', compact(
+            'invoice', 
+            'products', 
+            'services'
+        ));
     }
 
 }

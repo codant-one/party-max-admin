@@ -254,7 +254,7 @@ const getFlagCountry = country => {
                 <th scope="col"> SERVICIOS PUB. </th>
                 <th scope="col"> TOTAL PRODUCTOS </th>
                 <th scope="col"> TOTAL SERVICIOS </th>
-                <th scope="col" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">
+                <th scope="col" class="text-center" v-if="$can('editar', 'proveedores') || $can('eliminar', 'proveedores')">
                   ACCIONES
                 </th>
               </tr>
@@ -308,18 +308,18 @@ const getFlagCountry = country => {
                     {{ supplier.user.user_detail.province.country.name }} 
                   </span>
                 </td> -->
-                <td class="text-wrap w-15">
+                <td class="text-wrap w-15 text-center">
                   {{ supplier.product_count }}
                 </td>
-                <td class="text-wrap w-15">
+                <td class="text-wrap w-15 text-center">
                   {{ supplier.service_count }}
                 </td>
-                <td>
+                <td class="text-end">
                   <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
                     ${{ formatNumber(supplier.sales) ?? '0.00' }}
                   </span>
                 </td>
-                <td>
+                <td class="text-end">
                   <span class="text-body-1 font-weight-medium text-high-emphasis w-15">
                     ${{ formatNumber(supplier.services) ?? '0.00' }}
                   </span>

@@ -5,6 +5,7 @@ import { useClipboard } from '@vueuse/core'
 import { useServicesStores } from '@/stores/useServices'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { excelParser } from '@/plugins/csv/excelParser'
+import { formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import detailsService from "@/components/services/detailsService.vue";
@@ -456,7 +457,7 @@ const downloadCSV = async () => {
       title: toSentenceCase(cleanName),
       description: toSentenceCase(cleanDescriptionText),
       availability: 'in stock',
-      price: element.cupcakes.length > 0 ? element.cupcakes[0].price.toFixed(2) + ' COP' : element.price.toFixed(2) + ' COP',
+      price: element.cupcakes.length > 0 ? '$' + formatNumber(element.cupcakes[0].price ?? 0) : '$' + formatNumber(element.price ?? 0),
       image_link: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
       link: themeConfig.settings.urlDomain + 'services/' + element.slug,
       brand: 'PARTYMAX',
@@ -765,9 +766,9 @@ const downloadCSV = async () => {
                   <th> #ID </th>
                   <th> SERVICIO </th>
                   <th class="pe-4"> SKU </th>
-                  <th class="pe-4"> PRECIO </th>
-                  <th class="pe-4"> STATUS </th>
-                  <th scope="pe-4" v-if="
+                  <th class="pe-4 text-end"> PRECIO </th>
+                  <th class="pe-4 text-center"> STATUS </th>
+                  <th scope="pe-4" class="text-center" v-if="
                     $can('aprobar', 'servicios') || 
                     $can('rechazar', 'servicios') || 
                     $can('editar', 'servicios') || 
@@ -798,8 +799,8 @@ const downloadCSV = async () => {
                   </div>
                 </td>
                 <td> {{ service.sku }} </td>
-                <td> {{ (parseFloat(service.cupcakes.length > 0 ? service.cupcakes[0].price : service.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                <td> 
+                <td class="text-end"> ${{ formatNumber(service.cupcakes.length > 0 ? service.cupcakes[0].price : service.price ?? 0) }}</td>
+                <td class="text-center"> 
                   <VChip
                     v-bind="resolveStatus(service.state_id)"
                     density="default"

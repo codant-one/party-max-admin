@@ -5,6 +5,7 @@ import { useInvoicesStores } from '@/stores/useInvoices'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { avatarText } from '@core/utils/formatters'
 import { ref } from "vue"
+import { formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
 
 const invoicesStores = useInvoicesStores()
@@ -197,9 +198,9 @@ const addInvoiceByUser = invoiceData => {
                         <th scope="col"> ESTATUS </th>
                         <th scope="col"> EMPRESA </th>
                         <th scope="col"> CONTACTO </th>
-                        <th scope="col"> PRODUCTOS </th>
-                        <th scope="col"> SERVICIOS </th>
-                        <th scope="col"> TOTAL </th>
+                        <th scope="col" class="text-end"> PRODUCTOS </th>
+                        <th scope="col" class="text-end"> SERVICIOS </th>
+                        <th scope="col" class="text-end"> TOTAL </th>
                     </tr>
                 </thead>
                 <!-- 👉 table body -->
@@ -224,7 +225,7 @@ const addInvoiceByUser = invoiceData => {
                                     </VAvatar>
                                 </template>
                                 <p class="mb-0"> Pendiente </p>
-                                <p class="mb-0"> Total: {{ (parseFloat(invoice.products_total + invoice.services_total)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</p>
+                                <p class="mb-0"> Total: ${{ formatNumber(invoice.products_total + invoice.services_total) }}</p>
                             </VTooltip>
                         </td>
                         <td class="text-wrap">
@@ -258,24 +259,24 @@ const addInvoiceByUser = invoiceData => {
                                 <span class="text-sm text-disabled">{{ invoice.email }}</span>
                             </div>
                         </td>
-                        <td class="text-wrap" style="width: 150px;">
+                        <td class="text-wrap text-end" style="width: 150px;">
                             <div class="d-flex flex-column">
                                 <span class="font-weight-medium">
-                                    {{ (parseFloat(invoice.products_total ?? '0.00')).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
+                                    ${{ formatNumber(invoice.products_total ?? '0.00') }}
                                 </span>
                                 <span class="text-sm text-disabled">{{ invoice.products_count }} (Q)</span>
                             </div>
                         </td>
-                        <td class="text-wrap" style="width: 150px;">
+                        <td class="text-wrap text-end" style="width: 150px;">
                             <div class="d-flex flex-column">
                                 <span class="font-weight-medium">
-                                    {{ (parseFloat(invoice.services_total ?? '0.00')).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
+                                    ${{ formatNumber(invoice.services_total ?? '0.00') }}
                                 </span>
                                 <span class="text-sm text-disabled">{{ invoice.services_count }} (Q)</span>
                             </div>
                         </td>
-                        <td> 
-                            {{ (parseFloat(invoice.products_total + invoice.services_total)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}
+                        <td class="text-end"> 
+                            ${{ formatNumber(invoice.products_total + invoice.services_total) }}
                         </td>
                     </tr>
                 </tbody>

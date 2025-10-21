@@ -3,7 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { useInvoicesStores } from '@/stores/useInvoices'
 import { useSuppliersStores } from '@/stores/useSuppliers'
-import { avatarText } from '@core/utils/formatters'
+import { formatNumber } from '@/@core/utils/formatters'
 import { ref } from 'vue'
 import router from '@/router'
 
@@ -53,25 +53,6 @@ onMounted(async () => {
     await suppliersStores.fetchSuppliers({limit: -1})
     loadSuppliers()
   }
-
-  const response = await invoicesStores.invoicesByUser(Number(userData.value.id))
-      
-  console.log('response', response)
-  
-  if(response.success) {   
-    // Procesar los productos/servicios para la factura
-    invoicePendingData.value = response.data.payments.map(payment => ({
-      ...payment,
-      disabled: true
-    }));
-
-    if (invoicePendingData && invoicePendingData.value.length <= 0){
-      advisor.value.show = true
-      advisor.value.type = 'warning'
-      advisor.value.message = 'No existen productos o servicios por facturar'
-    }
-    
-  }
 })
 
 watchEffect(fetchData)
@@ -115,19 +96,19 @@ const resolveInvoiceProducts = (invoice) => {
   if (invoice.products_invoice_bypay_count > 0) {
     return [
         invoice.products_bypay_total ?? 0,
-        parseFloat( (invoice.products_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_bypay_total ?? 0) ),
         invoice.products_invoice_bypay_count
     ]
   } else if (invoice.products_invoice_paid_count > 0) {
     return [
         invoice.products_paid_total ?? 0,
-        parseFloat( (invoice.products_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_paid_total ?? 0) ),
         invoice.products_invoice_paid_count
     ]
   } else {
     return [
         invoice.products_total ?? 0,
-        parseFloat( (invoice.products_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_total ?? 0) ),
         invoice.products_count
     ]
   }
@@ -138,19 +119,19 @@ const resolveInvoiceServices = (invoice) => {
   if (invoice.services_invoice_bypay_count > 0) {
     return [
         invoice.services_bypay_total ?? 0,
-        parseFloat( (invoice.services_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_bypay_total ?? 0) ),
         invoice.services_invoice_bypay_count
     ]
   } else if (invoice.services_invoice_paid_count > 0) {
     return [
         invoice.services_paid_total ?? 0,
-        parseFloat( (invoice.services_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_paid_total ?? 0) ),
         invoice.services_invoice_paid_count
     ]
   } else {
     return [
         invoice.services_total ?? 0,
-        parseFloat( (invoice.services_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_total ?? 0) ),
         invoice.services_count
     ]
   }
@@ -211,6 +192,30 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`
 }
 
+const generateInvoice = async () => {   
+
+  isRequestOngoing.value = true
+  const response = await invoicesStores.invoicesByUser(Number(userData.value.id))
+  isRequestOngoing.value = false
+
+  if(response.success) {   
+    if (response.data.payments.length > 0) {
+      router.push({ name: 'dashboard-invoices-add-id', params: { id: userData.value.id } })
+    } else {
+      advisor.value.show = true
+      advisor.value.type = 'warning'
+      advisor.value.message = 'No existen productos o servicios por facturar'
+
+      setTimeout(() => {
+        advisor.value = {
+            type: '',
+            message: '',
+            show: false
+        }
+      }, 3000)
+    }
+  }
+}
 </script>
 
 <template>
@@ -227,6 +232,13 @@ const formatDate = (dateString) => {
       </VCard>
     </VDialog>
 
+    <VAlert
+      v-if="advisor.show"
+      :type="advisor.type"
+      class="mb-6">       
+      {{ advisor.message }}
+    </VAlert>
+
     <VCard>
       <VCardText class="d-flex align-center flex-wrap gap-4">
         <div class="d-flex align-center">
@@ -236,16 +248,10 @@ const formatDate = (dateString) => {
 
         <VSpacer />
 
-        <VAlert
-          v-if="advisor.show"
-          :type="advisor.type"
-          class="mb-6">       
-          {{ advisor.message }}
-        </VAlert>
         <VBtn
-          v-if="$can('crear','facturas') && invoicePendingData && invoicePendingData.length > 0"
+          v-if="$can('crear','facturas')"
           prepend-icon="tabler-plus"
-          :to="{ name: 'dashboard-invoices-add-id', params: { id: userData.id } }">
+          @click="generateInvoice()">
           Generar Factura
         </VBtn>
       </VCardText>
@@ -255,16 +261,16 @@ const formatDate = (dateString) => {
       <v-table class="text-no-wrap">
         <thead>
           <tr>
-            <th scope="col"> FACTURA # </th>
+            <th scope="col"> # </th>
             <th scope="col"> FECHA DE SOLICITUD </th>
             <th scope="col"> FECHA DE PAGO </th>
             <th scope="col"> TIPO DE PAGO </th>
             <th scope="col"> REFERENCIA DEL PAGO </th>
-            <th scope="col"> PRODUCTOS </th>
-            <th scope="col"> SERVICIOS </th>
-            <th scope="col"> TOTAL </th>
-            <th scope="col"> ESTATUS </th>
-            <th scope="col" v-if="$can('editar','facturas') || $can('eliminar','facturas')"> ACCIONES </th>
+            <th scope="col" class="text-end"> PRODUCTOS </th>
+            <th scope="col" class="text-end"> SERVICIOS </th>
+            <th scope="col" class="text-end"> TOTAL </th>
+            <th scope="col" class="text-center"> ESTATUS </th>
+            <th scope="col" class="text-center" v-if="$can('editar','facturas') || $can('eliminar','facturas')"> ACCIONES </th>
           </tr>
         </thead>
         <tbody>
@@ -286,20 +292,20 @@ const formatDate = (dateString) => {
             <td class="text-wrap text-center">
               {{ (invoice.reference !== "null") ? invoice.reference : '-' }}
             </td>
-            <td class="text-wrap" style="width: 150px;">
+            <td class="text-wrap text-end" style="width: 150px;">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ resolveInvoiceProducts(invoice)[1] }}</span>
                 <span class="text-sm text-disabled">{{ resolveInvoiceProducts(invoice)[2] }} (Q)</span>
               </div>
             </td>
-            <td class="text-wrap" style="width: 150px;">
+            <td class="text-wrap text-end" style="width: 150px;">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ resolveInvoiceServices(invoice)[1] }}</span>
                 <span class="text-sm text-disabled">{{ resolveInvoiceServices(invoice)[2] }} (Q)</span>
               </div>
             </td>
-            <td>
-              {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}
+            <td class="text-end">
+              ${{ formatNumber( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) }}
             </td>
             <td class="text-center">
               <VTooltip>
@@ -309,7 +315,7 @@ const formatDate = (dateString) => {
                   </VAvatar>
                 </template>
                 <p class="mb-0"> {{ statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).label }} </p>
-                <p class="mb-0"> Total: {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}</p>
+                <p class="mb-0"> Total: ${{ formatNumber( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) }}</p>
               </VTooltip>
             </td>
             <!-- 👉 Acciones -->
@@ -342,9 +348,9 @@ const formatDate = (dateString) => {
                       v-if="resolveInvoiceStatusVariantAndIcon(invoice) == 12"
                       @click="paymentReference(invoice)">
                         <template #prepend>
-                            <VIcon icon="mdi-file-pdf-box" />
+                            <VIcon icon="mdi-eye" />
                         </template>
-                        <VListItemTitle>Comprobante de Pago</VListItemTitle>
+                        <VListItemTitle>Comprobante de pago</VListItemTitle>
                     </VListItem>              
                 </VList>
                 </VMenu>

@@ -5,6 +5,7 @@ import { useInvoicesStores } from '@/stores/useInvoices'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { avatarText } from '@core/utils/formatters'
 import { ref } from 'vue'
+import { formatNumber } from '@/@core/utils/formatters'
 import router from '@/router'
 
 const invoicesStores = useInvoicesStores()
@@ -92,19 +93,19 @@ const resolveInvoiceProducts = (invoice) => {
   if (invoice.unpaid_invoices_count > 0) {
     return [
         invoice.products_bypay_total ?? 0,
-        parseFloat( (invoice.products_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_bypay_total ?? 0) ),
         invoice.products_invoice_bypay_count
     ]
   } else if (invoice.paid_invoices_count > 0) {
     return [
         invoice.products_paid_total ?? 0,
-        parseFloat( (invoice.products_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_paid_total ?? 0) ),
         invoice.products_invoice_paid_count
     ]
   } else {
     return [
         invoice.products_total ?? 0,
-        parseFloat( (invoice.products_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.products_total ?? 0) ),
         invoice.products_count
     ]
   }
@@ -115,19 +116,19 @@ const resolveInvoiceServices = (invoice) => {
   if (invoice.unpaid_invoices_count > 0) {
     return [
         invoice.services_bypay_total ?? 0,
-        parseFloat( (invoice.services_bypay_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_bypay_total ?? 0) ),
         invoice.services_invoice_bypay_count
     ]
   } else if (invoice.paid_invoices_count > 0) {
     return [
         invoice.services_paid_total ?? 0,
-        parseFloat( (invoice.services_paid_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_paid_total ?? 0) ),
         invoice.services_invoice_paid_count
     ]
   } else {
     return [
         invoice.services_total ?? 0,
-        parseFloat( (invoice.services_total ?? 0) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }),
+        '$' + formatNumber( (invoice.services_total ?? 0) ),
         invoice.services_count
     ]
   }
@@ -218,35 +219,25 @@ const download = async(invoiceData) => {
       <v-table class="text-no-wrap">
         <thead>
           <tr>
-            <th scope="col"> ESTATUS </th>
-            <th scope="col"> FACTURA # </th>
+            <th scope="col"> # </th>
             <th scope="col"> EMPRESA </th>
             <th scope="col"> CONTACTO </th>
-            <th scope="col"> PRODUCTOS </th>
-            <th scope="col"> SERVICIOS </th>
-            <th scope="col"> TOTAL </th>
+            <th scope="col" class="text-end"> PRODUCTOS </th>
+            <th scope="col" class="text-end"> SERVICIOS </th>
+            <th scope="col" class="text-end"> TOTAL </th>
+            <th scope="col" class="text-end"> PAGADO POR </th>
+            <th scope="col"> ESTATUS </th>
             <th scope="col" v-if="$can('editar','facturas') || $can('eliminar','facturas')"> ACCIONES </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="invoice in invoices" :key="invoice.id" style="height: 3.75rem;">
-            <td class="text-center">
-              <VTooltip>
-                <template #activator="{ props }">
-                  <VAvatar v-bind="props" :size="30" :color="statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).variant" variant="tonal">
-                    <VIcon :size="20" :icon="statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).icon" />
-                  </VAvatar>
-                </template>
-                <p class="mb-0"> {{ statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).label }} </p>
-                <p class="mb-0"> Total: {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}</p>
-              </VTooltip>
-            </td>
-            <td class="text-wrap" >
+            <td class="text-wrap">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ invoice.invoice_id }}</span>
               </div>
             </td>
-            <td class="text-wrap">
+            <td class="text-wrap w-50">
               <div class="d-flex align-center gap-x-3">
                 <VAvatar :variant="invoice.user.avatar ? 'outlined' : 'tonal'" size="38">
                   <VImg v-if="invoice.user.avatar" style="border-radius: 50%;" :src="themeConfig.settings.urlStorage + invoice.user.avatar" />
@@ -268,26 +259,37 @@ const download = async(invoiceData) => {
                 <span class="text-sm text-disabled">{{ invoice.user.email }}</span>
               </div>
             </td>
-            <td class="text-wrap" style="width: 150px;">
+            <td class="text-wrap text-end" style="width: 150px;">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ resolveInvoiceProducts(invoice)[1] }}</span>
                 <span class="text-sm text-disabled">{{ resolveInvoiceProducts(invoice)[2] }} (Q)</span>
               </div>
             </td>
-            <td class="text-wrap" style="width: 150px;">
+            <td class="text-wrap text-end" style="width: 150px;">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ resolveInvoiceServices(invoice)[1] }}</span>
                 <span class="text-sm text-disabled">{{ resolveInvoiceServices(invoice)[2] }} (Q)</span>
               </div>
             </td>
-            <td>
-              {{ ( parseFloat( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'COP' }) }}
+            <td class="text-end">
+              ${{ formatNumber( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) }}
             </td>
-            <td class="text-wrap">
+            <td class="text-wrap text-end">
               <div class="d-flex flex-column">
                 <span class="font-weight-medium">{{ invoice.admin.name }} {{ invoice.admin.last_name ?? '' }}</span>
                 <span class="text-sm text-disabled">{{ invoice.admin.email }}</span>
               </div>
+            </td>
+            <td class="text-center">
+              <VTooltip>
+                <template #activator="{ props }">
+                  <VAvatar v-bind="props" :size="30" :color="statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).variant" variant="tonal">
+                    <VIcon :size="20" :icon="statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).icon" />
+                  </VAvatar>
+                </template>
+                <p class="mb-0"> {{ statusMap(resolveInvoiceStatusVariantAndIcon(invoice)).label }} </p>
+                <p class="mb-0"> Total: ${{ formatNumber( resolveInvoiceProducts(invoice)[0] + resolveInvoiceServices(invoice)[0] ) }}</p>
+              </VTooltip>
             </td>
             <td class="text-center" style="width: 5rem;" v-if="$can('editar','facturas') || $can('eliminar','facturas')">
               <VMenu>
@@ -318,9 +320,9 @@ const download = async(invoiceData) => {
                       v-if="resolveInvoiceStatusVariantAndIcon(invoice) == 12"
                       @click="paymentReference(invoice)">
                         <template #prepend>
-                            <VIcon icon="mdi-file-pdf-box" />
+                            <VIcon icon="mdi-eye" />
                         </template>
-                        <VListItemTitle>Comprobante de Pago</VListItemTitle>
+                        <VListItemTitle>Comprobante de pago</VListItemTitle>
                     </VListItem>              
                 </VList>
               </VMenu>

@@ -4,6 +4,7 @@ import { themeConfig } from '@themeConfig'
 import { FreeMode, Navigation, Thumbs, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Carousel, Slide } from 'vue3-carousel'
+import { formatNumber } from '@/@core/utils/formatters'
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -359,15 +360,15 @@ const buildEmbedUrl = (url) => {
                                             <VCol cols="12">
                                                 <div>
                                                     <span class="font-weight-semibold"> Costo: </span>
-                                                    <span>{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                                                    <span>${{ formatNumber(price) }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="font-weight-semibold"> Precio al detal: </span>
-                                                    <span>{{ (parseFloat(price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                                                    <span>${{ formatNumber(price_for_sale) }}</span>
                                                 </div>
                                                 <div v-if="wholesale">
                                                     <span class="font-weight-semibold"> Precio al mayor: </span>
-                                                    <span>{{ (parseFloat(wholesale_price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                                                    <span>${{ formatNumber(wholesale_price) }}</span>
                                                 </div>
                                                 <div>
                                                     <span class="font-weight-semibold"> Alto: </span>

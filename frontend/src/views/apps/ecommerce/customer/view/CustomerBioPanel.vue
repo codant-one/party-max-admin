@@ -118,7 +118,7 @@ const getFlagCountry = country => {
                 <VIcon icon="tabler-currency-dollar" />
               </VAvatar>
               <div class="d-flex flex-column align-start">
-                <span class="text-body-1 font-weight-medium">COP {{ formatNumber(sales) ?? '0.00' }}</span>
+                <span class="text-body-1 font-weight-medium">${{ formatNumber(sales) ?? '0.00' }}</span>
                 <span class="text-body-2">Ventas Totales</span>
               </div>
             </div>

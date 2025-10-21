@@ -377,3 +377,4 @@ Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendS
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
 Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
 Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contactUs');
+Route::get('invoicesPDF', [TestingController::class , 'invoicesPDF'])->name('invoicesPDF');

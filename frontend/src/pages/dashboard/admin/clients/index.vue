@@ -409,8 +409,8 @@ const getFlagCountry = country => {
                 <th scope="col"> USUARIO </th>
                 <th scope="col"> PEDIDOS </th>
                 <th scope="col"> TOTAL VENTAS </th>
-                <th scope="col"> STATUS </th>
-                <th scope="col" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">
+                <th scope="col" class="text-center"> STATUS </th>
+                <th scope="col" class="text-center" v-if="$can('editar', 'clientes') || $can('eliminar', 'clientes')">
                   ACCIONES
                 </th>
               </tr>
@@ -443,11 +443,11 @@ const getFlagCountry = country => {
                   </div>
                 </td>
                 <td class="text-wrap"> {{ client.user.username }} </td>
-                <td>
+                <td class="text-center">
                   {{ client.orders_count }}
                 </td>
-                <td>
-                  <span class="text-body-1 font-weight-medium text-high-emphasis">$ {{ formatNumber(client.sales) ?? '0.00' }}</span>
+                <td class="text-end">
+                  <span class="text-body-1 font-weight-medium text-high-emphasis">${{ formatNumber(client.sales) ?? '0.00' }}</span>
                 </td>
                 <td> 
                   <VChip

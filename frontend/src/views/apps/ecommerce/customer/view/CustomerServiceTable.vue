@@ -2,6 +2,7 @@
 
 import { useServicesStores } from '@/stores/useServices'
 import { themeConfig } from '@themeConfig'
+import { formatNumber } from '@/@core/utils/formatters'
 import show from "@/components/services/show.vue";
 import router from '@/router'
 
@@ -233,7 +234,7 @@ const editService = id => {
                         </div>
                     </td>
                     <td> {{ service.sku }} </td>
-                    <td> {{ (parseFloat(service.cupcakes.length > 0 ? service.cupcakes[0].price : service.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                    <td> ${{ formatNumber(service.cupcakes.length > 0 ? service.cupcakes[0].price : service.price ?? 0) }}</td>
                     <td> 
                         <VChip
                             v-bind="resolveStatus(service.state_id)"

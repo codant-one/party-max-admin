@@ -141,11 +141,11 @@ class AIAgentController extends Controller
 
         **💰 Estimación de presupuesto**  
         Para cada producto o servicio, usa este formato:  
-        **[NOMBRE DEL PRODUCTO] - (CANTIDAD DESCRIPTIVA = PRECIO COP)**  
+        **[NOMBRE DEL PRODUCTO] - (CANTIDAD DESCRIPTIVA = $ PRECIO)**  
         Por ejemplo:  
-        PLATO TEMÁTICA VALLENATA X 12 - (3 paquetes = 3.000 COP)
+        PLATO TEMÁTICA VALLENATA X 12 - (3 paquetes = $3.000)
 
-        Finaliza con una línea en bold de **Total estimado: XX.XXX COP**
+        Finaliza con una línea en bold de **Total estimado: $XX.XXX**
         No muestres operaciones matemáticas como “x 1” o “3 x 1000”.
 
         IMPORTANTE:

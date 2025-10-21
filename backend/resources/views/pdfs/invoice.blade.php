@@ -95,6 +95,9 @@
         color: #FF0090;
       }
 
+      .text-error {
+        color: #FFC549;
+      }
   </style>
   </head>
   <body style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;margin:0">
@@ -163,10 +166,10 @@
                 {{ $product['quantity'] }}
               </td>
               <td class="products_cant">
-                COP {{ formatCurrency($product['product_price']) }}
+                ${{ formatCurrency($product['product_price']) }}
               </td>
               <td class="products_cant">
-                COP {{ formatCurrency($product['product_total']) }}
+                ${{ formatCurrency($product['product_total']) }}
               </td>
           </tr>
           @endforeach
@@ -206,10 +209,10 @@
                 {{ $service['quantity'] }}
               </td>
               <td class="products_cant">
-                COP {{ formatCurrency($service['service_price']) }}
+                ${{ formatCurrency($service['service_price']) }}
               </td>
               <td class="products_cant">
-                COP {{ formatCurrency($service['service_total']) }}
+                ${{ formatCurrency($service['service_total']) }}
               </td>  
           </tr>
           @endforeach
@@ -218,18 +221,18 @@
             <td class="products"></td>
             
             <td class="products_cant" colspan="2">
-              <p class="text m-0"><strong>Subtotal Productos:</strong></p>
-              <p class="text m-0"><strong>Comisión Productos ({{ $invoice->products_commission_percentage }} %):</strong></p>
-              <p class="text m-0"><strong>Subtotal Servicios:</strong></p>
-              <p class="text m-0"><strong>Comisión Servicios ({{ $invoice->services_commission_percentage }} %):</strong></p>
+              <p class="text m-0">Subtotal productos:</p>
+              <p class="text m-0 text-error">Comisión productos ({{ $invoice->products_commission_percentage }} %):</p>
+              <p class="text m-0">Subtotal servicios:</p>
+              <p class="text m-0 text-error">Comisión servicios ({{ $invoice->services_commission_percentage }} %):</p>
               <p class="text m-0 text-primary"><strong>Total:</strong></p>
             </td>
             <td class="products_cant" style="padding: 10px 0;">
-              <p class="numbers m-0"><strong>{{ formatCurrency($invoice->total_products) }} COP</strong></p>
-              <p class="numbers m-0 text-warning"><strong>@if($invoice->products_commission_amount > 0) - @endif {{ formatCurrency($invoice->products_commission_amount) }} COP</strong></p>
-              <p class="numbers m-0"><strong>{{ formatCurrency($invoice->total_services) }} COP</strong></p>
-              <p class="numbers m-0 text-warning"><strong>@if($invoice->services_commission_amount > 0) - @endif {{ formatCurrency($invoice->services_commission_amount) }} COP</strong></p>
-              <p class="numbers m-0 text-primary"><strong>{{ formatCurrency($invoice->total_amount) }} COP</strong></p>
+              <p class="numbers m-0">${{ formatCurrency($invoice->total_products) }}</p>
+              <p class="numbers m-0 text-error">@if($invoice->products_commission_amount > 0) - @endif ${{ formatCurrency($invoice->products_commission_amount) }}</p>
+              <p class="numbers m-0">${{ formatCurrency($invoice->total_services) }}</p>
+              <p class="numbers m-0 text-error">@if($invoice->services_commission_amount > 0) - @endif ${{ formatCurrency($invoice->services_commission_amount) }}</p>
+              <p class="numbers m-0 text-primary"><strong>${{ formatCurrency($invoice->total_amount) }}</strong></p>
             </td>
           </tr>
           @if($invoice->note)

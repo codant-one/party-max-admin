@@ -4,6 +4,7 @@ import InvoiceProductEdit from "@/components/invoice/InvoiceProductEdit.vue"
 import { useInvoicesStores } from '@/stores/useInvoices'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { config } from '@layouts/config'
 import { formatNumber } from '@/@core/utils/formatters'
 import { requiredValidator } from '@validators'
 
@@ -262,28 +263,23 @@ const inputData = () => {
   <VCard class="pa-10">
     <VCardText class="d-flex flex-wrap justify-space-between flex-column flex-sm-row print-row bg-var-theme-background rounded">
       <div class="ma-sm-4">
-        <div class="d-flex align-center mb-6">
+        <div class="d-flex align-center mb-2">
           <!-- 👉 Logo -->
           <VNodeRenderer
-            :nodes="themeConfig.app.logoFull"
-            class="me-3"
+            :nodes="config.app.logoSlogan"
+            style="width: 250px;"
           />
-
-          <!-- 👉 Title -->
-          <h6 class="font-weight-bold text-capitalize text-h4">
-            {{ themeConfig.app.title }}
-          </h6>
         </div>
 
         <!-- 👉 Address -->
         <p class="mb-0">
-          Office 149, 450 South Brand Brooklyn
+          Calle 13 #69-06
         </p>
         <p class="mb-0">
-          San Diego County, CA 91905, USA
+          Bogotá, Colombia
         </p>
         <p class="mb-0">
-          +1 (123) 456 7891, +44 (876) 543 2198
+          +57 310 4870 310
         </p>
       </div>
 
@@ -477,7 +473,7 @@ const inputData = () => {
     <VCardText class="add-products-form px-0">
       <!-- eslint-disable vue/no-mutating-props -->
       <!-- Header fijo con títulos -->
-      <div class="add-products-header mb-4 d-none d-md-flex ps-5 pe-16">
+      <div class="add-products-header mb-4 d-none d-md-flex ps-5" :class="{ 'pe-6': typeInvoice == '1', 'pe-16': typeInvoice == '0' }">
         <VRow class="font-weight-medium">
           <VCol
             cols="12"
@@ -518,7 +514,7 @@ const inputData = () => {
             </span>
           </VCol>
         </VRow>
-        <div class="d-flex flex-column justify-space-between pa-0" style="width: 1%;"></div>
+        <div class="d-flex flex-column justify-space-between pa-0" style="width: 1%;" v-if="typeInvoice == '0'"></div>
       </div>
 
       <!-- Contenedor con scroll solo para los productos -->
@@ -599,42 +595,42 @@ const inputData = () => {
           <tbody>
             <tr>
               <td class="pe-16">
-                Subtotal Productos:
+                Subtotal productos:
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
-                <h6 class="text-sm">
-                  {{ formatNumber(totalProducts) }} COP
+                <h6 class="text-sm font-weight-medium">
+                 ${{ formatNumber(totalProducts) }}
                 </h6>
               </td>
             </tr>
             <tr>
-              <td class="pe-16">
-                Comisión Productos ({{ formatNumber(commissionProducts) }} %):
+              <td class="pe-16 text-error">
+                Comisión productos ({{ formatNumber(commissionProducts) }} %):
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
-                <h6 class="text-sm text-warning">
-                  <span v-if="amountCommissionProducts > 0">-</span> {{ formatNumber( amountCommissionProducts) }} COP
+                <h6 class="text-sm text-error font-weight-medium">
+                  <span v-if="amountCommissionProducts > 0">-</span> ${{ formatNumber( amountCommissionProducts) }}
                 </h6>
               </td>
             </tr>
 
             <tr>
               <td class="pe-16">
-                Subtotal Servicios:
+                Subtotal servicios:
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
-                <h6 class="text-sm">
-                  {{ formatNumber(totalServices) }} COP
+                <h6 class="text-sm font-weight-medium">
+                  ${{ formatNumber(totalServices) }}
                 </h6>
               </td>
             </tr>
             <tr>
-              <td class="pe-16">
-                Comisión Servicios ({{ formatNumber(commissionServices) }} %):
+              <td class="pe-16 text-error">
+                Comisión servicios ({{ formatNumber(commissionServices) }} %):
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
-                <h6 class="text-sm text-warning">
-                  <span v-if="amountCommissionServices > 0">-</span> {{ formatNumber( amountCommissionServices) }} COP
+                <h6 class="text-sm text-error font-weight-medium">
+                  <span v-if="amountCommissionServices > 0">-</span> ${{ formatNumber( amountCommissionServices) }}
                 </h6>
               </td>
             </tr>
@@ -646,12 +642,12 @@ const inputData = () => {
             </tr>
 
             <tr>
-              <td class="pe-16">
+              <td class="pe-16 text-primary font-weight-bold">
                 Total:
               </td>
               <td :class="$vuetify.locale.isRtl ? 'text-start' : 'text-end'">
-                <h6 class="text-sm">
-                  {{ formatNumber(totalLessCommission) }} COP
+                <h6 class="text-sm text-primary">
+                  ${{ formatNumber(totalLessCommission) }}
                 </h6>
               </td>
             </tr>
