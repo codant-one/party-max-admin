@@ -239,7 +239,7 @@ const generateInvoice = async () => {
       {{ advisor.message }}
     </VAlert>
 
-    <VCard>
+    <VCard title="Facturación">
       <VCardText class="d-flex align-center flex-wrap gap-4">
         <div class="d-flex align-center">
           <span class="text-no-wrap me-3">Ver:</span>

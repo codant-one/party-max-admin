@@ -1,5 +1,6 @@
 <script setup>
 
+import { themeConfig } from '@themeConfig'
 import { integerValidator, requiredValidator } from '@/@core/utils/validators'
 import { useInvoicesStores } from '@/stores/useInvoices'
 import InvoiceEditable from '@/views/apps/invoice/InvoiceEditable.vue'
@@ -287,11 +288,13 @@ const onSubmit = () => {
           formData.append(`payments[]`, JSON.stringify(element));
         });
 
+      isRequestOngoing.value = true
+      
       invoicesStores.addInvoice(formData)
         .then((res) => {
           const pdfPath = res?.data?.data?.invoice?.pdf
           if (pdfPath) {
-            window.open(`/storage/${pdfPath}`, '_blank')
+            window.open(themeConfig.settings.urlStorage + pdfPath, '_blank')
           }
           let data = {
             message: 'Factura creada con éxito',
@@ -302,9 +305,11 @@ const onSubmit = () => {
           emitter.emit('toast', data)
       })
       .catch((err) => {
+        console.log('err', err)
+        isRequestOngoing.value = false
         advisor.value.show = true
         advisor.value.type = 'error'
-        advisor.value.message = Object.values(err.message).flat().join('<br>')
+        advisor.value.message = Object.values(err.errors).flat().join('<br>')
 
         setTimeout(() => { 
           advisor.value.show = false

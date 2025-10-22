@@ -481,24 +481,78 @@ class InvoiceController extends Controller
             DB::beginTransaction();
 
             // Validar datos requeridos
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'start' => 'required|date',
-                'end' => 'required|date|after:start',
-                // 'payment_type' => 'required|string',
-                // 'reference' => 'required|string',
-                'total' => 'required|numeric|min:0',
-                'totalProducts' => 'required|numeric|min:0',
-                'totalServices' => 'required|numeric|min:0',
-                'commissionProducts' => 'required|numeric|min:0',
-                'amountCommissionProducts' => 'required|numeric|min:0',
-                'commissionServices' => 'required|numeric|min:0',
-                'amountCommissionServices' => 'required|numeric|min:0',
-                'totalLessCommission' => 'required|numeric|min:0',
-                'payments' => 'required|array|min:1',
-                'note' => 'nullable|string',
-                // 'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
-            ]);
+            $request->validate(
+                [
+                    'user_id' => 'required|exists:users,id',
+                    'start' => 'required|date',
+                    'end' => 'required|date|after:start',
+                    // 'payment_type' => 'required|string',
+                    // 'reference' => 'required|string',
+                    'total' => 'required|numeric|min:0',
+                    'totalProducts' => 'required|numeric|min:0',
+                    'totalServices' => 'required|numeric|min:0',
+                    'commissionProducts' => 'required|numeric|min:0',
+                    'amountCommissionProducts' => 'required|numeric|min:0',
+                    'commissionServices' => 'required|numeric|min:0',
+                    'amountCommissionServices' => 'required|numeric|min:0',
+                    'totalLessCommission' => 'required|numeric|min:0',
+                    'payments' => 'required|array|min:1',
+                    'note' => 'nullable|string',
+                    // 'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+                ],
+                [
+                    'user_id.required' => 'El usuario es obligatorio.',
+                    'user_id.exists' => 'El usuario seleccionado no existe.',
+                    'start.required' => 'La fecha de emisión es obligatoria.',
+                    'start.date' => 'La fecha de emisión no tiene un formato válido.',
+                    'end.required' => 'La fecha de vencimiento es obligatoria.',
+                    'end.date' => 'La fecha de vencimiento no tiene un formato válido.',
+                    'end.after' => 'La fecha de vencimiento debe ser posterior a La fecha de emisión.',
+                    'total.required' => 'El total es obligatorio.',
+                    'total.numeric' => 'El total debe ser numérico.',
+                    'total.min' => 'El total no puede ser negativo.',
+                    'totalProducts.required' => 'El total de productos es obligatorio.',
+                    'totalProducts.numeric' => 'El total de productos debe ser numérico.',
+                    'totalProducts.min' => 'El total de productos no puede ser negativo.',
+                    'totalServices.required' => 'El total de servicios es obligatorio.',
+                    'totalServices.numeric' => 'El total de servicios debe ser numérico.',
+                    'totalServices.min' => 'El total de servicios no puede ser negativo.',
+                    'commissionProducts.required' => 'El porcentaje de comisión de productos es obligatorio.',
+                    'commissionProducts.numeric' => 'El porcentaje de comisión de productos debe ser numérico.',
+                    'commissionProducts.min' => 'El porcentaje de comisión de productos no puede ser negativo.',
+                    'amountCommissionProducts.required' => 'El monto de comisión de productos es obligatorio.',
+                    'amountCommissionProducts.numeric' => 'El monto de comisión de productos debe ser numérico.',
+                    'amountCommissionProducts.min' => 'El monto de comisión de productos no puede ser negativo.',
+                    'commissionServices.required' => 'El porcentaje de comisión de servicios es obligatorio.',
+                    'commissionServices.numeric' => 'El porcentaje de comisión de servicios debe ser numérico.',
+                    'commissionServices.min' => 'El porcentaje de comisión de servicios no puede ser negativo.',
+                    'amountCommissionServices.required' => 'El monto de comisión de servicios es obligatorio.',
+                    'amountCommissionServices.numeric' => 'El monto de comisión de servicios debe ser numérico.',
+                    'amountCommissionServices.min' => 'El monto de comisión de servicios no puede ser negativo.',
+                    'totalLessCommission.required' => 'El total menos comisión es obligatorio.',
+                    'totalLessCommission.numeric' => 'El total menos comisión debe ser numérico.',
+                    'totalLessCommission.min' => 'El total menos comisión no puede ser negativo.',
+                    'payments.required' => 'Debe seleccionar al menos un elemento para facturar.',
+                    'payments.array' => 'El campo pagos debe ser un arreglo.',
+                    'payments.min' => 'Debe seleccionar al menos un elemento para facturar.',
+                    'note.string' => 'La nota debe ser un texto.'
+                ],
+                [
+                    'user_id' => 'usuario',
+                    'start' => 'fecha de inicio',
+                    'end' => 'fecha fin',
+                    'total' => 'total',
+                    'totalProducts' => 'total de productos',
+                    'totalServices' => 'total de servicios',
+                    'commissionProducts' => 'comisión de productos (%)',
+                    'amountCommissionProducts' => 'monto de comisión de productos',
+                    'commissionServices' => 'comisión de servicios (%)',
+                    'amountCommissionServices' => 'monto de comisión de servicios',
+                    'totalLessCommission' => 'total menos comisión',
+                    'payments' => 'pagos',
+                    'note' => 'nota'
+                ]
+            );
 
             // Determinar correlativo por usuario (invoice_id)
             $nextInvoiceId = (int) (\App\Models\Invoice::where('user_id', $request->user_id)->max('invoice_id') ?? 0) + 1;
@@ -521,9 +575,9 @@ class InvoiceController extends Controller
                 'services_commission_percentage' => $request->commissionServices,
                 'services_commission_amount' => $request->amountCommissionServices,
                 'total_amount' => $request->totalLessCommission,
-                'payment_type' => $request->payment_type,
+                'payment_type' => $request->payment_type === 'null' ? null : $request->payment_type,
                 'payment_date' => null,
-                'reference' => $request->reference,
+                'reference' => $request->reference == 'null' ? null : $request->reference,
                 'image' => null,
                 'note' => $request->note === '' ? null : $request->note
             ]);
@@ -712,11 +766,23 @@ class InvoiceController extends Controller
             DB::beginTransaction();
 
             // Validar datos requeridos
-            $request->validate([
-                'payment_type' => 'required|string',
-                'reference' => 'required|string',
-                //'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
-            ]);
+            $request->validate(
+                [
+                    'payment_type' => 'required|string',
+                    'reference' => 'required|string',
+                    //'image' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048'
+                ],
+                [
+                    'payment_type.required' => 'El tipo de pago es obligatorio.',
+                    'payment_type.string' => 'El tipo de pago no es válido.',
+                    'reference.required' => 'La referencia es obligatoria.',
+                    'reference.string' => 'La referencia debe ser un texto.'
+                ],
+                [
+                    'payment_type' => 'tipo de pago',
+                    'reference' => 'referencia'
+                ]
+            );
 
             $invoice = Invoice::find($id);
 
@@ -739,8 +805,9 @@ class InvoiceController extends Controller
 
             $invoice->payment_date = now()->toDateString();
             $invoice->admin_id = auth()->id();
+            $invoice->note = $request->note === 'null' ? null : $request->note;
 
-            $invoice->fill($request->except(['id', 'image', 'payment_date']));
+            $invoice->fill($request->except(['id', 'image', 'payment_date', 'note']));
 
             //Se borra el archivo PDF si existe
             if (!empty($invoice->pdf)) {

@@ -278,7 +278,7 @@ const onSubmit = () => {
       formData.append('id', Number(route.query.invoice))
       formData.append('note', invoice.value.note)
 
-
+      isRequestOngoing.value = true
       invoicesStores.updatePayment({id: Number(route.query.invoice), data: formData})
         .then((res) => {
           let data = {
@@ -290,6 +290,7 @@ const onSubmit = () => {
           emitter.emit('toast', data)
       })
       .catch((err) => {
+        isRequestOngoing.value = false
         advisor.value.show = true
         advisor.value.type = 'error'
         advisor.value.message = Object.values(err.message).flat().join('<br>')

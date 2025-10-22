@@ -97,7 +97,6 @@ export const useInvoicesStores = defineStore('invoices', {
 
             return Invoices.create(data)
                 .then((response) => {
-                    this.invoices.push(response.data.data.invoice)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))

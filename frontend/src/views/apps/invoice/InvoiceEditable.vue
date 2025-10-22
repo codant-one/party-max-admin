@@ -347,7 +347,7 @@ const inputData = () => {
     </VCardText>
     <!-- !SECTION -->
 
-    <VCardText class="d-flex flex-wrap justify-space-between flex-column flex-sm-row gap-y-5 gap-4 px-0">
+    <VCardText class="d-flex flex-wrap justify-space-between flex-column flex-sm-row gap-y-5 gap-4 px-0 pb-2">
       <div
         class="my-sm-4"
       >
@@ -470,10 +470,10 @@ const inputData = () => {
     </VCardText>
 
     <!-- 👉 Add purchased products -->
-    <VCardText class="add-products-form px-0">
+    <VCardText class="add-products-form px-0 pb-0">
       <!-- eslint-disable vue/no-mutating-props -->
       <!-- Header fijo con títulos -->
-      <div class="add-products-header mb-4 d-none d-md-flex ps-5" :class="{ 'pe-6': typeInvoice == '1', 'pe-16': typeInvoice == '0' }">
+      <div class="add-products-header d-none d-md-flex ps-5" :class="{ 'pe-6': typeInvoice == '1', 'pe-16': typeInvoice == '0' }">
         <VRow class="font-weight-medium">
           <VCol
             cols="12"
