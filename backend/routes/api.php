@@ -303,6 +303,7 @@ Route::group([
 ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
+    Route::get('categoriesAll', [MiscellaneousController::class, 'categoriesAllInfo']);
     Route::get('products', [MiscellaneousController::class, 'products']);
     Route::get('colors', [MiscellaneousController::class, 'colors']);
     Route::get('products/{slug}', [MiscellaneousController::class, 'productDetail']);

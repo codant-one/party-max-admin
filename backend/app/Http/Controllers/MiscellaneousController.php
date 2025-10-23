@@ -66,6 +66,28 @@ class MiscellaneousController extends Controller
         }
     }
 
+    public function categoriesAllInfo(): JsonResponse
+    {
+        try {
+
+            $categories = Category::all();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'categories' => $categories
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
     public function categoriesAll(): JsonResponse
     {
         try {
@@ -128,6 +150,26 @@ class MiscellaneousController extends Controller
 
             // Cache de productos paginados
             $products = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
+                // Si limit es -1, crear una consulta completamente separada sin paginación
+                if ($limit === '-1') {
+                    return Product::select(
+                            'products.id', 'products.user_id', 'products.wholesale_price', 'products.price_for_sale', 
+                            'products.name', 'products.image', 'products.rating', 'products.single_description',
+                            'products.slug', 'products.wholesale_min', 'products.order_id'
+                        )
+                        ->with(['colors.categories.category:id,name,keywords'])
+                        ->with(['firstColor:id,product_id,in_stock,stock'])
+                        ->where('products.state_id', 3)
+                        ->applyFilters($filters)
+                        ->isFavorite()
+                        ->store()
+                        ->company()
+                        ->userProduct()
+                        ->distinct('products.id')
+                        ->get();
+                }
+                
+                // Si no, usar paginación normal
                 return Product::select(
                         'products.id', 'products.user_id', 'products.wholesale_price', 'products.price_for_sale', 
                         'products.name', 'products.image', 'products.rating', 'products.single_description',
@@ -444,6 +486,25 @@ class MiscellaneousController extends Controller
 
             // Cache del listado paginado
             $services = Cache::remember($pageKey, now()->addMinutes(1), function () use ($filters, $limit) {
+                // Si limit es -1, crear una consulta completamente separada sin paginación
+                if ($limit === '-1') {
+                    return Service::select(
+                            'services.id', 'services.user_id', 'services.image', 'services.price', 
+                            'services.name', 'services.rating', 'services.single_description', 
+                            'services.slug', 'services.order_id'
+                        )
+                        ->with(['firstCupcake:id,service_id,price'])
+                        ->where('services.state_id', 3)
+                        ->applyFilters($filters)
+                        ->isFavorite()
+                        ->store()
+                        ->company()
+                        ->userService()
+                        ->distinct('services.id')
+                        ->get();
+                }
+                
+                // Si no, usar paginación normal
                 return Service::select(
                         'services.id', 'services.user_id', 'services.image', 'services.price', 
                         'services.name', 'services.rating', 'services.single_description', 
