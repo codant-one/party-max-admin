@@ -133,6 +133,329 @@ class Supplier extends Model
                 }]);
     }
 
+    //Not invoiced scopes
+    public function scopeServicesNotInvoice($query)
+    {
+        return  $query->addSelect(['service_not_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('services as se', 'se.user_id', '=', 'u.id')
+                        ->leftJoin('order_details as od', function ($join){
+                            $join->on('od.service_id', '=', 'se.id')
+                                ->where('od.is_invoice', '=', 0);
+                        })
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('se.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeSalesNotInvoice($query)
+    {
+        return  $query->addSelect(['sales_not_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', function ($join){
+                            $join->on('od.product_color_id', '=', 'pc.id')
+                                ->where('od.is_invoice', '=', 0);
+                        })
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeRetailSalesNotInvoice($query)
+    {
+        return  $query->addSelect(['retail_sales_not_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', function ($join){
+                            $join->on('od.product_color_id', '=', 'pc.id')
+                                ->where('od.is_invoice', '=', 0);
+                        })
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 0)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeWholesaleSalesNotInvoice($query)
+    {
+        return  $query->addSelect(['wholesale_sales_not_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('products as p', 'p.user_id', '=', 'u.id')
+                        ->leftJoin('product_colors as pc', 'pc.product_id', '=', 'p.id')
+                        ->leftJoin('order_details as od', function ($join){
+                            $join->on('od.product_color_id', '=', 'pc.id')
+                                ->where('od.is_invoice', '=', 0);
+                        })
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 1)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    //All Invoiced scopes
+    public function scopeServicesInvoice($query)
+    {
+        return  $query->addSelect(['service_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('services as se', 'se.id', '=', 'od.service_id')
+                        ->where('se.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeSalesInvoice($query)
+    {
+        return  $query->addSelect(['sales_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeRetailSalesInvoice($query)
+    {
+        return  $query->addSelect(['retail_sales_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 0)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeWholesaleSalesInvoice($query)
+    {
+        return  $query->addSelect(['wholesale_sales_invoices' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 1)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    //Invoiced Not Paid scopes
+    public function scopeServicesInvoiceNotPaid($query)
+    {
+        return  $query->addSelect(['service_invoices_not_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('services as se', 'se.id', '=', 'od.service_id')
+                        ->where('se.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeSalesInvoiceNotPaid($query)
+    {
+        return  $query->addSelect(['sales_invoices_not_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeRetailSalesInvoiceNotPaid($query)
+    {
+        return  $query->addSelect(['retail_sales_invoices_not_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 0)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeWholesaleSalesInvoiceNotPaid($query)
+    {
+        return  $query->addSelect(['wholesale_sales_invoices_not_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 1)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+
+    //Invoiced Paid scopes
+    public function scopeServicesInvoicePaid($query)
+    {
+        return  $query->addSelect(['service_invoices_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNotNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('services as se', 'se.id', '=', 'od.service_id')
+                        ->where('se.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeSalesInvoicePaid($query)
+    {
+        return  $query->addSelect(['sales_invoices_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNotNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeRetailSalesInvoicePaid($query)
+    {
+        return  $query->addSelect(['retail_sales_invoices_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNotNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 0)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
+    public function scopeWholesaleSalesInvoicePaid($query)
+    {
+        return  $query->addSelect(['wholesale_sales_invoices_paid' => function ($q){
+                    $q->selectRaw('SUM(CAST(od.total AS DECIMAL(10, 2)))')
+                        ->from('suppliers as s')
+                        ->leftJoin('users as u', 'u.id', '=', 's.user_id')
+                        ->leftJoin('invoices as i', function ($join){
+                            $join->on('i.user_id', '=', 'u.id')
+                                ->whereNotNull('i.payment_date');
+                        })
+                        ->leftJoin('order_details as od', 'od.invoice_id', '=', 'i.id')
+                        ->leftJoin('orders as o', 'od.order_id', '=', 'o.id')
+                        ->leftJoin('product_colors as pc', 'pc.id', '=', 'od.product_color_id')
+                        ->leftJoin('products as p', 'p.id', '=', 'pc.product_id')
+                        ->where('p.state_id', 3)
+                        ->where('o.payment_state_id', 4)
+                        ->where('o.wholesale', 1)
+                        ->whereColumn('s.id', 'suppliers.id');
+                }]);
+    }
+
     public function scopeWhereSearch($query, $search) {
         $query->whereHas('user', function ($q) use ($search) {
             $q->where(function ($query) use ($search) {
