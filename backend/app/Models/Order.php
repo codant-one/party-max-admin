@@ -140,7 +140,7 @@ class Order extends Model
             'shipping_express' => $request->shipping_express,
             'tax' => $request->tax,
             'total' => $request->total,
-            'wholesale' => $request->wholesale,
+            'wholesale' => $request->wholesale ?? 0,
             'type' => $request->type,
             'ip' => $request->ip === null ? null : $request->ip,
             'user_agent' => $request->user_agent === null ? null : $request->user_agent
