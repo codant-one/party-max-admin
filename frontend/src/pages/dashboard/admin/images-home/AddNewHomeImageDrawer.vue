@@ -92,9 +92,14 @@ const onImageSelected = event => {
 
   URL.createObjectURL(file)
 
-  resizeImage(file, 1200, 1200, 1)
+  resizeImage(file, null, null, 1)
     .then(async blob => {
-        image.value = blob
+        // Crear un nuevo File con el nombre original
+        const originalFile = new File([blob], file.name, {
+          type: file.type,
+          lastModified: file.lastModified
+        })
+        image.value = originalFile
         let r = await blobToBase64(blob)
         avatar.value = 'data:image/jpeg;base64,' + r
     })
@@ -108,9 +113,14 @@ const onMobileSelected = event => {
 
   URL.createObjectURL(file)
 
-  resizeImage(file, 1200, 1200, 1)
+  resizeImage(file, null, null, 1)
     .then(async blob => {
-        mobile.value = blob
+        // Crear un nuevo File con el nombre original
+        const originalFile = new File([blob], file.name, {
+          type: file.type,
+          lastModified: file.lastModified
+        })
+        mobile.value = originalFile
         let r = await blobToBase64(blob)
         avatar_mobile.value = 'data:image/jpeg;base64,' + r
     })
@@ -128,14 +138,17 @@ const resizeImage = function(file, maxWidth, maxHeight, quality) {
       let width = img.width
       let height = img.height
 
-      if (maxWidth && width > maxWidth) {
-        height *= maxWidth / width
-        width = maxWidth
-      }
+      // Solo redimensionar si se especifican maxWidth y maxHeight
+      if (maxWidth && maxHeight) {
+        if (width > maxWidth) {
+          height *= maxWidth / width
+          width = maxWidth
+        }
 
-      if (maxHeight && height > maxHeight) {
-        width *= maxHeight / height
-        height = maxHeight
+        if (height > maxHeight) {
+          width *= maxHeight / height
+          height = maxHeight
+        }
       }
 
       canvas.width = width

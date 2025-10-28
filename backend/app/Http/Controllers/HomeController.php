@@ -221,7 +221,7 @@ class HomeController extends Controller
 
                 $path = 'home/';
 
-                $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($image, $path, '', 'public', true);
 
                 $homeImage->image = $file_data['filePath'];
                 $homeImage->update();
@@ -232,7 +232,7 @@ class HomeController extends Controller
 
                 $path = 'home/';
 
-                $file_data = uploadFile($image, $path);
+                $file_data = uploadFile($image, $path, '', 'public', true);
 
                 $homeImage->mobile = $file_data['filePath'];
                 $homeImage->update();
@@ -285,7 +285,7 @@ class HomeController extends Controller
 
                 $path = 'home/';
 
-                $file_data = uploadFile($image, $path, $homeImage->image);
+                $file_data = uploadFile($image, $path, $homeImage->image, 'public', true);
 
                 $homeImage->image = $file_data['filePath'];
                 $homeImage->update();
@@ -296,7 +296,7 @@ class HomeController extends Controller
 
                 $path = 'home/';
 
-                $file_data = uploadFile($image, $path, $homeImage->mobile);
+                $file_data = uploadFile($image, $path, $homeImage->mobile, 'public', true);
 
                 $homeImage->mobile = $file_data['filePath'];
                 $homeImage->update();
