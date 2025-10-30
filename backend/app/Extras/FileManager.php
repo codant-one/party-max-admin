@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
     if (!function_exists('uploadFile')) {
-        function uploadFile($file, $path, $image = '', $disk = 'public') {
+        function uploadFile($file, $path, $image = '', $disk = 'public', $useOriginalName = false) {
             if($file) {
 
                 $oldFilePath = storage_path('app/public/'.strtolower($image));
@@ -13,7 +13,14 @@ use Illuminate\Support\Str;
                 if(File::exists($oldFilePath) && !is_dir($oldFilePath))
                     deleteFile($image);
 
-                $file_name  = Str::random(25);
+                // Usar nombre original si se especifica, sino usar random
+                if ($useOriginalName) {
+                    $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $file_name = $originalName;
+                } else {
+                    $file_name = Str::random(25);
+                }
+                
                 $file_type  = $file->getClientOriginalExtension();
                 $filePath   = $path . $file_name . '.' .File::guessExtension($file) ;
                 Storage::disk($disk)->put($filePath, File::get($file));
