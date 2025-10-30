@@ -96,7 +96,7 @@ class HomeController extends Controller
             $recommendations = Product::with(['user.userDetail', 'user.supplier', 'firstColor:id,product_id,in_stock,stock'])
                                       ->where('favourite', true)
                                       ->orderBy('created_at', 'desc')
-                                      ->limit(5)
+                                      ->limit(6)
                                       ->get();
 
             // Validate if the user is authenticated
@@ -119,7 +119,7 @@ class HomeController extends Controller
                                             $query->where('tag_id', $tag_id);
                                         })
                                     ->orderBy('created_at', 'desc')
-                                    ->limit(5)
+                                    ->limit(6)
                                     ->get();
 
                         $data['recommendations'] = $recommendations;
