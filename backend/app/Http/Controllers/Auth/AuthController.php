@@ -405,6 +405,8 @@ class AuthController extends Controller
             $user->username =  Str::slug($request->name);
             $user->email = strtolower($request->email);
             $user->password = $hashedPassword;
+            $user->google_id = $request->google_id ?? null;
+            $user->email_verified_at =  $request->google_id ? now() : null;
             $user->save();
 
             //Crear o Actualizar token.
@@ -475,7 +477,7 @@ class AuthController extends Controller
                     'email' => 'emails.auth.notifications'
                 ];
                 
-                $responseMail = $this->sendMail($info, $user->id); 
+                $responseMail = $request->google_id ? 'Registro exitoso via Google. Por favor, inicie sesión para continuar.' : $this->sendMail($info, $user->id); 
             }
 
             return response()->json([
@@ -613,7 +615,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+    public function respondWithToken($token)
     {
         $permissions = getPermissionsByRole(Auth::user());
         $userData = getUserData(Auth::user()->load(['userDetail.province.country', 'userDetail.document_type', 'client.gender', 'supplier']));
