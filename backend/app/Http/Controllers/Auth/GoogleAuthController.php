@@ -11,6 +11,8 @@ use App\Http\Requests\RegisterClientRequest;
 use Throwable;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 use Illuminate\Http\Request;
 
@@ -20,11 +22,11 @@ use App\Models\User;
 class GoogleAuthController extends Controller
 {
     /**
-     * Redirect the user to Google’s OAuth page.
+     * Redirect the user to Google's OAuth page.
      */
     public function redirect()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -34,7 +36,7 @@ class GoogleAuthController extends Controller
     {
         try {
             // Get the user information from Google
-            $user = Socialite::driver('google')->user();
+            $user = Socialite::driver('google')->stateless()->user();
         } catch (Throwable $e) {
            // Build the complete frontend URL with token
            $appDomain = env('APP_DOMAIN');
@@ -44,7 +46,7 @@ class GoogleAuthController extends Controller
                $appDomain = (request()->secure() ? 'https://' : 'http://') . $appDomain;
            }
            $message = 'Google authentication failed.';
-           $frontendUrl = $appDomain . '/callback?error=' . urlencode($message);
+           $frontendUrl = $appDomain . '/callback?error=' . urlencode($e);
            return redirect($frontendUrl); 
         }
 
@@ -52,17 +54,9 @@ class GoogleAuthController extends Controller
         $existingUser = User::where('email', $user->email)->first();
 
         if ($existingUser) {
+            // Si el usuario no tiene google_id o es diferente, actualizarlo
             if($existingUser->google_id !== $user->id){
-                // Build the complete frontend URL with token
-                $appDomain = env('APP_DOMAIN');
-                    
-                // Ensure APP_DOMAIN has a proper scheme (http:// or https://)
-                if (!preg_match('/^https?:\/\//', $appDomain)) {
-                    $appDomain = (request()->secure() ? 'https://' : 'http://') . $appDomain;
-                }
-                $message = 'El usuario registrado no ha ingresado con Google Authentication.';
-                $frontendUrl = $appDomain . '/callback?error=' . urlencode($message);
-                return redirect($frontendUrl);
+                $existingUser->google_id = $user->id;
             }
             // Update user online status
             $existingUser->online = Carbon::now();
@@ -116,6 +110,14 @@ class GoogleAuthController extends Controller
                 $client = $data['data']['client'];
                 $userCreated = User::find($client['user_id']);
                 
+                // Download and save Google avatar if available
+                if ($user->avatar && $userCreated) {
+                    $avatarPath = $this->downloadGoogleAvatar($user->avatar, $userCreated);
+                    if ($avatarPath) {
+                        $userCreated->avatar = $avatarPath;
+                        $userCreated->save();
+                    }
+                }
                 
                 // Generate JWT token without credentials
                 $token = JWTAuth::fromUser($userCreated);
@@ -148,5 +150,58 @@ class GoogleAuthController extends Controller
                 
             }
         }
+    }
+
+    /**
+     * Download and save Google avatar image
+     * 
+     * @param string $avatarUrl
+     * @param User $user
+     * @return string|null
+     */
+    private function downloadGoogleAvatar($avatarUrl, $user)
+    {
+        try {
+            // Download the image from Google
+            $response = Http::timeout(10)->get($avatarUrl);
+            
+            if ($response->successful()) {
+                $imageContent = $response->body();
+                $imageInfo = getimagesizefromstring($imageContent);
+                
+                if ($imageInfo === false) {
+                    return null;
+                }
+                
+                // Determine file extension from MIME type
+                $mimeType = $imageInfo['mime'];
+                $extension = match($mimeType) {
+                    'image/jpeg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                    default => 'jpg'
+                };
+                
+                // Generate unique filename
+                $fileName = Str::random(25) . '.' . $extension;
+                $path = 'avatars/' . $fileName;
+                
+                // Delete old avatar if exists
+                if ($user->avatar) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+                
+                // Save the image
+                Storage::disk('public')->put($path, $imageContent);
+                
+                return $path;
+            }
+        } catch (Throwable $e) {
+            // Log error but don't fail the registration
+            \Log::warning('Failed to download Google avatar: ' . $e->getMessage());
+        }
+        
+        return null;
     }
 }
