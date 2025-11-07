@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Http\Requests\RegisterClientRequest;
 use Throwable;
@@ -26,9 +25,9 @@ class GoogleAuthController extends Controller
             ->stateless()
             ->scopes(['openid','email','profile'])
             ->with([
-                'prompt' => 'select_account',       // o 'consent select_account'
-                'include_granted_scopes' => 'false',
-                'access_type' => 'online',
+                'prompt' => 'consent select_account', // fuerza confirmación y elección de cuenta
+                'include_granted_scopes' => 'false',   // no reutilizar permisos previos
+                'access_type' => 'online',             // o 'offline' si quieres refresh_token
             ])
             ->redirect();
     }
@@ -44,7 +43,7 @@ class GoogleAuthController extends Controller
                 ->user();
         } catch (Throwable $e) {
             \Log::warning('Google auth failed: ' . $e->getMessage());
-            return $this->redirectToFrontend([], 'Google authentication failed.');
+            return $this->postMessageAndClose([], 'Google authentication failed.');
         }
 
         // Buscar usuario por email
@@ -66,20 +65,23 @@ class GoogleAuthController extends Controller
                 'supplier'
             ]));
 
-            return $this->redirectToFrontend([
+            $tokenData = [
                 'token' => $token,
                 'accessToken' => $token,
                 'token_type' => 'bearer',
                 'user_data' => $userData,
-                'userAbilities' => $permissions,
-            ]);
+                'userAbilities' => $permissions
+            ];
+
+            // Popup: enviar datos a opener y cerrar. Fallback: redirigir al frontend /callback.
+            return $this->postMessageAndClose($tokenData);
         }
 
-        // Crear usuario nuevo
+        // Registrar usuario nuevo si no existe
         $registerReq = new RegisterClientRequest();
         $registerReq->name = $googleUser->name;
         $registerReq->email = $googleUser->email;
-        $registerReq->password = Str::random(32);   // evita passwords débiles
+        $registerReq->password = Str::random(32);  // evita passwords débiles
         $registerReq->phone = '----';
         $registerReq->rolname = 'cliente';
         $registerReq->google_id = $googleUser->id;
@@ -89,7 +91,7 @@ class GoogleAuthController extends Controller
         $data = json_decode($response->getContent(), true);
 
         if (!($data['success'] ?? false)) {
-            return $this->redirectToFrontend([], 'Register failed.');
+            return $this->postMessageAndClose([], 'Register failed.');
         }
 
         $client = $data['data']['client'];
@@ -113,13 +115,59 @@ class GoogleAuthController extends Controller
             'supplier'
         ]));
 
-        return $this->redirectToFrontend([
+        $tokenData = [
             'token' => $token,
             'accessToken' => $token,
             'token_type' => 'bearer',
             'user_data' => $userData,
-            'userAbilities' => $permissions,
-        ]);
+            'userAbilities' => $permissions
+        ];
+
+        return $this->postMessageAndClose($tokenData);
+    }
+
+    /**
+     * Devuelve una página mínima que postMessage los datos al opener y cierra el popup.
+     * Si no hay opener (p.ej. dispositivos que bloquean opener), redirige al frontend.
+     */
+    private function postMessageAndClose(array $payload = [], ?string $error = null)
+    {
+        $type = $error ? 'google-auth-error' : 'google-auth-success';
+
+        // Fallback redirect para cuando no hay opener (móvil, bloqueo navegador, etc.)
+        $app = $this->appDomain();
+        if ($error) {
+            $fallback = $app . '/callback?error=' . urlencode($error);
+        } else {
+            $encoded = base64_encode(json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            $fallback = $app . '/callback?data=' . urlencode($encoded);
+        }
+
+        $json = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        $html = <<<HTML
+<!doctype html>
+<meta http-equiv="referrer" content="no-referrer">
+<title>Signing in…</title>
+<script>
+(function () {
+  try {
+    var msg = { type: '{$type}', payload: {$json} };
+    if (window.opener && window.opener !== window) {
+      window.opener.postMessage(msg, '*');
+      window.close();
+      return;
+    }
+  } catch (e) {}
+  // Fallback si no hay opener
+  location.replace('{$fallback}');
+})();
+</script>
+HTML;
+
+        return response($html, 200)
+            ->header('Content-Type', 'text/html; charset=utf-8')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 
     private function appDomain(): string
@@ -129,18 +177,6 @@ class GoogleAuthController extends Controller
             $appDomain = (request()->secure() ? 'https://' : 'http://') . $appDomain;
         }
         return rtrim($appDomain, '/');
-    }
-
-    private function redirectToFrontend(array $payload = [], ?string $error = null)
-    {
-        $app = $this->appDomain();
-
-        if ($error) {
-            return redirect($app . '/callback?error=' . urlencode($error));
-        }
-
-        $encoded = base64_encode(json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-        return redirect($app . '/callback?data=' . urlencode($encoded));
     }
 
     /**
@@ -164,7 +200,7 @@ class GoogleAuthController extends Controller
                 }
 
                 $mimeType = $imageInfo['mime'];
-                $extension = match ($mimeType) {
+                $extension = match($mimeType) {
                     'image/jpeg' => 'jpg',
                     'image/png' => 'png',
                     'image/gif' => 'gif',
