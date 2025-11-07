@@ -7,7 +7,8 @@ use App\Http\Controllers\Testing\TestingController;
 
 use App\Http\Controllers\Auth\{
     AuthController,
-    PasswordResetController
+    PasswordResetController,
+    GoogleAuthController
 };
 
 use App\Http\Controllers\Shopping\{
