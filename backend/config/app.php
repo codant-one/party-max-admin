@@ -171,6 +171,7 @@ return [
         shweshi\OpenGraph\Providers\OpenGraphProvider::class,
 
         Jenssegers\Agent\AgentServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
     ])->toArray(),
 
@@ -189,6 +190,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'OpenGraph' => shweshi\OpenGraph\Facades\OpenGraphFacade::class,
         'Agent' => Jenssegers\Agent\AgentServiceProvider::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ])->toArray(),
 
 ];
