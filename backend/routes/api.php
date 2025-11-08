@@ -54,7 +54,8 @@ use App\Http\Controllers\{
     IpController,
     AIAgentController,
     QuoteController,
-    CouponController
+    CouponController,
+    BannerController
 };
 
 /*
@@ -121,6 +122,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('ips', IpController::class);
     Route::apiResource('quotes', QuoteController::class);
     Route::apiResource('coupons', CouponController::class);
+    Route::apiResource('banners', BannerController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -158,6 +160,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [CategoryController::class, 'delete']);
         Route::get('/events/all', [CategoryController::class, 'events']);
         Route::put('updateStates/{id}', [CategoryController::class, 'updateStates']);
+    });
+
+    //Banners
+    Route::group(['prefix' => 'banners'], function () {
+        Route::post('delete', [BannerController::class, 'delete']);
     });
 
     //Products
