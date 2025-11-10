@@ -55,7 +55,8 @@ use App\Http\Controllers\{
     AIAgentController,
     QuoteController,
     CouponController,
-    InvoiceController
+    InvoiceController,
+    BannerController
 };
 
 /*
@@ -123,6 +124,7 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('quotes', QuoteController::class);
     Route::apiResource('coupons', CouponController::class);
     Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('banners', BannerController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -160,6 +162,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [CategoryController::class, 'delete']);
         Route::get('/events/all', [CategoryController::class, 'events']);
         Route::put('updateStates/{id}', [CategoryController::class, 'updateStates']);
+    });
+
+    //Banners
+    Route::group(['prefix' => 'banners'], function () {
+        Route::post('delete', [BannerController::class, 'delete']);
     });
 
     //Products
@@ -318,6 +325,7 @@ Route::group([
     'middleware' => 'throttle:200,1'
 ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
+    Route::get('banners/{slug}', [MiscellaneousController::class, 'banners']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('categoriesAll', [MiscellaneousController::class, 'categoriesAllInfo']);
     Route::get('products', [MiscellaneousController::class, 'products']);

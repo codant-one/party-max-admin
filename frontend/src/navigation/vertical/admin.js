@@ -25,6 +25,13 @@ export default [
         subject: 'home-imágenes', 
       },
       {
+        title: 'Banners',
+        icon: { icon: 'tabler-category' },
+        to: 'dashboard-admin-banners', 
+        action: 'ver', 
+        subject: 'banners', 
+      },
+      {
         title: 'Registro de ips',
         icon: { icon: 'tabler-device-imac-off' },
         to: 'dashboard-admin-ips', 
