@@ -71,7 +71,7 @@ class MiscellaneousController extends Controller
     {
         try {
 
-            $banners = Banner::where('slug', $slug)->get();
+            $banners = Banner::where('slug', $slug)->first();
             $categories = Category::where('category_type_id', $slug === 'productos' ? 1 : 2 )->whereNull('category_id')->get();
 
             return response()->json([

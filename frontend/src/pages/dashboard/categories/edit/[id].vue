@@ -45,6 +45,32 @@ const categoryTypes = ref([
 
 const isValid =  ref(null)
 
+// Validadores condicionales para banners: solo requeridos si no existe un banner previo
+const bannerValidator = (index) => {
+  return (value) => {
+    // Si ya existe un banner (avatarsOld tiene valor y no está vacío), no es obligatorio
+    const hasExistingBanner = avatarsOld.value[index] && 
+                              avatarsOld.value[index] !== '' && 
+                              avatarsOld.value[index] !== null
+    
+    if (hasExistingBanner) {
+      return true
+    }
+    
+    // Si no existe banner previo, verificar que se haya seleccionado uno nuevo
+    // value puede ser un array de archivos o un archivo individual
+    const hasNewBanner = value && 
+                        ((Array.isArray(value) && value.length > 0) || 
+                         (!Array.isArray(value) && value))
+    
+    if (!hasNewBanner) {
+      return 'Este campo es requerido'
+    }
+    
+    return true
+  }
+}
+
 watchEffect(fetchData)
 
 async function fetchData() {
@@ -358,7 +384,7 @@ const onSubmit = () => {
                                         @keydown.enter.prevent="addTag"
                                     />  
                                 </VCol>
-                                <VCol cols="12" md="6" v-if="category_id !== null">
+                                <VCol cols="12" md="6">
                                     <VFileInput
                                         v-model="filename"
                                         label="Icono Categoria"
@@ -369,7 +395,7 @@ const onSubmit = () => {
                                         @click:clear="avatars[4] = avatarsOld[4]"
                                     />
                                 </VCol>
-                                <VCol cols="12" md="6" class="d-flex justify-center align-center"  v-if="category_id !== null">
+                                <VCol cols="12" md="6" class="d-flex justify-center align-center">
                                     <VImg
                                         :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
                                         v-if="avatars[4] !== null"
@@ -396,7 +422,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 0)"
                                             @click:clear="avatars[0] = avatarsOld[0]"
-                                            :rules="[requiredValidator]"
+                                            :rules="[bannerValidator(0)]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 1 -->
@@ -458,7 +484,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 1)"
                                             @click:clear="avatars[1] = avatarsOld[1]"
-                                            :rules="[requiredValidator]"
+                                            :rules="[bannerValidator(1)]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 2 --> 
@@ -520,7 +546,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 2)"
                                             @click:clear="avatars[2] = avatarsOld[2]"
-                                            :rules="[requiredValidator]"
+                                            :rules="[bannerValidator(2)]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 3 -->
@@ -582,7 +608,7 @@ const onSubmit = () => {
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 3)"
                                             @click:clear="avatars[3] = avatarsOld[3]"
-                                            :rules="[requiredValidator]"
+                                            :rules="[bannerValidator(3)]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 4 -->
