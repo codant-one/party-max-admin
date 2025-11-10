@@ -125,6 +125,7 @@ const onSubmit = () => {
     refForm.value?.validate().then(({ valid }) => {
         isValid.value = valid
         if (valid) {
+            isRequestOngoing.value = true
             error.value = undefined
 
             let formData = new FormData()
@@ -204,7 +205,7 @@ const onSubmit = () => {
                     <VCard class="mb-8">
                         <VCardText>
                             <VRow>
-                                <VCol cols="12" md="8">
+                                <VCol cols="12" md="12">
                                     <VTextField
                                         v-model="name"
                                         :rules="[requiredValidator]"
@@ -213,136 +214,135 @@ const onSubmit = () => {
                                 </VCol>
                             </VRow>
                         </VCardText>
+                        <VDivider />
+                        
+                        <VCardText>
+                            <VRow no-gutters>
+                                <VCol cols="12" md="2"></VCol>
+                                <VCol cols="12" md="10">
+                                    <VFileInput
+                                        v-model="filename"
+                                        label="Banner Principal"
+                                        class="mb-2"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp"
+                                        prepend-icon="tabler-camera"
+                                        :rules="[requiredValidator]"
+                                        @change="onImageSelected($event, 0)"
+                                        @click:clear="avatars[0] = avatarsOld[0]"
+                                    />
+                                </VCol>
+                                <!-- 👉 Banner Category 1 -->
+                                <VCol cols="12" class="d-flex justify-center align-center">
+                                    <VImg
+                                        :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[0] !== null"
+                                        :src="avatars[0]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
+                                    />
+                                </VCol>
+                            </VRow>
+                        </VCardText>
+
+                        <VDivider />
+
+                        <VCardText>
+                            <VRow no-gutters>
+                                <VCol cols="12" md="2"></VCol>
+                                <VCol cols="12" md="10">
+                                    <VFileInput
+                                        v-model="filename2"
+                                        label="Banner 2"
+                                        class="mb-2"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp"
+                                        prepend-icon="tabler-camera"
+                                        :rules="[requiredValidator]"
+                                        @change="onImageSelected($event, 1)"
+                                        @click:clear="avatars[1] = avatarsOld[1]"
+                                    />
+                                </VCol>
+                                <!-- 👉 Banner Category 2 --> 
+                                <VCol cols="12" class="d-flex justify-center align-center">
+                                    <VImg
+                                        :class="((filename2.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[1] !== null"
+                                        :src="avatars[1]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
+                                    />
+                                </VCol>
+                            </VRow>
+                        </VCardText>
+
+                        <VDivider />
+
+                        <VCardText>
+                            <VRow no-gutters>
+                                <VCol cols="12" md="2"></VCol>
+                                <VCol cols="12" md="10">
+                                    <VFileInput
+                                        v-model="filename3"
+                                        label="Banner 3"
+                                        class="mb-2"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp"
+                                        prepend-icon="tabler-camera"
+                                        :rules="[requiredValidator]"
+                                        @change="onImageSelected($event, 2)"
+                                        @click:clear="avatars[2] = avatarsOld[2]"
+                                    />
+                                </VCol>
+                                <!-- 👉 Banner Category 3 -->
+                                <VCol cols="12" class="d-flex justify-center align-center">
+                                    <VImg
+                                        :class="((filename3.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[2] !== null"
+                                        :src="avatars[2]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
+                                    />
+                                </VCol>
+                            </VRow>
+                        </VCardText>
+
+                        <VDivider />
+
+                        <VCardText>
+                            <VRow no-gutters>
+                                <VCol cols="12" md="2"></VCol>
+                                <VCol cols="12" md="10">
+                                    <VFileInput
+                                        v-model="filename4"
+                                        label="Banner 4"
+                                        class="mb-2"
+                                        accept="image/png, image/jpeg, image/bmp, image/webp"
+                                        prepend-icon="tabler-camera"
+                                        :rules="[requiredValidator]"
+                                        @change="onImageSelected($event, 3)"
+                                        @click:clear="avatars[3] = avatarsOld[3]"
+                                    />
+                                </VCol>
+                                <!-- 👉 Banner Category 4 -->
+                                <VCol cols="12" class="d-flex justify-center align-center">
+                                    <VImg
+                                        :class="((filename4.length === 0 && isValid === false)) ? 'border-error' : ''"
+                                        v-if="avatars[3] !== null"
+                                        :src="avatars[3]"
+                                        :height="300"
+                                        aspect-ratio="1/1"
+                                        class="border-img"
+                                        cover
+                                    />
+                                </VCol>
+                            </VRow>
+                        </VCardText>
+                        
                     </VCard>
-
-                    <div >
-                            <VDivider />
-                            <VCardText>
-                                <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
-                                        <VFileInput
-                                            v-model="filename"
-                                            label="Banner Principal"
-                                            class="mb-2 me-2"
-                                            accept="image/png, image/jpeg, image/bmp, image/webp"
-                                            prepend-icon="tabler-camera"
-                                            :rules="[requiredValidator]"
-                                            @change="onImageSelected($event, 0)"
-                                            @click:clear="avatars[0] = avatarsOld[0]"
-                                        />
-                                    </VCol>
-                                    <!-- 👉 Banner Category 1 -->
-                                    <VCol cols="12" class="d-flex justify-center align-center">
-                                        <VImg
-                                            :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
-                                            v-if="avatars[0] !== null"
-                                            :src="avatars[0]"
-                                            :height="300"
-                                            aspect-ratio="1/1"
-                                            class="border-img"
-                                            cover
-                                        />
-                                    </VCol>
-                                </VRow>
-                            </VCardText>
-
-                            <VDivider />
-
-                            <VCardText>
-                                <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
-                                        <VFileInput
-                                            v-model="filename2"
-                                            label="Banner 2"
-                                            class="mb-2 me-2"
-                                            accept="image/png, image/jpeg, image/bmp, image/webp"
-                                            prepend-icon="tabler-camera"
-                                            :rules="[requiredValidator]"
-                                            @change="onImageSelected($event, 1)"
-                                            @click:clear="avatars[1] = avatarsOld[1]"
-                                        />
-                                    </VCol>
-                                    <!-- 👉 Banner Category 2 --> 
-                                    <VCol cols="12" class="d-flex justify-center align-center">
-                                        <VImg
-                                            :class="((filename2.length === 0 && isValid === false)) ? 'border-error' : ''"
-                                            v-if="avatars[1] !== null"
-                                            :src="avatars[1]"
-                                            :height="300"
-                                            aspect-ratio="1/1"
-                                            class="border-img"
-                                            cover
-                                        />
-                                    </VCol>
-                                </VRow>
-                            </VCardText>
-
-                            <VDivider />
-
-                            <VCardText>
-                                <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
-                                        <VFileInput
-                                            v-model="filename3"
-                                            label="Banner 3"
-                                            class="mb-2 me-2"
-                                            accept="image/png, image/jpeg, image/bmp, image/webp"
-                                            prepend-icon="tabler-camera"
-                                            :rules="[requiredValidator]"
-                                            @change="onImageSelected($event, 2)"
-                                            @click:clear="avatars[2] = avatarsOld[2]"
-                                        />
-                                    </VCol>
-                                    <!-- 👉 Banner Category 3 -->
-                                    <VCol cols="12" class="d-flex justify-center align-center">
-                                        <VImg
-                                            :class="((filename3.length === 0 && isValid === false)) ? 'border-error' : ''"
-                                            v-if="avatars[2] !== null"
-                                            :src="avatars[2]"
-                                            :height="300"
-                                            aspect-ratio="1/1"
-                                            class="border-img"
-                                            cover
-                                        />
-                                    </VCol>
-                                </VRow>
-                            </VCardText>
-
-                            <VDivider />
-
-                            <VCardText>
-                                <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
-                                        <VFileInput
-                                            v-model="filename4"
-                                            label="Banner 4"
-                                            class="mb-2 me-2"
-                                            accept="image/png, image/jpeg, image/bmp, image/webp"
-                                            prepend-icon="tabler-camera"
-                                            :rules="[requiredValidator]"
-                                            @change="onImageSelected($event, 3)"
-                                            @click:clear="avatars[3] = avatarsOld[3]"
-                                        />
-                                    </VCol>
-                                    <!-- 👉 Banner Category 4 -->
-                                    <VCol cols="12" class="d-flex justify-center align-center">
-                                        <VImg
-                                            :class="((filename4.length === 0 && isValid === false)) ? 'border-error' : ''"
-                                            v-if="avatars[3] !== null"
-                                            :src="avatars[3]"
-                                            :height="300"
-                                            aspect-ratio="1/1"
-                                            class="border-img"
-                                            cover
-                                        />
-                                    </VCol>
-                                </VRow>
-                            </VCardText>
-                        </div>
                 </VCol>
 
                 <VCol cols="12" md="3">

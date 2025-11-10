@@ -310,6 +310,7 @@ Route::group([
     'middleware' => 'throttle:200,1'
 ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
+    Route::get('banners/{slug}', [MiscellaneousController::class, 'banners']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('categoriesAll', [MiscellaneousController::class, 'categoriesAllInfo']);
     Route::get('products', [MiscellaneousController::class, 'products']);

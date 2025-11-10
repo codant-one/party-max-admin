@@ -146,7 +146,8 @@ const onSubmit = () => {
         isValid.value = valid
         if (valid) {
             error.value = undefined
-
+            isRequestOngoing.value = true
+            
             let formData = new FormData()
 
             formData.append('banner', banners.value[0] ?? null)
@@ -230,7 +231,7 @@ const onSubmit = () => {
                     <VCard class="mb-8">
                         <VCardText>
                             <VRow>
-                                <VCol cols="12" md="8">
+                                <VCol cols="12" md="12">
                                     <VTextField
                                         v-model="name"
                                         :rules="[requiredValidator]"
@@ -243,12 +244,12 @@ const onSubmit = () => {
                             <VDivider />
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
+                                    <VCol cols="12" md="2"></VCol>
+                                    <VCol cols="12" md="10">
                                         <VFileInput
                                             v-model="filename"
                                             label="Banner Principal"
-                                            class="mb-2 me-2"
+                                            class="mb-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 0)"
@@ -274,12 +275,12 @@ const onSubmit = () => {
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
+                                    <VCol cols="12" md="2"></VCol>
+                                    <VCol cols="12" md="10">
                                         <VFileInput
                                             v-model="filename2"
                                             label="Banner 2"
-                                            class="mb-2 me-2"
+                                            class="mb-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 1)"
@@ -305,12 +306,12 @@ const onSubmit = () => {
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
+                                    <VCol cols="12" md="2"></VCol>
+                                    <VCol cols="12" md="10">
                                         <VFileInput
                                             v-model="filename3"
                                             label="Banner 3"
-                                            class="mb-2 me-2"
+                                            class="mb-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 2)"
@@ -336,12 +337,12 @@ const onSubmit = () => {
 
                             <VCardText>
                                 <VRow no-gutters>
-                                    <VCol cols="12"  md="2"></VCol>
-                                    <VCol cols="12"  md="5">
+                                    <VCol cols="12" md="2"></VCol>
+                                    <VCol cols="12" md="10">
                                         <VFileInput
                                             v-model="filename4"
                                             label="Banner 4"
-                                            class="mb-2 me-2"
+                                            class="mb-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 3)"

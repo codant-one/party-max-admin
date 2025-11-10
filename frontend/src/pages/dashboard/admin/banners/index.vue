@@ -167,7 +167,7 @@ const removeBanner = async () => {
                 v-if="$can('crear','banners')"
                 prepend-icon="tabler-plus"
                 :to="{ name: 'dashboard-admin-banners-add' }">
-                  Agregar Banner
+                  Agregar Banners
               </v-btn>
             </div>
           </v-card-text>
@@ -191,17 +191,8 @@ const removeBanner = async () => {
                 :key="banner.id"
                 style="height: 3.75rem;">
 
-                <td>
-                  <div class="d-flex gap-x-3">
-                    <div class="d-block">
-                      <span class="d-block text-base">
-                        {{ banner.name }}
-                      </span>
-                      <span class="d-block text-sm text-disabled">
-                        {{ banner.slug }}
-                      </span>
-                    </div>
-                  </div>
+                <td class="text-wrap">
+                    {{ banner.name }}
                 </td>
                 <!-- 👉 Acciones -->
                 <td class="text-center" style="width: 5rem;" v-if="$can('editar', 'banners') || $can('eliminar', 'banners')">      
@@ -306,10 +297,10 @@ const removeBanner = async () => {
       <DialogCloseBtn @click="isConfirmDeleteDialogVisible = !isConfirmDeleteDialogVisible" />
 
       <!-- Dialog Content -->
-      <VCard title="Eliminar Banner">
+      <VCard title="Eliminar Banners">
         <VDivider class="mt-4"/>
         <VCardText>
-          Está seguro de eliminar el banner de <strong>{{ selectedBanner.name }}</strong>?.
+          Está seguro de eliminar los banners de <strong>{{ selectedBanner.name }}</strong>?.
         </VCardText>
 
         <VCardText class="d-flex justify-end gap-3 flex-wrap">

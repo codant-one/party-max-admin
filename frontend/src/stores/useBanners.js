@@ -37,7 +37,6 @@ export const useBannersStores = defineStore('banners', {
 
             return Banners.create(data)
                 .then((response) => {
-                    this.banners.push(response.data.data.banner)
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
@@ -65,8 +64,6 @@ export const useBannersStores = defineStore('banners', {
             
             return Banners.update(data)
                 .then((response) => {
-                    let pos = this.banners.findIndex((item) => item.id === response.data.data.banner.id)
-                    this.banners[pos] = response.data.data.banner
                     return Promise.resolve(response)
                 })
                 .catch(error => Promise.reject(error))
