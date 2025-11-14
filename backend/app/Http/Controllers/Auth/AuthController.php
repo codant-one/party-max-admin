@@ -432,7 +432,7 @@ class AuthController extends Controller
 
                 $billings = Billing::where('email', $request->email)->get();
 
-                foreach($billings as $billing) {
+                foreach ($billings as $billing) {
                     $address = new Address();
                     $address->client_id = $client->id;
                     $address->addresses_type_id = 1;
@@ -447,9 +447,12 @@ class AuthController extends Controller
                     $address->save();
 
                     $order = Order::find($billing->order_id);
-                    $order->client_id = $client->id;
-                    $order->address_id = $address->id;
-                    $order->save();
+
+                    if ($order) {
+                        $order->client_id = $client->id;
+                        $order->address_id = $address->id;
+                        $order->save();
+                    }
                 }
 
                 $client = Client::with(['user'])->find($client->id);
