@@ -26,13 +26,19 @@ class GoogleAuthController extends Controller
         $scopes = [
             'openid',
             'email',
-            'profile'
+            'profile',
         ];
 
         // Scope de birthday solo si está habilitado y la app está verificada
         // Para habilitarlo, agrega GOOGLE_REQUEST_BIRTHDAY=true en tu .env
         if (env('GOOGLE_REQUEST_BIRTHDAY', false)) {
             $scopes[] = 'https://www.googleapis.com/auth/user.birthday.read';
+        }
+
+        // Scope de phone solo si está habilitado y la app está verificada
+        // Para habilitarlo, agrega GOOGLE_REQUEST_PHONE=true en tu .env
+        if (env('GOOGLE_REQUEST_PHONE', false)) {
+            $scopes[] = 'https://www.googleapis.com/auth/user.phonenumbers.read';
         }
 
         return Socialite::driver('google')
@@ -56,9 +62,9 @@ class GoogleAuthController extends Controller
                 ->stateless()
                 ->user();
             
-            // Intentar obtener birthday adicional desde People API si el scope está habilitado
-            // Esto es necesario porque el scope básico no incluye birthday
-            if (env('GOOGLE_REQUEST_BIRTHDAY', false) && isset($googleUser->token)) {
+            // Intentar obtener datos adicionales (birthday / phone) desde People API si el scope está habilitado
+            // Esto es necesario porque el scope básico no incluye estos datos
+            if ((env('GOOGLE_REQUEST_BIRTHDAY', false) || env('GOOGLE_REQUEST_PHONE', false)) && isset($googleUser->token)) {
                 $this->fetchBirthdayFromPeopleAPI($googleUser);
             }
         } catch (Throwable $e) {
@@ -102,10 +108,16 @@ class GoogleAuthController extends Controller
 
         // Registrar usuario nuevo si no existe
         $registerReq = new RegisterClientRequest();
-        $registerReq->name = $googleUser->name;
+
+        // Separar nombre y apellido a partir del nombre completo de Google
+        [$firstName, $lastName] = $this->splitGoogleName($googleUser->name);
+        $registerReq->name = $firstName;
+        $registerReq->last_name = $lastName;
         $registerReq->email = $googleUser->email;
         $registerReq->password = Str::random(32);  // evita passwords débiles
-        $registerReq->phone = '----';
+        // Intentar obtener el teléfono desde los datos de Google
+        $googlePhone = $this->getPhoneFromGoogle($googleUser);
+        $registerReq->phone = $googlePhone ?: '----';
         $registerReq->rolname = 'cliente';
         $registerReq->google_id = $googleUser->id;
 
@@ -253,6 +265,83 @@ HTML;
     }
 
     /**
+     * Extrae el teléfono desde el objeto de usuario de Google, si está disponible.
+     *
+     * @param \Laravel\Socialite\Two\User $googleUser
+     * @return string|null
+     */
+    private function getPhoneFromGoogle($googleUser): ?string
+    {
+        try {
+            $phone = null;
+
+            // 1) Campo directo en el objeto Socialite (por si algún driver lo mapea así)
+            if (isset($googleUser->phone) && !empty($googleUser->phone)) {
+                $phone = $googleUser->phone;
+            }
+
+            // 2) Revisar el array raw user que entrega Google (lo que llenamos desde People API)
+            $rawUser = $googleUser->user ?? null;
+
+            if (!$phone && is_array($rawUser)) {
+                if (!empty($rawUser['phone'])) {
+                    $phone = $rawUser['phone'];
+                } elseif (!empty($rawUser['phoneNumber'])) {
+                    $phone = $rawUser['phoneNumber'];
+                } elseif (!empty($rawUser['phone_number'])) {
+                    $phone = $rawUser['phone_number'];
+                } elseif (!empty($rawUser['phoneNumbers']) && is_array($rawUser['phoneNumbers'])) {
+                    // Recorremos todos los phoneNumbers buscando value o canonicalForm
+                    foreach ($rawUser['phoneNumbers'] as $p) {
+                        if (!empty($p['value'])) {
+                            $phone = $p['value'];
+                            break;
+                        }
+                        if (!empty($p['canonicalForm'])) {
+                            $phone = $p['canonicalForm'];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (is_string($phone)) {
+                $phone = trim($phone);
+            }
+
+            return $phone ?: null;
+        } catch (Throwable $e) {
+            \Log::warning('Failed to get phone from Google user: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Separa un nombre completo en nombre y apellido.
+     * Ej: "Juan Pérez Gómez" => ["Juan Pérez", "Gómez"]
+     *
+     * @param string|null $fullName
+     * @return array{0:string,1:string}
+     */
+    private function splitGoogleName(?string $fullName): array
+    {
+        $fullName = trim((string) $fullName);
+        if ($fullName === '') {
+            return ['', ''];
+        }
+
+        $parts = preg_split('/\s+/', $fullName);
+        if (!$parts || count($parts) === 1) {
+            return [$fullName, ''];
+        }
+
+        $lastName = array_pop($parts);
+        $firstName = implode(' ', $parts);
+
+        return [$firstName, $lastName];
+    }
+
+    /**
      * Update client profile with Google data (birthday)
      * 
      * @param User $user
@@ -354,16 +443,24 @@ HTML;
                 return;
             }
 
-            // Llamar a People API para obtener información adicional incluyendo birthday
+            // Llamar a People API para obtener información adicional (birthday / phone)
+            // Pedimos siempre birthdays y phoneNumbers; la API solo devolverá lo que esté permitido por los scopes
+            $fields = ['birthdays', 'phoneNumbers'];
+
             $response = Http::withToken($googleUser->token)
                 ->timeout(10)
                 ->get('https://people.googleapis.com/v1/people/me', [
-                    'personFields' => 'birthdays'
+                    'personFields' => implode(',', $fields)
                 ]);
 
             if ($response->successful()) {
                 $peopleData = $response->json();
                 
+                // Asegurarnos de tener el array user inicializado
+                if (!isset($googleUser->user) || !is_array($googleUser->user)) {
+                    $googleUser->user = [];
+                }
+
                 // Agregar birthday al objeto googleUser si está disponible
                 if (isset($peopleData['birthdays']) && is_array($peopleData['birthdays'])) {
                     foreach ($peopleData['birthdays'] as $birthdayData) {
@@ -376,18 +473,26 @@ HTML;
                                     $date['day']
                                 );
                                 
-                                // Agregar al array user del objeto googleUser
-                                if (!isset($googleUser->user)) {
-                                    $googleUser->user = [];
-                                }
                                 $googleUser->user['birthday'] = $birthday;
                                 $googleUser->user['birthdays'] = $peopleData['birthdays'];
                                 
-                                \Log::info('Birthday obtenido desde People API', [
-                                    'birthday' => $birthday
-                                ]);
                                 break;
                             }
+                        }
+                    }
+                }
+
+                // Agregar phone al objeto googleUser si está disponible
+                if (isset($peopleData['phoneNumbers']) && is_array($peopleData['phoneNumbers'])) {
+                    foreach ($peopleData['phoneNumbers'] as $phoneData) {
+                        // Formato típico: { "value": "+54 9 11 1234-5678", "type": "mobile", ... }
+                        $candidate = $phoneData['value'] ?? ($phoneData['canonicalForm'] ?? null);
+                        if (!empty($candidate)) {
+                            $phone = trim($candidate);
+                            $googleUser->user['phone'] = $phone;
+                            $googleUser->user['phoneNumbers'] = $peopleData['phoneNumbers'];
+
+                            break;
                         }
                     }
                 }

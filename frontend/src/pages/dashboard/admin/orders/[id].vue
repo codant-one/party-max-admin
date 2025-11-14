@@ -663,7 +663,7 @@ const removeOrder = async () => {
                   <span>Tipo de documento: {{ order.billing?.document_type?.name }} </span>
                   <span>Documento: {{ order.billing?.document }} </span>
                   <span>Email: {{ order.client ? order.client.user.email : order.billing?.email }} </span>
-                  <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing?.phone}}</span>
+                  <span>Teléfono: {{ order.client?.user?.user_detail?.phone || order.billing?.phone }}</span>
                 </div>
               </VCardText>
             </VCard>

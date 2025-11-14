@@ -402,7 +402,9 @@ class AuthController extends Controller
 
             $user = new User();
             $user->name = $request->name;
-            $user->username =  Str::slug($request->name);
+            // last_name es opcional (útil para registros via Google)
+            $user->last_name = $request->last_name ?? null;
+            $user->username =  Str::slug(trim($request->name . ' ' . ($request->last_name ?? '')));
             $user->email = strtolower($request->email);
             $user->password = $hashedPassword;
             $user->google_id = $request->google_id ?? null;
