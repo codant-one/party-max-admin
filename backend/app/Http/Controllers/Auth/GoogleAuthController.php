@@ -117,7 +117,7 @@ class GoogleAuthController extends Controller
         $registerReq->password = Str::random(32);  // evita passwords débiles
         // Intentar obtener el teléfono desde los datos de Google
         $googlePhone = $this->getPhoneFromGoogle($googleUser);
-        $registerReq->phone = $googlePhone ?: '----';
+        $registerReq->phone = $googlePhone ?: null;
         $registerReq->rolname = 'cliente';
         $registerReq->google_id = $googleUser->id;
 
