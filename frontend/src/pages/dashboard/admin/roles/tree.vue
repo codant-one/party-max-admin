@@ -181,6 +181,20 @@ const closeTreeDialog  = function(){
                             </li>
                         </ul>
                         <li class="tab n3">
+                            <strong>Ver Banners</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de banners</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Banners</strong>&emsp;/&emsp;<code>Permite la creación de banners</code>
+                            </li>                      
+                            <li class="tab n3">
+                                <strong>Editar Banners</strong>&emsp;/&emsp;<code>Permite la edición de banners</code>
+                            </li>                            
+                            <li class="tab n3">
+                                <strong>Eliminar Banners</strong>&emsp;/&emsp;<code>Permite la eliminación de banners</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
                             <strong>Ver Registros de Ips</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de registros de ips</code>
                         </li>
                         <ul class="tab">

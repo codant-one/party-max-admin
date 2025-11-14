@@ -366,6 +366,31 @@ const closeModal = function(){
                             />
                         </div>
                         <VLabel style="font-weight: bold;">
+                            Banners
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver banners"
+                                value="ver banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear banners"
+                                value="crear banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar banners"
+                                value="editar banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar banners"
+                                value="eliminar banners"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
                             Registro de ips
                         </VLabel>
                         <div class="demo-space-x ml-5">
