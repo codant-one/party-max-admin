@@ -60,7 +60,11 @@ class Banner extends Model
             'banner' => '',
             'banner_2' => '',
             'banner_3' => '',
-            'banner_4' => ''
+            'banner_4' => '',
+            'url' => $request->url,
+            'url_2' => $request->url_2,
+            'url_3' => $request->url_3,
+            'url_4' => $request->url_4
         ]);
 
         return $banner;
@@ -70,7 +74,11 @@ class Banner extends Model
 
         $banner->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name)
+            'slug' => Str::slug($request->name),
+            'url' => $request->url,
+            'url_2' => $request->url_2,
+            'url_3' => $request->url_3,
+            'url_4' => $request->url_4
         ]);
 
         return $banner;

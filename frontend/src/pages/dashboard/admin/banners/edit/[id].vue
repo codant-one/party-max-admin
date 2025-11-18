@@ -2,7 +2,7 @@
 
 import router from '@/router'
 import { inject } from "vue"
-import { requiredValidator } from '@validators'
+import { requiredValidator, urlValidator } from '@validators'
 import { useBannersStores } from '@/stores/useBanners'
 import { themeConfig } from '@themeConfig'
 
@@ -18,9 +18,6 @@ const error = ref(undefined)
 const emitter = inject("emitter")
 
 const name = ref('')
-const category_id = ref()
-const selectedTags = ref([])
-const existingTags = ref([])
 const banner = ref(null)
 const banners = ref([])
 const avatars = ref([])
@@ -29,6 +26,10 @@ const filename = ref([])
 const filename2 = ref([])
 const filename3 = ref([])
 const filename4 = ref([])
+const url = ref(null)
+const url2 = ref(null)      
+const url3 = ref(null)
+const url4 = ref(null)
 
 const isValid =  ref(null)
 
@@ -44,6 +45,10 @@ async function fetchData() {
 
 
         name.value = banner.value.name
+        url.value = banner.value.url
+        url2.value = banner.value.url_2
+        url3.value = banner.value.url_3
+        url4.value = banner.value.url_4
 
         avatars.value[0] = banner.value.banner === null ? '' : themeConfig.settings.urlStorage + banner.value.banner
         avatarsOld.value[0] = banner.value.banner === null ? '' : themeConfig.settings.urlStorage + banner.value.banner
@@ -131,15 +136,6 @@ const blobToBase64 = blob => {
   })
 }
 
-const closeDropdown = () => { 
-  document.getElementById("selectCategory").blur()
-  document.getElementById("selectBanner1Category").blur()
-  document.getElementById("selectBanner2Category").blur()
-  document.getElementById("selectBanner3Category").blur()
-  document.getElementById("selectBanner4Category").blur()
-}
-
-
 const onSubmit = () => {
 
     refForm.value?.validate().then(({ valid }) => {
@@ -155,6 +151,10 @@ const onSubmit = () => {
             formData.append('banner_3', banners.value[2] ?? null)
             formData.append('banner_4', banners.value[3] ?? null)
             formData.append('name', name.value)
+            formData.append('url', url.value)
+            formData.append('url_2', url2.value)    
+            formData.append('url_3', url3.value)
+            formData.append('url_4', url4.value)
             formData.append('_method', 'PUT')
             
             let data = {
@@ -245,18 +245,24 @@ const onSubmit = () => {
                             <VCardText>
                                 <VRow no-gutters>
                                     <VCol cols="12" md="2"></VCol>
-                                    <VCol cols="12" md="10">
+                                    <VCol cols="12" md="5">
                                         <VFileInput
                                             v-model="filename"
                                             label="Banner Principal"
-                                            class="mb-2"
+                                            class="mb-2 me-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 0)"
                                             @click:clear="avatars[0] = avatarsOld[0]"
                                         />
                                     </VCol>
-                                    
+                                    <VCol cols="12" md="5">
+                                        <VTextField
+                                            v-model="url"
+                                            label="URL Banner Principal"
+                                            :rules="[requiredValidator, urlValidator]"
+                                        />
+                                    </VCol>
                                     <VCol cols="12" class="d-flex justify-center align-center">
                                         <VImg
                                             :class="((filename.length === 0 && isValid === false)) ? 'border-error' : ''"
@@ -276,15 +282,22 @@ const onSubmit = () => {
                             <VCardText>
                                 <VRow no-gutters>
                                     <VCol cols="12" md="2"></VCol>
-                                    <VCol cols="12" md="10">
+                                    <VCol cols="12" md="5">
                                         <VFileInput
                                             v-model="filename2"
                                             label="Banner 2"
-                                            class="mb-2"
+                                            class="mb-2 me-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 1)"
                                             @click:clear="avatars[1] = avatarsOld[1]"
+                                        />
+                                    </VCol>
+                                    <VCol cols="12" md="5">
+                                        <VTextField
+                                            v-model="url2"
+                                            label="URL Banner 2"
+                                            :rules="[requiredValidator, urlValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 2 --> 
@@ -307,15 +320,22 @@ const onSubmit = () => {
                             <VCardText>
                                 <VRow no-gutters>
                                     <VCol cols="12" md="2"></VCol>
-                                    <VCol cols="12" md="10">
+                                    <VCol cols="12" md="5">
                                         <VFileInput
                                             v-model="filename3"
                                             label="Banner 3"
-                                            class="mb-2"
+                                            class="mb-2 me-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 2)"
                                             @click:clear="avatars[2] = avatarsOld[2]"
+                                        />
+                                    </VCol>
+                                    <VCol cols="12" md="5">
+                                        <VTextField
+                                            v-model="url3"
+                                            label="URL Banner 3"
+                                            :rules="[requiredValidator, urlValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 3 -->
@@ -338,15 +358,22 @@ const onSubmit = () => {
                             <VCardText>
                                 <VRow no-gutters>
                                     <VCol cols="12" md="2"></VCol>
-                                    <VCol cols="12" md="10">
+                                    <VCol cols="12" md="5">
                                         <VFileInput
                                             v-model="filename4"
                                             label="Banner 4"
-                                            class="mb-2"
+                                            class="mb-2 me-2"
                                             accept="image/png, image/jpeg, image/bmp, image/webp"
                                             prepend-icon="tabler-camera"
                                             @change="onImageSelected($event, 3)"
                                             @click:clear="avatars[3] = avatarsOld[3]"
+                                        />
+                                    </VCol>
+                                    <VCol cols="12" md="5">
+                                        <VTextField
+                                            v-model="url4"
+                                            label="URL Banner 4"
+                                            :rules="[requiredValidator, urlValidator]"
                                         />
                                     </VCol>
                                     <!-- 👉 Banner Category 4 -->
