@@ -7,13 +7,13 @@ export default [
         action: 'ver',
         subject: 'ventas',
     },
-   /* {
+   {
         title: 'Facturación',
         icon: { icon: 'tabler-file-invoice' },
         to: 'dashboard-invoices',
         action: 'ver',
         subject: 'facturas',
-    },*/
+    },
     {
         title: 'Proveedores', 
         icon: { icon: 'mdi-account-tie' },
