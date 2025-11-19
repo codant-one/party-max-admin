@@ -176,7 +176,7 @@ class Client extends Model
         $clientD = Client::updateOrCreate(
             [    'user_id' => $user->id ],
             [
-                'gender_id' => $request->gender_id,
+                'gender_id' => $request->gender_id ?? 1,
                 'birthday' => $birthday
             ]
         );
