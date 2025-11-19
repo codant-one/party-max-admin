@@ -136,7 +136,34 @@ class CouponController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        //
+        try {
+            $coupon = Coupon::find($id);
+
+            if (!$coupon) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'not_found',
+                    'feedback' => 'Cupón no encontrado'
+                ], 404);
+            }
+
+            $coupon->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'deleted_successfully',
+                'data' => [
+                    'id' => $id
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
     }
 
     public function couponsbyclient(Request $request, $id): JsonResponse

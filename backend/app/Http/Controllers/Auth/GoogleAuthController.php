@@ -405,7 +405,9 @@ HTML;
 
             // Obtener el cliente existente o null
             $client = $user->client;
-            $existingGenderId = $client ? $client->gender_id : null;
+
+            // Si existe cliente usamos su género, si no, por defecto 1 para evitar error de integridad
+            $existingGenderId = ($client && $client->gender_id) ? $client->gender_id : 1;
             $existingBirthday = $client ? $client->birthday : null;
 
             // Preparar el birthday: priorizar el de Google si está disponible, sino mantener el existente
@@ -418,7 +420,7 @@ HTML;
             // Para el birthday: priorizar el de Google si está disponible, sino mantener el existente
             $birthdayToSave = $finalBirthday ?: $existingBirthday;
             
-            $request->merge([
+            $request->replace([
                 'gender_id' => $existingGenderId, // Mantener el género existente si existe
                 'birthday' => $birthdayToSave // Puede ser null, el método lo maneja correctamente
             ]);
