@@ -237,6 +237,9 @@ class Service extends Model
     }
 
     public function scopeWhereCategorySlug($query, $search) {
+        if (!$search) {
+            return $query;
+        }
 
         $query->addSelect('sl.order_id')
               ->join('service_lists as sl', 'sl.service_id', '=', 'services.id')
@@ -313,9 +316,9 @@ class Service extends Model
             $query->whereCategory($filters->get('category_id'));
         }
 
-        if ($filters->get('fathercategory') !== null) {
+        if ($filters->get('fathercategory') !== null && $filters->get('category') !== null && $filters->get('subcategory') !== null) {
             $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('fathercategory') . '/' . $filters->get('subcategory'));
-        } else if ($filters->get('subcategory') !== null) {
+        } else if ($filters->get('subcategory') !== null && $filters->get('category') !== null) {
             $query->whereCategorySlug($filters->get('category'). '/' . $filters->get('subcategory'));
         } else if ($filters->get('category') !== null) {
             $query->whereCategorySlug($filters->get('category'));
