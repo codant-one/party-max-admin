@@ -681,7 +681,7 @@ const removeOrder = async () => {
                 </div>
                 <div>
                   <h6 class="text-h6 me-2 mt-4 d-print-none">
-                    {{ order.address ? order.address.type.name : order.address_type.name }}
+                    {{ order.address ? order.address.type.name : order.address_type?.name }}
                   </h6>
                   <span v-if="order.address">
                     {{ order.address.address }} <br> 
