@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Str;
-use App\Models\Brand;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Carbon\Carbon;
@@ -29,7 +28,7 @@ class ServiceFactory extends Factory
 
         return [
             'user_id' => 1,
-            'brand_id' => Brand::inRandomOrder()->value('id'),
+            'brand_id' => 3,
             'state_id' => rand(3, 5),
             'name' => $name,
             'description' => $this->faker->sentence,
