@@ -741,7 +741,7 @@ const onSubmit = () => {
             <VCardText>
               <AppTextField
                 v-model="price"
-                prefix="COP"
+                prefix="$"
                 type="number"
                 label="Costo"
                 class="mb-6"
@@ -750,7 +750,7 @@ const onSubmit = () => {
 
               <AppTextField
                 v-model="price_for_sale"
-                prefix="COP"
+                prefix="$"
                 type="number"
                 label="Precio al detal"
                 class="mb-4"
@@ -769,7 +769,7 @@ const onSubmit = () => {
                 <AppTextField
                   v-model="wholesale_price"
                   v-if="wholesale === 1"
-                  prefix="COP"
+                  prefix="$"
                   type="number"
                   label="Precio por mayor"
                   class="mb-4 me-3"

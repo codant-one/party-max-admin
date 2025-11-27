@@ -402,9 +402,13 @@ class AuthController extends Controller
 
             $user = new User();
             $user->name = $request->name;
-            $user->username =  Str::slug($request->name);
+            // last_name es opcional (útil para registros via Google)
+            $user->last_name = $request->last_name ?? null;
+            $user->username =  Str::slug(trim($request->name . ' ' . ($request->last_name ?? '')));
             $user->email = strtolower($request->email);
             $user->password = $hashedPassword;
+            $user->google_id = $request->google_id ?? null;
+            $user->email_verified_at =  $request->google_id ? now() : null;
             $user->save();
 
             //Crear o Actualizar token.
@@ -430,7 +434,7 @@ class AuthController extends Controller
 
                 $billings = Billing::where('email', $request->email)->get();
 
-                foreach($billings as $billing) {
+                foreach ($billings as $billing) {
                     $address = new Address();
                     $address->client_id = $client->id;
                     $address->addresses_type_id = 1;
@@ -445,9 +449,12 @@ class AuthController extends Controller
                     $address->save();
 
                     $order = Order::find($billing->order_id);
-                    $order->client_id = $client->id;
-                    $order->address_id = $address->id;
-                    $order->save();
+
+                    if ($order) {
+                        $order->client_id = $client->id;
+                        $order->address_id = $address->id;
+                        $order->save();
+                    }
                 }
 
                 $client = Client::with(['user'])->find($client->id);
@@ -475,7 +482,7 @@ class AuthController extends Controller
                     'email' => 'emails.auth.notifications'
                 ];
                 
-                $responseMail = $this->sendMail($info, $user->id); 
+                $responseMail = $request->google_id ? 'Registro exitoso via Google. Por favor, inicie sesión para continuar.' : $this->sendMail($info, $user->id); 
             }
 
             return response()->json([
@@ -613,7 +620,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+    public function respondWithToken($token)
     {
         $permissions = getPermissionsByRole(Auth::user());
         $userData = getUserData(Auth::user()->load(['userDetail.province.country', 'userDetail.document_type', 'client.gender', 'supplier']));

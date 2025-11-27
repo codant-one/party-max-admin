@@ -452,8 +452,8 @@ const downloadCSV = async () => {
                         <th> TIPO </th>
                         <th class="pe-4" v-if="rol !== 'Proveedor'"> CLIENTE </th>
                         <th class="pe-4"> ESTADO DEL ENVÍO </th>
-                        <th class="pe-4"> ESTADO DEL PAGO </th>
-                        <th class="pe-4"> PRECIO </th>
+                        <th class="pe-4 text-center"> ESTADO DEL PAGO </th>
+                        <th class="pe-4 text-end"> PRECIO </th>
                   
                         <th scope="pe-4" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             ACCIONES
@@ -522,7 +522,7 @@ const downloadCSV = async () => {
                                 </div>
                             </div>
                         </td>
-                        <td> 
+                        <td>     
                             <li
                                 :class="`text-${resolveStatusShipping(order.shipping.id)?.color}`"
                                 class="font-weight-medium"
@@ -532,7 +532,7 @@ const downloadCSV = async () => {
                             </li>
                             <span v-else>----------------------</span>
                         </td>
-                        <td> 
+                        <td class="text-center"> 
                             <VChip
                                 label
                                 :color="resolveStatusPayment(order.payment.id)?.color"
@@ -540,7 +540,7 @@ const downloadCSV = async () => {
                             {{ order.payment.name }}
                             </VChip>
                         </td>
-                        <td>${{ formatNumber(order.sub_total) }}</td>
+                        <td class="text-end">${{ formatNumber(order.sub_total) }}</td>
                         <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'pedidos') || $can('eliminar', 'pedidos')">
                             <VBtn
                                 v-if="$can('ver', 'pedidos')"

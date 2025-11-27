@@ -404,7 +404,7 @@ class Product extends Model
     public function scopeApplyFilters($query, array $filters) {
         $filters = collect($filters);
 
-        if(Auth::check() && Auth::user()->getRoleNames()[0] === 'Proveedor') {
+        if(Auth::check() && Auth::user()->hasRole('Proveedor')) {
             $query->where('user_id', Auth::user()->id);
         } else {
             if($filters->get('supplier_id')) {
@@ -743,13 +743,13 @@ class Product extends Model
  
         $user_id = 
             ($request->user_id === '0') ? 
-            (Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1) : 
+            ((Auth::check() && Auth::user()->hasRole('Proveedor')) ? Auth::user()->id : 1) : 
             $request->user_id;
 
         $product = self::create([
             'user_id' => $user_id,
             'brand_id' => $request->brand_id,
-            'state_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? 4 : 3,
+            'state_id' => (Auth::check() && Auth::user()->hasRole('Proveedor')) ? 4 : 3,
             'name' => $request->name,
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,
@@ -774,13 +774,13 @@ class Product extends Model
  
         $user_id = 
             ($request->user_id === '0') ? 
-            (Auth::user()->getRoleNames()[0] === 'Proveedor' ? Auth::user()->id : 1) : 
+            ((Auth::check() && Auth::user()->hasRole('Proveedor')) ? Auth::user()->id : 1) : 
             $request->user_id;
 
         $product->update([
             'user_id' => $user_id,
             'brand_id' => $request->brand_id,
-            'state_id' => Auth::user()->getRoleNames()[0] === 'Proveedor' ? 4 : 3,
+            'state_id' => (Auth::check() && Auth::user()->hasRole('Proveedor')) ? 4 : 3,
             'name' => $request->name,
             'single_description' => $request->single_description === 'null' ? null : $request->single_description,
             'description' => $request->description === 'null' ? null : $request->description,

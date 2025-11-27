@@ -2,6 +2,7 @@
 
 import { themeConfig } from '@themeConfig'
 import { useQuotesStores } from '@/stores/useQuotes'
+import { formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 
 const quotesStores = useQuotesStores()
@@ -174,9 +175,9 @@ const printQuote = async(quote) => {
               <th> TELÉFONO </th>
               <th class="pe-4"> DOCUMENTO </th>
               <th class="pe-4"> E-MAIL </th>
-              <th class="pe-4"> FECHA SOLICITUD </th>
-              <th class="pe-4"> FECHA VENCIMIENTO </th>
-              <th class="pe-4"> TOTAL </th>
+              <th class="pe-4 text-center"> FECHA SOLICITUD </th>
+              <th class="pe-4 text-center"> FECHA VENCIMIENTO </th>
+              <th class="pe-4 text-end"> TOTAL </th>
               <th class="pe-4"> ACCIONES </th>
             </tr>
           </thead>
@@ -197,14 +198,14 @@ const printQuote = async(quote) => {
               <td class="text-wrap">
                 {{ quote.email }}
               </td>
-              <td class="text-wrap">
+              <td class="text-wrap text-center">
                 {{ quote.start_date }}
               </td>
-              <td class="text-wrap">
+              <td class="text-wrap text-center">
                 <span :class="new Date(quote.due_date) < new Date() ? 'text-warning' : ''">{{ quote.due_date }}</span>
               </td>
-              <td class="text-wrap">
-                {{ quote.total }}
+              <td class="text-end">
+                ${{ formatNumber(quote.total) }}
               </td>
               <!-- 👉 Acciones -->
               <td class="text-center" style="width: 5rem;" v-if="$can('ver', 'cotizaciones')">      

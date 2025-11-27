@@ -106,6 +106,20 @@ const closeTreeDialog  = function(){
                             <strong>Ventas</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de ventas</code>
                         </li>
                         <li class="n2">
+                            <strong>Facturación</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de facturación</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Facturas</strong>&emsp;/&emsp;<code>Permite la creación de facturas</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Editar Facturas</strong>&emsp;/&emsp;<code>Permite la edición de facturas</code>
+                            </li>
+                            <li class="tab n3">
+                                <strong>Eliminar Facturas</strong>&emsp;/&emsp;<code>Permite la eliminación de facturas</code>
+                            </li>
+                        </ul>
+                        <li class="n2">
                             <strong>Remisiones</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de remisiones</code>
                         </li>
                         <ul class="tab">
@@ -164,6 +178,20 @@ const closeTreeDialog  = function(){
                             </li>
                             <li class="tab n3">
                                 <strong>Eliminar Home Imágenes</strong>&emsp;/&emsp;<code>Permite la eliminación imágenes de home</code>
+                            </li>
+                        </ul>
+                        <li class="tab n3">
+                            <strong>Ver Banners</strong>&emsp;/&emsp;<code>Acceso de solo lectura al módulo de banners</code>
+                        </li>
+                        <ul class="tab">
+                            <li class="tab n3">
+                                <strong>Crear Banners</strong>&emsp;/&emsp;<code>Permite la creación de banners</code>
+                            </li>                      
+                            <li class="tab n3">
+                                <strong>Editar Banners</strong>&emsp;/&emsp;<code>Permite la edición de banners</code>
+                            </li>                            
+                            <li class="tab n3">
+                                <strong>Eliminar Banners</strong>&emsp;/&emsp;<code>Permite la eliminación de banners</code>
                             </li>
                         </ul>
                         <li class="tab n3">

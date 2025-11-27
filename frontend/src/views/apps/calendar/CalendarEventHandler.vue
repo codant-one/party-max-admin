@@ -3,6 +3,7 @@
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
 import { themeConfig } from '@themeConfig'
 import { ref } from "vue"
+import { formatNumber } from '@/@core/utils/formatters'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 
@@ -284,7 +285,7 @@ const dialogModelValueUpdate = val => {
                 </div>
                 <div>
                   <span class="font-weight-medium text-primary text-h6">Precio:</span>
-                  <span class="text-h6 text-disabled ms-2">{{ (parseFloat(price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</span>
+                  <span class="text-h6 text-disabled ms-2">{{ '$' + formatNumber(price) }}</span>
                 </div>
               </VCol>
 

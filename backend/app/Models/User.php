@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
 
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+
 use App\Traits\UserHelper;
 
 class User extends Authenticatable implements JWTSubject
@@ -17,7 +19,8 @@ class User extends Authenticatable implements JWTSubject
     use HasRoles;
     use SoftDeletes;
     use UserHelper;
-
+    use HasRelationships;
+    
     protected $guard_name = 'api';
     /**
      * The attributes that are mass assignable.

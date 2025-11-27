@@ -26,6 +26,7 @@ use App\Models\Filling;
 use App\Models\CakeType;
 use App\Models\CakeSize;
 use App\Models\ClientIp;
+use App\Models\Banner;
 
 class MiscellaneousController extends Controller
 {
@@ -54,6 +55,30 @@ class MiscellaneousController extends Controller
                 'data' => [            
                     'category' => $category,
                     'products' => $products
+                ]
+            ], 200);
+
+        } catch(\Illuminate\Database\QueryException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'database_error',
+                'exception' => $ex->getMessage()
+            ], 500);
+        }
+    }
+
+    public function banners($slug): JsonResponse
+    {
+        try {
+
+            $banners = Banner::where('slug', $slug)->first();
+            $categories = Category::where('category_type_id', $slug === 'productos' ? 1 : 2 )->whereNull('category_id')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [            
+                    'categories' => $categories,
+                    'banners' => $banners
                 ]
             ], 200);
 

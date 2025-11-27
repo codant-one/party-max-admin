@@ -8,6 +8,7 @@ import { useThemeConfig } from '@core/composable/useThemeConfig'
 import { useEventsStore } from '@/stores/useEvents'
 import { themeConfig } from '@themeConfig'
 import { avatarText } from '@core/utils/formatters'
+import { formatNumber } from '@/@core/utils/formatters'
 
 export const blankEvent = {
   title: '',
@@ -354,7 +355,7 @@ export const useCalendar = (event, isEventHandlerSidebarActive, isLeftSidebarOpe
 
         textEvent.textContent = 'Pedido #' + eventText
         textEvent.classList.add('w-50')
-        price.textContent = (parseFloat(price_)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' })
+        price.textContent = '$' + formatNumber(price_)
 
         divState.classList.add('flex-grow-1')
 

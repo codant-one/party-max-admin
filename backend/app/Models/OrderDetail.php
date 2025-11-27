@@ -56,4 +56,9 @@ class OrderDetail extends Model
     {
         return $this->hasOne(OrderFile::class, 'id', 'order_file_id');
     }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'id', 'invoice_id');
+    }
 }

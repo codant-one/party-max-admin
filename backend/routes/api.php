@@ -7,7 +7,8 @@ use App\Http\Controllers\Testing\TestingController;
 
 use App\Http\Controllers\Auth\{
     AuthController,
-    PasswordResetController
+    PasswordResetController,
+    GoogleAuthController
 };
 
 use App\Http\Controllers\Shopping\{
@@ -53,7 +54,9 @@ use App\Http\Controllers\{
     IpController,
     AIAgentController,
     QuoteController,
-    CouponController
+    CouponController,
+    InvoiceController,
+    BannerController
 };
 
 /*
@@ -120,6 +123,8 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
     Route::apiResource('ips', IpController::class);
     Route::apiResource('quotes', QuoteController::class);
     Route::apiResource('coupons', CouponController::class);
+    Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('banners', BannerController::class);
 
     /* DASHBOARD */
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -157,6 +162,11 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('delete', [CategoryController::class, 'delete']);
         Route::get('/events/all', [CategoryController::class, 'events']);
         Route::put('updateStates/{id}', [CategoryController::class, 'updateStates']);
+    });
+
+    //Banners
+    Route::group(['prefix' => 'banners'], function () {
+        Route::post('delete', [BannerController::class, 'delete']);
     });
 
     //Products
@@ -282,6 +292,19 @@ Route::group(['middleware' => ['cors','jwt'] ], function(){
         Route::post('store', [CouponController::class, 'store']);
     });
 
+    //Invoices
+    Route::group(['prefix' => 'invoices'], function () {
+        Route::post('delete', [InvoiceController::class, 'delete']);
+        Route::get('pending/all', [InvoiceController::class, 'pending']);
+        Route::get('bypay/all', [InvoiceController::class, 'bypay']);
+        Route::get('suppliers/all', [InvoiceController::class, 'suppliers']);
+        Route::get('paid/all', [InvoiceController::class, 'paid']);
+        Route::get('all/all', [InvoiceController::class, 'all']);
+        Route::get('users/{id}/{type}/{invoice_id}', [InvoiceController::class, 'invoicesByUser']);
+        Route::post('updatepayment/{id}', [InvoiceController::class, 'updatePayment']);
+        Route::get('pdf/{id}', [InvoiceController::class, 'pdf']);
+    });
+
 });
 
 //Public Endpoints
@@ -302,6 +325,7 @@ Route::group([
     'middleware' => 'throttle:200,1'
 ], function () {
     Route::get('categories/{slug}', [MiscellaneousController::class, 'categories']);
+    Route::get('banners/{slug}', [MiscellaneousController::class, 'banners']);
     Route::get('categories', [MiscellaneousController::class, 'categoriesAll']);
     Route::get('categoriesAll', [MiscellaneousController::class, 'categoriesAllInfo']);
     Route::get('products', [MiscellaneousController::class, 'products']);
@@ -363,3 +387,4 @@ Route::get('sendSurvey', [TestingController::class , 'sendSurvey'])->name('sendS
 Route::get('pdfs', [TestingController::class , 'pdfs'])->name('pdfs');
 Route::get('infoOldUser', [TestingController::class , 'infoOldUser'])->name('infoOldUser');
 Route::get('contactUs', [TestingController::class , 'contactUs'])->name('contactUs');
+Route::get('invoicesPDF', [TestingController::class , 'invoicesPDF'])->name('invoicesPDF');

@@ -158,6 +158,16 @@ class Order extends Model
                 'shipping_city' => $addressFind['city'],
                 'shipping_postal_code' => $addressFind['postal_code']
             ]);
+        } else if ($request->client_id === null) {
+            $order->update([
+                'province_id' => $request->province_id,
+                'addresses_type_id' => null,
+                'shipping_phone' => $request->phone,
+                'shipping_address' => $request->address,
+                'shipping_street' => $request->street,
+                'shipping_city' => $request->city,
+                'shipping_postal_code' => $request->postal_code
+            ]);
         }
         
         switch (intval($request->type)) {

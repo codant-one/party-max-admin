@@ -165,11 +165,19 @@ class Client extends Model
 
     public static function updateOrCreateClientProfile($request, $user) {
 
+        $birthday = null;
+        if ($request->birthday) {
+            $parsedDate = strtotime($request->birthday);
+            if ($parsedDate !== false) {
+                $birthday = date('Y-m-d', $parsedDate);
+            }
+        }
+
         $clientD = Client::updateOrCreate(
             [    'user_id' => $user->id ],
             [
-                'gender_id' => $request->gender_id,
-                'birthday' => date('Y-m-d', strtotime($request->birthday) )
+                'gender_id' => $request->gender_id ?? 1,
+                'birthday' => $birthday
             ]
         );
 

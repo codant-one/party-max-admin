@@ -5,6 +5,7 @@ import { useClipboard } from '@vueuse/core'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { excelParser } from '@/plugins/csv/excelParser'
+import { formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 import router from '@/router'
 import detailsProduct from "@/components/products/detailsProduct.vue";
@@ -485,7 +486,7 @@ const downloadCSV = async () => {
       title: toSentenceCase(cleanName),
       description: toSentenceCase(cleanDescriptionText),
       availability: 'in stock',
-      price: element.price_for_sale.toFixed(2) + ' COP',
+      price:'$' + formatNumber(element.price_for_sale),
       image_link: element.image === null ? '' : themeConfig.settings.urlStorage + element.image,
       link: themeConfig.settings.urlDomain + 'products/' + element.slug,
       brand: 'PARTYMAX',
@@ -821,9 +822,9 @@ const downloadCSV = async () => {
                   <th> #ID </th>
                   <th> PRODUCTO </th>
                   <th class="pe-4"> SKU </th>
-                  <th class="pe-4"> PRECIO </th>
+                  <th class="pe-4 text-end"> PRECIO </th>
                   <th class="pe-4"> QTY </th>
-                  <th class="pe-4"> STATUS </th>
+                  <th class="pe-4 text-center"> STATUS </th>
                   <th scope="pe-4" v-if="
                     $can('aprobar', 'productos') || 
                     $can('rechazar', 'productos') || 
@@ -855,9 +856,9 @@ const downloadCSV = async () => {
                   </div>
                 </td>
                 <td> {{ product.colors[0]?.sku ?? '--' }} </td>
-                <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                <td class="text-end"> ${{ formatNumber(product.price_for_sale) }}</td>
                 <td> {{ product.colors[0]?.stock  }} </td>
-                <td> 
+                <td class="text-center"> 
                   <VChip
                     v-bind="resolveStatus(product.state_id)"
                     density="default"

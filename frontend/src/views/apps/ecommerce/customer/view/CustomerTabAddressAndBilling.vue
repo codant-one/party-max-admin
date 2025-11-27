@@ -462,7 +462,7 @@ const changeSersettings = () => {
                         <h6 class="text-base font-weight-semibold mt-10 mb-3">
                           Saldo a pagar:
                           <span class="text-body-2">
-                            COP {{ formatNumber(total_balance) ?? '0.00' }}
+                            ${{ formatNumber(total_balance) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>
@@ -470,7 +470,7 @@ const changeSersettings = () => {
                         <h6 class="text-base font-weight-semibold">
                           Detal:
                           <span class="text-body-2">
-                            COP {{ formatNumber(props.customerData.account?.retail_sales_amount) ?? '0.00' }}
+                            ${{ formatNumber(props.customerData.account?.retail_sales_amount) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>
@@ -478,7 +478,7 @@ const changeSersettings = () => {
                         <h6 class="text-base font-weight-semibold">
                           Por Mayor:
                           <span class="text-body-2">
-                            COP {{ formatNumber(props.customerData.account?.wholesale_sales_amount) ?? '0.00' }}
+                            ${{ formatNumber(props.customerData.account?.wholesale_sales_amount) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>
@@ -486,7 +486,7 @@ const changeSersettings = () => {
                         <h6 class="text-base font-weight-semibold">
                           Por Servicios:
                           <span class="text-body-2">
-                            COP {{ formatNumber(props.customerData.account?.service_sales_amount) ?? '0.00' }}
+                            ${{ formatNumber(props.customerData.account?.service_sales_amount) ?? '0.00' }}
                           </span>
                         </h6>
                       </VListItemTitle>

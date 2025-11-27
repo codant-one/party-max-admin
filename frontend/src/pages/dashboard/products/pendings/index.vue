@@ -371,9 +371,9 @@ const downloadCSV = async () => {
                         <th> #ID </th>
                         <th> PRODUCTO </th>
                         <th class="pe-4"> SKU </th>
-                        <th class="pe-4"> PRECIO </th>
-                        <th class="pe-4"> STATUS </th>
-                        <th scope="pe-4" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
+                        <th class="pe-4 text-end"> PRECIO </th>
+                        <th class="pe-4 text-center"> STATUS </th>
+                        <th scope="pe-4" class="text-center" v-if="$can('aprobar', 'productos') || $can('rechazar', 'productos') || $can('eliminar', 'productos')">
                             ACCIONES
                         </th>
                     </tr>
@@ -400,8 +400,8 @@ const downloadCSV = async () => {
                             </div>
                         </td>
                         <td> {{ product.colors[0]?.sku ?? '--' }} </td>
-                        <td> {{ (parseFloat(product.price_for_sale)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
-                        <td> 
+                        <td class="text-end"> ${{ formatNumber(product.price_for_sale) }}</td>
+                        <td class="text-center"> 
                             <VChip
                                 v-bind="resolveStatus(product.state_id)"
                                 density="default"

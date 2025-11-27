@@ -53,9 +53,9 @@ async function fetchData() {
     supplier.value = await suppliersStores.showSupplier(Number(route.params.id))
     online.value = supplier.value.user.online
 
-    let retail_sales = parseFloat(supplier.value.retail_sales ?? 0)
-    let wholesale_sales = parseFloat(supplier.value.wholesale_sales ?? 0)
-    let services_sales = parseFloat(supplier.value.services ?? 0)
+    let retail_sales = parseFloat(supplier.value.retail_sales_invoices_not_paid ?? 0)
+    let wholesale_sales = parseFloat(supplier.value.wholesale_sales_invoices_not_paid ?? 0)
+    let services_sales = parseFloat(supplier.value.services_invoices_not_paid ?? 0)
     let total_sales = retail_sales + wholesale_sales + services_sales
     let commission_retail = retail_sales * (parseFloat(supplier.value.commission ?? 0) / 100)
     let commission_wholesale = wholesale_sales * (parseFloat(supplier.value.wholesale_commission ?? 0) / 100) 

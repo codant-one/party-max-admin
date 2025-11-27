@@ -5,6 +5,7 @@ import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
 import { useSuppliersStores } from '@/stores/useSuppliers'
 import { useServicesStores } from '@/stores/useServices'
+import { formatNumber } from '@/@core/utils/formatters'
 import Toaster from "@/components/common/Toaster.vue";
 
 const servicesStores = useServicesStores()
@@ -450,7 +451,7 @@ const closeDropdown = () => {
                             {{ item.sku ?? '--' }}
                           </template>
                         </td>
-                        <td> {{ (parseFloat(item.sales_total)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                        <td> ${{ formatNumber(item.sales_total ?? 0) }}</td>
                         <td> {{ item.count_sales }}</td>
                         <td> 
                         <VChip
@@ -522,7 +523,7 @@ const closeDropdown = () => {
               </span>
 
               <span class="text-sm text-disabled">
-                <strong>TOTAL: COP {{ totalSum }}</strong>
+                <strong>TOTAL: ${{ formatNumber(totalSum) }}</strong>
               </span>
 
               <VPagination

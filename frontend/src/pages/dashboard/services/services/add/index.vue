@@ -654,7 +654,7 @@ const onSubmit = () => {
                     md="6">
                     <VTextField
                       v-model="prices[i-1]"
-                      prefix="COP"
+                      prefix="$"
                       type="number"
                       label="Costo"
                       :rules="!isCupcake ? [] : [requiredValidator]"
@@ -813,7 +813,7 @@ const onSubmit = () => {
                 
                 <VTextField
                   v-model="price"
-                  prefix="COP"
+                  prefix="$"
                   type="number"
                   label="Costo"
                   :rules="isCupcake ? [] : [requiredValidator]"

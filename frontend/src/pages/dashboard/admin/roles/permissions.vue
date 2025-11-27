@@ -225,6 +225,33 @@ const closeModal = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Facturación
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="ver facturas"
+                            value="ver facturas"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="crear facturas"
+                            value="crear facturas"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="editar facturas"
+                            value="editar facturas"
+                        />
+                        <VCheckbox
+                            v-model="assignedPermissions"
+                            label="eliminar facturas"
+                            value="eliminar facturas"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Remisiones
                 </VCardTitle>
                 <div class="ml-5">
@@ -336,6 +363,31 @@ const closeModal = function(){
                                 v-model="assignedPermissions"
                                 label="eliminar home-imágenes"
                                 value="eliminar home-imágenes"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Banners
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="ver banners"
+                                value="ver banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="crear banners"
+                                value="crear banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="editar banners"
+                                value="editar banners"
+                            />
+                            <VCheckbox
+                                v-model="assignedPermissions"
+                                label="eliminar banners"
+                                value="eliminar banners"
                             />
                         </div>
                         <VLabel style="font-weight: bold;">

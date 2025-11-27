@@ -238,10 +238,10 @@ const removeOrder = async () => {
               <v-table class="text-no-wrap order-preview-table">
                 <thead>
                   <tr class="text-no-wrap">
-                    <th class="font-weight-semibold"> PRODUCTO</th>
-                    <th class="font-weight-semibold"> PRECIO </th>
-                    <th class="font-weight-semibold"> CANTIDAD </th>
-                    <th class="font-weight-semibold"> TOTAL </th>   
+                    <th class="font-weight-semibold"> PRODUCTO</th>                    
+                    <th class="font-weight-semibold text-center"> CANTIDAD </th>
+                    <th class="font-weight-semibold text-end"> PRECIO </th>
+                    <th class="font-weight-semibold text-end"> TOTAL </th>   
                   </tr>
                 </thead>
                 <tbody>
@@ -279,10 +279,10 @@ const removeOrder = async () => {
                               </span>
                             </div>
                           </div>
-                        </td>
-                        <td><span>${{ formatNumber(item.price) }}</span></td>
+                        </td>                        
                         <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ item.quantity }}</span></td>
-                        <td><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
+                        <td class="text-end"><span>${{ formatNumber(item.price) }}</span></td>
+                        <td class="text-end"><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
                       </tr>
                     </template>
                     <template v-else>
@@ -348,9 +348,9 @@ const removeOrder = async () => {
                             </div>
                           </div>
                         </td>
-                        <td><span>${{ formatNumber(item.price) }}</span></td>
+                        <td class="text-end"><span>${{ formatNumber(item.price) }}</span></td>
                         <td class="text-center justify-content-center"><span class="text-high-emphasis font-weight-medium">{{ item.quantity }}</span></td>
-                        <td><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
+                        <td class="text-end"><span class="text-h6">${{ formatNumber(item.total) }}</span></td>
                       </tr>
                     </template>
                     
@@ -368,25 +368,25 @@ const removeOrder = async () => {
                         <td width="200px">
                           Subtotal:
                         </td>
-                        <td class="ps-1">
+                        <td class="ps-1 text-end">
                           $ {{ formatNumber(order.sub_total) }}
                         </td>
                       </tr>
                       <tr v-if="coupon_id">
                         <td class="text-error">Descuento: </td>
-                        <td class="text-error">
+                        <td class="text-error text-end">
                           -$ {{ formatNumber(discount) }}
                         </td>
                       </tr>
                       <tr>
                         <td>Envío Total: </td>
-                        <td class="ps-1">
+                        <td class="ps-1 text-end">
                           $ {{ formatNumber(order.shipping_total) }}
                         </td>
                       </tr>
                       <tr>
                         <td>IVA: </td>
-                        <td class="ps-1">
+                        <td class="ps-1 text-end">
                           $ {{ formatNumber(order.tax) }}
                         </td>
                       </tr>
@@ -394,7 +394,7 @@ const removeOrder = async () => {
                         <td class="text-high-emphasis font-weight-medium">
                           Total:
                         </td>
-                        <td class="font-weight-medium ps-1">
+                        <td class="font-weight-medium ps-1 text-end">
                           $ {{ formatNumber(order.total) }}
                         </td>
                       </tr>
@@ -663,7 +663,7 @@ const removeOrder = async () => {
                   <span>Tipo de documento: {{ order.billing?.document_type?.name }} </span>
                   <span>Documento: {{ order.billing?.document }} </span>
                   <span>Email: {{ order.client ? order.client.user.email : order.billing?.email }} </span>
-                  <span>Teléfono: {{ order.client ? order.client.user.user_detail.phone : order.billing?.phone}}</span>
+                  <span>Teléfono: {{ order.client?.user?.user_detail?.phone || order.billing?.phone }}</span>
                 </div>
               </VCardText>
             </VCard>
@@ -681,7 +681,7 @@ const removeOrder = async () => {
                 </div>
                 <div>
                   <h6 class="text-h6 me-2 mt-4 d-print-none">
-                    {{ order.address ? order.address.type.name : order.address_type.name }}
+                    {{ order.address ? order.address.type.name : order.address_type?.name }}
                   </h6>
                   <span v-if="order.address">
                     {{ order.address.address }} <br> 

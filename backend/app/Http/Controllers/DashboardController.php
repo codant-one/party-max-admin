@@ -73,7 +73,7 @@ class DashboardController extends Controller
 
                     $product->stock_percentage = $stock_percentage;
                     $product->lowest_color_stock = $stock;
-                    $product->sku = $color->sku;
+                    $product->sku = $color->sku ?? null;
 
                     return $product;
                 })
@@ -118,6 +118,22 @@ class DashboardController extends Controller
                         ->services()
                         ->retailSales()
                         ->wholesaleSales()
+                        ->salesNotInvoice()
+                        ->servicesNotInvoice()
+                        ->retailSalesNotInvoice()
+                        ->wholesaleSalesNotInvoice()
+                        ->salesInvoice()
+                        ->retailSalesInvoice()
+                        ->wholesaleSalesInvoice()
+                        ->servicesInvoice()
+                        ->salesInvoicePaid()
+                        ->retailSalesInvoicePaid()
+                        ->wholesaleSalesInvoicePaid()
+                        ->servicesInvoicePaid()
+                        ->salesInvoiceNotPaid()
+                        ->retailSalesInvoiceNotPaid()
+                        ->wholesaleSalesInvoiceNotPaid()
+                        ->servicesInvoiceNotPaid()
                         ->where('user_id', Auth::user()->id)
                         ->first();
         

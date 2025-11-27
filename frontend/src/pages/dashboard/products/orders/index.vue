@@ -3,6 +3,7 @@
 import { themeConfig } from '@themeConfig'
 import { useProductsStores } from '@/stores/useProducts'
 import { useCategoriesStores } from '@/stores/useCategories'
+import { formatNumber } from '@/@core/utils/formatters'
 import draggable from 'vuedraggable'
 
 const productsStores = useProductsStores()
@@ -226,7 +227,7 @@ const onEnd = async (e) => {
               <th> PRODUCTO </th>
               <th class="pe-4"> SKU </th>
               <th class="pe-4"> CATEGORÍAS </th>
-              <th class="pe-4"> PRECIO </th>
+              <th class="pe-4 text-end"> PRECIO </th>
               <th class="pe-4 text-end"> STATUS </th>
             </tr>
           </thead>
@@ -274,7 +275,7 @@ const onEnd = async (e) => {
                       </VChip>
                   </span>
                 </td>  
-                <td> {{ (parseFloat(element.price)).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "currency", currency: 'COP' }) }}</td>
+                <td class="text-end"> ${{ formatNumber(element.price) }}</td>
                 <td class="text-end"> 
                   <VChip
                     v-bind="resolveStatus(element.state_id)"

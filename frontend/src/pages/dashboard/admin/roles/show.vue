@@ -303,6 +303,37 @@ const closeRoleDetailDialog = function(){
                     </div>
                 </div>
                 <VCardTitle>
+                    Facturación
+                </VCardTitle>
+                <div class="ml-5">
+                    <div class="demo-space-x ml-5">
+                        <VCheckbox
+                            v-model="permissions"
+                            label="ver facturas"
+                            value="ver facturas"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="crear facturas"
+                            value="crear facturas"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="editar facturas"
+                            value="editar facturas"
+                            :readonly="readonly"
+                        />
+                        <VCheckbox
+                            v-model="permissions"
+                            label="eliminar facturas"
+                            value="eliminar facturas"
+                            :readonly="readonly"
+                        />
+                    </div>
+                </div>
+                <VCardTitle>
                     Remisiones
                 </VCardTitle>
                 <div class="ml-5">
@@ -429,6 +460,35 @@ const closeRoleDetailDialog = function(){
                                 v-model="permissions"
                                 label="eliminar home-imágenes"
                                 value="eliminar home-imágenes"
+                                :readonly="readonly"
+                            />
+                        </div>
+                        <VLabel style="font-weight: bold;">
+                            Banners
+                        </VLabel>
+                        <div class="demo-space-x ml-5">
+                            <VCheckbox
+                                v-model="permissions"
+                                label="ver banners"
+                                value="ver banners"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="crear banners"
+                                value="crear banners"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="editar banners"
+                                value="editar banners"
+                                :readonly="readonly"
+                            />
+                            <VCheckbox
+                                v-model="permissions"
+                                label="eliminar banners"
+                                value="eliminar banners"
                                 :readonly="readonly"
                             />
                         </div>

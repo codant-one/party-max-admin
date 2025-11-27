@@ -77,8 +77,12 @@ export const alphaValidator = value => {
 export const urlValidator = value => {
   if (isEmpty(value))
     return true
-  const re = /^(http[s]?:\/\/){0,1}(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}/
-  
+  // Soporta: http/https opcional, localhost, IP v4, dominios con TLD >=2, puerto y path
+  const re = /^(?:(?:https?):\/\/)?(?:localhost|(?:\d{1,3}\.){3}\d{1,3}|(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,63})(?::\d+)?(?:\/[^\s]*)?$/
+
+  if (Array.isArray(value))
+    return value.every(v => re.test(String(v))) || 'URL no es válida'
+
   return re.test(String(value)) || 'URL no es válida'
 }
 
